@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro - Médico</title>
+  <link rel="stylesheet" href="../public/css/register.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Preencha as Informações</h2>
+    <form id="registerForm">
+      <div class="form-section">
+        <h3>Informações Pessoais</h3>
+        <input type="text" name="nome" placeholder="Nome completo" required />
+        <input type="text" name="cpf" placeholder="CPF" required />
+        <input type="tel" name="telefonePessoal" placeholder="Telefone pessoal" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="senha" placeholder="Senha" required />
+      </div>
+      <div class="form-section">
+        <h3>Informações Profissionais</h3>
+        <input type="text" name="crm" placeholder="CRM" required />
+        <input type="text" name="areaAtuacao" placeholder="Área de atuação" required />
+        <select name="genero" required>
+          <option value="" disabled selected>Gênero</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Feminino">Feminino</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <input type="text" name="enderecoConsultorio" placeholder="Endereço do consultório" required />
+        <input type="tel" name="telefoneConsultorio" placeholder="Telefone consultório" required />
+      </div>
+      <button type="submit">Criar Conta</button>
+    </form>
+    <footer>Pulse<span>Flow</span></footer>
+  </div>
+
+  <script src="../public/js/register.js"></script>
+</body>
+</html>
