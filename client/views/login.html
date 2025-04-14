@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Médico</title>
+  <link rel="stylesheet" href="../public/css/register.css" />
+</head>
+<body>
+  <!-- Menu de navegação -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">PulseFlow</a>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="/client/views/register.html">Registrar</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2>Bem-vindo de volta</h2>
+    <form id="loginForm">
+      <div class="form-wrapper">
+        <div class="form-section">
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="password" name="senha" placeholder="Senha" required />
+        </div>
+      </div>
+
+      <div class="button-container">
+        <button type="submit">Entrar</button>
+      </div>
+    </form>
+
+    <!-- Mensagem para quem ainda não tem conta -->
+    <div class="login-prompt">
+      <p>Não tem uma conta? <a href="/client/views/register.html">Crie uma agora</a></p>
+    </div>
+
+    <footer>Pulse<span>Flow</span></footer>
+  </div>
+
+  <script src="../public/js/login.js"></script>
+</body>
+</html>

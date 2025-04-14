@@ -7,32 +7,55 @@
   <link rel="stylesheet" href="../public/css/register.css" />
 </head>
 <body>
+  <!-- Menu de navegação -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">PulseFlow</a>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="/client/views/login.html">Login</a></li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="container">
     <h2>Preencha as Informações</h2>
     <form id="registerForm">
-      <div class="form-section">
-        <h3>Informações Pessoais</h3>
-        <input type="text" name="nome" placeholder="Nome completo" required />
-        <input type="text" name="cpf" placeholder="CPF" required />
-        <input type="tel" name="telefonePessoal" placeholder="Telefone pessoal" required />
-        <input type="email" name="email" placeholder="Email" required />
-        <input type="password" name="senha" placeholder="Senha" required />
+      <div class="form-wrapper">
+        <div class="form-section">
+          <h3>Informações Pessoais</h3>
+          <input type="text" name="nome" placeholder="Nome completo" required />
+          <input type="text" name="cpf" placeholder="CPF" required />
+          <input type="tel" name="telefonePessoal" placeholder="Telefone pessoal" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="password" name="senha" placeholder="Senha" required />
+        </div>
+
+        <div class="form-section">
+          <h3>Informações Profissionais</h3>
+          <input type="text" name="crm" placeholder="CRM" required />
+          <input type="text" name="areaAtuacao" placeholder="Área de atuação" required />
+          <select name="genero" required>
+            <option value="" disabled selected>Gênero</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Outro">Outro</option>
+          </select>
+          <input type="text" name="enderecoConsultorio" placeholder="Endereço do consultório" required />
+          <input type="tel" name="telefoneConsultorio" placeholder="Telefone consultório" required />
+        </div>
       </div>
-      <div class="form-section">
-        <h3>Informações Profissionais</h3>
-        <input type="text" name="crm" placeholder="CRM" required />
-        <input type="text" name="areaAtuacao" placeholder="Área de atuação" required />
-        <select name="genero" required>
-          <option value="" disabled selected>Gênero</option>
-          <option value="Masculino">Masculino</option>
-          <option value="Feminino">Feminino</option>
-          <option value="Outro">Outro</option>
-        </select>
-        <input type="text" name="enderecoConsultorio" placeholder="Endereço do consultório" required />
-        <input type="tel" name="telefoneConsultorio" placeholder="Telefone consultório" required />
+
+      <div class="button-container">
+        <button type="submit">Criar Conta</button>
       </div>
-      <button type="submit">Criar Conta</button>
     </form>
+
+    <!-- Mensagem para já ter uma conta -->
+    <div class="login-prompt">
+      <p>Já tem uma conta? <a href="/client/views/login.html">Faça login</a></p>
+    </div>
+
     <footer>Pulse<span>Flow</span></footer>
   </div>
 

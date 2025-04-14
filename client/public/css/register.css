@@ -1,71 +1,157 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background: #f2f2f2;
+    background: #f7f8fc;
   }
   
+  /* Menu de navegação */
+  .navbar {
+    background-color: #003366;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+  }
+  
+  .nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+  }
+  
+  .nav-logo {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-links a:hover {
+    color: #00c3b7;
+  }
+  
+  /* Estilos para o container do formulário */
   .container {
     max-width: 900px;
-    margin: 40px auto;
+    margin: 100px auto 40px;
     padding: 40px;
     background: #fff;
     text-align: center;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
   
   h2 {
-    color: #002b45;
+    color: #003366;
     margin-bottom: 30px;
+    font-size: 28px;
   }
   
   form {
     display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .form-wrapper {
+    display: flex;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 20px;
+    gap: 40px;
   }
   
   .form-section {
     flex: 1;
-    min-width: 350px;
+    min-width: 280px;
+    text-align: left;
   }
   
   .form-section h3 {
-    font-size: 16px;
-    color: #002b45;
-    margin-bottom: 10px;
+    font-size: 18px;
+    color: #003366;
+    margin-bottom: 15px;
   }
   
   input, select {
     width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    background: #f0f0f0;
-    border: none;
+    padding: 14px;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    font-size: 14px;
-    color: #333;
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 15px; /* Mais espaçamento entre os campos */
+    transition: all 0.3s ease;
+  }
+  
+  input:focus, select:focus {
+    border-color: #00c3b7;
+    outline: none;
   }
   
   button {
-    margin-top: 20px;
-    padding: 12px 30px;
-    background: #002b45;
+    padding: 12px 28px;
+    background: #003366;
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+    transition: background-color 0.3s ease;
+    width: 50%;
+    max-width: 200px; /* Largura limitada para não ficar muito grande */
+    margin-top: 20px;
+  }
+  
+  button:hover {
+    background: #00c3b7;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .login-prompt {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #555;
+  }
+  
+  .login-prompt a {
+    color: #003366;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .login-prompt a:hover {
+    color: #00c3b7;
   }
   
   footer {
-    margin-top: 30px;
+    margin-top: 40px;
     font-size: 18px;
-    color: #002b45;
+    color: #003366;
   }
   
   footer span {
     color: #00c3b7;
+    font-weight: bold;
   }
   

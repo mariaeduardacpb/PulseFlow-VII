@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verificar Código 2FA</title>
+  <link rel="stylesheet" href="../public/css/verify-2fa.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Verificação em Duas Etapas</h2>
+    <form id="verifyForm">
+      <label for="otp">Código recebido:</label>
+      <input type="text" id="otp" name="otp" required maxlength="6" />
+      <button type="submit">Verificar</button>
+    </form>
+  </div>
+  <script src="../public/js/verify-2fa.js"></script>
+</body>
+</html>
