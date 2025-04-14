@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f3f3f3;
+  color: #333;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 240px;
+  background-color: #00324A;
+  color: #fff;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile h3 {
+  font-size: 16px;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.specialties details {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #1c4a7d;
+  padding-bottom: 8px;
+}
+
+.specialties summary {
+  list-style: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #f0f0f0;
+}
+
+/* Remove seta padrão do summary */
+.specialties summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Chevron personalizado */
+.specialties .chevron {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+  margin-left: 10px;
+}
+
+/* Gira a seta quando aberto */
+.specialties details[open] .chevron {
+  transform: rotate(135deg);
+}
+
+.specialties ul {
+  margin-top: 10px;
+  margin-left: 10px;
+  list-style: none;
+  padding-left: 0;
+}
+
+.specialties li {
+  margin: 8px 0;
+}
+
+.specialties a {
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.specialties a:hover {
+  background-color: rgba(0, 195, 183, 0.15);
+}
+
+.change-patient {
+  margin-top: auto;
+}
+
+.change-patient a {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.content {
+  margin-left: 240px;
+  width: calc(100% - 240px);
+  padding: 30px 40px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  font-size: 24px;
+  color: #1f1f1f;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 24px;
+  color: #1f1f1f;
+}
+
+.logo span {
+  color: #3fd3c4;
+}
+
+.chart-section {
+  margin-top: 30px;
+}
+
+.chart {
+  background-color: white;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+canvas {
+  width: 100%;
+  height: 300px;
+}
+.month-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .arrow-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #00324A;
+    transition: color 0.2s ease;
+  }
+  
+  .arrow-btn:hover {
+    color: #00c3b7;
+  }
+  
