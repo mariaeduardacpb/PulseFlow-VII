@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 📂 PulseFlow
 ├── 📁 server                            # Backend (Node.js + Express)
 │   ├── 📁 config                        # Configurações globais
@@ -24,3 +25,6 @@
 ├── 📄 .gitignore
 ├── 📄 package.json
 └── 📄 README.md                         # Instruções gerais do projeto
+=======
+# PulseFlow-VII
+>>>>>>> f137e0deba29597ea40f275c54a25642f6f4b235
