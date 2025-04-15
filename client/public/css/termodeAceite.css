@@ -1,0 +1,71 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background-color: #00324A;
+  }
+  
+  .full-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  
+  .card {
+    background-color: #00324A;
+    color: white;
+    padding: 40px;
+    max-width: 900px; /* aumentei de 480px para 900px */
+    width: 100%;
+    border-radius: 8px;
+  }
+  
+  .logo {
+    display: block;
+    margin: 0 auto 20px;
+    max-width: 160px;
+  }
+  
+  h2 {
+    font-size: 18px; /* Aumentado de 14px para 18px */
+    text-align: center;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  
+  p {
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 16px;
+    text-align: justify; /* <-- Alinha os dois lados do texto */
+  }
+  
+  
+  .checkbox {
+    display: flex;
+    align-items: start;
+    font-size: 15px;
+    margin: 24px 0 16px;
+    gap: 10px;
+  }
+  
+  .btn {
+    display: block;
+    margin: 40px auto 0; /* Aumentei a margem superior para 40px */
+    background-color: #E0E0E0;
+    color: #00324A;
+    padding: 12px 24px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .btn:hover {
+    background-color: #cfcfcf;
+  }
+  
