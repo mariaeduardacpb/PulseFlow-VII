@@ -1,3 +1,4 @@
+/* Reset e fontes */
 * {
   margin: 0;
   padding: 0;
@@ -8,6 +9,7 @@
 body {
   background-color: #f4f6f8;
   color: #333;
+  animation: fadeInBody 1s ease-in;
 }
 
 /* Header */
@@ -18,10 +20,15 @@ header {
   padding: 1.5rem 3rem;
   background-color: white;
   flex-wrap: wrap;
+  animation: slideDown 0.8s ease-out;
 }
 
 .logo img {
   height: 50px;
+  transition: transform 0.3s ease;
+}
+.logo img:hover {
+  transform: scale(1.05);
 }
 
 nav {
@@ -67,6 +74,7 @@ nav a:hover {
 .hero {
   max-width: 1512px;
   margin: 0 auto;
+  animation: fadeIn 1s ease;
 }
 
 .hero img {
@@ -74,6 +82,7 @@ nav a:hover {
   height: 760px;
   object-fit: cover;
   display: block;
+  animation: zoomIn 1.5s ease;
 }
 
 /* CTA */
@@ -84,6 +93,7 @@ nav a:hover {
   padding: 4rem 2rem;
   font-size: 2rem;
   font-weight: 700;
+  animation: fadeInUp 1.2s ease;
 }
 
 /* Features */
@@ -100,8 +110,9 @@ nav a:hover {
   text-align: center;
   color: white;
   max-width: 180px;
-  transition: all 0.3s ease;
   height: 500px;
+  transition: all 0.3s ease;
+  animation: fadeInFeature 0.6s ease forwards;
 }
 
 .feature-item:hover {
@@ -136,6 +147,7 @@ nav a:hover {
   font-size: 1rem;
   line-height: 1.6;
   text-align: left;
+  animation: fadeInUp 1s ease;
 }
 
 .section-title {
@@ -149,6 +161,7 @@ nav a:hover {
 .card-how-works {
   background-color: #EBEAEA;
   padding: 4rem 2rem;
+  animation: fadeIn 1.2s ease;
 }
 
 .how-it-works {
@@ -177,6 +190,7 @@ footer {
   background-color: #052b3b;
   color: white;
   padding: 3rem 2rem;
+  animation: fadeIn 1.5s ease;
 }
 
 .footer-container {
@@ -191,6 +205,10 @@ footer {
 .footer-left img {
   width: 150px;
   margin-top: 25px;
+  transition: transform 0.3s ease;
+}
+.footer-left img:hover {
+  transform: scale(1.1);
 }
 
 .footer-center {
@@ -224,7 +242,6 @@ footer {
 @media (max-width: 1024px) {
   .hero img {
     height: 500px;
-    object-fit: cover;
   }
 
   .cta {
@@ -271,6 +288,10 @@ footer {
   .footer-right {
     text-align: center;
   }
+
+  .footer-center {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -291,4 +312,39 @@ footer {
   .footer-center .social-icons img {
     width: 28px;
   }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInBody {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeInFeature {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+html {
+  scroll-behavior: smooth;
 }
