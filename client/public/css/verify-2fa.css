@@ -1,45 +1,124 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-    display: flex;
-    height: 100vh;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-  }
-  
-  .container {
-    background-color: #fff;
-    padding: 30px 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    width: 300px;
-    text-align: center;
-  }
-  
-  h2 {
-    margin-bottom: 20px;
-  }
-  
-  input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 16px;
-  }
-  
-  button {
-    padding: 10px;
-    width: 100%;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  color: #333;
+}
+
+.navbar {
+  background-color: #003a53;
+  padding: 12px 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 24px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links li a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.container {
+  max-width: 420px;
+  margin: 80px auto;
+  background: white;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #003a53;
+}
+
+.form-wrapper {
+  margin-bottom: 25px;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+input[type="text"],
+select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  transition: border 0.3s;
+}
+
+input[type="text"]:focus,
+select:focus {
+  border-color: #00bcd4;
+  outline: none;
+}
+
+button {
+  padding: 12px;
+  background-color: #003a53;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0097a7;
+}
+
+#infoText {
+  font-size: 14px;
+  color: #4caf50;
+  text-align: center;
+}
+
+#resendLink {
+  font-size: 14px;
+  color: #00796b;
+  text-decoration: underline;
+  text-align: center;
+  display: block;
+}
+
+.button-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+footer {
+  text-align: center;
+  margin-top: 30px;
+  color: #888;
+  font-size: 14px;
+}
+
+footer span {
+  color: #00bcd4;
+  font-weight: bold;
+}
