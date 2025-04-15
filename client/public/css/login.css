@@ -1,0 +1,134 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    height: 100vh;
+    background-color: #f5f5f5;
+  }
+  
+  .container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+  }
+  
+  /* Lado esquerdo */
+  .container .left {
+    background-color: #00394f;
+    color: white;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .container .left h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  
+  .container .left p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 400px;
+  }
+  
+  .container .left button {
+    background-color: #fff;
+    color: #00394f;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .container .left .logo {
+    margin-top: auto;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .container .left .logo span {
+    font-weight: 400;
+  }
+  
+  /* Lado direito */
+  .container .right {
+    background-color: #ffffff;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+  }
+  
+  .container .right h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #00394f;
+    margin-bottom: 10px;
+  }
+  
+  .container .right p {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 30px;
+  }
+  
+  form {
+    width: 100%;
+    max-width: 350px;
+  }
+  
+  input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    font-size: 14px;
+  }
+  
+  button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #00394f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .login-prompt {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #00394f;
+  }
+  
+  .login-prompt a {
+    color: #00394f;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  footer {
+    margin-top: 40px;
+    color: #00394f;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  footer span {
+    font-weight: 400;
+  }
+  
