@@ -1,0 +1,216 @@
+* {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    background-color: #f2f2f2;
+  }
+  
+  .container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .sidebar {
+    width: 240px;
+    background-color: #002A42;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+  }
+  
+  .profile h3 {
+    font-size: 16px;
+    margin-bottom: 30px;
+    font-weight: 600;
+  }
+  
+  .specialties details {
+    margin-bottom: 12px;
+    border-bottom: 1px solid #1c4a7d;
+    padding-bottom: 8px;
+  }
+  
+  .specialties summary {
+    list-style: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #f0f0f0;
+  }
+  
+  .specialties summary::-webkit-details-marker {
+    display: none;
+  }
+  
+  .specialties .chevron {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+    margin-left: 10px;
+  }
+  
+  .specialties details[open] .chevron {
+    transform: rotate(135deg);
+  }
+  
+  .specialties ul {
+    margin-top: 10px;
+    margin-left: 10px;
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .specialties li {
+    margin: 8px 0;
+  }
+  
+  .specialties a {
+    color: white;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+  }
+  
+  .specialties a:hover {
+    background-color: rgba(0, 195, 183, 0.15);
+  }
+  
+  .change-patient {
+    margin-top: auto;
+  }
+  
+  .change-patient a {
+    color: #FFF;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  
+  /* ---- CONTEÚDO ---- */
+  .content {
+    margin-left: 240px;
+    padding: 40px;
+    width: calc(100% - 240px);
+    max-width: 1280px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header h1 {
+    font-size: 24px;
+    color: #002A42;
+  }
+  
+  .logo {
+    font-weight: bold;
+    font-size: 22px;
+    color: #002A42;
+  }
+  
+  .logo span {
+    color: #50C4C4;
+  }
+  
+  /* FILTROS */
+  .filters {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .filters select,
+  .filters input {
+    height: 48px;
+    padding: 0 15px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .campo-personalizado {
+    flex: 1;
+    min-width: 250px;
+    height: 52px;
+  }
+  
+  .filters button {
+    background-color: #002A42;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    height: 48px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  /* PRONTUÁRIOS */
+  .record-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .record-item {
+    background-color: white;
+    border: 1px solid #002A42;
+    padding: 15px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    width: 100%;
+  }
+  
+  .record-item span {
+    display: block;
+    color: #002A42;
+  }
+  
+  .record-item a {
+    color: #002A42;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .change-patient a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #FFF;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  
+  
