@@ -69,7 +69,7 @@
   }
   
   .specialties details[open] .chevron {
-    transform: rotate(135deg);
+    transform: rotate(225deg);
   }
   
   .specialties ul {
@@ -213,4 +213,6 @@
     text-decoration: none;
   }
   
-  
+  .bold {
+    font-weight: 1000;
+  }
