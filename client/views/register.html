@@ -2,47 +2,87 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registro - Médico</title>
   <link rel="stylesheet" href="../public/css/register.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
-  <!-- Menu de navegação -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="#" class="nav-logo">PulseFlow</a>
-      <ul class="nav-links">
-        <li><a href="#">Home</a></li>
-        <li><a href="/client/views/login.html">Login</a></li>
-      </ul>
-    </div>
-  </nav>
-
   <div class="container">
     <h2>Preencha as Informações</h2>
     <form id="registerForm">
       <div class="form-wrapper">
         <div class="form-section">
           <h3>Informações Pessoais</h3>
-          <input type="text" name="nome" placeholder="Nome completo" required />
-          <input type="text" name="cpf" placeholder="CPF" required />
-          <input type="tel" name="telefonePessoal" placeholder="Telefone pessoal" required />
-          <input type="email" name="email" placeholder="Email" required />
-          <input type="password" name="senha" placeholder="Senha" required />
+
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" name="nome" id="nome" placeholder="Nome completo" required />
+          </div>
+          <span class="error-message" id="nomeError"></span>
+
+          <div class="input-group">
+            <i class="fas fa-id-card"></i>
+            <input type="text" name="cpf" id="cpf" placeholder="CPF" required />
+          </div>
+          <span class="error-message" id="cpfError"></span>
+
+          <div class="input-group">
+            <i class="fas fa-phone"></i>
+            <input type="tel" name="telefonePessoal" id="telefonePessoal" placeholder="Telefone pessoal" required />
+          </div>
+          <span class="error-message" id="telefonePessoalError"></span>
+
+          <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" name="email" id="email" placeholder="Email" required />
+          </div>
+          <span class="error-message" id="emailError"></span>
+
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="senha" id="senha" placeholder="Senha" required />
+          </div>
+          <span class="error-message" id="senhaError"></span>
         </div>
 
         <div class="form-section">
           <h3>Informações Profissionais</h3>
-          <input type="text" name="crm" placeholder="CRM" required />
-          <input type="text" name="areaAtuacao" placeholder="Área de atuação" required />
-          <select name="genero" required>
-            <option value="" disabled selected>Gênero</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Feminino">Feminino</option>
-            <option value="Outro">Outro</option>
-          </select>
-          <input type="text" name="enderecoConsultorio" placeholder="Endereço do consultório" required />
-          <input type="tel" name="telefoneConsultorio" placeholder="Telefone consultório" required />
+
+          <div class="input-group">
+            <i class="fas fa-id-badge"></i>
+            <input type="text" name="crm" id="crm" placeholder="CRM" required />
+          </div>
+          <span class="error-message" id="crmError"></span>
+
+          <div class="input-group">
+            <i class="fas fa-stethoscope"></i>
+            <input type="text" name="areaAtuacao" id="areaAtuacao" placeholder="Área de atuação" required />
+          </div>
+          <span class="error-message" id="areaAtuacaoError"></span>
+
+          <div class="input-group">
+            <i class="fas fa-venus-mars"></i>
+            <select name="genero" id="genero" required>
+              <option value="" disabled selected>Gênero</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Feminino">Feminino</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+          <span class="error-message" id="generoError"></span>
+
+          <div class="input-group">
+            <i class="fas fa-map-marker-alt"></i>
+            <input type="text" name="enderecoConsultorio" id="enderecoConsultorio" placeholder="Endereço do consultório" required />
+          </div>
+          <span class="error-message" id="enderecoConsultorioError"></span>
+
+          <div class="input-group">
+            <i class="fas fa-phone-square-alt"></i>
+            <input type="tel" name="telefoneConsultorio" id="telefoneConsultorio" placeholder="Telefone consultório" required />
+          </div>
+          <span class="error-message" id="telefoneConsultorioError"></span>
         </div>
       </div>
 
@@ -51,7 +91,6 @@
       </div>
     </form>
 
-    <!-- Mensagem para já ter uma conta -->
     <div class="login-prompt">
       <p>Já tem uma conta? <a href="/client/views/login.html">Faça login</a></p>
     </div>

@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const errorSpan = document.getElementById(`${field.id}Error`);
     if (errorSpan) {
       errorSpan.textContent = message;
-      errorSpan.style.color = "red";
     }
   };
 
@@ -48,7 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
   maskPhone(form.telefonePessoal);
   maskPhone(form.telefoneConsultorio);
   maskCRM(form.crm);
-  // ❌ NÃO aplicar máscara em enderecoConsultorio, pois é texto com número
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -72,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const field = form[fieldName];
       const value = field.value.trim();
 
-      // Validações específicas
       if (!value) {
         showError(field, "Este campo é obrigatório");
         isValid = false;
