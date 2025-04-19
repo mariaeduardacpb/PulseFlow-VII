@@ -3,7 +3,67 @@ import bcrypt from 'bcrypt';
 import otpService from '../services/otpService.js';
 import tokenService from '../services/tokenService.js';
 import jwt from 'jsonwebtoken';
-import { sendVerificationCode } from '../services/emailService.js';
+import nodemailer from 'nodemailer';
+
+
+export const confirmResetPassword = async (req, res) => {
+  const { senha, token } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(400).json({ message: 'Usuário não encontrado.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(senha, 10);
+    user.senha = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Senha redefinida com sucesso.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao redefinir a senha.' });
+    console.error(err);
+  }
+};
+
+
+export const resetPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(400).json({ message: 'Usuário não encontrado.' });
+  }
+
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+  const resetLink = `http://localhost:5000/client/views/reset-password-form.html?token=${token}`;
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+  
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Redefinição de Senha',
+    text: `Clique no link para redefinir sua senha: ${resetLink}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Link de redefinição de senha enviado.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao enviar e-mail de redefinição de senha.' });
+    console.error(err);
+  }
+};
 
 export const register = async (req, res) => {
   try {
@@ -44,58 +104,5 @@ export const login = async (req, res) => {
     res.status(200).json({ message: 'Login realizado com sucesso!', token });
   } catch (err) {
     res.status(500).json({ message: 'Erro ao fazer login.', error: err.message });
-  }
-};
-
-export const sendCode = async (req, res) => {
-  try {
-    const { method } = req.body;
-    const token = req.headers.authorization?.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (!user) return res.status(404).json({ message: 'Usuário não encontrado.' });
-
-    const otp = otpService.generateOTP();
-    user.otp = otp.code;
-    user.otpExpires = otp.expires;
-    await user.save();
-
-    if (method === 'email') {
-      await sendVerificationCode(user.email, otp.code);
-    }
-
-    res.status(200).json({ message: `Código enviado via ${method}.` });
-  } catch (err) {
-    res.status(500).json({ message: 'Erro ao enviar código.', error: err.message });
-  }
-};
-
-export const verifyOTP = async (req, res) => {
-  try {
-    const { method, code } = req.body;
-    const token = req.headers.authorization?.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (!user || !user.otp || !user.otpExpires) {
-      return res.status(400).json({ message: 'Código não encontrado.' });
-    }
-
-    if (user.otp !== code) {
-      return res.status(400).json({ message: 'Código incorreto.' });
-    }
-
-    if (user.otpExpires < new Date()) {
-      return res.status(400).json({ message: 'Código expirado.' });
-    }
-
-    user.otp = null;
-    user.otpExpires = null;
-    await user.save();
-
-    res.status(200).json({ message: 'Verificação bem-sucedida!' });
-  } catch (err) {
-    res.status(500).json({ message: 'Erro ao verificar código.', error: err.message });
   }
 };
