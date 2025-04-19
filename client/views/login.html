@@ -3,42 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - Médico</title>
-  <link rel="stylesheet" href="../public/css/register.css" />
+  <title>Login - PulseFlow</title>
+  <link rel="stylesheet" href="../public/css/login.css" />
 </head>
 <body>
-  <!-- Menu de navegação -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="#" class="nav-logo">PulseFlow</a>
-      <ul class="nav-links">
-        <li><a href="#">Home</a></li>
-        <li><a href="/client/views/register.html">Registrar</a></li>
-      </ul>
-    </div>
-  </nav>
-
   <div class="container">
-    <h2>Bem-vindo de volta</h2>
-    <form id="loginForm">
-      <div class="form-wrapper">
-        <div class="form-section">
-          <input type="email" name="email" placeholder="Email" required />
-          <input type="password" name="senha" placeholder="Senha" required />
-        </div>
-      </div>
-
-      <div class="button-container">
-        <button type="submit">Entrar</button>
-      </div>
-    </form>
-
-    <!-- Mensagem para quem ainda não tem conta -->
-    <div class="login-prompt">
-      <p>Não tem uma conta? <a href="/client/views/register.html">Crie uma agora</a></p>
+    <div class="left">
+      <h1>Comece sua jornada para uma vida mais saudável</h1>
+      <p>
+        Utilizar a tecnologia para monitorizar e gerir informações sobre doenças crônicas é um passo poderoso para melhorar a qualidade de vida e garantir um acompanhamento contínuo da sua saúde.
+      </p>
+      <button onclick="window.location.href='/client/views/register.html'">Cadastre-se Aqui</button>
+      <div class="logo">Pulse<span>Flow</span></div>
     </div>
 
-    <footer>Pulse<span>Flow</span></footer>
+    <div class="right">
+      <h2>BEM-VINDO DE VOLTA</h2>
+      <p>Estamos felizes em te ver por aqui!</p>
+
+      <form id="loginForm" novalidate>
+        <input type="email" name="email" id="email" placeholder="Email" required />
+        <span class="error" id="emailError"></span>
+      
+        <input type="password" name="senha" id="senha" placeholder="Senha" required />
+        <span class="error" id="senhaError"></span>
+
+        <button type="submit">Entrar</button>
+      </form>
+
+      <div class="link-auxiliar">
+        <a href="/client/views/reset-password.html">Esqueceu a senha? <span class="destaque">Clique Aqui</span></a>
+    </div>     
+    </div>
   </div>
 
   <script src="../public/js/login.js"></script>
