@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Novo Prontuário - Médico</title>
+  <link rel="stylesheet" href="../public/css/criarAnotações.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="profile">
+        <h3>Draª Eliane Young</h3>
+      </div>
+
+      <nav class="specialties">
+        <details>
+            <summary><span><a href="prontuario.html">Prontuário</a></span></summary>
+          </details>
+          <details>
+            <summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary>
+          </details>
+          <details>
+            <summary><span>Ginecologia</span><span class="chevron"></span></summary>
+            <ul><li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li></ul>
+          </details>
+          <details open>
+            <summary><span>Neurologia</span><span class="chevron"></span></summary>
+            <ul>
+              <li><a href="insonia.html">Insônia</a></li>
+              <li><a href="enxaqueca.html">Enxaqueca</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary><span>Dermatologia</span><span class="chevron"></span></summary>
+            <ul><li><a href="rotinaDermatologica.html">Rotina Dermatológica</a></li></ul>
+          </details>
+          <details>
+            <summary><span>Endocrinologia</span><span class="chevron"></span></summary>
+            <ul>
+              <li><a href="tireoide.html">Tireóide</a></li>
+              <li><a href="diabetes.html">Diabetes</a></li>
+              <li><a href="hormonal.html">Hormonal</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary><span>Gastroenterologia</span><span class="chevron"></span></summary>
+            <ul><li><a href="criseGastrite.html">Crise de Gastrite</a></li></ul>
+          </details>
+          <details>
+            <summary><span>Psiquiatria</span><span class="chevron"></span></summary>
+            <ul><li><a href="historicoMedicacoes.html">Histórico de Medicações</a></li></ul>
+          </details>
+          <details>
+            <summary><span>Cardiologia</span><span class="chevron"></span></summary>
+            <ul>
+              <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
+              <li><a href="batimentosCardiacos.html">Batimentos Cardíacos</a></li>
+              <li><a href="oxigenaçãoSangue.html">Oxigenação no sangue</a></li>
+            </ul>
+          </details>
+      </nav>
+
+      <div class="change-patient">
+        <a href="#">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M11.0303 8.53033C11.3232 8.23744 11.3232 7.76256 11.0303 7.46967C10.7374 7.17678 10.2626 7.17678 9.96967 7.46967L5.96967 11.4697C5.82322 11.6161 5.75 11.8081 5.75 12C5.75 12.1017 5.77024 12.1987 5.80691 12.2871C5.84351 12.3755 5.89776 12.4584 5.96967 12.5303L9.96967 16.5303C10.2626 16.8232 10.7374 16.8232 11.0303 16.5303C11.3232 16.2374 11.3232 15.7626 11.0303 15.4697L8.31066 12.75H18C18.4142 12.75 18.75 12.4142 18.75 12C18.75 11.5858 18.4142 11.25 18 11.25H8.31066L11.0303 8.53033Z" fill="white"/>
+          </svg>
+          Trocar de Paciente
+        </a>
+      </div>
+    </aside>
+
+    <main class="form-section">
+      <header class="form-header">
+        <span class="icon">📋</span>
+        <h1>Novo Prontuário</h1>
+        <div class="logo">
+            <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+          </div>
+      </header>
+
+      <form>
+        <label for="titulo">Título</label>
+        <select id="titulo" name="titulo">
+          <option value="">Selecione</option>
+        </select>
+
+        <label for="data">Data</label>
+        <input type="date" id="data" name="data" />
+
+        <label for="categoria">Categoria</label>
+        <input type="text" id="categoria" name="categoria" />
+
+        <label for="medico">Médico Responsável</label>
+        <input type="text" id="medico" name="medico" />
+
+        <label for="prontuario">Prontuário</label>
+        <textarea id="prontuario" name="prontuario" rows="6"></textarea>
+
+        <button type="submit">Salvar Prontuário</button>
+      </form>
+    </main>
+  </div>
+</body>
+</html>
