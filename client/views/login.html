@@ -5,37 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - PulseFlow</title>
   <link rel="stylesheet" href="../public/css/login.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
 <body>
-  <div class="container">
-    <div class="left">
+  <main class="container">
+    <section class="left">
       <h1>Comece sua jornada para uma vida mais saudável</h1>
-      <p>
-        Utilizar a tecnologia para monitorizar e gerir informações sobre doenças crônicas é um passo poderoso para melhorar a qualidade de vida e garantir um acompanhamento contínuo da sua saúde.
-      </p>
+      <p>Utilizar a tecnologia para monitorar e gerenciar doenças crônicas é essencial para uma vida melhor.</p>
       <button onclick="window.location.href='/client/views/register.html'">Cadastre-se Aqui</button>
       <div class="logo">Pulse<span>Flow</span></div>
-    </div>
+    </section>
 
-    <div class="right">
-      <h2>BEM-VINDO DE VOLTA</h2>
+    <section class="right">
+      <h2>BEM-VINDO</h2>
       <p>Estamos felizes em te ver por aqui!</p>
 
       <form id="loginForm" novalidate>
-        <input type="email" name="email" id="email" placeholder="Email" required />
+        <div class="input-icon">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="email" name="email" placeholder="Email" aria-label="Email" required />
+        </div>
         <span class="error" id="emailError"></span>
-      
-        <input type="password" name="senha" id="senha" placeholder="Senha" required />
+
+        <div class="input-icon">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="senha" name="senha" placeholder="Senha" aria-label="Senha" required />
+        </div>
         <span class="error" id="senhaError"></span>
+
+        <div id="mensagemGeral" class="mensagem-geral" style="display: none;">
+          <i class="fas" id="mensagemIcone"></i>
+          <span id="mensagemTexto"></span>
+        </div>
 
         <button type="submit">Entrar</button>
       </form>
 
       <div class="link-auxiliar">
         <a href="/client/views/reset-password.html">Esqueceu a senha? <span class="destaque">Clique Aqui</span></a>
-    </div>     
-    </div>
-  </div>
+      </div>
+    </section>
+  </main>
 
   <script src="../public/js/login.js"></script>
 </body>

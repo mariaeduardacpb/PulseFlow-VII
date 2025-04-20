@@ -7,6 +7,7 @@
 
 body, html {
   height: 100%;
+  background-color: #f9f9f9;
 }
 
 .container {
@@ -18,7 +19,7 @@ body, html {
 .left {
   flex: 1;
   background-color: #00394f;
-  color: #ffffff;
+  color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -28,19 +29,19 @@ body, html {
 }
 
 .left h1 {
-  font-size: 28px;
+  font-size: 30px;
   margin-bottom: 20px;
 }
 
 .left p {
   font-size: 18px;
-  line-height: 1.6;
   margin-bottom: 30px;
   max-width: 400px;
+  line-height: 1.6;
 }
 
 .left button {
-  background-color: #ffffff;
+  background-color: #fff;
   color: #00394f;
   border: none;
   padding: 14px 30px;
@@ -48,7 +49,12 @@ body, html {
   font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
+  transition: background 0.3s;
   margin-bottom: 30px;
+}
+
+.left button:hover {
+  background-color: #e6e6e6;
 }
 
 .logo {
@@ -75,14 +81,12 @@ body, html {
   font-size: 26px;
   color: #00394f;
   margin-bottom: 10px;
-  text-align: center;
 }
 
 .right p {
   font-size: 16px;
   color: #444;
   margin-bottom: 30px;
-  text-align: center;
 }
 
 form {
@@ -93,14 +97,35 @@ form {
   align-items: center;
 }
 
-input {
+.input-icon {
+  position: relative;
   width: 100%;
-  padding: 14px;
-  margin-bottom: 10px;
-  border: none;
+  margin-bottom: 15px;
+}
+
+.input-icon i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 16px;
+}
+
+.input-icon input {
+  width: 100%;
+  height: 48px;
+  padding-left: 40px;
+  border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #f0f0f0;
   font-size: 16px;
+  transition: border 0.3s;
+}
+
+.input-icon input:focus {
+  outline: none;
+  border-color: #00c3b7;
 }
 
 .error {
@@ -112,7 +137,7 @@ input {
 
 button[type="submit"] {
   width: 100%;
-  padding: 14px;
+  height: 48px;
   background-color: #00394f;
   color: white;
   border: none;
@@ -121,6 +146,11 @@ button[type="submit"] {
   font-weight: bold;
   cursor: pointer;
   margin-top: 10px;
+  transition: background 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #005f73;
 }
 
 .link-auxiliar {
@@ -131,12 +161,44 @@ button[type="submit"] {
   text-decoration: none;
   color: #00394f;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .link-auxiliar .destaque {
   color: #00c3b7;
   text-decoration: underline;
+}
+
+.mensagem-geral {
+  font-size: 15px;
+  margin-bottom: 15px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  display: none;
+}
+
+.mensagem-geral.sucesso {
+  background-color: #e6f9f1;
+  color: #1e824c;
+  border: 1px solid #b2e2c8;
+  display: flex;
+}
+
+.mensagem-geral.erro {
+  background-color: #fdecea;
+  color: #d93025;
+  border: 1px solid #f5c6cb;
+  display: flex;
+}
+
+.input-error {
+  border: 2px solid red;
+  outline: none;
 }
 
 
@@ -157,13 +219,5 @@ button[type="submit"] {
 
   .right h2 {
     font-size: 22px;
-  }
-
-  input {
-    font-size: 16px;
-  }
-
-  button[type="submit"] {
-    font-size: 16px;
   }
 }

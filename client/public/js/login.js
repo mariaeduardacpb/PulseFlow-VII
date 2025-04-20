@@ -4,32 +4,69 @@ document.addEventListener("DOMContentLoaded", () => {
   const senhaInput = document.getElementById("senha");
   const emailError = document.getElementById("emailError");
   const senhaError = document.getElementById("senhaError");
+  const mensagemGeral = document.getElementById("mensagemGeral");
+  const mensagemTexto = document.getElementById("mensagemTexto");
+  const mensagemIcone = document.getElementById("mensagemIcone");
+
+  let isSubmitting = false;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    isSubmitting = true;
 
-    // Limpa mensagens anteriores
+    // Reset mensagens e estilos
     emailError.textContent = "";
     senhaError.textContent = "";
+    mensagemGeral.style.display = "none";
+    mensagemGeral.className = "mensagem-geral";
+    emailInput.classList.remove("input-error");
+    senhaInput.classList.remove("input-error");
 
     const email = emailInput.value.trim();
-    const senha = senhaInput.value.trim();
+    const senha = senhaInput.value;
+
     let hasError = false;
-
-    // Validação de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      emailError.textContent = "Email inválido.";
+
+    if (!email) {
+      emailError.textContent = "O campo de email é obrigatório.";
+      emailInput.classList.add("input-error");
+      hasError = true;
+    } else if (!emailRegex.test(email)) {
+      emailError.textContent = "Formato de email inválido.";
+      emailInput.classList.add("input-error");
       hasError = true;
     }
 
-    // Validação de senha
-    if (!senha || senha.length < 4) {
-      senhaError.textContent = "Senha inválida ou muito curta.";
+    if (!senha) {
+      senhaError.textContent = "O campo de senha é obrigatório.";
+      senhaInput.classList.add("input-error");
+      hasError = true;
+    } else if (senha.length < 6) {
+      senhaError.textContent = "A senha deve ter pelo menos 6 caracteres.";
+      senhaInput.classList.add("input-error");
+      hasError = true;
+    } else if (senha.length > 20) {
+      senhaError.textContent = "A senha deve ter no máximo 20 caracteres.";
+      senhaInput.classList.add("input-error");
+      hasError = true;
+    } else if (senha !== senha.trim()) {
+      senhaError.textContent = "A senha não pode conter espaços no início ou fim.";
+      senhaInput.classList.add("input-error");
       hasError = true;
     }
 
-    if (hasError) return;
+    if (hasError) {
+      setTimeout(() => {
+        emailError.textContent = "";
+        senhaError.textContent = "";
+        emailInput.classList.remove("input-error");
+        senhaInput.classList.remove("input-error");
+      }, 3000);
+      isSubmitting = false;
+      return;
+    }
 
     const data = { email, senha };
 
@@ -43,15 +80,37 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.json();
 
       if (response.ok) {
-        alert("Login realizado com sucesso!");
+        mensagemTexto.textContent = "Login realizado com sucesso! Redirecionando...";
+        mensagemGeral.classList.add("sucesso");
+        mensagemIcone.className = "fas fa-check-circle";
+        mensagemGeral.style.display = "flex";
         localStorage.setItem("token", result.token);
-        window.location.href = "/client/views/verify-2fa.html";
+
+        setTimeout(() => {
+          window.location.href = "/client/views/verify-2fa.html";
+        }, 1500);
       } else {
-        alert(result.message || "Erro ao fazer login");
+        mensagemTexto.textContent = result.message || "Email ou senha incorretos.";
+        mensagemGeral.classList.add("erro");
+        mensagemIcone.className = "fas fa-exclamation-triangle";
+        mensagemGeral.style.display = "flex";
+
+        setTimeout(() => {
+          mensagemGeral.style.display = "none";
+        }, 4000);
       }
     } catch (err) {
-      alert("Erro na requisição");
+      mensagemTexto.textContent = "Erro ao conectar com o servidor.";
+      mensagemGeral.classList.add("erro");
+      mensagemIcone.className = "fas fa-exclamation-triangle";
+      mensagemGeral.style.display = "flex";
+
+      setTimeout(() => {
+        mensagemGeral.style.display = "none";
+      }, 4000);
       console.error(err);
+    } finally {
+      isSubmitting = false;
     }
   });
 });
