@@ -6,6 +6,9 @@ import { fileURLToPath } from 'url';
 
 import authRoutes from './routes/authRoutes.js';
 import connectDB from './config/db.js';
+import enxaquecaRoutes from './routes/enxaquecaRoutes.js';
+import pacienteRoutes from './routes/pacienteAuthRoutes.js';
+import insoniaRoutes from './routes/insoniaRoutes.js';
 
 dotenv.config();
 
@@ -25,5 +28,10 @@ app.use('/client', express.static(path.join(__dirname, '..', 'client')));
 
 // Rotas de autenticação
 app.use('/api/auth', authRoutes);
+
+app.use('/api/enxaqueca', enxaquecaRoutes);
+app.use('/api/paciente', pacienteRoutes); // para login e registro do paciente
+app.use('/api/insonia', insoniaRoutes);
+
 
 export default app;

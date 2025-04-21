@@ -119,22 +119,34 @@
       </header>
 
       <section class="chart-section">
-        <!-- GRÁFICO 1 -->
         <div class="chart">
-          <div class="chart-header">
-            <h4>Intensidade da Enxaqueca</h4>
-            <div class="month-selector" data-target="chartEnxaqueca">
-              <button class="arrow-btn" data-direction="prev">‹</button>
-              <span class="month-label">Abril • 2025</span>
-              <button class="arrow-btn" data-direction="next">›</button>
+            <div class="chart-header">
+              <h4>Intensidade da Enxaqueca</h4>
+              <div class="month-selector" data-target="chartEnxaqueca">
+                <button class="arrow-btn" data-direction="prev">‹</button>
+                <span class="month-label">Abril • 2025</span>
+                <button class="arrow-btn" data-direction="next">›</button>
+              </div>
             </div>
+           <!-- Mensagem de ausência de dados -->
+           <div id="no-data-msg" class="no-data-msg">
+            ⚠️ <span>Nenhum dado encontrado para este mês.</span>
           </div>
-          <canvas id="chartEnxaqueca"></canvas>
-        </div>
+            <canvas id="chartEnxaqueca"></canvas>        
+          </div>
       </section>
       
       
-
+      <footer class="referencia-dor">
+        <p>
+          🔎 Saiba mais sobre a classificação da intensidade da enxaqueca:
+          <a href="https://www.disturbiosdomovimento.com.br/post/como-classificar-a-intensidade-da-dor-de-cabeça-e-por-que-isso-é-importante"
+             target="_blank" rel="noopener noreferrer">
+            Artigo
+          </a>
+        </p>
+      </footer>
+      
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../public/js/enxaqueca.js"></script>
 </body>

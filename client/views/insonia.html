@@ -51,6 +51,12 @@
               <button class="arrow-btn" data-direction="next">›</button>
             </div>
           </div>
+        
+          <!-- MENSAGEM FORA DO HEADER -->
+          <div id="no-data-msg-horas" class="no-data-msg">
+            ⚠️ <span>Nenhum dado de horas de sono encontrado para este mês.</span>
+          </div>
+        
           <canvas id="chartHorasSono"></canvas>
         </div>
       
@@ -64,10 +70,23 @@
               <button class="arrow-btn" data-direction="next">›</button>
             </div>
           </div>
+          <!-- Mensagem de ausência de dados -->
+          <div id="no-data-msg-qualidade" class="no-data-msg">
+            ⚠️ <span>Nenhum dado de qualidade do sono encontrado para este mês.</span>
+          </div>
           <canvas id="chartQualidadeSono"></canvas>
         </div>
       </section>
       
+      <footer class="referencia-dor">
+        <p>
+          🔎 Saiba mais sobre a classificação da qualidade do sono:
+          <a href="https://support.garmin.com/pt-BR/?faq=DWcdBazhr097VgqFufsTk8"
+             target="_blank" rel="noopener noreferrer">
+            Artigo
+          </a>
+        </p>
+      </footer>
       
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
