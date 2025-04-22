@@ -3,45 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Verificação 2FA - PulseFlow</title>
-  <link rel="stylesheet" href="../public/css/verify-2fa.css" />
+  <title>Verificação 2FA</title>
+  <link rel="stylesheet" href="../public/css/verify-2fa.css"/>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="#" class="nav-logo">PulseFlow</a>
-      <ul class="nav-links">
-        <li><a href="#">Home</a></li>
-        <li><a href="/client/views/login.html">Login</a></li>
-      </ul>
-    </div>
-  </nav>
-
   <div class="container">
-    <h2>Verificação em duas etapas</h2>
-    <form id="verifyForm">
-      <div class="form-wrapper">
-        <div class="form-section">
-          <label for="method">Escolha o método:</label>
-          <select id="method" name="method" required>
-            <option value="" disabled selected>Selecione</option>
-            <option value="email">Verificar por Email</option>
-            <option value="sms">Verificar por SMS</option>
-          </select>
+    <div class="left-box">
+      <h2>🔐 Segurança em Primeiro Lugar</h2>
+      <p>Verifique sua identidade com o código enviado para o seu e-mail ou celular.</p>
+    </div>
 
-          <button type="button" id="sendCodeBtn" style="display:none;">Enviar código</button>
-          <p id="infoText" style="display:none;">Um código foi enviado para você.</p>
-          <input type="text" id="codeInput" name="code" placeholder="Digite o código" required style="display:none;" maxlength="6"/>
-          <a href="#" id="resendLink" style="display:none;">Reenviar código</a>
-        </div>
+    <div class="right-box">
+      <div class="form-box">
+        <h1>Verificação em 2 Fatores</h1>
+        <p class="subtitle">Insira o código de 6 dígitos enviado para você</p>
+
+        <input type="text" id="otpInput" maxlength="6" placeholder="Código de 6 dígitos"/>
+        <span id="error-message" class="error-message"></span>
+
+        <button id="verifyBtn">Verificar Código</button>
+        <button id="cancelBtn" class="cancel-btn">Cancelar</button>
+
+        <p class="resend-text">Não recebeu? <a href="#">Reenviar Código</a></p>
       </div>
-
-      <div class="button-container">
-        <button type="submit">Verificar</button>
-      </div>
-    </form>
-
-    <footer>Pulse<span>Flow</span></footer>
+    </div>
   </div>
 
   <script src="../public/js/verify-2fa.js"></script>

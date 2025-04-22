@@ -1,78 +1,62 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("verifyForm");
-  const methodSelect = document.getElementById("method");
-  const codeInput = document.getElementById("codeInput");
-  const sendCodeBtn = document.getElementById("sendCodeBtn");
-  const infoText = document.getElementById("infoText");
-  const resendLink = document.getElementById("resendLink");
+document.getElementById('verifyBtn').addEventListener('click', async () => {
+  const otp = document.getElementById('otpInput').value.trim();
+  const errorMessage = document.getElementById('error-message');
+  const verifyBtn = document.getElementById('verifyBtn');
 
-  methodSelect.addEventListener("change", () => {
-    sendCodeBtn.style.display = "block";
-    codeInput.style.display = "none";
-    infoText.style.display = "none";
-    resendLink.style.display = "none";
-  });
+  // Limpa mensagens de erro
+  errorMessage.textContent = '';
+  errorMessage.classList.remove('active');
 
-  sendCodeBtn.addEventListener("click", async () => {
-    const method = methodSelect.value;
+  // Validação de entrada
+  if (otp.length !== 6 || isNaN(otp)) {
+    errorMessage.textContent = 'Por favor, insira um código de 6 dígitos válido.';
+    errorMessage.classList.add('active');
+    return;
+  }
 
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/send-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method })
-      });
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    alert('Sessão expirada. Faça login novamente.');
+    window.location.href = '/client/views/login.html';
+    return;
+  }
 
-      const result = await response.json();
+  // Ativa carregamento no botão
+  verifyBtn.disabled = true;
+  const originalText = verifyBtn.innerHTML;
+  verifyBtn.innerHTML = `<span class="spinner"></span> Verificando...`;
 
-      if (response.ok) {
-        infoText.textContent = `Um código foi enviado por ${method.toUpperCase()}.`;
-        infoText.style.display = "block";
-        codeInput.style.display = "block";
-        resendLink.style.display = "inline";
-      } else {
-        alert(result.message || "Erro ao enviar código");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Erro na requisição");
-    }
-  });
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, code: otp }),
+    });
 
-  resendLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    sendCodeBtn.click();
-  });
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const method = methodSelect.value;
-    const code = codeInput.value.trim();
-
-    if (!method || code.length !== 6) {
-      alert("Selecione o método e digite um código válido de 6 dígitos.");
-      return;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Erro ${response.status}: ${errorText}`);
     }
 
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/verify-2fa", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method, code })
-      });
+    const data = await response.json();
 
-      const result = await response.json();
-
-      if (response.ok) {
-        alert("Verificação bem-sucedida!");
-        window.location.href = "/client/views/dashboard.html";
-      } else {
-        alert(result.message || "Código inválido.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao verificar o código.");
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      alert('Verificação realizada com sucesso!');
+      window.location.href = '/client/views/perfilPaciente.html';
+    } else {
+      alert(data.message || 'Código inválido ou expirado.');
     }
-  });
+  } catch (err) {
+    console.error('Erro ao verificar o código:', err);
+    alert('Erro ao verificar. Tente novamente em instantes.');
+  } finally {
+    // Restaura botão
+    verifyBtn.disabled = false;
+    verifyBtn.innerHTML = originalText;
+  }
+});
+
+document.getElementById('cancelBtn').addEventListener('click', () => {
+  window.location.href = '/client/views/login.html';
 });

@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Cadastro realizado com sucesso! Redirecionando...");
         form.reset();
         setTimeout(() => {
-          window.location.href = "/login";
+          window.location.href = "/client/views/login.html";
         }, 1000);
       } else {
         alert(result.message || "Erro ao cadastrar. Verifique os dados.");

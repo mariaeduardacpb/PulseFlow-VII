@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import authRoutes from './routes/authRoutes.js';
-import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js'; // Importando a rota de autenticação
+import connectDB from './config/db.js'; // Conectando ao banco de dados
 import enxaquecaRoutes from './routes/enxaquecaRoutes.js';
 import pacienteRoutes from './routes/pacienteAuthRoutes.js';
 import insoniaRoutes from './routes/insoniaRoutes.js';
@@ -24,14 +24,13 @@ app.use(express.json());
 // Conexão com o MongoDB
 connectDB();
 
+// Servindo arquivos estáticos
 app.use('/client', express.static(path.join(__dirname, '..', 'client')));
 
-// Rotas de autenticação
-app.use('/api/auth', authRoutes);
-
+// Definindo as rotas da API
+app.use('/api/auth', authRoutes); // Usando a rota de autenticação
 app.use('/api/enxaqueca', enxaquecaRoutes);
-app.use('/api/paciente', pacienteRoutes); // para login e registro do paciente
+app.use('/api/paciente', pacienteRoutes); // Para login e registro do paciente
 app.use('/api/insonia', insoniaRoutes);
 
-
-export default app;
+export default app; // Exportando o app

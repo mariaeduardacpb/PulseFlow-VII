@@ -1,12 +1,13 @@
 import express from 'express';
-import * as authController from '../controllers/authController.js'; // Isso importa todas as funções de authController
-
+import * as authController from '../controllers/authController.js';
 const router = express.Router();
 
-// Certifique-se de que resetPassword e confirmResetPassword estão no authController
+
 router.post('/register', authController.register);
 router.post('/login', authController.login);
-router.post('/reset-password', authController.resetPassword);  // Agora usa authController.resetPassword
-router.post('/confirm-reset-password', authController.confirmResetPassword);  // Também precisa estar exportada
+router.post('/reset-password', authController.resetPassword);
+router.post('/confirm-reset-password', authController.confirmResetPassword);
+router.post('/send-otp', authController.sendOtp);
+router.post('/verify-otp', authController.verifyOTP);
 
 export default router;

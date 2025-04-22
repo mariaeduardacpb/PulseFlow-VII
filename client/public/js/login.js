@@ -80,11 +80,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.json();
 
       if (response.ok) {
-        mensagemTexto.textContent = "Login realizado com sucesso! Redirecionando...";
+        mensagemTexto.textContent = "Código de verificação enviado! Redirecionando...";
         mensagemGeral.classList.add("sucesso");
         mensagemIcone.className = "fas fa-check-circle";
         mensagemGeral.style.display = "flex";
-        localStorage.setItem("token", result.token);
+
+        localStorage.setItem("userId", result.userId); // importante para o verify.js
 
         setTimeout(() => {
           window.location.href = "/client/views/verify-2fa.html";

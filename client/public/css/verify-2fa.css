@@ -1,124 +1,149 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  background: linear-gradient(135deg, #e0f7fa, #ffffff);
-  color: #333;
-}
-
-.navbar {
-  background-color: #003a53;
-  padding: 12px 30px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-logo {
-  color: white;
-  font-weight: bold;
-  text-decoration: none;
-  font-size: 24px;
-}
-
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-}
-
-.nav-links li a {
-  color: white;
-  text-decoration: none;
-  font-size: 16px;
+  background-color: #e9edf0;
 }
 
 .container {
-  max-width: 420px;
-  margin: 80px auto;
-  background: white;
-  padding: 40px 30px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  height: 100vh;
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: #003a53;
-}
-
-.form-wrapper {
-  margin-bottom: 25px;
-}
-
-.form-section {
+.left-box {
+  width: 40%;
+  background: linear-gradient(135deg, #003b54, #005b79);
+  color: white;
+  padding: 60px 40px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  justify-content: center;
 }
 
-input[type="text"],
-select {
-  padding: 12px;
-  border-radius: 8px;
+.left-box h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.left-box p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.right-box {
+  width: 60%;
+  background-color: #fefefe;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.form-box {
+  background-color: #ffffff;
+  padding: 40px 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+}
+
+.form-box h1 {
+  font-size: 24px;
+  color: #003b54;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 14px;
   border: 1px solid #ccc;
-  font-size: 15px;
-  transition: border 0.3s;
-}
-
-input[type="text"]:focus,
-select:focus {
-  border-color: #00bcd4;
-  outline: none;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 button {
-  padding: 12px;
-  background-color: #003a53;
-  border: none;
-  border-radius: 8px;
+  width: 100%;
+  padding: 14px;
+  background-color: #003b54;
   color: white;
-  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
   cursor: pointer;
-  font-size: 15px;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #0097a7;
+  background-color: #00293f;
 }
 
-#infoText {
-  font-size: 14px;
-  color: #4caf50;
-  text-align: center;
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: #003b54;
+  margin-top: 10px;
 }
 
-#resendLink {
-  font-size: 14px;
-  color: #00796b;
+.cancel-btn:hover {
+  background-color: #c1c1c1;
+}
+
+.resend-text {
+  margin-top: 18px;
+  font-size: 13px;
+  color: #444;
+}
+
+.resend-text a {
+  color: #003b54;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.resend-text a:hover {
   text-decoration: underline;
-  text-align: center;
+}
+
+.spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #003049;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.error-message.active {
   display: block;
 }
 
-.button-container {
-  text-align: center;
-  margin-top: 20px;
-}
-
-footer {
-  text-align: center;
-  margin-top: 30px;
-  color: #888;
-  font-size: 14px;
-}
-
-footer span {
-  color: #00bcd4;
-  font-weight: bold;
+.error-message.inactive {
+  display: none;
 }
