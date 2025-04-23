@@ -4,11 +4,12 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import authRoutes from './routes/authRoutes.js'; // Importando a rota de autenticação
-import connectDB from './config/db.js'; // Conectando ao banco de dados
+import authRoutes from './routes/authRoutes.js';
+import connectDB from './config/db.js';
 import enxaquecaRoutes from './routes/enxaquecaRoutes.js';
 import pacienteRoutes from './routes/pacienteAuthRoutes.js';
 import insoniaRoutes from './routes/insoniaRoutes.js';
+import anotacaoRoutes from './routes/anotacaoRoutes.js'; 
 
 dotenv.config();
 
@@ -27,10 +28,11 @@ connectDB();
 // Servindo arquivos estáticos
 app.use('/client', express.static(path.join(__dirname, '..', 'client')));
 
-// Definindo as rotas da API
-app.use('/api/auth', authRoutes); // Usando a rota de autenticação
+// Rotas da API
+app.use('/api/auth', authRoutes);
 app.use('/api/enxaqueca', enxaquecaRoutes);
-app.use('/api/paciente', pacienteRoutes); // Para login e registro do paciente
+app.use('/api/paciente', pacienteRoutes);
 app.use('/api/insonia', insoniaRoutes);
+app.use('/api/anotacoes', anotacaoRoutes);
 
-export default app; // Exportando o app
+export default app;
