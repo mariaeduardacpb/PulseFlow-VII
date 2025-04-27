@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
   telefoneConsultorio: String,
   otp: String,
   otpExpires: Date,
-});
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 

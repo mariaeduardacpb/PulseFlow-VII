@@ -6,6 +6,7 @@
   <title>Novo Prontuário - Médico</title>
   <link rel="stylesheet" href="../public/css/criarAnotações.css" />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
 </head>
 <body>
   <div class="container">
@@ -83,9 +84,7 @@
 
       <form>
         <label for="titulo">Título</label>
-        <select id="titulo" name="titulo">
-          <option value="">Selecione</option>
-        </select>
+        <input type="text" id="titulo" name="titulo" />
 
         <label for="data">Data</label>
         <input type="date" id="data" name="data" />
@@ -103,5 +102,6 @@
       </form>
     </main>
   </div>
+  <script src="../public/js/criarAnotacao.js"></script>
 </body>
 </html>

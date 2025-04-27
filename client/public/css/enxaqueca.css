@@ -1,35 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
 * {
+  font-family: 'Montserrat', sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: 'Montserrat', sans-serif;
-  background-color: #f3f3f3;
-  color: #333;
+  background-color: #f2f2f2;
+  overflow-y: auto;
 }
 
 .container {
   display: flex;
-  height: 100vh;
+  flex-direction: row;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
   width: 240px;
-  background-color: #00324A;
-  color: #fff;
-  padding: 30px 20px;
+  background-color: #002A42;
+  color: white;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+  padding: 30px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 10;
 }
 
 .profile h3 {
@@ -55,12 +58,10 @@ body {
   color: #f0f0f0;
 }
 
-/* Remove seta padrão do summary */
 .specialties summary::-webkit-details-marker {
   display: none;
 }
 
-/* Chevron personalizado */
 .specialties .chevron {
   display: inline-block;
   width: 8px;
@@ -72,9 +73,8 @@ body {
   margin-left: 10px;
 }
 
-/* Gira a seta quando aberto */
 .specialties details[open] .chevron {
-  transform: rotate(135deg);
+  transform: rotate(225deg);
 }
 
 .specialties ul {
@@ -107,7 +107,10 @@ body {
 }
 
 .change-patient a {
-  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #FFF;
   font-weight: bold;
   font-size: 14px;
   text-decoration: none;
@@ -116,13 +119,57 @@ body {
 .content {
   margin-left: 240px;
   width: calc(100% - 240px);
+  max-width: 1280px;
   padding: 30px 40px;
+}
+
+.patient-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #002A42;
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.profile-box {
+  background-color: #003954;
+  color: #fff;
+  border-radius: 8px;
+  display: flex;
+  gap: 30px;
+  padding: 30px;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.profile-box img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 100%;
+  border: 3px solid #f2f2f2;
+}
+
+.profile-box .info p {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.profile-box .separator {
+  width: 2px;
+  height: 100%;
+  background-color: #ffffff;
+  margin: 0 20px;
+  border-radius: 1px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .header h1 {
@@ -130,14 +177,8 @@ body {
   color: #1f1f1f;
 }
 
-.logo {
-  font-weight: bold;
-  font-size: 24px;
-  color: #1f1f1f;
-}
-
-.logo span {
-  color: #3fd3c4;
+.logo img {
+  height: 50px;
 }
 
 .chart-section {
@@ -163,74 +204,148 @@ canvas {
   width: 100%;
   height: 300px;
 }
+
 .month-selector {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.arrow-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #00324A;
+  transition: color 0.2s ease;
+}
+
+.arrow-btn:hover {
+  color: #00c3b7;
+}
+
+.bold {
+  font-weight: 1000;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 1024px) {
+  .content {
+    padding: 20px;
   }
-  
-  .arrow-btn {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: #00324A;
-    transition: color 0.2s ease;
-  }
-  
-  .arrow-btn:hover {
-    color: #00c3b7;
-  }
-  
-  .no-data-msg {
-    color: #d32f2f;
-    font-weight: 500;
+
+  .profile-box {
+    flex-direction: column;
     text-align: center;
-    margin: 0 auto 10px auto;
-    width: 60%;
+  }
+
+  .profile-box .separator {
     display: none;
-    font-size: 13px;
-    animation: fadeIn 0.5s ease-in-out;
-    background-color: #fdecea;
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: 1px solid #f5c6cb;
-    box-shadow: 0 0 4px rgba(211, 47, 47, 0.2);
   }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-5px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+
+  .profile-box img {
+    width: 120px;
+    height: 120px;
   }
-  
-  .referencia-dor {
-    text-align: center;
-    font-size: 13px;
-    color: #444;
-    margin-top: 30px;
-    padding: 10px;
-    background-color: #f6f6f6;
-    border-top: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 15px;
   }
-  
-  .referencia-dor a {
-    color: #003366;
-    font-weight: 500;
-    text-decoration: underline;
-    transition: color 0.3s ease;
+
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
   }
-  
-  .referencia-dor a:hover {
-    color: #00c3b7;
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  
+}
+
+@media (max-width: 480px) {
+  .chart {
+    padding: 15px;
+  }
+
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .patient-header h1 {
+    font-size: 20px;
+  }
+
+  .profile-box img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-box .info p {
+    font-size: 14px;
+  }
+
+  .specialties summary {
+    font-size: 14px;
+  }
+}
+
+.no-data-msg {
+  color: #d32f2f;
+  font-weight: 500;
+  text-align: center;
+  margin: 0 auto 10px auto;
+  width: 60%;
+  display: none;
+  font-size: 13px;
+  animation: fadeIn 0.5s ease-in-out;
+  background-color: #fdecea;
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #f5c6cb;
+  box-shadow: 0 0 4px rgba(211, 47, 47, 0.2);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.referencia-dor {
+  text-align: center;
+  font-size: 13px;
+  color: #444;
+  margin-top: 30px;
+  padding: 10px;
+  background-color: #f6f6f6;
+  border-top: 1px solid #ddd;
+}
+
+.referencia-dor a {
+  color: #003366;
+  font-weight: 500;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.referencia-dor a:hover {
+  color: #00c3b7;
+}

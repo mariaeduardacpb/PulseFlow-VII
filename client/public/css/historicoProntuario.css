@@ -28,6 +28,7 @@
     left: 0;
     bottom: 0;
     overflow-y: auto;
+    z-index: 10;
   }
   
   .profile h3 {
@@ -102,39 +103,78 @@
   }
   
   .change-patient a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     color: #FFF;
     font-weight: bold;
     font-size: 14px;
     text-decoration: none;
   }
   
-  /* ---- CONTEÚDO ---- */
   .content {
     margin-left: 240px;
-    padding: 40px;
     width: calc(100% - 240px);
     max-width: 1280px;
+    padding: 30px 40px;
+  }
+  
+  .patient-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #002A42;
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+  
+  .profile-box {
+    background-color: #003954;
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    gap: 30px;
+    padding: 30px;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  
+  .profile-box img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 100%;
+    border: 3px solid #f2f2f2;
+  }
+  
+  .profile-box .info p {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  .profile-box .separator {
+    width: 2px;
+    height: 100%;
+    background-color: #ffffff;
+    margin: 0 20px;
+    border-radius: 1px;
   }
   
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
   }
   
   .header h1 {
     font-size: 24px;
-    color: #002A42;
+    color: #1f1f1f;
   }
   
-  .logo {
-    font-weight: bold;
-    font-size: 22px;
-    color: #002A42;
-  }
-  
-  .logo span {
-    color: #50C4C4;
+  .logo img {
+    height: 50px;
   }
   
   /* FILTROS */
