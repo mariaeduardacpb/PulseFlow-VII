@@ -43,7 +43,7 @@ document.getElementById('verifyBtn').addEventListener('click', async () => {
     if (data.token) {
       localStorage.setItem('token', data.token);
       alert('Verificação realizada com sucesso!');
-      window.location.href = '/client/views/selecao.html'; //mudando aqui
+      window.location.href = '/client/views/selecao.html'; //mudando aquii
     } else {
       alert(data.message || 'Código inválido ou expirado.');
     }

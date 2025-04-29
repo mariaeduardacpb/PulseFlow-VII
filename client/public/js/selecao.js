@@ -44,7 +44,7 @@ btnAcesso.addEventListener('click', async () => {
 
     // Armazena os dados e redireciona
     localStorage.setItem('pacienteSelecionado', JSON.stringify(data));
-    window.location.href = 'perfilPaciente.html'; //mudando aqui
+    window.location.href = 'perfilPaciente.html'; //mudando aquii
   } catch (err) {
     console.error(err);
     msgErro.textContent = '⚠️ Erro de conexão com o servidor.';
