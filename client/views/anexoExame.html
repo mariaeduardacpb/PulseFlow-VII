@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anexo de Exames</title>
+  <link rel="stylesheet" href="../public/css/anexoExame.css" />
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="profile">
+        <h3>Draª Eliane Young</h3>
+      </div>
+      <nav class="specialties">
+        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
+        <details><summary><span><a href="prontuario.html">Prontuário</a></span></summary></details>
+        <details open><summary><span><a style="font-weight: bold;" href="anexoExame.html">Anexo de Exames</a></span></summary></details>
+        <details><summary><span>Ginecologia</span><span class="chevron"></span></summary><ul><li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li></ul></details>
+        <details><summary><span>Neurologia</span><span class="chevron"></span></summary><ul><li><a href="insonia.html">Insônia</a></li><li><a href="enxaqueca.html">Enxaqueca</a></li></ul></details>
+        <details><summary><span>Dermatologia</span><span class="chevron"></span></summary><ul><li><a href="rotinaDermatologica.html">Rotina Dermatológica</a></li></ul></details>
+        <details><summary><span>Endocrinologia</span><span class="chevron"></span></summary><ul><li><a href="tireoide.html">Tireóide</a></li><li><a href="diabetes.html">Diabetes</a></li><li><a href="hormonal.html">Hormonal</a></li></ul></details>
+        <details><summary><span>Gastroenterologia</span><span class="chevron"></span></summary><ul><li><a href="criseGastrite.html">Crise de Gastrite</a></li></ul></details>
+        <details><summary><span>Psiquiatria</span><span class="chevron"></span></summary><ul><li><a href="historicoMedicacoes.html">Histórico de Medicações</a></li></ul></details>
+        <details><summary><span>Cardiologia</span><span class="chevron"></span></summary><ul><li><a href="pressaoArterial.html">Pressão Arterial</a></li><li><a href="batimentosCardiacos.html">Batimentos Cardíacos</a></li><li><a href="oxigenaçãoSangue.html">Oxigenação no sangue</a></li></ul></details>
+      </nav>
+      <div class="change-patient">
+        <a href="selecao.html">
+          ⮐ Trocar de Paciente
+        </a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="header">
+        <h4>Visualize os exames médicos com organização.</h4>
+        <div class="logo">
+          <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+        </div>
+      </header>
+
+      <section class="form-section">  
+        <div class="form-container">
+          <div class="input-row">
+            <div class="input-group">
+              <label for="nomeExame">📄 Nome do Exame</label>
+              <input type="text" id="nomeExame" placeholder="Nome do Exame" />
+            </div>
+            <div class="input-group">
+              <label for="especialidade">📁 Especialidade</label>
+              <input type="text" id="especialidade" placeholder="Escolha uma especialidade" />
+            </div>
+            <div class="input-group">
+              <label for="dataExame">📅 Data do Exame</label>
+              <input type="date" id="dataExame" />
+            </div>
+          </div>
+      
+          <div class="form-actions">
+            <button class="btn-primary" id="buscarExameBtn">Buscar Exame</button>
+          </div>
+        </div>
+      </section>
+      
+      
+      <section class="exams-list">
+        <h2>Exames</h2>
+        
+        <div id="contador-exames" class="contador-exames" style="display: none;">🔎 0 exames encontrados</div>
+       
+        <div id="no-data-msg" class="no-data-msg">
+          ⚠️ <span>Nenhum exame encontrado para este paciente.</span>
+        </div>
+      
+        <div class="exam-grid" id="examGrid">
+          <!-- Os cards serão inseridos aqui via JS -->
+        </div>
+      </section>      
+      
+    </main>
+  </div>
+
+  <script src="../public/js/anexoExame.js"></script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+/* Reset e base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f3f3f3;
+    color: #333;
+  }
+  
+  .container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 240px;
+    background-color: #00324A;
+    color: #fff;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .profile h3 {
+    font-size: 16px;
+    margin-bottom: 30px;
+    font-weight: 600;
+  }
+  
+  .specialties details {
+    margin-bottom: 12px;
+    border-bottom: 1px solid #1c4a7d;
+    padding-bottom: 8px;
+  }
+  
+  .specialties summary {
+    list-style: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #f0f0f0;
+  }
+  
+  .specialties summary::-webkit-details-marker {
+    display: none;
+  }
+  
+  .specialties .chevron {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(45deg);
+    margin-left: 10px;
+  }
+  
+  .specialties details[open] .chevron {
+    transform: rotate(135deg);
+  }
+  
+  .specialties ul {
+    margin-top: 10px;
+    margin-left: 10px;
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .specialties a {
+    color: white;
+    font-size: 14px;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  
+  .change-patient {
+    margin-top: auto;
+  }
+  
+  .change-patient a {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  
+  .content {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    padding: 30px 40px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .header h1 {
+    font-size: 24px;
+    color: #1f1f1f;
+  }
+  
+  .logo img {
+    height: 40px;
+  }
+  
+  .upload-section {
+    background-color: #00324A;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 0 auto 30px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-container {
+    background-color: #00324A;
+    padding: 30px 40px;
+    border-radius: 10px;
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f3f3f3;
+  color: #1f1f1f;
+}
+
+.form-section {
+    background-color: #00324a;
+    border-radius: 5px;
+    padding: 10px 10px;
+    width: 90%;
+    max-width: 900px;
+    margin: 20px auto;
+    color: white;
+  }
+  
+  
+  .input-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    width: 100%;
+  }
+  
+  
+  .input-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  
+  .input-group label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  
+  .input-group input,
+  .input-group select {
+    padding: 12px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    width: 100%;
+  }
+  
+.input-group input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #026492;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  background-color: white;
+  color: #00324a;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #056a99;
+  color: white;
+}
+
+  
+  #salvarExame {
+    background-color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+  }
+  
+  .file-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .custom-file-btn {
+    background-color: white;
+    color: #00324A;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    transition: background 0.3s ease;
+    border: none;
+    display: inline-block;
+  }
+  
+  .custom-file-btn:hover {
+    background-color: #036d9e;
+    color: white;
+  }
+  
+  .exam-icon {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    margin: 25px 0 10px;
+    font-size: 18px;
+  }
+  
+  .exam-icon img {
+    width: 20px;
+    margin-right: 10px;
+  }
+  
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .search-bar input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .search-bar button {
+    padding: 10px 16px;
+    background-color: #00324A;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .exams-list {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .exams-list h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #00324A;
+  }
+  
+  .exam-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    background-color: #00324A;
+    border-radius: 10px;
+  }
+  
+  .exam-card {
+    background-color: #ffffff;
+    color: #00324A;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 14px;
+    min-height: 120px;
+  }
+  
+  .exam-card p {
+    margin: 4px 0;
+  }
+  
+  .exam-card button {
+    align-self: flex-end;
+    padding: 6px 12px;
+    background-color: #00324A;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: auto;
+    transition: background 0.3s ease;
+  }
+  
+  .exam-card button:hover {
+    background-color: #005b7f;
+  }
+  
+  .no-data-msg {
+    color: #d32f2f;
+    font-weight: 500;
+    text-align: center;
+    margin: 0 auto 10px auto;
+    width: 60%;
+    display: none;
+    font-size: 13px;
+    animation: fadeIn 0.5s ease-in-out;
+    background-color: #fdecea;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #f5c6cb;
+    box-shadow: 0 0 4px rgba(211, 47, 47, 0.2);
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .contador-exames {
+    color: #026492;
+    font-weight: 600;
+    text-align: center;
+    margin: 10px 0;
+    font-size: 14px;
+  }
+  
+  
+  

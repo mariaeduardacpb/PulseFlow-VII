@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sidebar PulseFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/css/cicloMenstrual.css">
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="profile">
+        <h3>Draª Eliane Young</h3>
+      </div>
+      <nav class="specialties">
+        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
+        <details><summary><span><a href="prontuario.html">Prontuário</a></span></summary></details>
+        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
+        <details open><summary><span>Ginecologia</span><span class="chevron"></span></summary>
+          <ul>
+            <li><a style="font-weight: bold;" href="cicloMenstrual.html">Ciclo Menstrual</a></li>
+          </ul>
+        </details>
+        <details><summary><span>Neurologia</span><span class="chevron"></span></summary>
+          <ul>
+            <li><a href="insonia.html">Insônia</a></li>
+            <li><a href="enxaqueca.html">Enxaqueca</a></li>
+          </ul>
+        </details>
+        <details><summary><span>Dermatologia</span><span class="chevron"></span></summary>
+          <ul>
+            <li><a href="rotinaDermatologica.html">Rotina Dermatológica</a></li>
+          </ul>
+        </details>
+        <details><summary><span>Endocrinologia</span><span class="chevron"></span></summary>
+          <ul>
+            <li><a href="tireoide.html">Tireóide</a></li>
+            <li><a href="diabetes.html">Diabetes</a></li>
+            <li><a href="hormonal.html">Hormonal</a></li>
+          </ul>
+        </details>
+        <details><summary><span>Gastroenterologia</span><span class="chevron"></span></summary>
+          <ul>
+            <li><a href="criseGastrite.html">Crise de Gastrite</a></li>
+          </ul>
+        </details>
+        <details><summary><span>Psiquiatria</span><span class="chevron"></span></summary>
+          <ul>
+            <li><a href="historicoMedicacoes.html">Histórico de Medicações</a></li>
+          </ul>
+        </details>
+        <details><summary><span>Cardiologia</span><span class="chevron"></span></summary>
+          <ul>
+            <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
+            <li><a href="batimentosCardiacos.html">Batimentos Cardíacos</a></li>
+            <li><a href="oxigenaçãoSangue.html">Oxigenação no sangue</a></li>
+          </ul>
+        </details>
+      </nav>
+
+      <div class="change-patient">
+        <a href="selecao.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;">
+            <path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/>
+          </svg>
+          Trocar de Paciente
+        </a>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="page-header">
+        <div class="top-bar">
+          <div class="calendar-title">
+            <img src="../public/assets/gota.png" alt="gota de sangue" class="calendar-icon">
+            <h1>Ciclo Menstrual</h1>
+          </div>
+          <div class="logo">
+            <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+          </div>
+        </div>
+      </header>
+
+      <div class="calendar-controls">
+        <div class="calendar-nav">
+          <button id="prev-month">&lt;</button>
+          <span id="month-year">Abril • 2025</span>
+          <button id="next-month">&gt;</button>
+        </div>
+      </div>
+
+      <section class="calendar">
+        <table>
+          <thead>
+            <tr>
+              <th>Domingo</th>
+              <th>Segunda</th>
+              <th>Terça</th>
+              <th>Quarta</th>
+              <th>Quinta</th>
+              <th>Sexta</th>
+              <th>Sábado</th>
+            </tr>
+          </thead>
+          <tbody id="calendar-body">
+            <!-- Dias preenchidos via JS -->
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+
+  <script src="../public/js/cicloMenstrual.js"></script>
+</body>
+</html>
