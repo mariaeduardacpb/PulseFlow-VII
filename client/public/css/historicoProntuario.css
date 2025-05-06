@@ -217,7 +217,28 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    width: 100%;
+    max-height: calc(100vh - 200px); /* Altura máxima considerando o header e margens */
+    overflow-y: auto;
+    padding-right: 10px; /* Espaço para a barra de rolagem */
+  }
+  
+  /* Estilização da barra de rolagem */
+  .record-list::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .record-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .record-list::-webkit-scrollbar-thumb {
+    background: #002A42;
+    border-radius: 4px;
+  }
+  
+  .record-list::-webkit-scrollbar-thumb:hover {
+    background: #004d73;
   }
   
   .record-item {
