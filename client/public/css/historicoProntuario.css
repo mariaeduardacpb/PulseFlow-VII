@@ -216,15 +216,15 @@
   .record-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 20px;
     width: 100%;
   }
   
   .record-item {
-    background-color: white;
-    border: 1px solid #002A42;
-    padding: 15px;
-    border-radius: 6px;
+    background-color: #fff;
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -232,8 +232,21 @@
     width: 100%;
   }
   
-  .record-item span {
-    display: block;
+  .record-item .info {
+    flex: 1;
+  }
+  
+  .record-item .info p {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: #333;
+  }
+  
+  .record-item .info p:last-child {
+    margin-bottom: 0;
+  }
+  
+  .record-item .info strong {
     color: #002A42;
   }
   
@@ -241,6 +254,15 @@
     color: #002A42;
     font-weight: bold;
     text-decoration: none;
+    padding: 8px 16px;
+    border: 1px solid #002A42;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  .record-item a:hover {
+    background-color: #002A42;
+    color: white;
   }
 
   .change-patient a {

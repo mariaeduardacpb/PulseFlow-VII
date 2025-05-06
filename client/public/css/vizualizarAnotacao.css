@@ -6,7 +6,7 @@
 }
 
 body {
-  background-color: #f2f2f2;
+  background-color: #f8f9fa;
 }
 
 .container {
@@ -119,96 +119,123 @@ body {
   padding: 30px 40px;
 }
 
-.patient-header h1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #002A42;
-  font-size: 26px;
-  margin-bottom: 20px;
-}
-
-.profile-box {
-  background-color: #003954;
-  color: #fff;
-  border-radius: 8px;
-  display: flex;
-  gap: 30px;
-  padding: 30px;
-  align-items: center;
-  margin-bottom: 40px;
-}
-
-.profile-box img {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 100%;
-  border: 3px solid #f2f2f2;
-}
-
-.profile-box .info p {
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-
-.profile-box .separator {
-  width: 2px;
-  height: 100%;
-  background-color: #ffffff;
-  margin: 0 20px;
-  border-radius: 1px;
-}
-
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+  margin-bottom: 40px;
 }
 
 .header h1 {
   font-size: 24px;
-  color: #1f1f1f;
+  color: #002A42;
+  font-weight: 600;
+  letter-spacing: -0.5px;
 }
 
 .logo img {
   height: 50px;
 }
 
+/* Novo design do card de anotação */
 .note-card {
-  background-color: #fff;
-  padding: 25px 30px;
-  border-radius: 10px;
-  margin-top: 30px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 42, 66, 0.08);
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
 }
 
-.note-card p {
-  font-size: 16px;
-  margin-bottom: 12px;
-  color: #333;
-}
-
-.note-card strong {
-  color: #002A42;
+.note-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #002A42, #004d73);
 }
 
 .note-card .titulo {
-  margin-bottom: 18px;
+  font-size: 28px;
+  color: #002A42;
+  margin-bottom: 35px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+  font-weight: 700;
 }
 
-.note-card .data {
-  margin-bottom: 18px;
+.note-card .titulo strong {
+  font-size: 28px;
+  color: #002A42;
+  font-weight: 700;
 }
 
-.note-card .categoria {
-  margin-bottom: 18px;
+.note-card .info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+  margin-bottom: 35px;
+}
+
+.note-card .info-item {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.note-card .info-item strong {
+  display: block;
+  color: #002A42;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.note-card .info-item span {
+  color: #495057;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .note-card .medico {
-  margin-bottom: 25px;
+  grid-column: 1 / -1;
+}
+
+.note-card .anotacao {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-top: 20px;
+}
+
+.note-card .anotacao strong {
+  display: block;
+  color: #002A42;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.note-card .anotacao p {
+  color: #495057;
+  font-size: 16px;
+  line-height: 1.8;
+  margin: 0;
+  padding: 0;
+}
+
+.note-card .anotacao p::after {
+  display: none;
 }
 
 
