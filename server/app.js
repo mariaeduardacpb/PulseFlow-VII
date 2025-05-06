@@ -11,7 +11,7 @@ import pacienteRoutes from './routes/pacienteAuthRoutes.js';
 import insoniaRoutes from './routes/insoniaRoutes.js';
 import anexoExameRoutes from './routes/anexoExameRoutes.js';
 import anotacaoRoutes from './routes/anotacaoRoutes.js';
-import criseGastriteRoutes from './routes/criseGastriteRoutes.js';
+import criseGastriteRoutes from './routes/gastriteRoutes.js';
 import cicloRoutes from './routes/cicloRoutes.js';
 
 dotenv.config();
@@ -38,6 +38,12 @@ app.use('/api/insonia', insoniaRoutes);
 app.use('/api/anexoExame', anexoExameRoutes);
 app.use('/api/anotacoes', anotacaoRoutes);
 app.use('/api/ciclo', cicloRoutes);
-app.use('/api/crises-gastrite', criseGastriteRoutes);
+app.use('/api/gastrite', criseGastriteRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Algo deu errado!' });
+});
 
 export default app;
