@@ -33,11 +33,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const item = document.createElement('div');
       item.className = 'record-item';
       item.innerHTML = `
-        <div>
-          <span>${dataFormatada} ${anotacao.titulo}</span>
-          <span>Draª ${anotacao.medico}</span>
+        <div class="info">
+          <p class="titulo"><strong>Título:</strong> ${anotacao.titulo}</p>
+          <p class="data"><strong>Data:</strong> ${dataFormatada}</p>
+          <p class="categoria"><strong>Categoria:</strong> ${anotacao.categoria}</p>
+          <p class="medico"><strong>Médico Responsável:</strong> Draª ${anotacao.medico}</p>
         </div>
-        <a href="#">Visualizar Prontuário</a>
+        <a href="/client/views/vizualizacaoAnotacao.html?id=${anotacao._id}">Visualizar Prontuário</a>
       `;
       recordList.appendChild(item);
     });

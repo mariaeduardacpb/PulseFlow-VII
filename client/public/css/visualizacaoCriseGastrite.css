@@ -1,0 +1,96 @@
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: #f5f5f5;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    color: #002A42;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.record-details {
+    background-color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.detail-item h3 {
+    color: #002A42;
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.detail-item p {
+    color: #333;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.back-button {
+    background-color: #002A42;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.back-button:hover {
+    background-color: #004d6d;
+}
+
+/* Estilo para intensidade da dor */
+.intensity {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.intensity.low {
+    background-color: #e6f3e6;
+    color: #2e7d32;
+}
+
+.intensity.medium {
+    background-color: #fff3e0;
+    color: #ef6c00;
+}
+
+.intensity.high {
+    background-color: #fbe9e7;
+    color: #c62828;
+} 
