@@ -54,4 +54,21 @@ export const buscarCategorias = async (req, res) => {
     console.error('Erro ao buscar categorias:', error);
     res.status(500).json({ message: 'Erro interno ao buscar categorias' });
   }
+  
+};
+
+export const buscarAnotacaoPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const anotacao = await AnotacaoMedica.findById(id);
+
+    if (!anotacao) {
+      return res.status(404).json({ message: 'Anotação não encontrada' });
+    }
+
+    res.status(200).json(anotacao);
+  } catch (error) {
+    console.error('Erro ao buscar anotação por ID:', error);
+    res.status(500).json({ message: 'Erro interno ao buscar anotação' });
+  }
 };
