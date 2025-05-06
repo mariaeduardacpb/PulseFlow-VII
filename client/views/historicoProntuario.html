@@ -43,15 +43,19 @@
       </header>
 
     <div class="filters">
-      <select class="campo-personalizado">
-        <option>Categoria</option>
+      <select id="filterCategory">
+        <option value="">Todas as especialidades</option>
+        <option value="ginecologia">Ginecologia</option>
+        <option value="neurologia">Neurologia</option>
+        <option value="dermatologia">Dermatologia</option>
+        <option value="endocrinologia">Endocrinologia</option>
+        <option value="gastroenterologia">Gastroenterologia</option>
+        <option value="psiquiatria">Psiquiatria</option>
+        <option value="cardiologia">Cardiologia</option>
       </select>
-      <input type="text" class="campo-personalizado" placeholder="Médico Responsável">
-      <button>Buscar Anotações</button>
-      <a href="criarAnotações.html">
-        <button>Nova Anotações</button>
-      </a>
-      
+      <input type="text" id="filterDoctor" placeholder="Médico Responsável">
+      <button id="filterButton">Filtrar</button>
+      <button onclick="window.location.href='criarAnotações.html'">Nova Anotação</button>
     </div>
 
     <div class="record-list">
