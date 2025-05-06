@@ -5,73 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes da Crise de Gastrite</title>
     <link rel="stylesheet" href="../public/css/visualizacaoCriseGastrite.css">
-    <link rel="stylesheet" href="../public/css/sidebar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <div class="logo">
-                <img src="../public/img/logo.png" alt="Logo">
+        <aside class="sidebar">
+            <div class="profile">
+                <h3>Draª Eliane Young</h3>
             </div>
-            <nav>
-                <ul>
-                    <li><a href="home.html">Home</a></li>
-                    <li><a href="prontuario.html">Prontuário</a></li>
-                    <li><a href="historicoAnotacao.html">Histórico de Anotações</a></li>
-                    <li><a href="historicoCriseGastrite.html">Histórico de Crises</a></li>
-                    <li><a href="index.html">Sair</a></li>
-                </ul>
+            <nav class="specialties">
+                <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
+                <details><summary><span><a href="prontuario.html">Prontuário</a></span></summary></details>
+                <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
+                <details><summary><span>Ginecologia</span><span class="chevron"></span></summary>
+                    <ul><li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li></ul>
+                </details>
+                <details><summary><span>Neurologia</span><span class="chevron"></span></summary>
+                    <ul>
+                        <li><a href="insonia.html">Insônia</a></li>
+                        <li><a href="enxaqueca.html">Enxaqueca</a></li>
+                    </ul>
+                </details>
+                <details><summary><span>Dermatologia</span><span class="chevron"></span></summary>
+                    <ul><li><a href="rotinaDermatologica.html">Rotina Dermatológica</a></li></ul>
+                </details>
+                <details><summary><span>Endocrinologia</span><span class="chevron"></span></summary>
+                    <ul>
+                        <li><a href="tireoide.html">Tireóide</a></li>
+                        <li><a href="diabetes.html">Diabetes</a></li>
+                        <li><a href="hormonal.html">Hormonal</a></li>
+                    </ul>
+                </details>
+                <details open><summary><span>Gastroenterologia</span><span class="chevron"></span></summary>
+                    <ul><li><a style="font-weight: bold;" href="historicoCriseGastrite.html">Crise de Gastrite</a></li></ul>
+                </details>
+                <details><summary><span>Psiquiatria</span><span class="chevron"></span></summary>
+                    <ul><li><a href="historicoMedicacoes.html">Histórico de Medicações</a></li></ul>
+                </details>
+                <details><summary><span>Cardiologia</span><span class="chevron"></span></summary>
+                    <ul>
+                        <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
+                        <li><a href="batimentosCardiacos.html">Batimentos Cardíacos</a></li>
+                        <li><a href="oxigenaçãoSangue.html">Oxigenação no sangue</a></li>
+                    </ul>
+                </details>
             </nav>
-        </div>
+            <div class="change-patient">
+                <a href="selecao.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;">
+                        <path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/>
+                    </svg>
+                    Trocar de Paciente
+                </a>
+            </div>
+        </aside>
 
-        <div class="main-content">
-            <div class="header">
+        <main class="content">
+            <header class="header">
                 <h1>Detalhes da Crise de Gastrite</h1>
-            </div>
+                <div class="logo">
+                    <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+                </div>
+            </header>
 
-            <div class="record-details">
-                <div class="detail-item">
-                    <h3>Data da Crise</h3>
-                    <p id="dataCrise"></p>
+            <section class="note-card">
+                <div class="card-header">
+                    <h2>Crise de Gastrite</h2>
+                    <div class="status-badge" id="statusCrise"></div>
                 </div>
 
-                <div class="detail-item">
-                    <h3>Intensidade da Dor</h3>
-                    <p id="intensidadeDor"></p>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Data da Crise</strong>
+                        <span id="dataCrise"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Intensidade da Dor</strong>
+                        <span id="intensidadeDor"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Alívio após Medicação</strong>
+                        <span id="alivioMedicacao"></span>
+                    </div>
                 </div>
 
-                <div class="detail-item">
-                    <h3>Sintomas Relatados</h3>
-                    <p id="sintomas"></p>
-                </div>
+                <div class="details-grid">
+                    <div class="detail-section">
+                        <h3>Sintomas Relatados</h3>
+                        <div class="detail-content">
+                            <p id="sintomas"></p>
+                        </div>
+                    </div>
 
-                <div class="detail-item">
-                    <h3>Alimentos Ingeridos</h3>
-                    <p id="alimentos"></p>
-                </div>
+                    <div class="detail-section">
+                        <h3>Alimentos Ingeridos</h3>
+                        <div class="detail-content">
+                            <p id="alimentos"></p>
+                        </div>
+                    </div>
 
-                <div class="detail-item">
-                    <h3>Medicação Usada</h3>
-                    <p id="medicacao"></p>
-                </div>
+                    <div class="detail-section">
+                        <h3>Medicação Usada</h3>
+                        <div class="detail-content">
+                            <p id="medicacao"></p>
+                        </div>
+                    </div>
 
-                <div class="detail-item">
-                    <h3>Alívio após Medicação</h3>
-                    <p id="alivioMedicacao"></p>
+                    <div class="detail-section">
+                        <h3>Observações Adicionais</h3>
+                        <div class="detail-content">
+                            <p id="observacoes"></p>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="detail-item">
-                    <h3>Observações Adicionais</h3>
-                    <p id="observacoes"></p>
-                </div>
-            </div>
-
-            <div class="actions">
-                <button onclick="window.location.href='historicoCriseGastrite.html'" class="back-button">Voltar</button>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
-
     <script src="../public/js/visualizacaoCriseGastrite.js"></script>
 </body>
 </html> 

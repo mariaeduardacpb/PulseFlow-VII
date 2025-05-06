@@ -73,8 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Adiciona os filtros à URL se existirem
       const queryParams = new URLSearchParams();
-      if (filters.month && filters.month !== '') queryParams.append('month', filters.month);
-      if (filters.year && filters.year !== '') queryParams.append('year', filters.year);
+      
+      // Lógica para o filtro de mês e ano
+      if (filters.month && filters.month !== '' && filters.year && filters.year !== '') {
+        // Formata o mês com zero à esquerda se necessário
+        const month = filters.month.padStart(2, '0');
+        queryParams.append('month', `${filters.year}-${month}`);
+      } else if (filters.year && filters.year !== '') {
+        queryParams.append('year', filters.year);
+      }
+
+      // Lógica para o filtro de intensidade
       if (filters.intensity && filters.intensity !== '') {
         const [min, max] = filters.intensity.split('-').map(Number);
         queryParams.append('intensity', `${min}-${max}`);
