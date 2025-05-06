@@ -148,13 +148,15 @@
     height: 24px;
   }
   
-  /* Controle de mês no canto direito */
   .calendar-controls {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 10px;
+    margin-top: 80px; /* move o seletor para baixo */
+    margin-bottom: 0;
+    padding-right: 8px;
   }
+  
+  
   
   .calendar-nav {
     display: flex;
@@ -172,11 +174,12 @@
     color: #002A42;
   }
   
-  /* Calendar table */
   .calendar {
     padding: 0;
     background: none;
+    margin-top: 20px; /* <-- adiciona esse espaçamento */
   }
+  
   
   .calendar table {
     width: 100%;
@@ -200,4 +203,46 @@
     font-size: 14px;
     color: #555;
   }
+
+  .day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    font-size: 14px;
+    height: 40px;
+    width: 40px;
+    margin: 4px auto;
+    border-radius: 50%;
+    position: relative;
+  }
+  
+  .day.menstrual {
+    color: #e74c3c;
+    font-weight: 500;
+  }
+  
+  .drop-icon {
+    margin-top: 2px;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+  }
+  
+  .day.menstrual:hover .drop-icon {
+    transform: scale(1.2);
+    transition: transform 0.2s ease;
+  }
+  
+  .day img {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #e74c3c; /* vermelho sangue */
+    margin-right: 5px;
+  }
+  
+  td {
+    text-align: center;
+  }
+  
   

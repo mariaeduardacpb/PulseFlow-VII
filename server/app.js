@@ -13,6 +13,7 @@ import anexoExameRoutes from './routes/anexoExameRoutes.js';
 import anotacaoRoutes from './routes/anotacaoRoutes.js';
 import criseGastriteRoutes from './routes/gastriteRoutes.js';
 import cicloRoutes from './routes/cicloRoutes.js';
+import menstruacaoRoutes from './routes/menstruacaoRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -39,6 +40,7 @@ app.use('/api/anexoExame', anexoExameRoutes);
 app.use('/api/anotacoes', anotacaoRoutes);
 app.use('/api/ciclo', cicloRoutes);
 app.use('/api/gastrite', criseGastriteRoutes);
+app.use('/api/menstruacao', menstruacaoRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciclo Menstrual - PulseFlow</title>
+    <link rel="stylesheet" href="css/menstruacao.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="calendar">
+            <div class="calendar-header">
+                <button id="prev-month">←</button>
+                <h2 id="month-year"></h2>
+                <button id="next-month">→</button>
+            </div>
+            <table class="calendar-grid">
+                <thead>
+                    <tr>
+                        <th>Dom</th>
+                        <th>Seg</th>
+                        <th>Ter</th>
+                        <th>Qua</th>
+                        <th>Qui</th>
+                        <th>Sex</th>
+                        <th>Sáb</th>
+                    </tr>
+                </thead>
+                <tbody id="calendar-body">
+                    <!-- O calendário será renderizado aqui -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="registro-form">
+            <h2>Registrar Menstruação</h2>
+            <form id="registroForm">
+                <div class="form-group">
+                    <label for="dataInicio">Data de Início:</label>
+                    <input type="date" id="dataInicio" name="dataInicio" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dataFim">Data de Término:</label>
+                    <input type="date" id="dataFim" name="dataFim" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="teveColica">Teve Cólica?</label>
+                    <select id="teveColica" name="teveColica" required>
+                        <option value="false">Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="intensidadeColicaGroup" style="display: none;">
+                    <label for="intensidadeColica">Intensidade da Cólica:</label>
+                    <select id="intensidadeColica" name="intensidadeColica">
+                        <option value="leve">Leve</option>
+                        <option value="moderada">Moderada</option>
+                        <option value="forte">Forte</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fluxo">Fluxo:</label>
+                    <select id="fluxo" name="fluxo" required>
+                        <option value="leve">Leve</option>
+                        <option value="moderado">Moderado</option>
+                        <option value="intenso">Intenso</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="humor">Humor:</label>
+                    <select id="humor" name="humor" required>
+                        <option value="bom">Bom</option>
+                        <option value="normal">Normal</option>
+                        <option value="irritada">Irritada</option>
+                        <option value="ansiosa">Ansiosa</option>
+                        <option value="deprimida">Deprimida</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="observacoes">Observações:</label>
+                    <textarea id="observacoes" name="observacoes" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn-registrar">Salvar Registro</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/menstruacao.js"></script>
+</body>
+</html> 
