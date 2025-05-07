@@ -9,7 +9,7 @@ export const getCrises = async (req, res) => {
         console.log('Buscando crises para CPF:', cpf);
 
         // Busca o paciente pelo CPF
-        const paciente = await Paciente.findOne({ cpf });
+        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
         console.log('Paciente encontrado:', paciente ? 'Sim' : 'Não');
 
         if (!paciente) {
@@ -73,15 +73,14 @@ export const createCrise = async (req, res) => {
     try {
         const { cpfPaciente, data, intensidadeDor, sintomas, alimentosIngeridos, medicacao, alivioMedicacao, observacoes } = req.body;
 
-        // Busca o paciente pelo CPF
-        const paciente = await Paciente.findOne({ cpf: cpfPaciente });
+        // Buscar o paciente pelo CPF
+        const paciente = await Paciente.findOne({ cpf: cpfPaciente.replace(/[^\d]/g, '') });
         if (!paciente) {
             return res.status(404).json({ message: 'Paciente não encontrado' });
         }
 
         const crise = new CriseGastrite({
             paciente: paciente._id,
-            cpfPaciente,
             data,
             intensidadeDor,
             sintomas,
@@ -95,7 +94,7 @@ export const createCrise = async (req, res) => {
         res.status(201).json(crise);
     } catch (error) {
         console.error('Erro ao criar crise:', error);
-        res.status(500).json({ message: 'Erro ao criar crise' });
+        res.status(400).json({ message: error.message });
     }
 };
 
@@ -136,5 +135,32 @@ export const deleteCrise = async (req, res) => {
     } catch (error) {
         console.error('Erro ao deletar crise:', error);
         res.status(500).json({ message: 'Erro ao deletar crise' });
+    }
+};
+
+// Buscar detalhes de uma crise específica
+export const getCriseDetails = async (req, res) => {
+    try {
+        const { cpf, id } = req.params;
+
+        // Buscar o paciente pelo CPF
+        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente não encontrado' });
+        }
+
+        const crise = await CriseGastrite.findOne({
+            _id: id,
+            paciente: paciente._id
+        });
+
+        if (!crise) {
+            return res.status(404).json({ message: 'Crise não encontrada' });
+        }
+
+        res.json(crise);
+    } catch (error) {
+        console.error('Erro ao buscar detalhes da crise:', error);
+        res.status(500).json({ message: 'Erro ao buscar detalhes da crise' });
     }
 };

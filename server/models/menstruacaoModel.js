@@ -6,10 +6,6 @@ const menstruacaoSchema = new mongoose.Schema({
         ref: 'Paciente',
         required: true
     },
-    cpfPaciente: {
-        type: String,
-        required: true
-    },
     dataInicio: {
         type: Date,
         required: true

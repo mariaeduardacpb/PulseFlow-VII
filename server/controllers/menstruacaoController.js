@@ -14,7 +14,6 @@ export const criarRegistro = async (req, res) => {
 
         const registro = new Menstruacao({
             paciente: paciente._id,
-            cpfPaciente,
             dataInicio,
             dataFim,
             teveColica,
@@ -39,7 +38,13 @@ export const obterRegistros = async (req, res) => {
             return res.status(400).json({ message: 'CPF não fornecido' });
         }
 
-        const registros = await Menstruacao.find({ cpfPaciente: cpf })
+        // Buscar o paciente pelo CPF
+        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente não encontrado' });
+        }
+
+        const registros = await Menstruacao.find({ paciente: paciente._id })
             .sort({ dataInicio: -1 });
         res.status(200).json(registros);
     } catch (error) {
@@ -56,9 +61,15 @@ export const obterRegistro = async (req, res) => {
             return res.status(400).json({ message: 'CPF ou ID não fornecidos' });
         }
 
+        // Buscar o paciente pelo CPF
+        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente não encontrado' });
+        }
+
         const registro = await Menstruacao.findOne({
             _id: id,
-            cpfPaciente: cpf
+            paciente: paciente._id
         });
 
         if (!registro) {
@@ -79,11 +90,17 @@ export const atualizarRegistro = async (req, res) => {
             return res.status(400).json({ message: 'CPF ou ID não fornecidos' });
         }
 
+        // Buscar o paciente pelo CPF
+        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente não encontrado' });
+        }
+
         const { dataInicio, dataFim, teveColica, intensidadeColica, fluxo, humor, observacoes } = req.body;
         
         const registro = await Menstruacao.findOne({
             _id: id,
-            cpfPaciente: cpf
+            paciente: paciente._id
         });
 
         if (!registro) {
@@ -113,9 +130,15 @@ export const excluirRegistro = async (req, res) => {
             return res.status(400).json({ message: 'CPF ou ID não fornecidos' });
         }
 
+        // Buscar o paciente pelo CPF
+        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente não encontrado' });
+        }
+
         const registro = await Menstruacao.findOneAndDelete({
             _id: id,
-            cpfPaciente: cpf
+            paciente: paciente._id
         });
 
         if (!registro) {

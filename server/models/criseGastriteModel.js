@@ -6,10 +6,6 @@ const criseGastriteSchema = new mongoose.Schema({
         ref: 'Paciente',
         required: true
     },
-    cpfPaciente: {
-        type: String,
-        required: true
-    },
     data: {
         type: Date,
         required: true
@@ -34,7 +30,7 @@ const criseGastriteSchema = new mongoose.Schema({
     },
     alivioMedicacao: {
         type: Boolean,
-        required: false
+        required: true
     },
     observacoes: {
         type: String,
