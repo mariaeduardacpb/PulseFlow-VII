@@ -66,3 +66,6 @@ Este documento explica a estrutura do projeto **frontend** do PulseFlow, contend
 1. Clone o repositório:
    ```bash
    git clone https://github.com/mariaeduardacpb/PulseFlow-VII.git
+
+2. Abra o terminal e certifique que você está dentro da pasta Server.
+3. Digite "NPM RUN DEV"
