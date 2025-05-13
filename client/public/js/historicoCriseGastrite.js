@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('Paciente não selecionado');
       }
 
-      let url = `http://localhost:5500/api/gastrite/crises/${paciente.cpf}`;
+      let url = `http://localhost:5000/api/gastrite/crises/${paciente.cpf}`;
       
       // Adiciona os filtros à URL se existirem
       const queryParams = new URLSearchParams();

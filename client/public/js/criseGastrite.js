@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 observacoes: document.getElementById('observacoes').value
             };
 
-            const response = await fetch('http://localhost:5500/api/crise-gastrite', {
+            const response = await fetch('http://localhost:5000/api/crise-gastrite', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

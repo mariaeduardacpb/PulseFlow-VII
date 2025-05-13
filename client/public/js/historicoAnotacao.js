@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    const response = await fetch(`http://localhost:5500/api/anotacoes/${cpf}`, {
+    const response = await fetch(`http://localhost:5000/api/anotacoes/${cpf}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

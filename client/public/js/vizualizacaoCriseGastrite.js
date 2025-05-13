@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Faz a requisição para obter os detalhes da crise
-        const response = await fetch(`http://localhost:5500/api/gastrite/crises/${paciente.cpf}/${criseId}`, {
+        const response = await fetch(`http://localhost:5000/api/gastrite/crises/${paciente.cpf}/${criseId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

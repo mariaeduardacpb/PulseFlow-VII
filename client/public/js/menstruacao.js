@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
     // Buscar ciclos
-    const resCiclos = await fetch(`http://localhost:5500/api/ciclo/${cpf}`, {
+    const resCiclos = await fetch(`http://localhost:5000/api/ciclo/${cpf}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 

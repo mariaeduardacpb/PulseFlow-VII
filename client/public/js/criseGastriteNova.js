@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const res = await fetch("http://localhost:5500/api/gastrite/crises", {
+      const res = await fetch("http://localhost:5000/api/gastrite/crises", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
