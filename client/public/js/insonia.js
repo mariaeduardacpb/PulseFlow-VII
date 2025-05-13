@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return { dias: [], horasSono: [], qualidadeSono: [] };
       }
 
-      const response = await fetch(`http://127.0.0.1:5000/api/insonia/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
+      const response = await fetch(`http://127.0.0.1:5500/api/insonia/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${tokenMedico}`,

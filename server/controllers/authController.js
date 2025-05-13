@@ -185,7 +185,7 @@ export const resetPassword = async (req, res) => {
 
     // Gerando token de redefinição de senha
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    const resetLink = `http://localhost:5000/client/views/reset-password-form.html?token=${token}`;
+    const resetLink = `http://localhost:5500/client/views/reset-password-form.html?token=${token}`;
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',

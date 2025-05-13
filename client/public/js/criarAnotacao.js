@@ -22,7 +22,7 @@ document.querySelector("form").addEventListener("submit", async (e) => {
   };
 
   try {
-    const res = await fetch("http://localhost:5000/api/anotacoes/nova", {
+    const res = await fetch("http://localhost:5500/api/anotacoes/nova", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,

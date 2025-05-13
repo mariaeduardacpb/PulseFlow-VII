@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Token não encontrado');
         }
 
-        const response = await fetch(`http://localhost:5000/api/gastrite/crises/detalhes/${criseId}`, {
+        const response = await fetch(`http://localhost:5500/api/gastrite/crises/detalhes/${criseId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

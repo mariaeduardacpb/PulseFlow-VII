@@ -28,7 +28,7 @@ btnAcesso.addEventListener('click', async () => {
   try {
     const token = localStorage.getItem('token');
 
-    const res = await fetch(`http://localhost:5000/api/pacientes/buscar?cpf=${cpfLimpo}`, {
+    const res = await fetch(`http://localhost:5500/api/pacientes/buscar?cpf=${cpfLimpo}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
