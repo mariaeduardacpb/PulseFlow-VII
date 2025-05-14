@@ -22,7 +22,7 @@ dotenv.config();
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
-const _dirname = path.dirname(_filename);
+const _dirname = path.dirname(__filename);
 
 // Configuração do CORS
 const corsOptions = {
@@ -40,7 +40,7 @@ app.use(express.json());
 connectDB();
 
 // Arquivos estáticos
-app.use('/client', express.static(path.join(__dirname, '..', 'client')));
+app.use('/client', express.static(path.join(_dirname, '..', 'client')));
 
 // Rotas da aplicação
 app.use('/api/auth', authRoutes);
