@@ -1,3 +1,4 @@
+// app.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -5,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js'; // ✅ NOVO IMPORT
 import connectDB from './config/db.js';
 import enxaquecaRoutes from './routes/enxaquecaRoutes.js';
 import pacienteRoutes from './routes/pacienteAuthRoutes.js';
@@ -39,8 +41,9 @@ connectDB();
 // Arquivos estáticos
 app.use('/client', express.static(path.join(__dirname, '..', 'client')));
 
-// Rotas
+// Rotas da aplicação
 app.use('/api/auth', authRoutes);
+app.use('/api/usuarios', userRoutes); // ✅ NOVA ROTA ATIVADA
 app.use('/api/enxaqueca', enxaquecaRoutes);
 app.use('/api/paciente', pacienteRoutes);
 app.use('/api/insonia', insoniaRoutes);
@@ -50,7 +53,7 @@ app.use('/api/ciclo', cicloRoutes);
 app.use('/api/gastrite', criseGastriteRoutes);
 app.use('/api/menstruacao', menstruacaoRoutes);
 
-// Error handling middleware
+// Middleware de erro
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Algo deu errado!' });
