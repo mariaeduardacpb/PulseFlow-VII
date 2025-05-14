@@ -60,4 +60,21 @@ export const buscarEventos = async (req, res) => {
     console.error('Erro ao buscar eventos:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
+};
+
+// Buscar um evento específico por ID
+export const buscarEventoPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const evento = await EventoClinico.findById(id).populate('paciente', 'nome cpf dataNascimento');
+    
+    if (!evento) {
+      return res.status(404).json({ message: 'Evento não encontrado' });
+    }
+
+    res.json(evento);
+  } catch (error) {
+    console.error('Erro ao buscar evento:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
 }; 

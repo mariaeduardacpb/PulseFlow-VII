@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Evento Clínico</title>
+    <link rel="stylesheet" href="../public/css/vizualizacaoEventoClinico.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="profile">
+                <h3>Draª Eliane Young</h3>
+            </div>
+            <nav class="specialties">
+                <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
+                <details><summary><span><a href="historicoProntuario.html">Anotações Médicas</a></span></summary></details>
+                <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
+                <details><summary><span style="font-weight: bold;"><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
+                <details><summary><span>Ginecologia</span><span class="chevron"></span></summary><ul><li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li></ul></details>
+                <details><summary><span>Cardiologia</span><span class="chevron"></span></summary><ul><li><a href="pressaoArterial.html">Pressão Arterial</a></li><li><a href="batimentosCardiacos.html">Batimentos Cardíacos</a></li><li><a href="oxigenaçãoSangue.html">Oxigenação no sangue</a></li></ul></details>
+            </nav>
+            <div class="change-patient">
+                <a href="selecao.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;">
+                        <path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/>
+                    </svg>
+                    Trocar de Paciente
+                </a>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="header">
+                <div class="header-left">
+                    <h1>Detalhes do Evento Clínico</h1>
+                    <div class="patient-info">
+                        <span class="patient-label">Paciente:</span>
+                        <span id="nomePaciente" class="patient-name"></span>
+                    </div>
+                </div>
+                <div class="logo">
+                    <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+                </div>
+            </header>
+
+            <section class="note-card">
+                <div class="card-header">
+                    <h2 id="tituloEvento">Evento Clínico</h2>
+                    <div class="status-badge" id="tipoEvento"></div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Data e Hora</strong>
+                        <span id="dataHora"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Especialidade</strong>
+                        <span id="especialidade"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Intensidade da Dor</strong>
+                        <span id="intensidadeDor"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Alívio</strong>
+                        <span id="alivio"></span>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-section">
+                        <h3>Descrição do Evento</h3>
+                        <div class="detail-content">
+                            <p id="descricao"></p>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>Sintomas Apresentados</h3>
+                        <div class="detail-content">
+                            <p id="sintomas"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="../public/js/vizualizacaoEventoClinico.js"></script>
+</body>
+</html> 

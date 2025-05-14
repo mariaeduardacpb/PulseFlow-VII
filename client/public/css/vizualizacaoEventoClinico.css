@@ -1,0 +1,310 @@
+* {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 240px;
+    background-color: #002A42;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.profile h3 {
+    font-size: 16px;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+.specialties details {
+    margin-bottom: 12px;
+    border-bottom: 1px solid #1c4a7d;
+    padding-bottom: 8px;
+}
+
+.specialties summary {
+    list-style: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #f0f0f0;
+}
+
+.specialties summary::-webkit-details-marker {
+    display: none;
+}
+
+.specialties .chevron {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+    margin-left: 10px;
+}
+
+.specialties details[open] .chevron {
+    transform: rotate(225deg);
+}
+
+.specialties ul {
+    margin-top: 10px;
+    margin-left: 10px;
+    list-style: none;
+    padding-left: 0;
+}
+
+.specialties li {
+    margin: 8px 0;
+}
+
+.specialties a {
+    color: white;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.specialties a:hover {
+    background-color: rgba(0, 195, 183, 0.15);
+}
+
+.change-patient {
+    margin-top: auto;
+}
+
+.change-patient a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #FFF;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.content {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    max-width: 1280px;
+    padding: 30px 40px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 40px;
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.patient-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 16px;
+}
+
+.patient-label {
+    font-weight: 500;
+    color: #002A42;
+}
+
+.patient-name {
+    font-weight: 600;
+    color: #002A42;
+}
+
+.header h1 {
+    font-size: 24px;
+    color: #002A42;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.logo img {
+    height: 50px;
+}
+
+.note-card {
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 42, 66, 0.08);
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.note-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #002A42, #004d73);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.card-header h2 {
+    font-size: 28px;
+    color: #002A42;
+    font-weight: 700;
+    margin: 0;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-badge.crise {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge.acompanhamento {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-badge.psicologico {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.medicacao {
+    background-color: #e6f4ea;
+    color: #1e7e34;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+.info-item {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.info-item strong {
+    display: block;
+    color: #002A42;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.info-item span {
+    color: #666;
+    font-size: 15px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+.detail-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.detail-section h3 {
+    color: #002A42;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 15px 0;
+}
+
+.detail-content {
+    color: #666;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.detail-content p {
+    margin: 0;
+}
+
+/* Estilos para a intensidade da dor */
+.intensity {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.intensity.low {
+    background-color: #e6f4ea;
+    color: #1e7e34;
+}
+
+.intensity.medium {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.intensity.high {
+    background-color: #f8d7da;
+    color: #721c24;
+} 

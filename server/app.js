@@ -53,6 +53,7 @@ app.use('/api/anotacoes', anotacaoRoutes);
 app.use('/api/ciclo', cicloRoutes);
 app.use('/api/gastrite', criseGastriteRoutes);
 app.use('/api/menstruacao', menstruacaoRoutes);
+app.use('/api/eventos-clinicos', eventoClinicoRoutes);
 
 // Middleware de erro
 app.use((err, req, res, next) => {
