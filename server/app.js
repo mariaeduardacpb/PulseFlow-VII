@@ -16,12 +16,13 @@ import anotacaoRoutes from './routes/anotacaoRoutes.js';
 import criseGastriteRoutes from './routes/gastriteRoutes.js';
 import cicloRoutes from './routes/cicloRoutes.js';
 import menstruacaoRoutes from './routes/menstruacaoRoutes.js';
+import eventoClinicoRoutes from './routes/eventoClinicoRoutes.js';
 
 dotenv.config();
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const _dirname = path.dirname(_filename);
 
 // Configuração do CORS
 const corsOptions = {
