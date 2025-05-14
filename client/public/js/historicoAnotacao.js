@@ -17,14 +17,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     if (!response.ok) {
-      throw new Error('Erro ao buscar anotações');
+      throw new Error('Erro ao buscar Registro Clinico');
     }
 
     const anotacoes = await response.json();
     recordList.innerHTML = '';
 
     if (anotacoes.length === 0) {
-      recordList.innerHTML = '<p>Nenhuma anotação encontrada.</p>';
+      recordList.innerHTML = '<p>Nenhum Registro Clinico encontrado.</p>';
       return;
     }
 
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <p class="categoria"><strong>Categoria:</strong> ${anotacao.categoria}</p>
           <p class="medico"><strong>Médico Responsável:</strong> Draª ${anotacao.medico}</p>
         </div>
-        <a href="/client/views/vizualizacaoAnotacao.html?id=${anotacao._id}">Visualizar Prontuário</a>
+        <a href="/client/views/vizualizacaoAnotacao.html?id=${anotacao._id}">Visualizar Registro Clinico </a>
       `;
       recordList.appendChild(item);
     });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Visualizar Anotação</title>
+  <title>Visualizar Registro Clinico Do Atendimento</title>
   <link rel="stylesheet" href="../public/css/vizualizarAnotacao.css">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
@@ -20,11 +20,6 @@
         <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
         <details><summary><span><a href="RegistroDoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
         <details><summary><span>Ginecologia</span><span class="chevron"></span></summary><ul><li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li></ul></details>
-        <details><summary><span>Neurologia</span><span class="chevron"></span></summary><ul><li><a href="insonia.html">Insônia</a></li><li><a href="enxaqueca.html">Enxaqueca</a></li></ul></details>
-        <details><summary><span>Dermatologia</span><span class="chevron"></span></summary><ul><li><a href="rotinaDermatologica.html">Rotina Dermatológica</a></li></ul></details>
-        <details><summary><span>Endocrinologia</span><span class="chevron"></span></summary><ul><li><a href="tireoide.html">Tireóide</a></li><li><a href="diabetes.html">Diabetes</a></li><li><a href="hormonal.html">Hormonal</a></li></ul></details>
-        <details><summary><span>Gastroenterologia</span><span class="chevron"></span></summary><ul><li><a href="NOVAcrise.html">Crise de Gastrite</a></li></ul></details>
-        <details><summary><span>Psiquiatria</span><span class="chevron"></span></summary><ul><li><a href="historicoMedicacoes.html">Histórico de Medicações</a></li></ul></details>
         <details><summary><span>Cardiologia</span><span class="chevron"></span></summary><ul><li><a href="pressaoArterial.html">Pressão Arterial</a></li><li><a href="batimentosCardiacos.html">Batimentos Cardíacos</a></li><li><a href="oxigenaçãoSangue.html">Oxigenação no sangue</a></li></ul></details>
       </nav>
       <div class="change-patient">
@@ -39,21 +34,21 @@
 
     <main class="content">
       <header class="header">
-        <h1>Visualizar Anotação</h1>
+        <h1>Visualizar Registro Clinico</h1>
         <div class="logo">
           <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
         </div>
       </header>
 
       <section class="note-card">
-        <p class="titulo"><strong>Título</strong></p>
+        <p class="titulo"><strong>Motivo Da Consulta</strong></p>
         <div class="info-grid">
           <div class="info-item">
             <strong>Data</strong>
             <span class="data"></span>
           </div>
           <div class="info-item">
-            <strong>Categoria</strong>
+            <strong>Especialidades</strong>
             <span class="categoria"></span>
           </div>
           <div class="info-item medico">
@@ -62,7 +57,7 @@
           </div>
         </div>
         <div class="anotacao">
-          <strong>Anotação</strong>
+          <strong>Registro Clínico</strong>
           <p></p>
         </div>
       </section>
