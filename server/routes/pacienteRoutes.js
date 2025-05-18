@@ -54,7 +54,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
       profissao: paciente.profissao,
       telefone: paciente.telefone,
       observacoes: paciente.observacoes,
-      fotoUrl: paciente.fotoUrl // exemplo: link ou base64
+      fotoPerfil: paciente.fotoPerfil // exemplo: link ou base64
     });
   } catch (err) {
     res.status(500).json({ message: 'Erro interno do servidor', error: err.message });

@@ -14,54 +14,59 @@ body {
 }
 
 .left-box {
-  width: 40%;
-  background: linear-gradient(135deg, #003b54, #005b79);
+  flex: 0.9; /* antes era 1 */
+  background-color: #00394f;
   color: white;
-  padding: 60px 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  padding: 5px;
+  text-align: center;
+  position: relative;
 }
 
-.left-box h2 {
+.left h2 {
   font-size: 28px;
-  margin-bottom: 20px;
+  margin-bottom: 50px;
+  max-width: 380px;
 }
 
-.left-box p {
-  font-size: 16px;
-  line-height: 1.6;
+.left p {
+  font-size: 18px;
+  max-width: 300px;
+  margin-bottom: 50px;
+  line-height: 1.5;
+  font-weight: 150;
 }
 
 .right-box {
-  width: 60%;
-  background-color: #fefefe;
+  flex: 1.2;
+  background-color: #f4f4f4;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 40px;
+  padding: 60px 40px;
 }
 
 .form-box {
-  background-color: #ffffff;
-  padding: 40px 32px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 60px 5px;
   max-width: 360px;
   width: 100%;
   text-align: center;
 }
 
 .form-box h1 {
-  font-size: 24px;
+  font-size: 26px;
   color: #003b54;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: 16px;
   color: #666;
-  margin-bottom: 30px;
+  margin-bottom: 50px;
 }
 
 input[type="text"] {
@@ -72,7 +77,7 @@ input[type="text"] {
   background-color: #f9f9f9;
   font-size: 16px;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 50px;
 }
 
 button {
@@ -94,7 +99,7 @@ button:hover {
 .cancel-btn {
   background-color: #e0e0e0;
   color: #003b54;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .cancel-btn:hover {
@@ -102,8 +107,8 @@ button:hover {
 }
 
 .resend-text {
-  margin-top: 18px;
-  font-size: 13px;
+  margin-top: 30px;
+  font-size: 16px;
   color: #444;
 }
 

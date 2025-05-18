@@ -3,11 +3,17 @@ document.querySelector("form").addEventListener("submit", async (e) => {
 
   const token = localStorage.getItem("token"); // Médico logado
 
-  // CPF de teste — troque por um que esteja cadastrado no seu MongoDB
-  const cpf = "14789636584";
+  // Recupera o CPF do paciente selecionado
+  const paciente = JSON.parse(localStorage.getItem("pacienteSelecionado"));
+  const cpf = paciente?.cpf;
+
+  if (!cpf) {
+    alert("Paciente não selecionado. Volte à tela de seleção.");
+    return;
+  }
 
   const body = {
-    cpf, // usando o CPF fixo
+    cpf,
     titulo: document.getElementById("titulo").value,
     data: document.getElementById("data").value,
     categoria: document.getElementById("categoria").value,
@@ -29,6 +35,7 @@ document.querySelector("form").addEventListener("submit", async (e) => {
     if (!res.ok) throw new Error(result.message || 'Erro ao salvar');
 
     alert("Anotação salva com sucesso!");
+    document.querySelector("form").reset(); // limpa o formulário
   } catch (err) {
     alert("Erro: " + err.message);
   }

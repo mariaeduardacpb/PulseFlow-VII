@@ -1,0 +1,210 @@
+/* Reset e base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  background-color: #f2f2f2;
+  overflow-y: auto;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: #002A42;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.profile h3 {
+  font-size: 16px;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.specialties details {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #1c4a7d;
+  padding-bottom: 8px;
+}
+
+.specialties summary {
+  list-style: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #f0f0f0;
+}
+
+.specialties summary::-webkit-details-marker {
+  display: none;
+}
+
+.specialties .chevron {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+  margin-left: 10px;
+}
+
+.specialties details[open] .chevron {
+  transform: rotate(135deg);
+}
+
+.specialties ul {
+  margin-top: 10px;
+  margin-left: 10px;
+  list-style: none;
+  padding-left: 0;
+}
+
+.specialties li {
+  margin: 8px 0;
+}
+
+.specialties a {
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.specialties a:hover {
+  background-color: rgba(0, 195, 183, 0.15);
+}
+
+.change-patient {
+  margin-top: auto;
+}
+
+.change-patient a {
+  color: #FFF;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.form-section {
+  flex-grow: 1;
+  margin-left: 240px;
+  padding: 40px 60px;
+  background-color: #fff;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.form-header h1 {
+  font-size: 24px;
+  color: #002A42;
+  margin-left: 10px;
+}
+
+.form-header .icon {
+  font-size: 28px;
+}
+
+.form-header .logo {
+  height: 30px;
+  margin-left: auto;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+form label {
+  font-weight: 500;
+  color: #333;
+}
+
+form input,
+form select,
+form textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M24.2469 13.1983C24.6785 13.6209 24.6857 14.3134 24.263 14.745L18.491 20.639C18.0684 21.0705 17.3759 21.0778 16.9443 20.6551L11.0503 14.8831C10.6187 14.4605 10.6115 13.768 11.0341 13.3364C11.4568 12.9048 12.1493 12.8976 12.5808 13.3202L17.6934 18.327L22.7002 13.2144C23.1228 12.7829 23.8153 12.7756 24.2469 13.1983Z" fill="black"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 25px 25px;
+  padding-right: 50px;
+}
+
+select:focus {
+  outline: none;
+  border-color: #003B5C;
+}
+
+select option {
+  position: relative;
+  z-index: 2;
+}
+
+/* Garante que o dropdown abra para baixo */
+select:focus option {
+  position: static;
+}
+
+form textarea {
+  resize: none;
+}
+
+form button {
+  align-self: center;
+  background-color: #003B5C;
+  color: white;
+  padding: 10px 20px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: #00547f;
+}
+
+.logo img {
+  height: 50px;
+}
