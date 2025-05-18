@@ -66,13 +66,15 @@ document.addEventListener("DOMContentLoaded", function () {
       datasets: [{
         label: 'Intensidade da Dor',
         data: [],
-        fill: true,
+        fill: true, // <<< ESSENCIAL PARA O PREENCHIMENTO
         borderColor: '#0a4466',
         backgroundColor: 'rgba(10, 68, 102, 0.1)',
         tension: 0.3,
         pointRadius: 4,
         pointHoverRadius: 6
+        
       }]
+    
     },
     options: {
       responsive: true,

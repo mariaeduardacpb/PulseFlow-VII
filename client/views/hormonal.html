@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hormonal</title>
+  <link rel="stylesheet" href="../public/css/hormonal.css" />
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+</head>
+<body>
+
+<div class="container">
+  <aside class="sidebar">
+    <div class="profile">
+      <h3>Draª Eliane Young</h3>
+    </div>
+    <nav class="specialties">
+      <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
+      <details><summary><span><a href="prontuario.html">Prontuário</a></span></summary></details>
+      <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
+      <details><summary><span>Ginecologia</span><span class="chevron"></span></summary><ul><li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li></ul></details>
+      <details open><summary><span>Endocrinologia</span><span class="chevron"></span></summary><ul><li><a style="font-weight: bold;" href="hormonal.html">Hormonal</a></li><li><a href="tireoide.html">Tireóide</a></li><li><a href="diabetes.html">Diabetes</a></li></ul></details>
+      <details><summary><span>Neurologia</span><span class="chevron"></span></summary><ul><li><a href="insonia.html">Insônia</a></li><li><a href="enxaqueca.html">Enxaqueca</a></li></ul></details>
+      <details><summary><span>Dermatologia</span><span class="chevron"></span></summary><ul><li><a href="rotinaDermatologica.html">Rotina Dermatológica</a></li></ul></details>
+      <details><summary><span>Gastroenterologia</span><span class="chevron"></span></summary><ul><li><a href="criseGastrite.html">Crise de Gastrite</a></li></ul></details>
+      <details><summary><span>Psiquiatria</span><span class="chevron"></span></summary><ul><li><a href="historicoMedicacoes.html">Histórico de Medicações</a></li></ul></details>
+      <details><summary><span>Cardiologia</span><span class="chevron"></span></summary><ul><li><a href="pressaoArterial.html">Pressão Arterial</a></li><li><a href="batimentosCardiacos.html">Batimentos Cardíacos</a></li><li><a href="oxigenaçãoSangue.html">Oxigenação no sangue</a></li></ul></details>
+    </nav>
+    <div class="change-patient">
+      <a href="selecao.html">⮐ Trocar de Paciente</a>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="header">
+      <h1>Níveis Hormonais</h1>
+      <div class="logo">
+        <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+      </div>
+    </header>
+
+    <section class="chart-section">
+      <div class="chart">
+        <div class="chart-header">
+          <h4>Dados Hormonais</h4>
+          <div class="month-selector" data-target="chartHormonal">
+            <button class="arrow-btn" data-direction="prev">‹</button>
+            <span class="month-label">Abril • 2025</span>
+            <button class="arrow-btn" data-direction="next">›</button>
+          </div>
+        </div>
+
+        <!-- Mensagem de ausência de dados -->
+        <div id="no-data-msg" class="no-data-msg">
+          ⚠️ <span>Nenhum dado encontrado para este mês.</span>
+        </div>
+
+        <canvas id="chartHormonal"></canvas>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../public/js/hormonal.js"></script>
+
+</body>
+</html>
