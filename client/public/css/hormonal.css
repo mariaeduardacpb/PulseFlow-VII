@@ -126,6 +126,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 10px;
 }
@@ -133,10 +134,17 @@ body {
 .header h1 {
   font-size: 24px;
   color: #1f1f1f;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .logo img {
-  height: 50px;
+  height: 40px;
+  max-width: 100%;
 }
 
 .chart-section {
@@ -166,10 +174,13 @@ canvas {
 .month-selector {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 14px;
   font-weight: 500;
   color: #333;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .arrow-btn {
@@ -204,4 +215,63 @@ canvas {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* BOTÃO HAMBÚRGUER */
+.menu-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  background-color: #00324A;
+  color: white;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 1101;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: left 0.3s ease;
+}
+
+.menu-toggle.shifted {
+  left: 260px;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .sidebar {
+    left: -100%;
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    width: 240px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    flex-direction: column;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+    margin-top: 64px; /* espaço para botão */
+  }
 }

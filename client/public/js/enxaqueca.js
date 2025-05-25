@@ -6,7 +6,14 @@ document.addEventListener("DOMContentLoaded", function () {
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
+const toggleButton = document.querySelector(".menu-toggle");
+  const sidebar = document.querySelector(".sidebar");
 
+  toggleButton.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+    toggleButton.classList.toggle("shifted");
+  });
+  
   const today = new Date();
   let currentMonthIndex = today.getMonth();
   const currentYear = today.getFullYear();

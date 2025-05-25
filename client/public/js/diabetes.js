@@ -1,7 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
   const ctx = document.getElementById('chartGlicemia').getContext('2d');
   const noDataLabel = document.getElementById('no-data-msg-glicemia');
+const toggleButton = document.querySelector(".menu-toggle");
+  const sidebar = document.querySelector(".sidebar");
 
+  toggleButton.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+    toggleButton.classList.toggle("shifted");
+  });
+  
   const months = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'

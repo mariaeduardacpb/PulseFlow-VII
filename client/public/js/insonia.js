@@ -12,7 +12,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const today = new Date();
   let currentMonthIndex = today.getMonth();
   const currentYear = today.getFullYear();
+  
+const toggleButton = document.querySelector(".menu-toggle");
+  const sidebar = document.querySelector(".sidebar");
 
+  toggleButton.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+    toggleButton.classList.toggle("shifted");
+  });
   async function fetchInsoniaData(month, year) {
     try {
       const tokenMedico = localStorage.getItem("token");

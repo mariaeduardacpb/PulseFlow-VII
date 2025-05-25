@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 * {
   font-family: 'Montserrat', sans-serif;
   margin: 0;
@@ -7,12 +8,12 @@
 
 body {
   background-color: #f2f2f2;
+  overflow-x: hidden;
 }
 
 .container {
   display: flex;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
 .sidebar {
@@ -21,20 +22,38 @@ body {
   color: white;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 30px 20px;
+  padding: 30px 20px 20px 20px; /* padding inferior reduzido para harmonia */
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   overflow-y: auto;
-  z-index: 10;
+}
+
+.profile {
+  margin-top: 10px; /* ✅ espaço do topo */
+  margin-bottom: 30px;
 }
 
 .profile h3 {
   font-size: 16px;
-  margin-bottom: 30px;
   font-weight: 600;
+  margin-bottom: 20px;
+}
+
+
+.profile a {
+  display: block;
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 8px 0;
+  border-bottom: 1px solid #1c4a7d;
+  transition: background-color 0.2s ease;
+}
+
+.profile a:hover {
+  background-color: rgba(0, 195, 183, 0.1);
 }
 
 .specialties details {
@@ -171,10 +190,17 @@ body {
 .header h1 {
   font-size: 24px;
   color: #1f1f1f;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .logo img {
-  height: 50px;
+  height: 40px;
+  max-width: 100%;
 }
 
 .chart-section {
@@ -200,14 +226,16 @@ canvas {
   width: 100%;
   height: 300px;
 }
-
 .month-selector {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 14px;
   font-weight: 500;
   color: #333;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .arrow-btn {
@@ -228,47 +256,8 @@ canvas {
 }
 
 /* ========== RESPONSIVIDADE ========== */
-@media (max-width: 1024px) {
-  .content {
-    padding: 20px;
-  }
 
-  .profile-box {
-    flex-direction: column;
-    text-align: center;
-  }
 
-  .profile-box .separator {
-    display: none;
-  }
-
-  .profile-box img {
-    width: 120px;
-    height: 120px;
-  }
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    position: relative;
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 15px;
-  }
-
-  .content {
-    margin-left: 0;
-    width: 100%;
-    padding: 20px;
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
 
 @media (max-width: 480px) {
   .chart {
@@ -295,6 +284,25 @@ canvas {
 
   .specialties summary {
     font-size: 14px;
+  }
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 15px;
+  }
+
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
@@ -344,4 +352,64 @@ canvas {
 
 .referencia-dor a:hover {
   color: #00c3b7;
+}
+
+/* BOTÃO HAMBÚRGUER */
+.menu-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  background-color: #00324A;
+  color: white;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 1101;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: left 0.3s ease;
+}
+
+.menu-toggle.shifted {
+  left: 260px;
+ 
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .sidebar {
+    left: -100%;
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    width: 240px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    flex-direction: column;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+    margin-top: 64px; /* espaço para botão */
+  }
 }

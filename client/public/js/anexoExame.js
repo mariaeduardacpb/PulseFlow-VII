@@ -3,6 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const semExamesMsg = document.getElementById("no-data-msg");
   const contadorExames = document.getElementById("contador-exames");
 
+  const toggleButton = document.querySelector(".menu-toggle");
+  const sidebar = document.querySelector(".sidebar");
+
+  toggleButton.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+    toggleButton.classList.toggle("shifted");
+  });
+
   let examesCarregados = []; // <<< variável global para armazenar exames
 
   function renderizarExames(listaExames) {
