@@ -5,6 +5,7 @@ const anotacaoSchema = new mongoose.Schema({
   titulo: { type: String, required: true },
   data: { type: Date, required: true },
   categoria: { type: String, required: true },
+  tipoConsulta: { type: String, required: true },
   medico: { type: String, required: true },
   anotacao: { type: String, required: true }
 }, { timestamps: true });

@@ -1,24 +1,223 @@
+document.addEventListener('DOMContentLoaded', async () => {
+  // Carrega dados do médico logado
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    const res = await fetch('http://localhost:5000/api/usuarios/perfil', {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error('Erro ao carregar dados do médico');
+    }
+
+    const medico = await res.json();
+    
+    // Preenche o campo de médico responsável
+    const medicoInput = document.getElementById("medico");
+    if (medicoInput) {
+      const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
+      const nomeFormatado = `${prefixo} ${medico.nome}`;
+      medicoInput.value = nomeFormatado;
+      medicoInput.readOnly = true;
+    }
+
+    // Preenche o campo de especialidade
+    const categoriaInput = document.getElementById("categoria");
+    if (medico.areaAtuacao) {
+      categoriaInput.value = medico.areaAtuacao;
+    }
+
+    // Define a data atual como padrão
+    const dataInput = document.getElementById("data");
+    if (dataInput) {
+      const hoje = new Date().toISOString().split('T')[0];
+      dataInput.value = hoje;
+      dataInput.max = hoje; // Não permite datas futuras
+    }
+
+    // Remove a classe touched de todos os campos ao carregar a página
+    document.querySelectorAll('input, select, textarea').forEach(field => {
+      field.classList.remove('touched');
+    });
+
+  } catch (error) {
+    console.error("Erro ao carregar dados do médico:", error);
+    mostrarAviso("Erro ao carregar dados do médico. Por favor, recarregue a página.");
+  }
+});
+
+// Variável para controlar se o formulário já foi submetido
+let formSubmitted = false;
+
+// Função para mostrar mensagem de aviso
+function mostrarAviso(mensagem) {
+  const aviso = document.createElement('div');
+  aviso.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #ffffff;
+    color: #002A42;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 42, 66, 0.1);
+    z-index: 1000;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    border: 1px solid #e1e5eb;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 400px;
+    animation: slideIn 0.3s ease-out;
+  `;
+
+  // Ícone de alerta
+  const icon = document.createElement('div');
+  icon.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00c3b7;">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+  `;
+
+  // Container do texto
+  const textContainer = document.createElement('div');
+  textContainer.style.cssText = `
+    flex: 1;
+    line-height: 1.4;
+  `;
+  textContainer.textContent = mensagem;
+
+  // Botão de fechar
+  const closeButton = document.createElement('button');
+  closeButton.style.cssText = `
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+  `;
+  closeButton.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  `;
+  closeButton.onclick = () => {
+    aviso.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(() => {
+      document.body.removeChild(aviso);
+      document.head.removeChild(style);
+    }, 300);
+  };
+
+  // Adiciona os elementos ao aviso
+  aviso.appendChild(icon);
+  aviso.appendChild(textContainer);
+  aviso.appendChild(closeButton);
+  document.body.appendChild(aviso);
+
+  // Adiciona estilo para a animação
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Remove o aviso após 5 segundos
+  setTimeout(() => {
+    if (document.body.contains(aviso)) {
+      aviso.style.animation = 'slideOut 0.3s ease-out';
+      setTimeout(() => {
+        if (document.body.contains(aviso)) {
+          document.body.removeChild(aviso);
+          document.head.removeChild(style);
+        }
+      }, 300);
+    }
+  }, 5000);
+}
+
+// Função para validar um campo específico
+function validarCampo(campo) {
+  if (!campo.readOnly) {
+    campo.classList.add('touched');
+    return campo.checkValidity();
+  }
+  return true;
+}
+
+// Função para validar todos os campos
+function validarFormulario() {
+  const campos = document.querySelectorAll('input, select, textarea');
+  let valido = true;
+
+  campos.forEach(campo => {
+    if (!validarCampo(campo)) {
+      valido = false;
+    }
+  });
+
+  return valido;
+}
+
 document.querySelector("form").addEventListener("submit", async (e) => {
   e.preventDefault();
+  
+  // Marca que o formulário foi submetido
+  formSubmitted = true;
+  
+  // Valida todos os campos
+  if (!validarFormulario()) {
+    mostrarAviso('Por favor, preencha todos os campos obrigatórios corretamente.');
+    return;
+  }
 
-  const token = localStorage.getItem("token"); // Médico logado
+  const token = localStorage.getItem("token");
+  if (!token) {
+    mostrarAviso("Sessão expirada. Por favor, faça login novamente.");
+    window.location.href = 'login.html';
+    return;
+  }
 
   // Recupera o CPF do paciente selecionado
   const paciente = JSON.parse(localStorage.getItem("pacienteSelecionado"));
-  const cpf = paciente?.cpf;
-
-  if (!cpf) {
-    alert("Paciente não selecionado. Volte à tela de seleção.");
+  if (!paciente?.cpf) {
+    mostrarAviso("Paciente não selecionado. Volte à tela de seleção.");
+    window.location.href = 'selecao.html';
     return;
   }
 
   const body = {
-    cpf,
-    titulo: document.getElementById("titulo").value,
+    cpf: paciente.cpf,
+    titulo: document.getElementById("titulo").value.trim(),
     data: document.getElementById("data").value,
     categoria: document.getElementById("categoria").value,
+    tipoConsulta: document.getElementById("tipoConsulta").value,
     medico: document.getElementById("medico").value,
-    anotacao: document.getElementById("prontuario").value,
+    anotacao: document.getElementById("prontuario").value.trim(),
   };
 
   try {
@@ -34,9 +233,12 @@ document.querySelector("form").addEventListener("submit", async (e) => {
     const result = await res.json();
     if (!res.ok) throw new Error(result.message || 'Erro ao salvar');
 
-    alert("Anotação salva com sucesso!");
-    document.querySelector("form").reset(); // limpa o formulário
+    mostrarAviso("Registro clínico salvo com sucesso!");
+    document.querySelector("form").reset();
+    
+    // Redireciona para a página de histórico após salvar
+    window.location.href = 'historicoProntuario.html';
   } catch (err) {
-    alert("Erro: " + err.message);
+    mostrarAviso("Erro ao salvar: " + err.message);
   }
 });

@@ -3,7 +3,7 @@ import Paciente from '../models/Paciente.js';
 
 export const salvarAnotacao = async (req, res) => {
   try {
-    const { cpf, titulo, data, categoria, medico, anotacao } = req.body;
+    const { cpf, titulo, data, categoria, tipoConsulta, medico, anotacao } = req.body;
     
     const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
     if (!paciente) {
@@ -15,6 +15,7 @@ export const salvarAnotacao = async (req, res) => {
       titulo,
       data: new Date(data),
       categoria,
+      tipoConsulta,
       medico,
       anotacao
     });
