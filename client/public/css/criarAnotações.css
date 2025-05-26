@@ -458,3 +458,115 @@ input[list]::placeholder {
   background-color: #003d5c;
   color: white;
 }
+
+/* Ajustes para o botão de toggle da sidebar em mobile */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1000;
+  background: #002A42;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .container {
+    position: relative;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    padding-top: 60px;
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .form-section {
+    margin-left: 0;
+    width: 100%;
+    padding: 15px;
+  }
+
+  .header {
+    margin-top: 60px;
+    padding-top: 20px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .header-left {
+    width: 100%;
+  }
+
+  .header h1 {
+    margin-top: 0;
+    font-size: 24px;
+  }
+
+  .logo {
+    margin-top: 10px;
+  }
+
+  .form-section-info {
+    padding: 20px;
+  }
+
+  form button {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    margin-top: 50px;
+  }
+
+  .sidebar-toggle {
+    top: 10px;
+    left: 10px;
+    padding: 8px;
+  }
+
+  .sidebar {
+    padding-top: 50px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .form-section-info {
+    padding: 15px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  form button {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}

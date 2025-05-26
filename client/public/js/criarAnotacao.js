@@ -1,4 +1,20 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  // Toggle da Sidebar
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebar = document.querySelector('.sidebar');
+  const content = document.querySelector('.content');
+
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+
+  // Fechar sidebar ao clicar fora
+  document.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && sidebar.classList.contains('active')) {
+      sidebar.classList.remove('active');
+    }
+  });
+
   // Carrega dados do médico logado
   try {
     const token = localStorage.getItem('token');
