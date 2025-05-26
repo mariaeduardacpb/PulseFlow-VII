@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const categoriaInput = document.getElementById("categoria");
     if (medico.areaAtuacao) {
       categoriaInput.value = medico.areaAtuacao;
+      categoriaInput.readOnly = true;
     }
 
     // Define a data atual como padrão

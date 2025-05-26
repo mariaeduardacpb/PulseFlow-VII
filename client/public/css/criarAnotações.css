@@ -223,7 +223,7 @@ body {
 .form-group input:hover,
 .form-group select:hover,
 .form-group textarea:hover {
-  border-color: #002A42;
+  border-color: #00c3b7;
   background-color: #fff;
 }
 
@@ -231,9 +231,9 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #002A42;
+  border-color: #00c3b7;
   background-color: #fff;
-  box-shadow: 0 0 0 3px rgba(0, 42, 66, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 195, 183, 0.1);
 }
 
 .form-group input::placeholder,
@@ -247,6 +247,20 @@ body {
 .form-group select[readonly] {
   background-color: #f1f3f5;
   cursor: not-allowed;
+}
+
+.form-group input[readonly]:hover,
+.form-group select[readonly]:hover {
+  border-color: #00c3b7;
+  background-color: #f1f3f5;
+  cursor: not-allowed;
+}
+
+.form-group input[readonly]:focus,
+.form-group select[readonly]:focus {
+  border-color: #00c3b7;
+  background-color: #f1f3f5;
+  box-shadow: 0 0 0 3px rgba(0, 195, 183, 0.1);
 }
 
 .form-group textarea {
