@@ -400,3 +400,30 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+@media print {
+  .card-footer,
+  .btn-primary,
+  .btn-secondary,
+  .card-footer button,
+  .sidebar-toggle,
+  .sidebar {
+    display: none !important;
+  }
+
+  .content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .note-card {
+    box-shadow: none !important;
+    padding: 20px !important;
+    margin: 0 !important;
+  }
+
+  body {
+    background-color: white !important;
+  }
+}

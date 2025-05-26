@@ -69,25 +69,49 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Função para baixar o registro clínico como PDF
 function downloadClinicalRecordAsPdf() {
-  console.log('Botão Salvar PDF clicado.'); // Log para verificar se a função é chamada
-  const element = document.querySelector('.note-card'); // Seleciona o elemento que contém o registro clínico
+  console.log('Botão Salvar PDF clicado.');
+  const element = document.querySelector('.note-card');
 
   if (element) {
-    console.log('Elemento .note-card encontrado. Iniciando conversão para PDF.', element); // Log para verificar se o elemento foi encontrado
+    console.log('Elemento .note-card encontrado. Iniciando conversão para PDF.', element);
+
+    // Hide buttons before generating PDF
+    const buttonsToHide = element.querySelectorAll('.card-footer button, .btn-primary, .btn-secondary');
+    buttonsToHide.forEach(button => {
+      button.style.display = 'none';
+    });
 
     // Configurações para html2pdf
     const options = {
-      margin: 10, // Margem em pixels ou unidades do jsPDF
+      margin: 10,
       filename: 'registro_clinico.pdf',
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true, useCORS: true, media: 'print' }, // Adiciona media: 'print' aqui
+      html2canvas: { 
+        scale: 2, 
+        logging: true, 
+        dpi: 192, 
+        letterRendering: true, 
+        useCORS: true,
+        onclone: function(clonedDoc) {
+          // Hide buttons in the cloned document
+          const clonedButtons = clonedDoc.querySelectorAll('.card-footer button, .btn-primary, .btn-secondary');
+          clonedButtons.forEach(button => {
+            button.style.display = 'none';
+          });
+        }
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    html2pdf().from(element).set(options).save();
+    html2pdf().from(element).set(options).save().then(() => {
+      // Show buttons again after PDF is generated
+      buttonsToHide.forEach(button => {
+        button.style.display = '';
+      });
+    });
 
   } else {
-    console.log('Elemento .note-card não encontrado.'); // Log se o elemento não for encontrado
+    console.log('Elemento .note-card não encontrado.');
     mostrarAviso('Não foi possível encontrar o conteúdo do registro clínico para salvar como PDF.');
   }
 }
