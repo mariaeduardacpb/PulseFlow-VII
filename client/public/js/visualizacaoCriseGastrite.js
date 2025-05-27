@@ -71,4 +71,117 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Erro:', error);
         alert('Erro ao carregar detalhes da crise: ' + error.message);
     }
+});
+
+// Função para carregar os dados da crise
+async function carregarDadosCrise() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        
+        if (!id) {
+            console.error('ID da crise não fornecido');
+            return;
+        }
+
+        const response = await fetch(`/api/crise-gastrite/${id}`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar dados da crise');
+        }
+
+        const crise = await response.json();
+        
+        // Preencher os dados na página
+        document.getElementById('dataCrise').textContent = new Date(crise.data).toLocaleDateString('pt-BR');
+        document.getElementById('intensidadeDor').textContent = crise.intensidade;
+        document.getElementById('alivioMedicacao').textContent = crise.alivioMedicacao ? 'Sim' : 'Não';
+        document.getElementById('sintomas').textContent = crise.sintomas || 'Não informado';
+        document.getElementById('alimentos').textContent = crise.alimentos || 'Não informado';
+        document.getElementById('medicacao').textContent = crise.medicacao || 'Não informado';
+        document.getElementById('observacoes').textContent = crise.observacoes || 'Não informado';
+        document.getElementById('statusCrise').textContent = crise.status || 'Crise Registrada';
+
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao carregar dados da crise');
+    }
+}
+
+// Função para gerar e salvar o PDF
+function gerarPDF() {
+    const element = document.querySelector('.note-card');
+    const logo = document.querySelector('.logo img');
+    
+    // Criar um clone do elemento para manipulação
+    const clone = element.cloneNode(true);
+    
+    // Criar um container para o PDF
+    const container = document.createElement('div');
+    container.style.padding = '20px';
+    
+    // Adicionar o logo
+    const logoContainer = document.createElement('div');
+    logoContainer.style.textAlign = 'center';
+    logoContainer.style.marginBottom = '20px';
+    const logoClone = logo.cloneNode(true);
+    logoClone.style.height = '60px';
+    logoContainer.appendChild(logoClone);
+    
+    // Adicionar o título
+    const title = document.createElement('h1');
+    title.textContent = 'Detalhes da Crise de Gastrite';
+    title.style.textAlign = 'center';
+    title.style.color = '#002A42';
+    title.style.marginBottom = '20px';
+    title.style.fontSize = '24px';
+    
+    // Montar o container
+    container.appendChild(logoContainer);
+    container.appendChild(title);
+    container.appendChild(clone);
+    
+    // Configurações do PDF
+    const opt = {
+        margin: 1,
+        filename: 'crise-gastrite.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            logging: true
+        },
+        jsPDF: { 
+            unit: 'in', 
+            format: 'a4', 
+            orientation: 'portrait'
+        }
+    };
+
+    // Remover temporariamente os botões antes de gerar o PDF
+    const cardFooter = clone.querySelector('.card-footer');
+    if (cardFooter) {
+        cardFooter.style.display = 'none';
+    }
+
+    // Gerar o PDF
+    html2pdf().set(opt).from(container).save().then(() => {
+        // Limpar o container após a geração
+        container.remove();
+    });
+}
+
+// Adicionar evento de clique ao botão de salvar PDF
+document.addEventListener('DOMContentLoaded', () => {
+    const btnSalvarPDF = document.querySelector('.btn-secondary:nth-child(2)');
+    if (btnSalvarPDF) {
+        btnSalvarPDF.addEventListener('click', gerarPDF);
+    }
+    
+    // Carregar os dados da crise quando a página carregar
+    carregarDadosCrise();
+});
+
+// Função para controlar o toggle da sidebar em mobile
+document.getElementById('sidebarToggle').addEventListener('click', function() {
+    document.querySelector('.sidebar').classList.toggle('active');
 }); 

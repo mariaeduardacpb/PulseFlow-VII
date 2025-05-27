@@ -5,11 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes da Crise de Gastrite</title>
     <link rel="stylesheet" href="../public/css/visualizacaoCriseGastrite.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
 </head>
 <body>
     <div class="container">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
         <aside class="sidebar">
             <div class="profile">
                 <h3>Draª Eliane Young</h3>
@@ -19,14 +26,23 @@
                 <details><summary><span><a href="historicoProntuario.html">Anotações Médicas</a></span></summary></details>
                 <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
                 <details><summary><span><a href="RegistroDoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
-                <details><summary><span>Ginecologia</span><span class="chevron"></span></summary><ul><li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li></ul></details>
-                <details><summary><span>Neurologia</span><span class="chevron"></span></summary><ul><li><a href="insonia.html">Insônia</a></li><li><a href="enxaqueca.html">Enxaqueca</a></li></ul></details>
-                <details><summary><span>Dermatologia</span><span class="chevron"></span></summary><ul><li><a href="rotinaDermatologica.html">Rotina Dermatológica</a></li></ul></details>
-                <details><summary><span>Endocrinologia</span><span class="chevron"></span></summary><ul><li><a href="tireoide.html">Tireóide</a></li><li><a href="diabetes.html">Diabetes</a></li><li><a href="hormonal.html">Hormonal</a></li></ul></details>
-                <details open><summary><span>Gastroenterologia</span><span class="chevron"></span></summary><ul><li><a href="NOVAcrise.html">Crise de Gastrite</a></li></ul></details>
-                <details><summary><span>Psiquiatria</span><span class="chevron"></span></summary><ul><li><a href="historicoMedicacoes.html">Histórico de Medicações</a></li></ul></details>
-                <details><summary><span>Cardiologia</span><span class="chevron"></span></summary><ul><li><a href="pressaoArterial.html">Pressão Arterial</a></li><li><a href="batimentosCardiacos.html">Batimentos Cardíacos</a></li><li><a href="oxigenaçãoSangue.html">Oxigenação no sangue</a></li></ul></details>
-              </nav>
+                <details><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
+                    <ul>
+                        <!-- Condições Crônicas -->
+                        <li><a href="diabetes.html">Diabetes</a></li>
+                        <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
+                        <li><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
+                        
+                        <!-- Saúde Hormonal e Reprodutiva -->
+                        <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
+                        <li><a href="hormonal.html">Hormonal</a></li>
+                        
+                        <!-- Saúde Mental e Sono -->
+                        <li><a href="insonia.html">Insônia</a></li>
+                        <li><a href="enxaqueca.html">Enxaqueca</a></li>
+                    </ul>
+                </details>
+            </nav>
             <div class="change-patient">
                 <a href="selecao.html">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;">
@@ -39,7 +55,10 @@
 
         <main class="content">
             <header class="header">
-                <h1>Detalhes da Crise de Gastrite</h1>
+                <div class="header-left">
+                    <h1>Detalhes da Crise de Gastrite</h1>
+                    <p class="subtitle">Informações detalhadas da crise</p>
+                </div>
                 <div class="logo">
                     <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
                 </div>
@@ -47,22 +66,57 @@
 
             <section class="note-card">
                 <div class="card-header">
-                    <h2>Crise de Gastrite</h2>
-                    <div class="status-badge" id="statusCrise"></div>
+                    <div class="titulo">
+                        <strong>Crise de Gastrite</strong>
+                        <span id="statusCrise"></span>
+                    </div>
+                    <div class="status-badge">
+                        <span class="status-dot"></span>
+                        Crise Registrada
+                    </div>
                 </div>
 
                 <div class="info-grid">
                     <div class="info-item">
-                        <strong>Data da Crise</strong>
-                        <span id="dataCrise"></span>
+                        <div class="info-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <strong>Data da Crise</strong>
+                            <span id="dataCrise"></span>
+                        </div>
                     </div>
                     <div class="info-item">
-                        <strong>Intensidade da Dor</strong>
-                        <span id="intensidadeDor"></span>
+                        <div class="info-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
+                                <line x1="16" y1="8" x2="2" y2="22"></line>
+                                <line x1="17.5" y1="15" x2="9" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <strong>Intensidade da Dor</strong>
+                            <span id="intensidadeDor"></span>
+                        </div>
                     </div>
                     <div class="info-item">
-                        <strong>Alívio após Medicação</strong>
-                        <span id="alivioMedicacao"></span>
+                        <div class="info-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <strong>Alívio após Medicação</strong>
+                            <span id="alivioMedicacao"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -95,9 +149,35 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card-footer">
+                    <button class="btn-secondary" onclick="window.history.back()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Voltar
+                    </button>
+                    <button class="btn-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Salvar PDF
+                    </button>
+                    <button class="btn-primary" onclick="window.print()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <rect x="6" y="14" width="12" height="8"></rect>
+                        </svg>
+                        Imprimir Registro
+                    </button>
+                </div>
             </section>
         </main>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="../public/js/visualizacaoCriseGastrite.js"></script>
 </body>
 </html> 
