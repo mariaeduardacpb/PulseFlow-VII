@@ -1,5 +1,6 @@
 import { Menstruacao } from '../models/menstruacaoModel.js';
 import Paciente from '../models/Paciente.js';
+import mongoose from 'mongoose'; // Import mongoose to use Types.ObjectId
 
 // Criar novo registro de menstruação
 export const criarRegistro = async (req, res) => {
@@ -34,18 +35,32 @@ export const criarRegistro = async (req, res) => {
 export const obterRegistros = async (req, res) => {
     try {
         const { cpf } = req.params;
+        console.log(`[obterRegistros] Recebido CPF: ${cpf}`);
+
         if (!cpf) {
             return res.status(400).json({ message: 'CPF não fornecido' });
         }
 
         // Buscar o paciente pelo CPF
         const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        console.log(`[obterRegistros] Paciente encontrado: ${paciente ? paciente._id : 'Nenhum'}`);
+
         if (!paciente) {
             return res.status(404).json({ message: 'Paciente não encontrado' });
         }
 
-        const registros = await Menstruacao.find({ paciente: paciente._id })
+        // Adicionar log da consulta e resultado
+        // Garantir que estamos consultando com um ObjectId e usando o nome do campo correto
+        const pacienteObjectId = new mongoose.Types.ObjectId(paciente._id);
+        const query = { pacienteId: pacienteObjectId };
+        console.log(`[obterRegistros] Executando consulta com ObjectId: ${JSON.stringify(query)}`);
+
+        const registros = await Menstruacao.find(query)
             .sort({ dataInicio: -1 });
+        
+        console.log(`[obterRegistros] Resultado da consulta (quantidade): ${registros.length}`);
+        console.log(`[obterRegistros] Resultado da consulta (dados): ${JSON.stringify(registros)}`);
+
         res.status(200).json(registros);
     } catch (error) {
         console.error('Erro ao buscar registros:', error);

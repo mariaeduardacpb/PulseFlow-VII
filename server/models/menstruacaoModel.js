@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const menstruacaoSchema = new mongoose.Schema({
-    paciente: {
+    pacienteId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Paciente',
         required: true
