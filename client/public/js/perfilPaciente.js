@@ -3,6 +3,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   async function carregarDadosMedico() {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token não encontrado. Por favor, faça login novamente.');
+      }
+
       const res = await fetch('http://localhost:5000/api/usuarios/perfil', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -20,6 +24,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       console.error("Erro ao carregar dados do médico:", error);
       const fallback = document.querySelector('.sidebar .profile h3');
       if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
+      mostrarErro("Erro ao carregar dados do médico. Por favor, faça login novamente.");
     }
   }
 
@@ -37,55 +42,75 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   try {
     const token = localStorage.getItem('token');
-    const res = await fetch(`http://localhost:5500/api/pacientes/${pacienteData.id}`, {
+    if (!token) {
+      throw new Error('Token não encontrado. Por favor, faça login novamente.');
+    }
+
+    const res = await fetch(`http://localhost:5000/api/pacientes/${pacienteData.id}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
     const paciente = await res.json();
 
     if (!res.ok) {
-      throw new Error(paciente.message);
+      throw new Error(paciente.message || 'Erro ao carregar dados do paciente');
     }
 
     preencherPerfil(paciente);
   } catch (error) {
-    console.error(error);
-    mostrarErro("Erro ao carregar dados do paciente. Verifique sua conexão ou tente novamente.");
+    console.error("Erro ao carregar dados do paciente:", error);
+    mostrarErro(error.message || "Erro ao carregar dados do paciente. Verifique sua conexão ou tente novamente.");
   }
 
   function mostrarErro(mensagem) {
+    if (!erroBox) return;
     erroBox.textContent = `⚠️ ${mensagem}`;
-    erroBox.classList.add('ativo');
+    erroBox.style.display = 'block';
   }
 
   function preencherPerfil(paciente) {
-    const imagemPerfil = document.querySelector('.profile-box img');
-    imagemPerfil.src = paciente.fotoPerfil || '../public/assets/perfilPhotoPadrao.png';
+    try {
+      const imagemPerfil = document.querySelector('.profile-box img');
+      if (imagemPerfil) {
+        imagemPerfil.src = paciente.fotoPerfil || '../public/assets/perfilPhotoPadrao.png';
+      }
 
-    document.querySelector('.info').innerHTML = `
-      <p class="fade-in"><strong>Nome do Paciente:</strong> ${paciente.nome}</p>
-      <p class="fade-in"><strong>Gênero:</strong> ${paciente.genero || '-'}</p>
-      <p class="fade-in"><strong>Idade:</strong> ${calcularIdadeTexto(paciente.dataNascimento)}</p>
-      <p class="fade-in"><strong>Nacionalidade:</strong> ${paciente.nacionalidade || '-'}</p>
-      <p class="fade-in"><strong>Altura:</strong> ${paciente.altura || '-'} cm</p>
-      <p class="fade-in"><strong>Peso:</strong> ${paciente.peso || '-'} kg</p>
-      <p class="fade-in"><strong>Profissão:</strong> ${paciente.profissao || '-'}</p>
-      <p class="fade-in"><strong>E-mail:</strong> ${paciente.email}</p>
-      <p class="fade-in"><strong>Telefone:</strong> ${paciente.telefone || '-'}</p>
-      <p class="fade-in"><strong>Observações:</strong> ${paciente.observacoes || 'Nenhuma'}</p>
-    `;
+      const infoContainer = document.querySelector('.info');
+      if (infoContainer) {
+        infoContainer.innerHTML = `
+          <p class="fade-in"><strong>Nome do Paciente:</strong> ${paciente.nome || '-'}</p>
+          <p class="fade-in"><strong>Gênero:</strong> ${paciente.genero || '-'}</p>
+          <p class="fade-in"><strong>Idade:</strong> ${calcularIdadeTexto(paciente.dataNascimento)}</p>
+          <p class="fade-in"><strong>Nacionalidade:</strong> ${paciente.nacionalidade || '-'}</p>
+          <p class="fade-in"><strong>Altura:</strong> ${paciente.altura || '-'} cm</p>
+          <p class="fade-in"><strong>Peso:</strong> ${paciente.peso || '-'} kg</p>
+          <p class="fade-in"><strong>Profissão:</strong> ${paciente.profissao || '-'}</p>
+          <p class="fade-in"><strong>E-mail:</strong> ${paciente.email || '-'}</p>
+          <p class="fade-in"><strong>Telefone:</strong> ${paciente.telefone || '-'}</p>
+          <p class="fade-in"><strong>Observações:</strong> ${paciente.observacoes || 'Nenhuma'}</p>
+        `;
+      }
+    } catch (error) {
+      console.error("Erro ao preencher perfil:", error);
+      mostrarErro("Erro ao exibir dados do paciente. Por favor, recarregue a página.");
+    }
   }
 
   function calcularIdadeTexto(dataISO) {
     if (!dataISO) return '-';
-    const nascimento = new Date(dataISO);
-    const hoje = new Date();
-    let anos = hoje.getFullYear() - nascimento.getFullYear();
-    let meses = hoje.getMonth() - nascimento.getMonth();
-    if (meses < 0 || (meses === 0 && hoje.getDate() < nascimento.getDate())) {
-      anos--;
-      meses += 12;
+    try {
+      const nascimento = new Date(dataISO);
+      const hoje = new Date();
+      let anos = hoje.getFullYear() - nascimento.getFullYear();
+      let meses = hoje.getMonth() - nascimento.getMonth();
+      if (meses < 0 || (meses === 0 && hoje.getDate() < nascimento.getDate())) {
+        anos--;
+        meses += 12;
+      }
+      return `${anos} anos e ${meses} meses`;
+    } catch (error) {
+      console.error("Erro ao calcular idade:", error);
+      return '-';
     }
-    return `${anos} anos e ${meses} meses`;
   }
 });
