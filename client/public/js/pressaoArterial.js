@@ -18,6 +18,45 @@ const toggleButton = document.querySelector(".menu-toggle");
   let currentMonthIndex = today.getMonth();
   const currentYear = today.getFullYear();
 
+  async function carregarDadosMedico() {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token não encontrado. Por favor, faça login novamente.');
+      }
+
+      const res = await fetch('http://localhost:5000/api/usuarios/perfil', {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Erro ao carregar dados do médico');
+      }
+
+      const medico = await res.json();
+      const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
+      const nomeFormatado = `${prefixo} ${medico.nome}`;
+      
+      const tituloSidebar = document.querySelector('.sidebar .profile h3');
+      if (tituloSidebar) {
+        tituloSidebar.textContent = nomeFormatado;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Erro ao carregar dados do médico:", error);
+      const fallback = document.querySelector('.sidebar .profile h3');
+      if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
+      mostrarErro("Erro ao carregar dados do médico. Por favor, faça login novamente.");
+      return false;
+    }
+  }
+
+
   // 👉 Função de classificação da pressão arterial
   function classificarPressao(sistolica, diastolica) {
     if (sistolica < 130 && diastolica < 85) {
@@ -228,4 +267,5 @@ requestAnimationFrame(animate);
   });
 
   loadChartData();
+  carregarDadosMedico();
 });

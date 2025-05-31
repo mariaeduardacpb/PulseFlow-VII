@@ -12,10 +12,10 @@ const router = express.Router();
 // Paciente registra sua enxaqueca
 router.post('/register', authPacienteMiddleware, registrarEnxaqueca);
 
-// Médico busca dados de um paciente pelo CPF
-router.get('/medico', authMiddleware, buscarEnxaquecaPaciente);
+// ✅ Médico busca dados de um paciente pelo CPF
+router.get('/medico', authMiddleware, buscarEnxaquecaMedico);
 
-// Paciente busca os próprios dados
-router.get('/paciente', authPacienteMiddleware, buscarEnxaquecaMedico);
+// ✅ Paciente busca os próprios dados
+router.get('/paciente', authPacienteMiddleware, buscarEnxaquecaPaciente);
 
 export default router;

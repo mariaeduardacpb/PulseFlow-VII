@@ -16,5 +16,5 @@ const pacienteSchema = new mongoose.Schema({
   observacoes: { type: String, required: true },
 });
 
-const Paciente = mongoose.model('Paciente', pacienteSchema);
+const Paciente = mongoose.model('Paciente', pacienteSchema, 'pacientes');
 export default Paciente;

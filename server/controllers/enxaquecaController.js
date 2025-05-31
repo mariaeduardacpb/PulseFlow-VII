@@ -31,7 +31,7 @@ export const buscarEnxaquecaMedico = async (req, res) => {
   const { cpf, month, year } = req.query;
 
   try {
-    const paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    const paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '').trim() });
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
