@@ -43,17 +43,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Função para determinar a classe de intensidade
   function getIntensityClass(intensity) {
-    if (intensity <= 3) return 'low';
-    if (intensity <= 6) return 'medium';
-    return 'high';
+    if (intensity === 0) return 'sem-dor';
+    if (intensity >= 1 && intensity <= 3) return 'leve';
+    if (intensity >= 4 && intensity <= 6) return 'moderada';
+    if (intensity >= 7 && intensity <= 9) return 'intensa';
+    if (intensity === 10) return 'insuportavel';
+    // Default or fallback if intensity is outside 0-10 range (optional, but good practice)
+    return ''; // Or a default class if needed
   }
 
   // Função para determinar o texto de intensidade
   function getIntensityText(intensity) {
     if (intensity === 0) return 'Sem dor';
-    if (intensity <= 3) return 'Leve';
-    if (intensity <= 6) return 'Moderada';
-    return 'Intensa';
+    if (intensity >= 1 && intensity <= 3) return 'Dor leve';
+    if (intensity >= 4 && intensity <= 6) return 'Dor Moderada';
+    if (intensity >= 7 && intensity <= 9) return 'Dor Intensa';
+    if (intensity === 10) return 'Dor insuportável';
+    return 'Intensidade não especificada'; // Default or fallback
   }
 
   // Função para carregar os registros

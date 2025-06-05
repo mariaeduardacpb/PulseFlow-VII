@@ -5,25 +5,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         return date.toLocaleDateString('pt-BR', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            year: 'numeric'
         });
     }
 
     // Função para determinar a classe de intensidade
     function getIntensityClass(intensity) {
-        if (intensity <= 3) return 'low';
-        if (intensity <= 6) return 'medium';
-        return 'high';
+        if (intensity === 0) return 'sem-dor';
+        if (intensity >= 1 && intensity <= 3) return 'leve';
+        if (intensity >= 4 && intensity <= 6) return 'moderada';
+        if (intensity >= 7 && intensity <= 9) return 'intensa';
+        if (intensity === 10) return 'insuportavel';
+        return ''; // Default or fallback
     }
 
     // Função para determinar o texto de intensidade
     function getIntensityText(intensity) {
         if (intensity === 0) return 'Sem dor';
-        if (intensity <= 3) return 'Leve';
-        if (intensity <= 6) return 'Moderada';
-        return 'Intensa';
+        if (intensity >= 1 && intensity <= 3) return 'Dor leve';
+        if (intensity >= 4 && intensity <= 6) return 'Dor Moderada';
+        if (intensity >= 7 && intensity <= 9) return 'Dor Intensa';
+        if (intensity === 10) return 'Dor insuportável';
+        return 'Intensidade não especificada';
     }
 
     try {
@@ -40,7 +43,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Token não encontrado');
         }
 
-        const response = await fetch(`http://localhost:5000/api/gastrite/crises/detalhes/${criseId}`, {
+        const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
+        if (!paciente || !paciente.cpf) {
+            throw new Error('Paciente não selecionado');
+        }
+
+        const response = await fetch(`http://localhost:5000/api/gastrite/crises/${paciente.cpf}/${criseId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -69,43 +77,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Erro:', error);
-        alert('Erro ao carregar detalhes da crise: ' + error.message);
+        // Only show error message if it's not a 404 (not found) error
+        if (error.message !== 'Erro ao carregar detalhes da crise') {
+            alert('Erro ao carregar detalhes da crise: ' + error.message);
+        }
     }
 });
-
-// Função para carregar os dados da crise
-async function carregarDadosCrise() {
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
-        
-        if (!id) {
-            console.error('ID da crise não fornecido');
-            return;
-        }
-
-        const response = await fetch(`/api/crise-gastrite/${id}`);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar dados da crise');
-        }
-
-        const crise = await response.json();
-        
-        // Preencher os dados na página
-        document.getElementById('dataCrise').textContent = new Date(crise.data).toLocaleDateString('pt-BR');
-        document.getElementById('intensidadeDor').textContent = crise.intensidade;
-        document.getElementById('alivioMedicacao').textContent = crise.alivioMedicacao ? 'Sim' : 'Não';
-        document.getElementById('sintomas').textContent = crise.sintomas || 'Não informado';
-        document.getElementById('alimentos').textContent = crise.alimentos || 'Não informado';
-        document.getElementById('medicacao').textContent = crise.medicacao || 'Não informado';
-        document.getElementById('observacoes').textContent = crise.observacoes || 'Não informado';
-        document.getElementById('statusCrise').textContent = crise.status || 'Crise Registrada';
-
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro ao carregar dados da crise');
-    }
-}
 
 // Função para gerar e salvar o PDF
 function gerarPDF() {
@@ -176,9 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnSalvarPDF) {
         btnSalvarPDF.addEventListener('click', gerarPDF);
     }
-    
-    // Carregar os dados da crise quando a página carregar
-    carregarDadosCrise();
 });
 
 // Função para controlar o toggle da sidebar em mobile

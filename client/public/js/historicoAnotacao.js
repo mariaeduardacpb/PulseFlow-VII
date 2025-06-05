@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const customSelect = document.querySelector('.custom-select');
   const selectOptions = document.getElementById('especialidadesList');
   let allAnotacoes = [];
+  let originalSpecialtyOptions = []; // To store the original list of specialty option elements
 
   const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
   const cpf = paciente?.cpf;
@@ -30,6 +31,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     recordList.innerHTML = '<p style="color: red;">Paciente não selecionado.</p>';
     return;
   }
+
+  // Store original specialty options from the HTML
+  originalSpecialtyOptions = Array.from(selectOptions.querySelectorAll('.option'));
+  console.log('Original specialty options loaded:', originalSpecialtyOptions.length); // Log original count
 
   // Função para formatar o nome do médico
   function formatarNomeMedico(nome) {
@@ -169,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Função para filtrar as anotações
+  // Função para filtrar a lista principal de anotações
   function filtrarAnotacoes() {
     const especialidadeFiltro = filterCategory.value.toLowerCase();
     const medicoFiltro = filterDoctor.value.toLowerCase();
@@ -177,13 +182,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Verifica se nenhum filtro foi preenchido
     if (!especialidadeFiltro && !medicoFiltro) {
       mostrarAviso('Por favor, selecione pelo menos um filtro para buscar.');
+      // If no filters, show all original records
+      if (allAnotacoes.length > 0) {
+          renderAnotacoes(allAnotacoes);
+      } else {
+          // Or clear if no records loaded initially
+          recordList.innerHTML = '';
+      }
       return;
     }
 
     const anotacoesFiltradas = allAnotacoes.filter(anotacao => {
-      // Se "Todas as Especialidades" estiver selecionado, não filtra por especialidade
-      const especialidadeMatch = especialidadeFiltro === 'todas as especialidades' || 
-        !especialidadeFiltro || 
+      // If "Todas as Especialidades" is effectively selected (input is empty after typing)
+      // or if input matches part of the category
+      const especialidadeMatch = !especialidadeFiltro || 
         anotacao.categoria.toLowerCase().includes(especialidadeFiltro);
       
       const medicoMatch = !medicoFiltro || 
@@ -195,51 +207,78 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderAnotacoes(anotacoesFiltradas);
   }
 
-  // Event listeners para o dropdown customizado
-  filterCategory.addEventListener('click', (e) => {
-    e.preventDefault();
-    customSelect.classList.toggle('active');
+  // Function to filter and display specialty options in the dropdown
+  function filterSpecialtyOptions(inputText) {
+      console.log('Filtering specialty options for input:', inputText); // Log input text
+      const lowerInput = inputText.toLowerCase();
+      selectOptions.innerHTML = ''; // Clear current options
+
+      const filteredOptions = originalSpecialtyOptions.filter(option => {
+          const optionText = option.textContent.toLowerCase();
+          return optionText.includes(lowerInput);
+      });
+
+      console.log('Filtered options count:', filteredOptions.length); // Log filtered count
+
+      if (filteredOptions.length > 0) {
+          filteredOptions.forEach(option => selectOptions.appendChild(option));
+          customSelect.classList.add('active'); // Show dropdown
+      } else {
+          customSelect.classList.remove('active'); // Hide dropdown if no matches
+      }
+  }
+
+  // Event listeners for the custom dropdown and input
+  filterCategory.addEventListener('input', () => {
+    console.log('Specialty input event fired.'); // Log input event
+    const inputText = filterCategory.value;
+    filterSpecialtyOptions(inputText); // Filter dropdown options
+    // Do NOT call filtrarAnotacoes here, it should only filter the main list
+    // when the filter button is clicked or an option is explicitly selected.
   });
+
+   // Handle click on the input field to show all options if input is empty
+   filterCategory.addEventListener('click', () => {
+      console.log('Specialty input clicked.'); // Log click event
+      if (filterCategory.value === '') {
+          filterSpecialtyOptions(''); // Show all options
+      }
+      customSelect.classList.add('active'); // Ensure dropdown is shown on click
+   });
+
 
   selectOptions.addEventListener('click', (e) => {
     const option = e.target.closest('.option');
     if (option) {
       const value = option.dataset.value;
-      filterCategory.value = value;
-      customSelect.classList.remove('active');
-      
-      // Remove a classe selected de todas as opções
+      filterCategory.value = value; // Set the input value
+      customSelect.classList.remove('active'); // Hide the dropdown
+
+      // Remove the class selected from all options and add to the clicked one
       document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-      // Adiciona a classe selected à opção clicada
       option.classList.add('selected');
-      
+
+      // Trigger filtering of the main record list after selecting from the dropdown
       filtrarAnotacoes();
     }
   });
 
   // Fechar o dropdown quando clicar fora
   document.addEventListener('click', (e) => {
-    if (!customSelect.contains(e.target)) {
+    if (!customSelect.contains(e.target) && e.target !== filterCategory) {
       customSelect.classList.remove('active');
     }
   });
 
-  // Event listeners para os filtros
+  // Event listeners for the main filter button
   filterButton.addEventListener('click', filtrarAnotacoes);
-  
-  // Filtro ao pressionar Enter nos campos
+
+  // Trigger main filter on Enter in the doctor field
   filterDoctor.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') filtrarAnotacoes();
   });
 
-  // Limpar filtro de especialidade ao selecionar "Todas as Especialidades"
-  filterCategory.addEventListener('change', (e) => {
-    if (e.target.value.toLowerCase() === 'todas as especialidades') {
-      e.target.value = '';
-      filtrarAnotacoes();
-    }
-  });
-
+  // Initial data load
   try {
     const response = await fetch(`http://localhost:5000/api/anotacoes/${cpf}`, {
       headers: {
