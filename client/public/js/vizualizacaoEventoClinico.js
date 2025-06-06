@@ -17,11 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Função para formatar a data
     function formatDate(dateString) {
         const date = new Date(dateString);
-        return date.toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
+        return `${date.getUTCDate().toString().padStart(2, '0')}/${(date.getUTCMonth() + 1).toString().padStart(2, '0')}/${date.getUTCFullYear()}`;
     }
 
     // Função para determinar a classe de intensidade
@@ -81,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Token não encontrado');
         }
 
-        const response = await fetch(`http://localhost:5000/api/eventos-clinicos/${eventoId}`, {
+        const response = await fetch(`http://localhost:65432/api/eventos-clinicos/${eventoId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

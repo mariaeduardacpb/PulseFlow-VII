@@ -76,7 +76,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       eventos.forEach(evento => {
-        const dataFormatada = new Date(evento.dataHora).toLocaleString('pt-BR');
+        const data = new Date(evento.dataHora);
+        const dataFormatada = `${data.getUTCDate().toString().padStart(2, '0')}/${(data.getUTCMonth() + 1).toString().padStart(2, '0')}/${data.getUTCFullYear()}`;
         const item = document.createElement('div');
         item.className = 'record-item';
 
@@ -101,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         item.innerHTML = `
           <div class="info">
             <p class="titulo"><strong>Título:</strong> ${evento.titulo}</p>
-            <p class="data"><strong>Data e Hora:</strong> ${dataFormatada}</p>
+            <p class="data"><strong>Data:</strong> ${dataFormatada}</p>
             <p class="tipo"><strong>Tipo:</strong> ${evento.tipoEvento}</p>
             <p class="especialidade"><strong>Especialidade:</strong> ${evento.especialidade}</p>
             <p class="alivio"><strong>Alívio:</strong> ${evento.alivio}</p>
