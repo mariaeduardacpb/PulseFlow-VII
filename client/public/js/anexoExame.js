@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const response = await fetch(`http://localhost:5000/api/anexoExame/medico?cpf=${cpf}`, {
+    const response = await fetch(`http://localhost:65432/api/anexoExame/medico?cpf=${cpf}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${tokenMedico}`,

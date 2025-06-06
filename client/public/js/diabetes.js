@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token não encontrado. Por favor, faça login novamente.');
 
-      const res = await fetch('http://localhost:5000/api/usuarios/perfil', {
+      const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       if (!cpf) return [];
 
-      const response = await fetch(`http://127.0.0.1:5000/api/diabetes/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
+      const response = await fetch(`http://127.0.0.1:65432/api/diabetes/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${tokenMedico}`,
