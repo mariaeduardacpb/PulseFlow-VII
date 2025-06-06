@@ -7,10 +7,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sidebarToggle = document.getElementById('sidebarToggle');
   const sidebar = document.querySelector('.sidebar');
 
-  // Sidebar toggle functionality
-  sidebarToggle.addEventListener('click', () => {
+  sidebarToggle?.addEventListener('click', () => {
     sidebar.classList.toggle('active');
   });
+
+  // ✅ Exibir nome do(a) médico(a) na sidebar
+  await carregarDadosMedico();
 
   const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
   const cpf = paciente?.cpf;
@@ -20,89 +22,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Function to determine the descriptive intensity text and class based on the value
   function getIntensityInfo(intensityValue) {
     let description = '';
     let className = '';
-
-    // Attempt to parse as a number first
     const numIntensity = parseInt(intensityValue, 10);
 
     if (intensityValue === 'na') {
       description = 'Não se Aplica';
       className = '';
     } else if (!isNaN(numIntensity)) {
-      // Handle numeric values based on the provided image ranges
       if (numIntensity === 0) {
-        description = 'Sem Dor';
-        className = 'sem-dor'; // Green
-      } else if (numIntensity >= 1 && numIntensity <= 3) {
-        description = 'Dor leve';
-        className = 'leve'; // Blue
-      } else if (numIntensity >= 4 && numIntensity <= 6) {
-        description = 'Dor Moderada';
-        className = 'moderada'; // Purple
-      } else if (numIntensity >= 7 && numIntensity <= 9) {
-        description = 'Dor Intensa';
-        className = 'intensa'; // Orange/Yellow
+        description = 'Sem Dor'; className = 'sem-dor';
+      } else if (numIntensity <= 3) {
+        description = 'Dor leve'; className = 'leve';
+      } else if (numIntensity <= 6) {
+        description = 'Dor Moderada'; className = 'moderada';
+      } else if (numIntensity <= 9) {
+        description = 'Dor Intensa'; className = 'intensa';
       } else if (numIntensity === 10) {
-        description = 'Dor insuportável';
-        className = 'insuportavel'; // Red
+        description = 'Dor insuportável'; className = 'insuportavel';
       } else {
-        // Fallback for numbers outside 0-10 range
-        description = intensityValue;
-        className = '';
+        description = intensityValue; className = '';
       }
     } else {
-      // If not a number, handle string values from enum (like '1-3', '4-6', '7-9', '10')
       switch(intensityValue) {
-        case '0':
-          description = 'Sem Dor';
-          className = 'sem-dor'; // Green
-          break;
-        case '1-3':
-          description = 'Dor leve';
-          className = 'leve'; // Blue
-          break;
-        case '4-6':
-          description = 'Dor Moderada';
-          className = 'moderada'; // Purple
-          break;
-        case '7-9':
-          description = 'Dor Intensa';
-          className = 'intensa'; // Orange/Yellow
-          break;
-        case '10':
-          description = 'Dor insuportável';
-          className = 'insuportavel'; // Red
-          break;
-        default:
-          // Fallback for unexpected string values
-          description = intensityValue;
-          className = '';
+        case '0': description = 'Sem Dor'; className = 'sem-dor'; break;
+        case '1-3': description = 'Dor leve'; className = 'leve'; break;
+        case '4-6': description = 'Dor Moderada'; className = 'moderada'; break;
+        case '7-9': description = 'Dor Intensa'; className = 'intensa'; break;
+        case '10': description = 'Dor insuportável'; className = 'insuportavel'; break;
+        default: description = intensityValue; className = '';
       }
     }
 
-    console.log(`Intensity Value: ${intensityValue}, Description: ${description}, Class: ${className}`);
     return { description, className };
   }
 
   async function loadEvents(filters = {}) {
     try {
-      const queryParams = new URLSearchParams({
-        cpf: cpf,
-        ...filters
-      }).toString();
-
-      const response = await fetch(`http://localhost:5000/api/eventos-clinicos?${queryParams}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+      const queryParams = new URLSearchParams({ cpf, ...filters }).toString();
+      const response = await fetch(`http://localhost:65432/api/eventos-clinicos?${queryParams}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
-      if (!response.ok) {
-        throw new Error('Erro ao buscar eventos clínicos');
-      }
+      if (!response.ok) throw new Error('Erro ao buscar eventos clínicos');
 
       const eventos = await response.json();
       recordList.innerHTML = '';
@@ -116,11 +79,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dataFormatada = new Date(evento.dataHora).toLocaleString('pt-BR');
         const item = document.createElement('div');
         item.className = 'record-item';
-        
+
         const intensityValue = evento.intensidadeDor;
         const { description: intensityDescription, className: intensityClass } = getIntensityInfo(intensityValue);
 
-        // Create and append elements for intensity to ensure correct structure and class application
         const intensityParagraph = document.createElement('p');
         const strongElement = document.createElement('strong');
         strongElement.textContent = 'Intensidade da Dor: ';
@@ -129,15 +91,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (intensityValue !== 'na') {
           const intensitySpan = document.createElement('span');
           intensitySpan.classList.add('intensity');
-          if (intensityClass) { // Add the color class if determined
-            intensitySpan.classList.add(intensityClass);
-          }
-          const intensityDisplayText = `${intensityDescription} (${intensityValue}/10)`;
-          intensitySpan.textContent = intensityDisplayText;
-          console.log(`Applying class: ${intensityClass} to span for value: ${intensityValue}`); // Log before appending
+          if (intensityClass) intensitySpan.classList.add(intensityClass);
+          intensitySpan.textContent = `${intensityDescription} (${intensityValue}/10)`;
           intensityParagraph.appendChild(intensitySpan);
         } else {
-          // If intensity is 'na', just append the description text
           intensityParagraph.textContent += intensityDescription;
         }
 
@@ -152,34 +109,29 @@ document.addEventListener('DOMContentLoaded', async () => {
           <a href="/client/views/vizualizacaoEventoClinico.html?id=${evento._id}">Visualizar Evento Clínico</a>
         `;
 
-        // Find the correct place to insert the intensity paragraph
         const infoDiv = item.querySelector('.info');
         if (infoDiv) {
-          // Insert before the alivio paragraph
           const alivioParagraph = infoDiv.querySelector('.alivio');
-          if(alivioParagraph) {
+          if (alivioParagraph) {
             infoDiv.insertBefore(intensityParagraph, alivioParagraph);
           } else {
-            // If alivio paragraph not found, just append to infoDiv
             infoDiv.appendChild(intensityParagraph);
           }
-        } else {
-          // Fallback: append to the item directly if .info not found
-          item.appendChild(intensityParagraph);
         }
 
         recordList.appendChild(item);
       });
+
     } catch (error) {
       console.error(error);
       recordList.innerHTML = '<p style="color: red;">Erro ao carregar eventos clínicos.</p>';
     }
   }
 
-  // Carregar eventos iniciais
+  // Carrega eventos inicialmente
   await loadEvents();
 
-  // Configurar filtros
+  // Filtros
   filterButton.addEventListener('click', async () => {
     const filters = {
       especialidade: filterCategory.value,
@@ -187,11 +139,46 @@ document.addEventListener('DOMContentLoaded', async () => {
       intensidadeDor: filterIntensity.value
     };
 
-    // Remover filters vazios
     Object.keys(filters).forEach(key => {
       if (!filters[key]) delete filters[key];
     });
 
     await loadEvents(filters);
   });
-}); 
+});
+
+// ✅ Função que exibe "Dr(a). Nome" na sidebar
+async function carregarDadosMedico() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Token não encontrado. Por favor, faça login novamente.');
+
+    const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || 'Erro ao carregar dados do médico');
+    }
+
+    const medico = await res.json();
+    const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
+    const nomeFormatado = `${prefixo} ${medico.nome}`;
+
+    const tituloSidebar = document.querySelector('.sidebar .profile h3');
+    if (tituloSidebar) {
+      tituloSidebar.textContent = nomeFormatado;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro ao carregar dados do médico:", error);
+    const fallback = document.querySelector('.sidebar .profile h3');
+    if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
+    return false;
+  }
+}

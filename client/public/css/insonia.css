@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
 * {
   font-family: 'Montserrat', sans-serif;
   margin: 0;
@@ -8,12 +9,14 @@
 
 body {
   background-color: #f2f2f2;
-  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .container {
   display: flex;
+  flex-direction: row;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .sidebar {
@@ -22,38 +25,20 @@ body {
   color: white;
   display: flex;
   flex-direction: column;
-  padding: 30px 20px 20px 20px; /* padding inferior reduzido para harmonia */
+  justify-content: space-between;
+  padding: 30px 20px;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   overflow-y: auto;
-}
-
-.profile {
-  margin-top: 10px; /* ✅ espaço do topo */
-  margin-bottom: 30px;
+  z-index: 10;
 }
 
 .profile h3 {
   font-size: 16px;
+  margin-bottom: 30px;
   font-weight: 600;
-  margin-bottom: 20px;
-}
-
-
-.profile a {
-  display: block;
-  color: white;
-  font-size: 14px;
-  text-decoration: none;
-  padding: 8px 0;
-  border-bottom: 1px solid #1c4a7d;
-  transition: background-color 0.2s ease;
-}
-
-.profile a:hover {
-  background-color: rgba(0, 195, 183, 0.1);
 }
 
 .specialties details {
@@ -190,17 +175,10 @@ body {
 .header h1 {
   font-size: 24px;
   color: #1f1f1f;
-  margin: 0;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
 .logo img {
-  height: 40px;
-  max-width: 100%;
+  height: 50px;
 }
 
 .chart-section {
@@ -226,17 +204,19 @@ canvas {
   width: 100%;
   height: 300px;
 }
+
 .month-selector {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 4px;
   font-size: 14px;
   font-weight: 500;
   color: #333;
   flex-wrap: nowrap;
   white-space: nowrap;
-  line-height: 1.2;
 }
+
 
 .arrow-btn {
   background: none;
@@ -256,53 +236,37 @@ canvas {
 }
 
 /* ========== RESPONSIVIDADE ========== */
-
-
-
-@media (max-width: 480px) {
-  .chart {
-    padding: 15px;
-  }
-
-  .chart-header {
+@media (max-width: 768px) {
+  .container {
     flex-direction: column;
-    align-items: flex-start;
   }
 
-  .patient-header h1 {
-    font-size: 20px;
-  }
-
-  .profile-box img {
-    width: 100px;
-    height: 100px;
-  }
-
-  .profile-box .info p {
-    font-size: 14px;
-  }
-
-  .specialties summary {
-    font-size: 14px;
-  }
+  .menu-toggle {
+  display: flex !important;
+}
   .sidebar {
-    position: relative;
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 15px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 240px;
+  height: 100vh;
+  background-color: #00324A;
+  z-index: 1000;
+  padding: 30px 20px;
+  transition: left 0.3s ease;
+  overflow-y: auto;
+}
+  .sidebar.active {
+    left: 0;
   }
 
   .content {
     margin-left: 0;
     width: 100%;
     padding: 20px;
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
+    margin-top: 64px; /* 🔥 espaço garantido para o botão */
   }
 }
 
@@ -354,7 +318,7 @@ canvas {
   color: #00c3b7;
 }
 
-/* BOTÃO HAMBÚRGUER */
+/* MENU TOGGLE */
 .menu-toggle {
   position: fixed;
   top: 16px;
@@ -378,38 +342,4 @@ canvas {
 
 .menu-toggle.shifted {
   left: 260px;
- 
-}
-
-/* RESPONSIVIDADE */
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-  }
-
-  .menu-toggle {
-    display: flex;
-  }
-
-  .sidebar {
-    left: -100%;
-    position: fixed;
-    top: 0;
-    height: 100vh;
-    width: 240px;
-    transition: left 0.3s ease;
-    z-index: 1000;
-    flex-direction: column;
-  }
-
-  .sidebar.active {
-    left: 0;
-  }
-
-  .content {
-    margin-left: 0;
-    width: 100%;
-    padding: 20px;
-    margin-top: 64px; /* espaço para botão */
-  }
 }

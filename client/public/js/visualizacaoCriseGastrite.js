@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Paciente não selecionado');
         }
 
-        const response = await fetch(`http://localhost:5000/api/gastrite/crises/${paciente.cpf}/${criseId}`, {
+        const response = await fetch(`http://localhost:65432/api/gastrite/crises/${paciente.cpf}/${criseId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
