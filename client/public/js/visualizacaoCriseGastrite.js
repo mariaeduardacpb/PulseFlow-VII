@@ -2,11 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Função para formatar a data
     function formatDate(dateString) {
         const date = new Date(dateString);
-        return date.toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
+        return `${date.getUTCDate().toString().padStart(2, '0')}/${(date.getUTCMonth() + 1).toString().padStart(2, '0')}/${date.getUTCFullYear()}`;
     }
 
     // Função para determinar a classe de intensidade
@@ -48,6 +44,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Paciente não selecionado');
         }
 
+        console.log('Buscando crise:', {
+            cpf: paciente.cpf,
+            criseId: criseId,
+            url: `http://localhost:65432/api/gastrite/crises/${paciente.cpf}/${criseId}`
+        });
+
         const response = await fetch(`http://localhost:65432/api/gastrite/crises/${paciente.cpf}/${criseId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -55,6 +57,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('Crise não encontrada');
+            }
             throw new Error('Erro ao carregar detalhes da crise');
         }
 
@@ -77,10 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Erro:', error);
-        // Only show error message if it's not a 404 (not found) error
-        if (error.message !== 'Erro ao carregar detalhes da crise') {
-            alert('Erro ao carregar detalhes da crise: ' + error.message);
-        }
+        alert(error.message);
     }
 });
 
