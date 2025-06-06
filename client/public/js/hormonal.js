@@ -70,15 +70,9 @@ document.addEventListener("DOMContentLoaded", function () {
           console.error("Token não encontrado.");
           return [];
         }
-  
-        const [, payloadBase64] = tokenPaciente.split('.');
-        if (!payloadBase64) {
-          console.error("Token de paciente inválido.");
-          return [];
-        }
-  
-        const decodedPayload = JSON.parse(atob(payloadBase64));
-        const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+        const decodedPayload = JSON.parse(atob(tokenPaciente));
+        const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, "");
+
   
         if (!cpf) {
           console.error("CPF não encontrado no token.");

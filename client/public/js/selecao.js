@@ -44,6 +44,11 @@ btnAcesso.addEventListener('click', async () => {
 
     // Armazena os dados e redireciona
     localStorage.setItem('pacienteSelecionado', JSON.stringify(data));
+
+    const cpfCodificado = btoa(JSON.stringify({ cpf: cpfLimpo }));
+    localStorage.setItem('tokenPaciente', cpfCodificado);
+
+    
     window.location.href = 'perfilPaciente.html'; //mudando aquii
   } catch (err) {
     console.error(err);

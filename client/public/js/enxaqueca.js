@@ -67,15 +67,9 @@ const toggleButton = document.querySelector(".menu-toggle");
         return [];
       }
 
-      // Decodifica o token do paciente para extrair o CPF
-      const [, payloadBase64] = tokenPaciente.split('.');
-      if (!payloadBase64) {
-        console.error("Token de paciente inválido.");
-        return [];
-      }
+     const decodedPayload = JSON.parse(atob(tokenPaciente));
+      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, "");
 
-      const decodedPayload = JSON.parse(atob(payloadBase64));
-      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
 
       if (!cpf) {
         console.error("CPF não encontrado no token.");

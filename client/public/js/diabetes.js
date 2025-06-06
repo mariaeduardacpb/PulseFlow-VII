@@ -64,11 +64,9 @@ const toggleButton = document.querySelector(".menu-toggle");
 
       if (!tokenMedico || !tokenPaciente) return [];
 
-      const [, payloadBase64] = tokenPaciente.split(".");
-      if (!payloadBase64) return [];
-
-      const decodedPayload = JSON.parse(atob(payloadBase64));
+      const decodedPayload = JSON.parse(atob(tokenPaciente));
       const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, "");
+
       if (!cpf) return [];
 
       const response = await fetch(`http://127.0.0.1:5000/api/diabetes/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {

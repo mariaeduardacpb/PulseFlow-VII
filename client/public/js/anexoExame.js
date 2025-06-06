@@ -78,53 +78,48 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Buscar exames do paciente
-  async function buscarExamesPaciente() {
-    try {
-      const tokenMedico = localStorage.getItem('token');
-      const tokenPaciente = localStorage.getItem('tokenPaciente');
+ async function buscarExamesPaciente() {
+  try {
+    const tokenMedico = localStorage.getItem('token');
+    const tokenPaciente = localStorage.getItem('tokenPaciente');
 
-      if (!tokenMedico || !tokenPaciente) {
-        alert("Sessão expirada. Faça login novamente!");
-        return;
-      }
-
-      const [, payloadBase64] = tokenPaciente.split('.');
-      if (!payloadBase64) {
-        alert("Token de paciente inválido.");
-        return;
-      }
-
-      const decodedPayload = JSON.parse(atob(payloadBase64));
-      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
-
-      if (!cpf) {
-        alert("CPF não encontrado no token do paciente.");
-        return;
-      }
-
-      const response = await fetch(`http://localhost:5000/api/anexoExame/medico?cpf=${cpf}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${tokenMedico}`,
-          "Content-Type": "application/json"
-        }
-      });
-
-      const exames = await response.json();
-
-      if (!response.ok) {
-        alert("Erro ao buscar exames!");
-        return;
-      }
-
-      examesCarregados = exames; // <<< salva para usar no filtro
-      renderizarExames(examesCarregados);
-
-    } catch (error) {
-      console.error('Erro ao buscar exames:', error);
-      alert("Erro interno ao buscar exames.");
+    if (!tokenMedico || !tokenPaciente) {
+      alert("Sessão expirada. Faça login novamente!");
+      return;
     }
+
+    const decodedPayload = JSON.parse(atob(tokenPaciente));
+    const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+
+    if (!cpf) {
+      alert("CPF não encontrado no token do paciente.");
+      return;
+    }
+
+    const response = await fetch(`http://localhost:5000/api/anexoExame/medico?cpf=${cpf}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${tokenMedico}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const exames = await response.json();
+
+    if (!response.ok) {
+      alert("Erro ao buscar exames!");
+      return;
+    }
+
+    examesCarregados = exames;
+    renderizarExames(examesCarregados);
+
+  } catch (error) {
+    console.error('Erro ao buscar exames:', error);
+    alert("Erro interno ao buscar exames.");
   }
+}
+
 
   // Função para baixar exame
   window.baixarExame = async function (idExame, nomeExame) {
