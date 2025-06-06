@@ -31,7 +31,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         throw new Error('Token não encontrado. Por favor, faça login novamente.');
       }
 
-      const res = await fetch('http://localhost:5000/api/usuarios/perfil', {
+      const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -51,6 +51,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (tituloSidebar) {
         tituloSidebar.textContent = nomeFormatado;
       }
+
+      // Armazena o nome do médico para usar nos atalhos
+      localStorage.setItem('nomeMedico', nomeFormatado);
 
       return true;
     } catch (error) {
@@ -84,7 +87,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
 
       // Faz a requisição
-      const res = await fetch(`http://localhost:5000/api/pacientes/${pacienteData.id}`, {
+      const res = await fetch(`http://localhost:65432/api/pacientes/${pacienteData.id}`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -154,42 +157,29 @@ window.addEventListener('DOMContentLoaded', async () => {
         };
       }
 
-      // Atualiza as informações
-      const infoContainer = document.querySelector('.info');
-      if (infoContainer) {
-        // Adiciona classe para animação
-        infoContainer.classList.add('fade-in');
-        
-        // Formata os dados antes de exibir
-        const dadosFormatados = {
-          nome: paciente.nome || '-',
-          genero: paciente.genero || '-',
-          idade: calcularIdadeTexto(paciente.dataNascimento),
-          nacionalidade: paciente.nacionalidade || '-',
-          altura: paciente.altura ? `${paciente.altura} cm` : '-',
-          peso: paciente.peso ? `${paciente.peso} kg` : '-',
-          profissao: paciente.profissao || '-',
-          email: paciente.email || '-',
-          telefone: formatarTelefone(paciente.telefone) || '-',
-          observacoes: paciente.observacoes || 'Nenhuma'
-        };
+      // Formata os dados antes de exibir
+      const dadosFormatados = {
+        nomePaciente: paciente.nome || '-',
+        generoPaciente: paciente.genero || '-',
+        idadePaciente: calcularIdadeTexto(paciente.dataNascimento),
+        nacionalidadePaciente: paciente.nacionalidade || '-',
+        alturaPaciente: paciente.altura ? `${paciente.altura} cm` : '-',
+        pesoPaciente: paciente.peso ? `${paciente.peso} kg` : '-',
+        profissaoPaciente: paciente.profissao || '-',
+        emailPaciente: paciente.email || '-',
+        telefonePaciente: formatarTelefone(paciente.telefone) || '-',
+        observacoesPaciente: paciente.observacoes || 'Nenhuma'
+      };
 
-        // Atualiza o HTML com os dados formatados
-        infoContainer.innerHTML = Object.entries(dadosFormatados)
-          .map(([key, value]) => `
-            <p class="fade-in">
-              <strong>${formatarLabel(key)}:</strong> ${value}
-            </p>
-          `).join('');
+      // Atualiza cada campo individualmente
+      Object.entries(dadosFormatados).forEach(([id, valor]) => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+          elemento.textContent = valor;
+          elemento.style.animation = 'fadeIn 0.3s ease-in';
+        }
+      });
 
-        // Adiciona animação de fade-in para cada elemento
-        setTimeout(() => {
-          const elementos = infoContainer.querySelectorAll('p');
-          elementos.forEach((el, index) => {
-            el.style.animation = `fadeIn 0.3s ease-in ${index * 0.1}s`;
-          });
-        }, 100);
-      }
     } catch (error) {
       console.error("Erro ao preencher perfil:", error);
       mostrarErro("Erro ao exibir dados do paciente. Por favor, recarregue a página.");
@@ -252,6 +242,98 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  async function carregarUltimosRegistros() {
+    try {
+      const token = localStorage.getItem('token');
+      const pacienteData = JSON.parse(localStorage.getItem('pacienteSelecionado'));
+      
+      if (!token || !pacienteData || !pacienteData.id) {
+        console.error('Dados necessários:', { token: !!token, pacienteData });
+        throw new Error('Dados necessários não encontrados');
+      }
+
+      // Ajustando a rota da API para buscar as anotações médicas
+      const res = await fetch(`http://localhost:65432/api/anotacoes/${pacienteData.cpf}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Erro na resposta da API:', errorData);
+        throw new Error(errorData.message || 'Erro ao carregar registros clínicos');
+      }
+
+      const registros = await res.json();
+      console.log('Registros recebidos:', registros); // Debug
+
+      const shortcutGrid = document.querySelector('.shortcut-grid');
+      if (!shortcutGrid) {
+        console.error('Elemento .shortcut-grid não encontrado');
+        return;
+      }
+
+      // Limpa os atalhos existentes
+      shortcutGrid.innerHTML = '';
+
+      if (!registros || registros.length === 0) {
+        shortcutGrid.innerHTML = '<p class="no-records">Nenhum registro clínico encontrado</p>';
+        return;
+      }
+
+      // Pega apenas os 3 registros mais recentes
+      const registrosRecentes = registros.slice(0, 3);
+
+      // Cria os cards para cada registro
+      registrosRecentes.forEach(registro => {
+        try {
+          const dataFormatada = registro.data ? new Date(registro.data).toLocaleDateString('pt-BR') : 'Data não informada';
+          const card = document.createElement('div');
+          card.className = 'shortcut-card';
+          card.innerHTML = `
+            <p>
+              <strong>Motivo da Consulta:</strong> ${registro.titulo || 'Não informado'}<br>
+              <strong>Médico Responsável:</strong> ${registro.medico || 'Não informado'}<br>
+              <strong>Especialidade:</strong> ${registro.categoria || 'Não informada'}<br>
+              <strong>Data:</strong> ${dataFormatada}
+            </p>
+            <button onclick="visualizarRegistro('${registro._id}')">Visualizar</button>
+          `;
+          shortcutGrid.appendChild(card);
+        } catch (error) {
+          console.error('Erro ao criar card para registro:', registro, error);
+        }
+      });
+
+    } catch (error) {
+      console.error('Erro ao carregar registros:', error);
+      mostrarErro('Erro ao carregar registros clínicos. Por favor, tente novamente.');
+      
+      // Mostra uma mensagem de erro mais amigável na interface
+      const shortcutGrid = document.querySelector('.shortcut-grid');
+      if (shortcutGrid) {
+        shortcutGrid.innerHTML = `
+          <div class="error-message">
+            <p>Não foi possível carregar os registros clínicos.</p>
+            <p>Por favor, tente novamente mais tarde.</p>
+          </div>
+        `;
+      }
+    }
+  }
+
+  // Função para visualizar um registro específico
+  window.visualizarRegistro = function(id) {
+    console.log('Visualizando registro com ID:', id); // Debug
+    if (!id) {
+      console.error('ID do registro não fornecido');
+      return;
+    }
+    window.location.href = `vizualizacaoAnotacao.html?id=${encodeURIComponent(id)}`;
+  };
+
   // Inicia o carregamento
   try {
     // Primeiro carrega os dados do médico
@@ -262,6 +344,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // Depois carrega os dados do paciente
     await carregarDadosPaciente();
+
+    // Carrega os últimos registros clínicos
+    await carregarUltimosRegistros();
   } catch (error) {
     console.error("Erro durante o carregamento:", error);
     mostrarErro(error.message || "Ocorreu um erro ao carregar os dados. Por favor, tente novamente.");

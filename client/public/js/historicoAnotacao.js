@@ -1,19 +1,19 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // Toggle da Sidebar
   const sidebarToggle = document.getElementById('sidebarToggle');
   const sidebar = document.querySelector('.sidebar');
   const content = document.querySelector('.content');
 
-  sidebarToggle.addEventListener('click', () => {
+  sidebarToggle?.addEventListener('click', () => {
     sidebar.classList.toggle('active');
   });
 
-  // Fechar sidebar ao clicar fora
   document.addEventListener('click', (e) => {
     if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && sidebar.classList.contains('active')) {
       sidebar.classList.remove('active');
     }
   });
+
+  await carregarDadosMedico(); // <- Exibe "Dr(a). Nome" na sidebar
 
   const recordList = document.querySelector('.record-list');
   const filterCategory = document.getElementById('filterCategory');
@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const customSelect = document.querySelector('.custom-select');
   const selectOptions = document.getElementById('especialidadesList');
   let allAnotacoes = [];
+  let originalSpecialtyOptions = [];
 
   const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
   const cpf = paciente?.cpf;
@@ -31,118 +32,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Função para formatar o nome do médico
+  originalSpecialtyOptions = Array.from(selectOptions.querySelectorAll('.option'));
+
   function formatarNomeMedico(nome) {
-    // Remove qualquer prefixo existente (Dra., Draª, Dr., etc)
     nome = nome.replace(/^(Dra\.|Draª|Dr\.)\s*/i, '');
-    // Adiciona o prefixo Draª
     return `Draª ${nome}`;
   }
 
-  // Função para mostrar mensagem de aviso
   function mostrarAviso(mensagem) {
     const aviso = document.createElement('div');
     aviso.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #ffffff;
-      color: #002A42;
-      padding: 16px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 42, 66, 0.1);
-      z-index: 1000;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 14px;
-      border: 1px solid #e1e5eb;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 300px;
-      max-width: 400px;
-      animation: slideIn 0.3s ease-out;
+      position: fixed; top: 20px; right: 20px; background-color: #fff;
+      color: #002A42; padding: 16px 20px; border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 42, 66, 0.1); z-index: 1000;
+      font-family: 'Montserrat', sans-serif; font-size: 14px;
+      border: 1px solid #e1e5eb; display: flex; align-items: center;
+      gap: 12px; min-width: 300px; max-width: 400px; animation: slideIn 0.3s ease-out;
     `;
 
-    // Ícone de alerta
     const icon = document.createElement('div');
     icon.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00c3b7;">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
+      <svg width="24" height="24" stroke="currentColor"><circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     `;
 
-    // Container do texto
     const textContainer = document.createElement('div');
-    textContainer.style.cssText = `
-      flex: 1;
-      line-height: 1.4;
-    `;
+    textContainer.style.flex = '1';
     textContainer.textContent = mensagem;
 
-    // Botão de fechar
     const closeButton = document.createElement('button');
-    closeButton.style.cssText = `
-      background: none;
-      border: none;
-      padding: 4px;
-      cursor: pointer;
-      color: #94a3b8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s;
-    `;
-    closeButton.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    `;
-    closeButton.onclick = () => {
-      aviso.style.animation = 'slideOut 0.3s ease-out';
-      setTimeout(() => {
-        document.body.removeChild(aviso);
-        document.head.removeChild(style);
-      }, 300);
-    };
+    closeButton.style.cssText = `background: none; border: none; cursor: pointer; color: #94a3b8;`;
+    closeButton.innerHTML = `<svg width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    closeButton.onclick = () => aviso.remove();
 
-    // Adiciona os elementos ao aviso
-    aviso.appendChild(icon);
-    aviso.appendChild(textContainer);
-    aviso.appendChild(closeButton);
+    aviso.append(icon, textContainer, closeButton);
     document.body.appendChild(aviso);
 
-    // Adiciona estilo para a animação
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Remove o aviso após 5 segundos
-    setTimeout(() => {
-      if (document.body.contains(aviso)) {
-        aviso.style.animation = 'slideOut 0.3s ease-out';
-        setTimeout(() => {
-          if (document.body.contains(aviso)) {
-            document.body.removeChild(aviso);
-            document.head.removeChild(style);
-          }
-        }, 300);
-      }
-    }, 5000);
+    setTimeout(() => aviso.remove(), 5000);
   }
 
-  // Função para renderizar as anotações
   function renderAnotacoes(anotacoes) {
     recordList.innerHTML = '';
 
@@ -152,7 +80,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     anotacoes.forEach(anotacao => {
-      const dataFormatada = new Date(anotacao.data).toLocaleDateString('pt-BR');
+      const data = new Date(anotacao.data);
+      const dataFormatada = `${data.getUTCDate().toString().padStart(2, '0')}/${(data.getUTCMonth() + 1).toString().padStart(2, '0')}/${data.getUTCFullYear()}`;
       const nomeMedicoFormatado = formatarNomeMedico(anotacao.medico);
       const item = document.createElement('div');
       item.className = 'record-item';
@@ -169,87 +98,83 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Função para filtrar as anotações
   function filtrarAnotacoes() {
     const especialidadeFiltro = filterCategory.value.toLowerCase();
     const medicoFiltro = filterDoctor.value.toLowerCase();
 
-    // Verifica se nenhum filtro foi preenchido
     if (!especialidadeFiltro && !medicoFiltro) {
       mostrarAviso('Por favor, selecione pelo menos um filtro para buscar.');
+      renderAnotacoes(allAnotacoes);
       return;
     }
 
     const anotacoesFiltradas = allAnotacoes.filter(anotacao => {
-      // Se "Todas as Especialidades" estiver selecionado, não filtra por especialidade
-      const especialidadeMatch = especialidadeFiltro === 'todas as especialidades' || 
-        !especialidadeFiltro || 
-        anotacao.categoria.toLowerCase().includes(especialidadeFiltro);
-      
-      const medicoMatch = !medicoFiltro || 
-        anotacao.medico.toLowerCase().includes(medicoFiltro);
-      
+      const especialidadeMatch = !especialidadeFiltro || anotacao.categoria.toLowerCase().includes(especialidadeFiltro);
+      const medicoMatch = !medicoFiltro || anotacao.medico.toLowerCase().includes(medicoFiltro);
       return especialidadeMatch && medicoMatch;
     });
 
     renderAnotacoes(anotacoesFiltradas);
   }
 
-  // Event listeners para o dropdown customizado
-  filterCategory.addEventListener('click', (e) => {
-    e.preventDefault();
-    customSelect.classList.toggle('active');
+  function filterSpecialtyOptions(inputText) {
+    const lowerInput = inputText.toLowerCase();
+    selectOptions.innerHTML = '';
+
+    const filteredOptions = originalSpecialtyOptions.filter(option =>
+      option.textContent.toLowerCase().includes(lowerInput)
+    );
+
+    if (filteredOptions.length > 0) {
+      filteredOptions.forEach(option => selectOptions.appendChild(option));
+      customSelect.classList.add('active');
+    } else {
+      customSelect.classList.remove('active');
+    }
+  }
+
+  filterCategory.addEventListener('input', () => {
+    filterSpecialtyOptions(filterCategory.value);
+  });
+
+  filterCategory.addEventListener('click', () => {
+    if (filterCategory.value === '') {
+      filterSpecialtyOptions('');
+    }
+    customSelect.classList.add('active');
   });
 
   selectOptions.addEventListener('click', (e) => {
     const option = e.target.closest('.option');
     if (option) {
-      const value = option.dataset.value;
-      filterCategory.value = value;
+      filterCategory.value = option.dataset.value;
       customSelect.classList.remove('active');
-      
-      // Remove a classe selected de todas as opções
       document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-      // Adiciona a classe selected à opção clicada
       option.classList.add('selected');
-      
       filtrarAnotacoes();
     }
   });
 
-  // Fechar o dropdown quando clicar fora
   document.addEventListener('click', (e) => {
-    if (!customSelect.contains(e.target)) {
+    if (!customSelect.contains(e.target) && e.target !== filterCategory) {
       customSelect.classList.remove('active');
     }
   });
 
-  // Event listeners para os filtros
   filterButton.addEventListener('click', filtrarAnotacoes);
-  
-  // Filtro ao pressionar Enter nos campos
+
   filterDoctor.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') filtrarAnotacoes();
   });
 
-  // Limpar filtro de especialidade ao selecionar "Todas as Especialidades"
-  filterCategory.addEventListener('change', (e) => {
-    if (e.target.value.toLowerCase() === 'todas as especialidades') {
-      e.target.value = '';
-      filtrarAnotacoes();
-    }
-  });
-
   try {
-    const response = await fetch(`http://localhost:5000/api/anotacoes/${cpf}`, {
+    const response = await fetch(`http://localhost:65432/api/anotacoes/${cpf}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
 
-    if (!response.ok) {
-      throw new Error('Erro ao buscar Registro Clinico');
-    }
+    if (!response.ok) throw new Error('Erro ao buscar Registro Clinico');
 
     allAnotacoes = await response.json();
     renderAnotacoes(allAnotacoes);
@@ -259,3 +184,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     recordList.innerHTML = '<p style="color: red;">Erro ao carregar anotações.</p>';
   }
 });
+
+// Função padrão para exibir nome do(a) médico(a) na sidebar
+async function carregarDadosMedico() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Token não encontrado. Por favor, faça login novamente.');
+
+    const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || 'Erro ao carregar dados do médico');
+    }
+
+    const medico = await res.json();
+    const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
+    const nomeFormatado = `${prefixo} ${medico.nome}`;
+
+    const tituloSidebar = document.querySelector('.sidebar .profile h3');
+    if (tituloSidebar) {
+      tituloSidebar.textContent = nomeFormatado;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro ao carregar dados do médico:", error);
+    const fallback = document.querySelector('.sidebar .profile h3');
+    if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
+    return false;
+  }
+}

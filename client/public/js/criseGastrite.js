@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 observacoes: document.getElementById('observacoes').value
             };
 
-            const response = await fetch('http://localhost:5000/api/crise-gastrite', {
+            const response = await fetch('http://localhost:65432/api/crise-gastrite', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Paciente não selecionado. Por favor, selecione um paciente primeiro.');
             }
 
-            let url = `http://localhost:5000/api/crise-gastrite/${pacienteSelecionado.cpf}`;
+            let url = `http://localhost:65432/api/crise-gastrite/${pacienteSelecionado.cpf}`;
             const params = new URLSearchParams();
 
             if (monthFilter.value) {

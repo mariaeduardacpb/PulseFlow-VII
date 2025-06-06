@@ -218,16 +218,6 @@ body {
   box-shadow: 0 2px 6px rgba(0, 42, 66, 0.1);
 }
 
-/* Estilo para o botão "Nova Crise" */
-.filters button:last-child {
-  background-color: #00c3b7;
-  margin-left: auto;
-}
-
-.filters button:last-child:hover {
-  background-color: #00a99f;
-}
-
 /* Record List */
 .record-list {
   display: grid;
@@ -279,51 +269,30 @@ body {
   font-weight: 500;
 }
 
-/* --- New Intensity Color Classes --- */
 .record-item .intensity.sem-dor {
-  background-color: #e8f5e9; /* Light Green */
-  color: #2e7d32; /* Dark Green */
+  background-color: #e8f5e9;
+  color: #2e7d32;
 }
 
 .record-item .intensity.leve {
-  background-color: #e3f2fd; /* Light Blue */
-  color: #1565c0; /* Dark Blue */
+  background-color: #e3f2fd;
+  color: #1565c0;
 }
 
 .record-item .intensity.moderada {
-  background-color: #fff3e0; /* Light Orange */
-  color: #f57c00; /* Dark Orange */
+  background-color: #ede7f6;
+  color: #4527a0;
 }
 
 .record-item .intensity.intensa {
-  background-color: #ede7f6; /* Light Purple */
-  color: #4527a0; /* Dark Purple */
+  background-color: #ede7f6;
+  color: #4527a0;
 }
 
 .record-item .intensity.insuportavel {
-  background-color: #fbe9e7; /* Light Red */
-  color: #d32f2f; /* Dark Red */
-}
-
-/* --- End New Intensity Color Classes --- */
-
-/* Old Intensity Classes (Commented out) */
-/*
-.record-item .intensity.low {
-  background-color: #e3f2fd;
-  color: #1976d2;
-}
-
-.record-item .intensity.medium {
-  background-color: #fff3e0;
-  color: #f57c00;
-}
-
-.record-item .intensity.high {
   background-color: #fbe9e7;
   color: #d32f2f;
 }
-*/
 
 .record-item a {
   color: #002A42;

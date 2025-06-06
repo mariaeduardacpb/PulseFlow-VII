@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error('Token não encontrado. Por favor, faça login novamente.');
       }
 
-      const res = await fetch('http://localhost:5000/api/usuarios/perfil', {
+      const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -77,8 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Buscar exames do paciente
- async function buscarExamesPaciente() {
+  async function buscarExamesPaciente() {
   try {
     const tokenMedico = localStorage.getItem('token');
     const tokenPaciente = localStorage.getItem('tokenPaciente');
@@ -126,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const token = localStorage.getItem('token');
   
-      const response = await fetch(`http://localhost:5000/api/anexoExame/download/${idExame}`, {
+      const response = await fetch(`http://localhost:65432/api/anexoExame/download/${idExame}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`

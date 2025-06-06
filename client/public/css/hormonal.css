@@ -32,6 +32,7 @@ body {
   left: 0;
   bottom: 0;
   overflow-y: auto;
+  z-index: 10;
 }
 
 .profile h3 {
@@ -122,11 +123,51 @@ body {
   padding: 30px 40px;
 }
 
+.patient-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #002A42;
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.profile-box {
+  background-color: #003954;
+  color: #fff;
+  border-radius: 8px;
+  display: flex;
+  gap: 30px;
+  padding: 30px;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.profile-box img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 100%;
+  border: 3px solid #f2f2f2;
+}
+
+.profile-box .info p {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.profile-box .separator {
+  width: 2px;
+  height: 100%;
+  background-color: #ffffff;
+  margin: 0 20px;
+  border-radius: 1px;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 10px;
 }
@@ -134,17 +175,10 @@ body {
 .header h1 {
   font-size: 24px;
   color: #1f1f1f;
-  margin: 0;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
 .logo img {
-  height: 40px;
-  max-width: 100%;
+  height: 50px;
 }
 
 .chart-section {
@@ -174,14 +208,15 @@ canvas {
 .month-selector {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 4px;
   font-size: 14px;
   font-weight: 500;
   color: #333;
   flex-wrap: nowrap;
   white-space: nowrap;
-  line-height: 1.2;
 }
+
 
 .arrow-btn {
   background: none;
@@ -194,6 +229,45 @@ canvas {
 
 .arrow-btn:hover {
   color: #00c3b7;
+}
+
+.bold {
+  font-weight: 1000;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .menu-toggle {
+  display: flex !important;
+}
+  .sidebar {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 240px;
+  height: 100vh;
+  background-color: #00324A;
+  z-index: 1000;
+  padding: 30px 20px;
+  transition: left 0.3s ease;
+  overflow-y: auto;
+}
+  .sidebar.active {
+    left: 0;
+  }
+
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+    margin-top: 64px; /* 🔥 espaço garantido para o botão */
+  }
 }
 
 .no-data-msg {
@@ -213,11 +287,38 @@ canvas {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* BOTÃO HAMBÚRGUER */
+.referencia-dor {
+  text-align: center;
+  font-size: 13px;
+  color: #444;
+  margin-top: 30px;
+  padding: 10px;
+  background-color: #f6f6f6;
+  border-top: 1px solid #ddd;
+}
+
+.referencia-dor a {
+  color: #003366;
+  font-weight: 500;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.referencia-dor a:hover {
+  color: #00c3b7;
+}
+
+/* MENU TOGGLE */
 .menu-toggle {
   position: fixed;
   top: 16px;
@@ -241,37 +342,4 @@ canvas {
 
 .menu-toggle.shifted {
   left: 260px;
-}
-
-/* RESPONSIVIDADE */
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-  }
-
-  .menu-toggle {
-    display: flex;
-  }
-
-  .sidebar {
-    left: -100%;
-    position: fixed;
-    top: 0;
-    height: 100vh;
-    width: 240px;
-    transition: left 0.3s ease;
-    z-index: 1000;
-    flex-direction: column;
-  }
-
-  .sidebar.active {
-    left: 0;
-  }
-
-  .content {
-    margin-left: 0;
-    width: 100%;
-    padding: 20px;
-    margin-top: 64px; /* espaço para botão */
-  }
 }

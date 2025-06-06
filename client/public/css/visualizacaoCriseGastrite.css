@@ -31,21 +31,21 @@ body {
     bottom: 0;
     overflow-y: auto;
     z-index: 10;
-}
-
-.profile h3 {
+  }
+  
+  .profile h3 {
     font-size: 16px;
     margin-bottom: 30px;
     font-weight: 600;
-}
-
-.specialties details {
+  }
+  
+  .specialties details {
     margin-bottom: 12px;
     border-bottom: 1px solid #1c4a7d;
     padding-bottom: 8px;
-}
-
-.specialties summary {
+  }
+  
+  .specialties summary {
     list-style: none;
     cursor: pointer;
     font-weight: 500;
@@ -54,13 +54,13 @@ body {
     justify-content: space-between;
     align-items: center;
     color: #f0f0f0;
-}
-
-.specialties summary::-webkit-details-marker {
+  }
+  
+  .specialties summary::-webkit-details-marker {
     display: none;
-}
-
-.specialties .chevron {
+  }
+  
+  .specialties .chevron {
     display: inline-block;
     width: 8px;
     height: 8px;
@@ -69,24 +69,24 @@ body {
     transform: rotate(45deg);
     transition: transform 0.3s ease;
     margin-left: 10px;
-}
-
-.specialties details[open] .chevron {
+  }
+  
+  .specialties details[open] .chevron {
     transform: rotate(225deg);
-}
-
-.specialties ul {
+  }
+  
+  .specialties ul {
     margin-top: 10px;
     margin-left: 10px;
     list-style: none;
     padding-left: 0;
-}
-
-.specialties li {
+  }
+  
+  .specialties li {
     margin: 8px 0;
-}
-
-.specialties a {
+  }
+  
+  .specialties a {
     color: white;
     font-size: 14px;
     text-decoration: none;
@@ -94,17 +94,17 @@ body {
     padding: 4px 8px;
     border-radius: 6px;
     transition: background 0.2s ease;
-}
-
-.specialties a:hover {
+  }
+  
+  .specialties a:hover {
     background-color: rgba(0, 195, 183, 0.15);
-}
-
-.change-patient {
+  }
+  
+  .change-patient {
     margin-top: auto;
-}
-
-.change-patient a {
+  }
+  
+  .change-patient a {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -112,8 +112,8 @@ body {
     font-weight: bold;
     font-size: 14px;
     text-decoration: none;
-}
-
+  }
+  
 .content {
     margin-left: 240px;
     width: calc(100% - 240px);

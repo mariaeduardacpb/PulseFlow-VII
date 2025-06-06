@@ -5,20 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Histórico de Eventos Clínicos</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../public/css/historicoProntuario.css">
+  <link rel="stylesheet" href="../public/css/historicoEventoClinico.css">
   <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
 </head>
 <body>
   <div class="container">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
     <aside class="sidebar">
       <div class="profile">
         <h3>Draª Eliane Young</h3>
       </div>
       <nav class="specialties">
         <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
-        <details><summary><span style="font-weight: bold;"><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
+        <details><summary><span><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
         <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
-        <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
+        <details open><summary><span style="font-weight: bold;"><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
         <details><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
           <ul>
             <!-- Condições Crônicas -->
@@ -43,7 +50,7 @@
         </a>
       </div>
     </aside>
-      
+
     <main class="content">
       <header class="header">
         <h1>Histórico de Eventos Clínicos</h1>
@@ -53,29 +60,47 @@
       </header>
 
       <div class="filters">
-        <select id="filterCategory">
-          <option value="">Todas as especialidades</option>
-          <option value="cardiologia">Cardiologia</option>
-          <option value="dermatologia">Dermatologia</option>
-          <option value="endocrinologia">Endocrinologia</option>
-          <option value="gastroenterologia">Gastroenterologia</option>
-          <option value="ginecologia">Ginecologia</option>
-          <option value="neurologia">Neurologia</option>
-          <option value="psiquiatria">Psiquiatria</option>
-        </select>
-        <select id="filterType">
-          <option value="">Todos os tipos</option>
-          <option value="crise">Crise / Emergência</option>
-          <option value="acompanhamento">Acompanhamento de Condição Crônica</option>
-          <option value="psicologico">Episódio Psicológico ou Emocional</option>
-          <option value="medicacao">Evento Relacionado à Medicação</option>
-        </select>
-        <input type="text" id="filterDoctor" placeholder="Médico Responsável">
-        <button id="filterButton">Filtrar</button>
+        <div class="filter-group">
+          <select id="filterCategory">
+            <option value="">Todas as especialidades</option>
+            <option value="cardiologia">Cardiologia</option>
+            <option value="dermatologia">Dermatologia</option>
+            <option value="endocrinologia">Endocrinologia</option>
+            <option value="gastroenterologia">Gastroenterologia</option>
+            <option value="ginecologia">Ginecologia</option>
+            <option value="neurologia">Neurologia</option>
+            <option value="psiquiatria">Psiquiatria</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select id="filterType">
+            <option value="">Todos os tipos</option>
+            <option value="crise">Crise / Emergência</option>
+            <option value="acompanhamento">Acompanhamento de Condição Crônica</option>
+            <option value="psicologico">Episódio Psicológico ou Emocional</option>
+            <option value="medicacao">Evento Relacionado à Medicação</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select id="filterIntensity">
+            <option value="">Todas as intensidades</option>
+            <option value="0">Sem dor</option>
+            <option value="1-3">Leve (1-3)</option>
+            <option value="4-6">Moderada (4-6)</option>
+            <option value="7-10">Intensa (7-10)</option>
+          </select>
+        </div>
+        <button id="filterButton">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          Filtrar
+        </button>
       </div>
 
       <div class="record-list">
-        <!-- Os registros serão carregados dinamicamente via JavaScript -->
+        <!-- Os registros serão inseridos aqui via JavaScript -->
       </div>
     </main>
   </div>

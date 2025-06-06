@@ -2,6 +2,7 @@ import express from 'express';
 import { getCrises, getCrise, createCrise, updateCrise, deleteCrise } from '../controllers/criseGastriteController.js';
 import { auth } from '../middleware/authMiddleware.js';
 import { CriseGastrite } from '../models/criseGastriteModel.js';
+import Paciente from '../models/Paciente.js';
 
 const router = express.Router();
 
@@ -20,9 +21,16 @@ router.get('/crises/:cpf/:id', async (req, res) => {
     try {
         const { cpf, id } = req.params;
 
+        // Primeiro, encontrar o paciente pelo CPF
+        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente não encontrado' });
+        }
+
+        // Depois, encontrar a crise pelo ID e pelo ID do paciente
         const crise = await CriseGastrite.findOne({
-            cpfPaciente: cpf,
-            _id: id
+            _id: id,
+            paciente: paciente._id
         });
 
         if (!crise) {
