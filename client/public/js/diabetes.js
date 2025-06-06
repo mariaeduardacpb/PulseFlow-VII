@@ -1,14 +1,16 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const ctx = document.getElementById('chartGlicemia').getContext('2d');
+document.addEventListener("DOMContentLoaded", async function () {
+  console.log('Script iniciado');
+
+  const canvas = document.getElementById('chartGlicemia');
   const noDataLabel = document.getElementById('no-data-msg-glicemia');
-const toggleButton = document.querySelector(".menu-toggle");
+  const toggleButton = document.querySelector(".menu-toggle");
   const sidebar = document.querySelector(".sidebar");
 
   toggleButton.addEventListener("click", () => {
     sidebar.classList.toggle("active");
     toggleButton.classList.toggle("shifted");
   });
-  
+
   const months = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
@@ -18,12 +20,19 @@ const toggleButton = document.querySelector(".menu-toggle");
   let currentMonthIndex = today.getMonth();
   const currentYear = today.getFullYear();
 
+  function mostrarErro(mensagem) {
+    const erroBox = document.getElementById('erroPerfil');
+    if (erroBox) {
+      erroBox.textContent = `⚠️ ${mensagem}`;
+      erroBox.style.display = 'block';
+      erroBox.style.animation = 'fadeIn 0.3s ease-in';
+    }
+  }
+
   async function carregarDadosMedico() {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token não encontrado. Por favor, faça login novamente.');
-      }
+      if (!token) throw new Error('Token não encontrado. Por favor, faça login novamente.');
 
       const res = await fetch('http://localhost:5000/api/usuarios/perfil', {
         headers: { 
@@ -55,7 +64,6 @@ const toggleButton = document.querySelector(".menu-toggle");
       return false;
     }
   }
-
 
   async function fetchGlicemiaData(month, year) {
     try {
@@ -89,6 +97,7 @@ const toggleButton = document.querySelector(".menu-toggle");
     }
   }
 
+  const ctx = canvas.getContext('2d');
   const chartGlicemia = new Chart(ctx, {
     type: "line",
     data: {
@@ -152,13 +161,12 @@ const toggleButton = document.querySelector(".menu-toggle");
         }
       }
     }
-          
   });
 
   async function loadChartData() {
     const dados = await fetchGlicemiaData(currentMonthIndex, currentYear);
     const dias = dados.map(d => d.dia);
-    const valores = dados.map(d => d.nivelGlicemia); // use "valor" se sua API retornar assim
+    const valores = dados.map(d => d.nivelGlicemia);
 
     if (valores.length === 0) {
       chartGlicemia.data.labels = [];
@@ -195,7 +203,7 @@ const toggleButton = document.querySelector(".menu-toggle");
   document.querySelectorAll(".month-label").forEach(el => {
     el.textContent = `${months[currentMonthIndex]} • ${currentYear}`;
   });
-  
-  carregarDadosMedico();
-  loadChartData();
+
+  await carregarDadosMedico(); // <- chama aqui para garantir que aparece o nome
+  await loadChartData();
 });

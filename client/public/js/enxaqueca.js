@@ -25,7 +25,7 @@ const toggleButton = document.querySelector(".menu-toggle");
         throw new Error('Token não encontrado. Por favor, faça login novamente.');
       }
 
-      const res = await fetch('http://localhost:5000/api/usuarios/perfil', {
+      const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -82,7 +82,7 @@ const toggleButton = document.querySelector(".menu-toggle");
         return [];
       }
 
-      const response = await fetch(`http://127.0.0.1:5000/api/enxaqueca/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
+      const response = await fetch(`http://127.0.0.1:65432/api/enxaqueca/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${tokenMedico}`,

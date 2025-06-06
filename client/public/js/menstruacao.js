@@ -8,6 +8,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const prevMonthBtn = document.getElementById('prev-month');
   const nextMonthBtn = document.getElementById('next-month');
   const recordsContainer = document.getElementById('records-container');
+  const toggleButton = document.querySelector('.menu-toggle');
+  const sidebar = document.querySelector('.sidebar');
+
+  toggleButton?.addEventListener("click", () => {
+    sidebar?.classList.toggle("active");
+    toggleButton?.classList.toggle("shifted");
+  });
+
+  await carregarDadosMedico(); // <-- Nome do médico na sidebar
 
   // Navegação entre os meses
   prevMonthBtn.addEventListener('click', () => {
@@ -30,97 +39,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Mostrar loading state
   calendarBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Carregando dados...</td></tr>';
   recordsContainer.innerHTML = '<p>Carregando registros...</p>';
 
   try {
-    // Debug endpoint para verificar os ciclos
-    console.log("[Data Fetching] Iniciando debug de ciclos para CPF:", cpf);
-    const debugRes = await fetch(`http://localhost:5000/api/ciclo/debug/${cpf}`, {
+    const debugRes = await fetch(`http://localhost:65432/api/ciclo/debug/${cpf}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     
     if (debugRes.ok) {
       const debugData = await debugRes.json();
-      console.log("[Data Fetching] Debug de ciclos:", debugData);
+      console.log("[DEBUG] Ciclos:", debugData);
     }
 
-    // Buscar ciclos
-    console.log("[Data Fetching] Iniciando busca de ciclos para CPF:", cpf);
-    const resCiclos = await fetch(`http://localhost:5000/api/ciclo/${cpf}`, {
+    const resCiclos = await fetch(`http://localhost:65432/api/ciclo/${cpf}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    if (!resCiclos.ok) {
-      throw new Error(`Erro ao carregar ciclos: ${resCiclos.statusText}`);
-    }
-    
+    if (!resCiclos.ok) throw new Error(`Erro ao carregar ciclos: ${resCiclos.statusText}`);
     const ciclosResponse = await resCiclos.json();
-    console.log("[Data Fetching] Resposta bruta dos ciclos:", ciclosResponse);
-    
-    // Verificar se a resposta é um array
-    if (!Array.isArray(ciclosResponse)) {
-      console.error("[Data Fetching] Resposta dos ciclos não é um array:", ciclosResponse);
-      ciclos = [];
-    } else {
-      ciclos = ciclosResponse;
-    }
-    
-    console.log("[Data Fetching] Ciclos processados:", {
-      status: resCiclos.status,
-      ciclosLength: ciclos?.length,
-      ciclosData: ciclos,
-      isArray: Array.isArray(ciclos)
-    });
+    ciclos = Array.isArray(ciclosResponse) ? ciclosResponse : [];
 
-    // Buscar registros de menstruação
-    console.log("[Data Fetching] Iniciando busca de registros de menstruação para CPF:", cpf);
-    const resMenstruacao = await fetch(`http://localhost:5000/api/menstruacao/${cpf}`, {
+    const resMenstruacao = await fetch(`http://localhost:65432/api/menstruacao/${cpf}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    if (!resMenstruacao.ok) {
-      throw new Error(`Erro ao carregar registros de menstruação: ${resMenstruacao.statusText}`);
-    }
-    
+    if (!resMenstruacao.ok) throw new Error(`Erro ao carregar registros de menstruação: ${resMenstruacao.statusText}`);
     const registrosResponse = await resMenstruacao.json();
-    console.log("[Data Fetching] Resposta bruta dos registros:", registrosResponse);
-    
-    // Verificar se a resposta é um array
-    if (!Array.isArray(registrosResponse)) {
-      console.error("[Data Fetching] Resposta dos registros não é um array:", registrosResponse);
-      registrosMenstruacao = [];
-    } else {
-      registrosMenstruacao = registrosResponse;
-    }
-    
-    console.log("[Data Fetching] Registros processados:", {
-      status: resMenstruacao.status,
-      registrosLength: registrosMenstruacao?.length,
-      registrosData: registrosMenstruacao,
-      isArray: Array.isArray(registrosMenstruacao)
-    });
+    registrosMenstruacao = Array.isArray(registrosResponse) ? registrosResponse : [];
 
     if ((!Array.isArray(ciclos) || ciclos.length === 0) && 
         (!Array.isArray(registrosMenstruacao) || registrosMenstruacao.length === 0)) {
-      console.log("[Data Fetching] Nenhum dado encontrado");
       calendarBody.innerHTML = '<tr><td colspan="7">Nenhum registro encontrado.</td></tr>';
       recordsContainer.innerHTML = '<p>Nenhum registro encontrado.</p>';
-      // Limpar estatísticas
       document.getElementById('last-menstruation').textContent = '--';
       document.getElementById('avg-duration').textContent = '--';
       document.getElementById('avg-cycle-length').textContent = '--';
       return;
     }
-
-    // Log adicional para verificar as datas dos ciclos
-    ciclos.forEach((ciclo, index) => {
-      console.log(`Ciclo ${index + 1}:`, {
-        dataInicio: new Date(ciclo.dataInicio),
-        dataFim: new Date(ciclo.dataFim)
-      });
-    });
 
     renderCalendar(currentDate, ciclos, registrosMenstruacao);
     renderRecords(registrosMenstruacao);
@@ -131,6 +87,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     recordsContainer.innerHTML = `<p style="color: red;">Erro ao buscar dados: ${err.message}</p>`;
   }
 });
+
+async function carregarDadosMedico() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Token não encontrado. Por favor, faça login novamente.');
+
+    const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || 'Erro ao carregar dados do médico');
+    }
+
+    const medico = await res.json();
+    const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
+    const nomeFormatado = `${prefixo} ${medico.nome}`;
+    
+    const tituloSidebar = document.querySelector('.sidebar .profile h3');
+    if (tituloSidebar) {
+      tituloSidebar.textContent = nomeFormatado;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro ao carregar dados do médico:", error);
+    const fallback = document.querySelector('.sidebar .profile h3');
+    if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
+    return false;
+  }
+}
 
 function formatDate(date) {
   return new Date(date).toLocaleDateString('pt-BR');
@@ -144,7 +135,6 @@ function renderRecords(registros) {
     return;
   }
 
-  // Ordenar registros por data de início (mais recente primeiro)
   registros.sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
 
   const recordsHTML = registros.map(registro => `
@@ -216,30 +206,17 @@ function renderCalendar(date, ciclos, registrosMenstruacao) {
 
     const cell = document.createElement('td');
     const currentDate = new Date(year, month, day);
-    // Set currentDate to the beginning of the day in local time
     currentDate.setHours(0, 0, 0, 0);
 
     let cicloAtivo = false;
     let registroAtivo = false;
     let registroInfo = null;
 
-    // Verificar ciclos
     for (const ciclo of ciclos) {
-      // Create Date objects from ISO strings. These are parsed as UTC by default.
       const periodStart = new Date(ciclo.dataInicio);
       const periodEnd = new Date(ciclo.dataFim);
-
-      // To compare correctly with local currentDate (start of the day),
-      // we need to ensure the periodEnd includes the entire last day.
-      // We can do this by comparing local currentDate with the UTC dates.
-      // If currentDate (local) falls on or after periodStart (UTC) and
-      // strictly before periodEnd + 1 day (UTC), it's within the range.
-      
-      // Create a Date object for the day *after* the periodEnd in UTC
       const dayAfterPeriodEnd = new Date(periodEnd);
       dayAfterPeriodEnd.setUTCDate(periodEnd.getUTCDate() + 1);
-      // We need to compare local currentDate with these UTC dates correctly.
-      // Convert local currentDate to UTC for comparison.
       const currentDateUTC = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
 
       if (currentDateUTC >= periodStart && currentDateUTC < dayAfterPeriodEnd) {
@@ -248,14 +225,11 @@ function renderCalendar(date, ciclos, registrosMenstruacao) {
       }
     }
 
-    // Verificar registros de menstruação
     for (const registro of registrosMenstruacao) {
       const periodStart = new Date(registro.dataInicio);
       const periodEnd = new Date(registro.dataFim);
-      
       const dayAfterPeriodEnd = new Date(periodEnd);
       dayAfterPeriodEnd.setUTCDate(periodEnd.getUTCDate() + 1);
-      
       const currentDateUTC = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
 
       if (currentDateUTC >= periodStart && currentDateUTC < dayAfterPeriodEnd) {
@@ -266,7 +240,6 @@ function renderCalendar(date, ciclos, registrosMenstruacao) {
     }
 
     if (registroAtivo) {
-      // Dia de menstruação
       const tooltipTitle = `Dia de menstruação\nFluxo: ${registroInfo.fluxo || 'Não informado'}\nCólicas: ${registroInfo.teveColica ? 'Sim' + (registroInfo.intensidadeColica ? ' (' + registroInfo.intensidadeColica + '/10)' : '') : 'Não'}\nHumor: ${registroInfo.humor || 'Não informado'}`;
       cell.innerHTML = `
         <div class="day menstrual" title="${tooltipTitle}">
@@ -277,7 +250,6 @@ function renderCalendar(date, ciclos, registrosMenstruacao) {
         </div>
       `;
     } else if (cicloAtivo) {
-      // Dia de ciclo
       cell.innerHTML = `
         <div class="day cycle" title="Período do ciclo">
           <span class="day-number">${day}</span>
@@ -303,13 +275,9 @@ function displayStats(registros, ciclos) {
   const lastMenstruationEl = document.getElementById('last-menstruation');
   const avgDurationEl = document.getElementById('avg-duration');
 
-  // Última Menstruação
   if (registros.length > 0) {
-    // Ordenar por data de início decrescente para encontrar a última
     const sortedRegistros = [...registros].sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
     const ultimoRegistro = sortedRegistros[0];
-    
-    // Usar as datas exatamente como estão no banco
     const dataInicioFormatada = formatDate(ultimoRegistro.dataInicio);
     const dataFimFormatada = formatDate(ultimoRegistro.dataFim);
     lastMenstruationEl.textContent = `${dataInicioFormatada} a ${dataFimFormatada}`;
@@ -317,7 +285,6 @@ function displayStats(registros, ciclos) {
     lastMenstruationEl.textContent = 'N/A';
   }
 
-  // Tempo Médio de Duração da Menstruação
   if (registros.length > 0) {
     const totalDuration = registros.reduce((sum, registro) => {
       const inicio = new Date(registro.dataInicio);

@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const res = await fetch('http://localhost:5000/api/usuarios/perfil', {
+    const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
       headers: { 
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -238,7 +238,7 @@ document.querySelector("form").addEventListener("submit", async (e) => {
   };
 
   try {
-    const res = await fetch("http://localhost:5000/api/anotacoes/nova", {
+    const res = await fetch("http://localhost:65432/api/anotacoes/nova", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -258,4 +258,65 @@ document.querySelector("form").addEventListener("submit", async (e) => {
   } catch (err) {
     mostrarAviso("Erro ao salvar: " + err.message);
   }
+});
+
+function mostrarErro(mensagem) {
+  const erroBox = document.getElementById('erroPerfil');
+  if (!erroBox) return;
+  erroBox.textContent = `⚠️ ${mensagem}`;
+  erroBox.style.display = 'block';
+  erroBox.style.animation = 'fadeIn 0.3s ease-in';
+}
+
+async function carregarDadosMedico() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Token não encontrado. Por favor, faça login novamente.');
+    }
+
+    const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || 'Erro ao carregar dados do médico');
+    }
+
+    const medico = await res.json();
+    const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
+    const nomeFormatado = `${prefixo} ${medico.nome}`;
+    
+    const tituloSidebar = document.querySelector('.sidebar .profile h3');
+    if (tituloSidebar) {
+      tituloSidebar.textContent = nomeFormatado;
+    }
+
+    // Preenche o campo do médico responsável
+    const campoMedico = document.getElementById('medico');
+    if (campoMedico) {
+      campoMedico.value = nomeFormatado;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro ao carregar dados do médico:", error);
+    const fallback = document.querySelector('.sidebar .profile h3');
+    if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
+    mostrarErro("Erro ao carregar dados do médico. Por favor, faça login novamente.");
+    return false;
+  }
+}
+
+// Inicialização
+document.addEventListener("DOMContentLoaded", async function () {
+  // Carrega os dados do médico primeiro
+  await carregarDadosMedico();
+  
+  // Resto do código de inicialização
+  // ... existing code ...
 });

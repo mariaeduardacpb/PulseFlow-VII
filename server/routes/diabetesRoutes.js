@@ -1,4 +1,3 @@
-
 // routes/diabetesRoutes.js
 import express from 'express';
 import { authMiddleware } from '../middlewares/authMiddleware.js';

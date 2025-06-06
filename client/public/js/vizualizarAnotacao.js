@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const response = await fetch(`http://localhost:5000/api/anotacoes/detalhe/${anotacaoId}`, {
+    const response = await fetch(`http://localhost:65432/api/anotacoes/detalhe/${anotacaoId}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
