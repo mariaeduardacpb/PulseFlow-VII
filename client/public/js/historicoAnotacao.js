@@ -80,7 +80,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     anotacoes.forEach(anotacao => {
-      const dataFormatada = new Date(anotacao.data).toLocaleDateString('pt-BR');
+      const data = new Date(anotacao.data);
+      const dataFormatada = `${data.getUTCDate().toString().padStart(2, '0')}/${(data.getUTCMonth() + 1).toString().padStart(2, '0')}/${data.getUTCFullYear()}`;
       const nomeMedicoFormatado = formatarNomeMedico(anotacao.medico);
       const item = document.createElement('div');
       item.className = 'record-item';

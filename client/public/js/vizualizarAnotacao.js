@@ -50,7 +50,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       <strong>Motivo da Consulta</strong>
       <span>${anotacao.titulo || 'Sem título'}</span>
     `;
-    document.querySelector('.data').textContent = anotacao.data ? new Date(anotacao.data).toLocaleDateString('pt-BR') : 'Data não informada';
+    
+    // Formatação correta da data usando UTC
+    const data = new Date(anotacao.data);
+    const dataFormatada = `${data.getUTCDate().toString().padStart(2, '0')}/${(data.getUTCMonth() + 1).toString().padStart(2, '0')}/${data.getUTCFullYear()}`;
+    document.querySelector('.data').textContent = anotacao.data ? dataFormatada : 'Data não informada';
+    
     document.querySelector('.categoria').textContent = anotacao.categoria || 'Categoria não informada';
     document.querySelector('.medico-nome').textContent = anotacao.medico || 'Médico não informado';
     document.querySelector('.anotacao p').textContent = anotacao.anotacao || 'Sem anotação';

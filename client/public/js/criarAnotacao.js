@@ -55,9 +55,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Define a data atual como padrão
     const dataInput = document.getElementById("data");
     if (dataInput) {
-      const hoje = new Date().toISOString().split('T')[0];
-      dataInput.value = hoje;
-      dataInput.max = hoje; // Não permite datas futuras
+      const hoje = new Date();
+      // Ajusta para o fuso horário brasileiro (UTC-3)
+      const dataAjustada = new Date(hoje.getTime() - (hoje.getTimezoneOffset() * 60000));
+      const dataFormatada = dataAjustada.toISOString().split('T')[0];
+      dataInput.value = dataFormatada;
+      dataInput.max = dataFormatada; // Não permite datas futuras
     }
 
     // Remove a classe touched de todos os campos ao carregar a página
