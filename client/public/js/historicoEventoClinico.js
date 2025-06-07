@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const filterIntensity = document.getElementById('filterIntensity');
   const sidebarToggle = document.getElementById('sidebarToggle');
   const sidebar = document.querySelector('.sidebar');
+  const customSelect = document.querySelector('.custom-select');
+  const selectOptions = document.getElementById('especialidadesList');
+  let originalSpecialtyOptions = [];
 
   sidebarToggle?.addEventListener('click', () => {
     sidebar.classList.toggle('active');
@@ -21,6 +24,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     recordList.innerHTML = '<p style="color: red;">Paciente não selecionado.</p>';
     return;
   }
+
+  originalSpecialtyOptions = Array.from(selectOptions.querySelectorAll('.option'));
+
+  function filterSpecialtyOptions(inputText) {
+    const lowerInput = inputText.toLowerCase();
+    selectOptions.innerHTML = '';
+
+    const filteredOptions = originalSpecialtyOptions.filter(option =>
+      option.textContent.toLowerCase().includes(lowerInput)
+    );
+
+    if (filteredOptions.length > 0) {
+      filteredOptions.forEach(option => selectOptions.appendChild(option));
+      customSelect.classList.add('active');
+    } else {
+      customSelect.classList.remove('active');
+    }
+  }
+
+  filterCategory.addEventListener('input', () => {
+    filterSpecialtyOptions(filterCategory.value);
+  });
+
+  filterCategory.addEventListener('click', () => {
+    if (filterCategory.value === '') {
+      filterSpecialtyOptions('');
+    }
+    customSelect.classList.add('active');
+  });
+
+  selectOptions.addEventListener('click', (e) => {
+    const option = e.target.closest('.option');
+    if (option) {
+      filterCategory.value = option.dataset.value;
+      customSelect.classList.remove('active');
+      document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!customSelect.contains(e.target) && e.target !== filterCategory) {
+      customSelect.classList.remove('active');
+    }
+  });
 
   function getIntensityInfo(intensityValue) {
     let description = '';

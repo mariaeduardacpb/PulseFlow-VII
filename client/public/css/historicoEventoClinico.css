@@ -450,4 +450,130 @@ body {
     padding: 10px 20px;
     font-size: 14px;
   }
+}
+
+/* Custom Select Styles */
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e1e5eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f8fafc;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding-right: 40px;
+}
+
+.custom-select input:hover {
+  border-color: #002A42;
+  background-color: #fff;
+}
+
+.custom-select input:focus {
+  outline: none;
+  border-color: #002A42;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 42, 66, 0.1);
+}
+
+.custom-select::after {
+  content: '';
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #94a3b8;
+  border-bottom: 2px solid #94a3b8;
+  transform: translateY(-50%) rotate(45deg);
+  transition: transform 0.3s ease;
+  pointer-events: none;
+}
+
+.custom-select.active::after {
+  transform: translateY(-50%) rotate(-135deg);
+  border-right: 2px solid #002A42;
+  border-bottom: 2px solid #002A42;
+}
+
+.select-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e1e5eb;
+  border-radius: 8px;
+  margin-top: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0, 42, 66, 0.1);
+}
+
+.custom-select.active .select-options {
+  display: block;
+}
+
+.option {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #333;
+}
+
+.option:hover {
+  background-color: #f8fafc;
+  color: #002A42;
+}
+
+.option.selected {
+  background-color: #f0f7fa;
+  color: #002A42;
+  font-weight: 500;
+}
+
+/* Estilização da barra de rolagem do select */
+.select-options::-webkit-scrollbar {
+  width: 8px;
+}
+
+.select-options::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.select-options::-webkit-scrollbar-thumb {
+  background: #002A42;
+  border-radius: 4px;
+}
+
+.select-options::-webkit-scrollbar-thumb:hover {
+  background: #004d73;
+}
+
+/* Ajustes para o dropdown em mobile */
+@media (max-width: 768px) {
+  .custom-select {
+    width: 100%;
+  }
+
+  .select-options {
+    max-height: 250px;
+  }
+
+  .option {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
 } 
