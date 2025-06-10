@@ -1,0 +1,194 @@
+/* Estilos base */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #00324A;
+  color: white;
+  animation: fadeInBody 1s ease-in;
+}
+
+header {
+  text-align: right;
+  padding: 20px 30px;
+  animation: slideDown 0.8s ease-out;
+}
+
+.perfil-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.perfil-link:hover {
+  color: #ccc;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 90vh; /* Centralização perfeita */
+  text-align: center;
+  padding: 0 20px;
+  animation: fadeIn 1s ease;
+  box-sizing: border-box;
+}
+
+.logo-img {
+  width: 180px;
+  max-width: 80%;
+  margin-bottom: 40px;
+  animation: fadeInLogo 1.2s ease;
+}
+
+.subtitulo {
+  font-weight: 600;
+  font-size: 20px;
+  margin-top: 50px;
+  animation: fadeInUp 1.2s ease;
+  padding: 0 15px;
+}
+
+.input-cpf {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #333;
+  transition: transform 0.3s ease;
+}
+
+.input-cpf:focus {
+  outline: none;
+  transform: scale(1.02);
+}
+
+.btn-acesso {
+  padding: 12px 30px;
+  margin-top: 50px;
+  font-size: 16px;
+  background-color: white;
+  color: #00324A;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s ease;
+}
+
+.btn-acesso:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+.erro-cpf {
+  visibility: hidden; /* oculta visualmente, mas mantém o espaço */
+  opacity: 0;
+  height: auto;
+  min-height: 44px; /* altura mínima para reservar espaço */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.1);
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ff4d4d;
+  font-weight: 500;
+  max-width: 300px;
+  margin-top: 50px;
+  text-align: center;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.erro-cpf.ativo {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLogo {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeInBody {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInErro {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsividade aprimorada */
+@media (max-width: 768px) {
+  header {
+    text-align: center;
+    padding: 15px;
+  }
+
+  .subtitulo {
+    font-size: 18px;
+    padding: 0 10px;
+  }
+
+  .logo-img {
+    width: 160px;
+    margin-bottom: 30px;
+  }
+
+  .input-cpf,
+  .btn-acesso,
+  .erro-cpf {
+    max-width: 90%;
+    font-size: 15px;
+  }
+
+  .btn-acesso {
+    padding: 12px;
+  }
+
+  .erro-cpf {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .subtitulo {
+    font-size: 16px;
+  }
+
+  .btn-acesso {
+    font-size: 15px;
+  }
+
+  .erro-cpf {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}

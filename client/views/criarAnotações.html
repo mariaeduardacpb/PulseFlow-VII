@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Novo Registro Clinico</title>
+  <link rel="stylesheet" href="../public/css/criarAnotações.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+  <!-- Select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <aside class="sidebar">
+      <div class="profile">
+        <h3></h3>
+      </div>
+      <nav class="specialties">
+        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
+        <details><summary><span style="font-weight: bold;"><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
+        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
+        <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
+        <details><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
+          <ul>
+            <!-- Condições Crônicas -->
+            <li><a href="diabetes.html">Diabetes</a></li>
+            <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
+            <li><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
+            
+            <!-- Saúde Hormonal e Reprodutiva -->
+            <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
+            <li><a href="hormonal.html">Hormonal</a></li>
+            
+            <!-- Saúde Mental e Sono -->
+            <li><a href="insonia.html">Insônia</a></li>
+            <li><a href="enxaqueca.html">Enxaqueca</a></li>
+          </ul>
+        </details>
+      </nav>
+      <div class="change-patient">
+        <a href="selecao.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
+          Trocar de Paciente
+        </a>
+      </div>
+    </aside>
+
+    <main class="form-section">
+      <header class="header">
+        <h1>Novo Registro Clinico Do Atendimento</h1>
+        <div class="logo">
+          <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+        </div>
+      </header>
+
+      <div id="erroPerfil" class="erro-box" style="display: none;"></div>
+
+      <form>
+        <div class="form-section-info">
+          <h2>Informações do Atendimento</h2>
+          <div class="form-group">
+            <label for="titulo">Motivo da Consulta</label>
+            <input type="text" id="titulo" name="titulo" required minlength="5" 
+                   placeholder="Descreva o motivo da consulta (mínimo 5 caracteres)" />
+            <span class="error-message">O motivo da consulta é obrigatório e deve ter pelo menos 5 caracteres</span>
+          </div>
+
+          <div class="form-group">
+            <label for="data">Data</label>
+            <input type="date" id="data" name="data" required />
+            <span class="error-message">A data da consulta é obrigatória</span>
+          </div>
+
+          <div class="form-group">
+            <label for="tipoConsulta">Tipo da Consulta</label>
+            <select id="tipoConsulta" name="tipoConsulta" required>
+              <option value="" disabled selected>Selecione o tipo da consulta</option>
+              <option value="primeira">Primeira consulta</option>
+              <option value="rotina">Consulta de rotina</option>
+              <option value="preventiva">Consulta preventiva</option>
+              <option value="urgencia">Consulta de urgência/emergência</option>
+              <option value="retorno">Consulta de retorno</option>
+              <option value="segundaOpniao">Consulta de segunda opinião</option>
+            </select>
+            <span class="error-message">O tipo da consulta é obrigatório</span>
+          </div>
+        </div>
+
+        <div class="form-section-info">
+          <h2>Informações do Médico</h2>
+          <div class="form-group">
+            <label for="categoria">Especialidades</label>
+            <input type="text" id="categoria" name="categoria" 
+                   placeholder="Digite a especialidade" />
+          </div>
+
+          <div class="form-group">
+            <label for="medico">Médico Responsável</label>
+            <input type="text" id="medico" name="medico" readonly 
+                   placeholder="Carregando informações do médico..." />
+          </div>
+        </div>
+
+        <div class="form-section-info">
+          <h2>Registro Clínico</h2>
+          <div class="form-group">
+            <label for="prontuario">Registro</label>
+            <textarea id="prontuario" name="prontuario" rows="6" required minlength="20"
+                      placeholder="Descreva o registro clínico (mínimo 20 caracteres)"></textarea>
+            <span class="error-message">O registro clínico é obrigatório e deve ter pelo menos 20 caracteres</span>
+          </div>
+        </div>
+
+        <button type="submit">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          Salvar Registro
+        </button>
+      </form>
+    </main>
+  </div>
+
+  <!-- jQuery (necessário para o Select2) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Select2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="../public/js/criarAnotacao.js"></script>
+</body>
+</html>

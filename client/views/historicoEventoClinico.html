@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFlow | Eventos Clínicos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/css/historicoEventoClinico.css">
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+</head>
+<body>
+  <div class="container">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <aside class="sidebar">
+      <div class="profile">
+        <h3>Draª Eliane Young</h3>
+      </div>
+      <nav class="specialties">
+        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
+        <details><summary><span><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
+        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
+        <details open><summary><span style="font-weight: bold;"><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
+        <details><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
+          <ul>
+            <!-- Condições Crônicas -->
+            <li><a href="diabetes.html">Diabetes</a></li>
+            <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
+            <li><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
+            
+            <!-- Saúde Hormonal e Reprodutiva -->
+            <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
+            <li><a href="hormonal.html">Hormonal</a></li>
+            
+            <!-- Saúde Mental e Sono -->
+            <li><a href="insonia.html">Insônia</a></li>
+            <li><a href="enxaqueca.html">Enxaqueca</a></li>
+          </ul>
+        </details>
+      </nav>
+      <div class="change-patient">
+        <a href="selecao.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
+          Trocar de Paciente
+        </a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="header">
+        <h1>Histórico de Eventos Clínicos</h1>
+        <div class="logo">
+          <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+        </div>
+      </header>
+
+      <div class="filters">
+        <div class="filter-group">
+          <select id="filterCategory">
+            <option value="">Todas as especialidades</option>
+            <option value="Acupuntura">Acupuntura</option>
+            <option value="Alergia e imunologia">Alergia e imunologia</option>
+            <option value="Anestesiologia">Anestesiologia</option>
+            <option value="Angiologia">Angiologia</option>
+            <option value="Cardiologia">Cardiologia</option>
+            <option value="Cirurgia cardiovascular">Cirurgia cardiovascular</option>
+            <option value="Cirurgia da mão">Cirurgia da mão</option>
+            <option value="Cirurgia de cabeça e pescoço">Cirurgia de cabeça e pescoço</option>
+            <option value="Cirurgia do aparelho digestivo">Cirurgia do aparelho digestivo</option>
+            <option value="Cirurgia geral">Cirurgia geral</option>
+            <option value="Cirurgia oncológica">Cirurgia oncológica</option>
+            <option value="Cirurgia pediátrica">Cirurgia pediátrica</option>
+            <option value="Cirurgia plástica">Cirurgia plástica</option>
+            <option value="Cirurgia torácica">Cirurgia torácica</option>
+            <option value="Cirurgia vascular">Cirurgia vascular</option>
+            <option value="Clínica médica">Clínica médica</option>
+            <option value="Coloproctologia">Coloproctologia</option>
+            <option value="Dermatologia">Dermatologia</option>
+            <option value="Endocrinologia e metabologia">Endocrinologia e metabologia</option>
+            <option value="Endoscopia">Endoscopia</option>
+            <option value="Gastroenterologia">Gastroenterologia</option>
+            <option value="Genética médica">Genética médica</option>
+            <option value="Geriatria">Geriatria</option>
+            <option value="Ginecologia e obstetrícia">Ginecologia e obstetrícia</option>
+            <option value="Hematologia e hemoterapia">Hematologia e hemoterapia</option>
+            <option value="Homeopatia">Homeopatia</option>
+            <option value="Infectologia">Infectologia</option>
+            <option value="Mastologia">Mastologia</option>
+            <option value="Medicina de emergência">Medicina de emergência</option>
+            <option value="Medicina de família e comunidade">Medicina de família e comunidade</option>
+            <option value="Medicina do trabalho">Medicina do trabalho</option>
+            <option value="Medicina do tráfego">Medicina do tráfego</option>
+            <option value="Medicina esportiva">Medicina esportiva</option>
+            <option value="Medicina física e reabilitação">Medicina física e reabilitação</option>
+            <option value="Medicina intensiva">Medicina intensiva</option>
+            <option value="Medicina legal e perícia médica">Medicina legal e perícia médica</option>
+            <option value="Medicina nuclear">Medicina nuclear</option>
+            <option value="Medicina preventiva e social">Medicina preventiva e social</option>
+            <option value="Nefrologia">Nefrologia</option>
+            <option value="Neurocirurgia">Neurocirurgia</option>
+            <option value="Neurologia">Neurologia</option>
+            <option value="Nutrologia">Nutrologia</option>
+            <option value="Oftalmologia">Oftalmologia</option>
+            <option value="Oncologia clínica">Oncologia clínica</option>
+            <option value="Ortopedia e traumatologia">Ortopedia e traumatologia</option>
+            <option value="Otorrinolaringologia">Otorrinolaringologia</option>
+            <option value="Patologia">Patologia</option>
+            <option value="Patologia clínica/medicina laboratorial">Patologia clínica/medicina laboratorial</option>
+            <option value="Pediatria">Pediatria</option>
+            <option value="Pneumologia">Pneumologia</option>
+            <option value="Psiquiatria">Psiquiatria</option>
+            <option value="Radiologia e diagnóstico por imagem">Radiologia e diagnóstico por imagem</option>
+            <option value="Radioterapia">Radioterapia</option>
+            <option value="Reumatologia">Reumatologia</option>
+            <option value="Urologia">Urologia</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select id="filterType">
+            <option value="">Todos os tipos</option>
+            <option value="Crise / Emergência">Crise / Emergência</option>
+            <option value="Acompanhamento de Condição Crônica">Acompanhamento de Condição Crônica</option>
+            <option value="Episódio Psicológico ou Emocional">Episódio Psicológico ou Emocional</option>
+            <option value="Evento Relacionado à Medicação">Evento Relacionado à Medicação</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select id="filterIntensity">
+            <option value="">Todas as intensidades</option>
+            <option value="0">Sem dor</option>
+            <option value="1-3">Leve (1-3)</option>
+            <option value="4-6">Moderada (4-6)</option>
+            <option value="7-9">Intensa (7-9)</option>
+            <option value="10">Dor insuportável (10)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="record-list">
+        <!-- Os registros serão inseridos aqui via JavaScript -->
+      </div>
+    </main>
+  </div>
+  <script src="../public/js/historicoEventoClinico.js"></script>
+</body>
+</html> 

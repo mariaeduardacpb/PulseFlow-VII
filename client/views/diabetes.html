@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Diabetes</title>
+  <link rel="stylesheet" href="../public/css/diabetes.css"/>
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+</head>
+<body>
+  <button class="menu-toggle" aria-label="Abrir menu">☰</button>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="profile">
+        <h3></h3>
+      </div>
+      <nav class="specialties">
+        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
+        <details><summary><span><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
+        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
+        <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
+        <details open><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
+          <ul>
+            <!-- Condições Crônicas -->
+            <li style="font-weight: bold;"><a href="diabetes.html">Diabetes</a></li>
+            <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
+            <li><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
+            
+            <!-- Saúde Hormonal e Reprodutiva -->
+            <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
+            <li><a href="hormonal.html">Hormonal</a></li>
+            
+            <!-- Saúde Mental e Sono -->
+            <li><a href="insonia.html">Insônia</a></li>
+            <li><a href="enxaqueca.html">Enxaqueca</a></li>
+          </ul>
+        </details>
+      </nav>
+      <div class="change-patient">
+        <a href="selecao.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
+          Trocar de Paciente
+        </a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="header">
+        <h1>Níveis de Glicemia</h1>
+        <div class="logo">
+          <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+        </div>
+      </header>
+
+      <section class="chart-section">
+        <div class="chart">
+          <div class="chart-header">
+            <h4>Dados de Glicemia</h4>
+            <div class="month-selector">
+              <button class="arrow-btn" data-direction="prev">‹</button>
+              <span class="month-label">Abril • 2025</span>
+              <button class="arrow-btn" data-direction="next">›</button>
+            </div>
+          </div>
+          <div id="no-data-msg-glicemia" class="no-data-msg">
+            ⚠️ <span>Nenhum dado de glicemia encontrado para este mês.</span>
+          </div>
+          <canvas id="chartGlicemia"></canvas>
+        </div>
+      </section>
+
+      <footer class="referencia-dor">
+        <p>
+          🔎 Saiba mais sobre níveis glicêmicos saudáveis:
+          <a href="https://lavoisier.com.br/saude/glicemia#:~:text=Glicemia%20de%20jejum%20normal%3A%20inferior,inferior%20a%2070%20mg%2FdL."
+             target="_blank" rel="noopener noreferrer">
+            Artigo
+          </a>
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../public/js/diabetes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+
+</body>
+</html>
+

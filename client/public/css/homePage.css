@@ -1,0 +1,367 @@
+/* Reset e fontes */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f4f6f8;
+  color: #333;
+  animation: fadeInBody 1s ease-in;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 3rem;
+  background-color: white;
+  flex-wrap: wrap;
+  animation: slideDown 0.8s ease-out;
+}
+
+.logo img {
+  height: 50px;
+  transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.05);
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+nav a {
+  margin: 0 1.2rem;
+  text-decoration: none;
+  color: #000;
+  font-weight: 400;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+nav a:hover {
+  color: #5594B2;
+  text-decoration: underline;
+}
+
+.btn-container {
+  display: flex;
+}
+
+.login-button {
+  background-color: #052b3b;
+  color: white;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #026184;
+  transform: scale(1.05);
+}
+
+/* Hero */
+.hero {
+  max-width: 1512px;
+  margin: 0 auto;
+  animation: fadeIn 1s ease;
+}
+
+.hero img {
+  width: 100%;
+  height: auto;
+  max-height: 760px;
+  object-fit: cover;
+  display: block;
+  animation: zoomIn 1.5s ease;
+}
+
+/* CTA */
+.cta {
+  background-color: #052b3b;
+  color: white;
+  text-align: center;
+  padding: 4rem 2rem;
+  font-size: 2rem;
+  font-weight: 700;
+  animation: fadeInUp 1.2s ease;
+}
+
+/* Features */
+.features {
+  background-color: #052b3b;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 2rem 1rem;
+  gap: 2rem;
+}
+
+.feature-item {
+  text-align: center;
+  color: white;
+  max-width: 180px;
+  height: 500px;
+  transition: all 0.3s ease;
+  animation: fadeInFeature 0.6s ease forwards;
+}
+
+.feature-item:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+.feature-item img {
+  width: 75px;
+  margin-bottom: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.feature-item:hover img {
+  transform: scale(1.2);
+}
+
+.feature-item p {
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-bottom: 70px;
+}
+
+/* Card azul claro */
+.card {
+  background-color: #5594B2;
+  color: white;
+  margin: -20rem auto 5rem;
+  padding: 8rem 10rem;
+  border-radius: 1rem;
+  max-width: 700px;
+  font-size: 1rem;
+  line-height: 1.6;
+  text-align: left;
+  animation: fadeInUp 1s ease;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  line-height: 1.2;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Como funciona */
+.card-how-works {
+  background-color: #EBEAEA;
+  padding: 4rem 2rem;
+  animation: fadeIn 1.2s ease;
+}
+
+.how-it-works {
+  max-width: 800px;
+  margin: 0 auto;
+  color: #000;
+}
+
+.how-it-works h2 {
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+}
+
+.how-it-works p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.how-it-works strong {
+  font-weight: 700;
+}
+
+/* Footer */
+footer {
+  background-color: #052b3b;
+  color: white;
+  padding: 3rem 2rem;
+  animation: fadeIn 1.5s ease;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.footer-left img {
+  width: 150px;
+  margin-top: 25px;
+  transition: transform 0.3s ease;
+}
+
+.footer-left img:hover {
+  transform: scale(1.1);
+}
+
+.footer-center {
+  text-align: center;
+  flex: 1;
+  margin-left: 200px;
+}
+
+.footer-center .social-icons img {
+  width: 32px;
+  margin: 0 8px;
+  transition: transform 0.3s ease;
+}
+
+.footer-center .social-icons img:hover {
+  transform: scale(1.15);
+}
+
+.footer-center p {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.footer-right {
+  max-width: 400px;
+  font-size: 0.875rem;
+  text-align: right;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .hero img {
+    max-height: 500px;
+  }
+
+  .cta {
+    font-size: 1.6rem;
+  }
+
+  .card {
+    padding: 4rem 3rem;
+    margin: -10rem auto 3rem;
+  }
+
+  .how-it-works h2 {
+    font-size: 1.6rem;
+  }
+
+  .footer-center {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .features {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card,
+  .card-how-works {
+    padding: 2rem 1rem;
+    margin: -6rem auto 2rem;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-right {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta {
+    font-size: 1.4rem;
+    padding: 2rem 1rem;
+  }
+
+  .feature-item p {
+    font-size: 0.9rem;
+    margin-bottom: 40px;
+  }
+
+  .footer-left img {
+    width: 120px;
+  }
+
+  .footer-center .social-icons img {
+    width: 28px;
+  }
+
+  .card {
+    padding: 2rem;
+  }
+
+  .how-it-works h2 {
+    font-size: 1.5rem;
+  }
+
+  .how-it-works p {
+    font-size: 1rem;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInBody {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeInFeature {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

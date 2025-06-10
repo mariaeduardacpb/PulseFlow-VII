@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Seleção Paciente</title>
+  <link rel="stylesheet" href="../public/css/selecao.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+</head>
+<body>
+  <header>
+    <a href="perfilMedico.html" class="perfil-link">Meu Perfil →</a>
+  </header>
+
+  <main class="container">
+    <!-- Logo como imagem -->
+    <img src="../public/assets/PulseNegativo.png" alt="Logo PulseFlow" class="logo-img" />
+
+    <p class="subtitulo">VEJA A SAÚDE DO SEU PACIENTE AQUI!</p>
+
+    <input type="text" placeholder="CPF DO PACIENTE" class="input-cpf" />
+
+    <button class="btn-acesso">Solicitar Acesso</button>
+
+    <div id="mensagem-erro" class="erro-cpf"></div>
+  </main>
+  <script src="../public/js/selecao.js"></script>
+</body>
+</html>

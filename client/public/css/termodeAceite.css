@@ -1,0 +1,96 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #002A42 0%, #00324A 100%);
+    min-height: 100vh;
+  }
+  
+  .full-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  
+  .card {
+    background-color: white;
+    color: #002A42;
+    padding: 50px;
+    max-width: 1000px;
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #00c3b7, #002A42);
+  }
+  
+  .logo {
+    display: block;
+    margin: 0 auto 30px;
+    max-width: 180px;
+    transition: transform 0.3s ease;
+  }
+  
+  .logo:hover {
+    transform: scale(1.05);
+  }
+  
+  h2 {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #002A42;
+    letter-spacing: 0.5px;
+  }
+  
+  p {
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    text-align: justify;
+    color: #4a5568;
+  }
+  
+  @media (max-width: 768px) {
+    .card {
+      padding: 30px 20px;
+    }
+  
+    h2 {
+      font-size: 20px;
+    }
+  
+    p {
+      font-size: 15px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .card {
+      padding: 25px 15px;
+    }
+  
+    h2 {
+      font-size: 18px;
+    }
+  
+    p {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  }
+  
