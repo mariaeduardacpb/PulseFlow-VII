@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFlow | Crises de Gastrite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/css/historicoCriseGastrite.css">
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+</head>
+<body>
+  <div class="container">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <aside class="sidebar">
+      <div class="profile">
+        <h3>Draª Eliane Young</h3>
+      </div>
+      <nav class="specialties">
+        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
+        <details><summary><span><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
+        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
+        <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
+        <details open><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
+          <ul>
+            <!-- Condições Crônicas -->
+            <li><a href="diabetes.html">Diabetes</a></li>
+            <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
+            <li style="font-weight: bold;"><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
+            
+            <!-- Saúde Hormonal e Reprodutiva -->
+            <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
+            <li><a href="hormonal.html">Hormonal</a></li>
+            
+            <!-- Saúde Mental e Sono -->
+            <li><a href="insonia.html">Insônia</a></li>
+            <li><a href="enxaqueca.html">Enxaqueca</a></li>
+          </ul>
+        </details>
+      </nav>
+      <div class="change-patient">
+        <a href="selecao.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
+          Trocar de Paciente
+        </a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="header">
+        <h1>Histórico de Crises de Gastrite</h1>
+        <div class="logo">
+          <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+        </div>
+      </header>
+
+      <div class="filters">
+        <div class="filter-group">
+          <select id="filterMonth">
+            <option value="">Todos os meses</option>
+            <option value="1">Janeiro</option>
+            <option value="2">Fevereiro</option>
+            <option value="3">Março</option>
+            <option value="4">Abril</option>
+            <option value="5">Maio</option>
+            <option value="6">Junho</option>
+            <option value="7">Julho</option>
+            <option value="8">Agosto</option>
+            <option value="9">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select id="filterYear">
+            <option value="">Todos os anos</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select id="filterIntensity">
+            <option value="">Todas as intensidades</option>
+            <option value="0">Sem dor</option>
+            <option value="1-3">Leve (1-3)</option>
+            <option value="4-6">Moderada (4-6)</option>
+            <option value="7-9">Intensa (7-9)</option>
+            <option value="10">Dor insuportável (10)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="record-list">
+        <!-- Os registros serão inseridos aqui via JavaScript -->
+      </div>
+    </main>
+  </div>
+  <script src="../public/js/historicoCriseGastrite.js"></script>
+</body>
+</html>

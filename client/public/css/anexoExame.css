@@ -1,0 +1,540 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+/* RESET E BASE */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f3f3f3;
+  color: #1f1f1f;
+  overflow-x: hidden;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+
+/* MENU TOGGLE (BOTÃO HAMBÚRGUER) */
+.menu-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  background-color: #002A42;
+  color: white;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 1101;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: left 0.3s ease;
+}
+
+.menu-toggle.shifted {
+  left: 260px; /* move o botão para o branco ao abrir a sidebar */
+}
+
+
+/* SIDEBAR PADRÃO */
+.sidebar {
+  min-width: 240px;
+  max-width: 240px;
+  width: 240px;
+  background-color: #00324A;
+  color: #fff;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  transition: left 0.3s ease;
+}
+
+/* NOME DO PERFIL */
+.profile h3 {
+  font-size: 16px;
+  margin-bottom: 30px;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+/* CONTEÚDO PRINCIPAL */
+.content {
+  margin-left: 240px;
+  flex: 1;
+  padding: 30px 40px;
+  transition: margin-left 0.3s ease;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  background-color: #00324A;
+  color: white;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  z-index: 1101; /* acima da sidebar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+  /* Evita sobreposição com o conteúdo */
+  .sidebar.active + .content .menu-toggle {
+    position: fixed;
+    left: 260px; /* move o botão para o branco ao abrir a sidebar */
+    top: 16px;
+  }
+
+  /* Garante que o conteúdo tenha margem para o botão */
+  .content {
+     margin-top: 64px;
+  }
+
+  .upload-section,
+  .form-container,
+  .exams-list {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .search-bar input,
+  .search-bar button {
+    width: 100%;
+  }
+
+  .input-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .exam-grid {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .form-section {
+    width: 95%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .custom-file-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .exam-icon {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* TODO O RESTANTE DO CSS PERMANECE IGUAL - MANTIDO A PARTIR DAQUI */
+
+.specialties details {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #1c4a7d;
+  padding-bottom: 8px;
+}
+
+.specialties summary {
+  list-style: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #f0f0f0;
+}
+
+.specialties summary::-webkit-details-marker {
+  display: none;
+}
+
+.specialties .chevron {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+  margin-left: 10px;
+}
+
+.specialties details[open] .chevron {
+  transform: rotate(135deg);
+}
+
+.specialties ul {
+  margin-top: 10px;
+  margin-left: 10px;
+  list-style: none;
+  padding-left: 0;
+}
+
+.specialties a {
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.change-patient {
+  margin-top: auto;
+}
+
+.change-patient a {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 24px;
+  color: #1f1f1f;
+}
+
+.logo img {
+  height: 40px;
+  max-width: 100%;
+}
+
+.logo img {
+  height: 40px;
+  max-width: 100%;
+}
+
+.upload-section,
+.form-container,
+.exams-list {
+  background-color: #00324A;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 100%;
+  margin: 0 auto 30px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-container {
+  align-items: center;
+  padding: 30px 40px;
+}
+
+.form-section {
+  background-color: #00324a;
+  border-radius: 5px;
+  padding: 10px;
+  width: 90%;
+  max-width: 900px;
+  margin: 20px auto;
+  color: white;
+}
+
+.input-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  width: 100%;
+}
+
+.input-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.input-group input,
+.input-group select {
+  padding: 12px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.input-group input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #026492;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.btn-primary,
+#salvarExame,
+.custom-file-btn {
+  background-color: white;
+  color: #00324A;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.btn-primary:hover,
+#salvarExame:hover,
+.custom-file-btn:hover {
+  background-color: #056a99;
+  color: white;
+}
+
+.file-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.exam-icon {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  margin: 25px 0 10px;
+  font-size: 18px;
+}
+
+.exam-icon img {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.search-bar button {
+  padding: 10px 16px;
+  background-color: #00324A;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.exams-list {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.exams-list h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #00324A;
+}
+
+.exam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  background-color: #00324A;
+  border-radius: 10px;
+}
+
+.exam-card {
+  background-color: #ffffff;
+  color: #00324A;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 14px;
+  min-height: 120px;
+}
+
+.exam-card button {
+  align-self: flex-end;
+  margin-top: auto;
+  padding: 6px 12px;
+  background-color: #00324A;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.exam-card button:hover {
+  background-color: #005b7f;
+}
+
+.no-data-msg {
+  color: #d32f2f;
+  font-weight: 500;
+  text-align: center;
+  margin: 0 auto 10px auto;
+  width: 60%;
+  display: none;
+  font-size: 13px;
+  animation: fadeIn 0.5s ease-in-out;
+  background-color: #fdecea;
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #f5c6cb;
+  box-shadow: 0 0 4px rgba(211, 47, 47, 0.2);
+}
+
+.contador-exames {
+  color: #026492;
+  font-weight: 600;
+  text-align: center;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+/* ANIMAÇÃO */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* MEDIA QUERY PARA RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .sidebar {
+    display: none;
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+
+  .sidebar.active {
+    display: flex;
+  }
+
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .upload-section,
+  .form-container,
+  .exams-list {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .search-bar input,
+  .search-bar button {
+    width: 100%;
+  }
+
+  .input-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .exam-grid {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .form-section {
+    width: 95%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .custom-file-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .exam-icon {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+}
+  html, body {
+  overflow-x: hidden;
+}

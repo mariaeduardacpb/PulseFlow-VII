@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Verificação de Acesso</title>
+  <link rel="stylesheet" href="../public/css/verify-2fa.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+</head>
+<body>
+  <div class="container">
+    <div class="left-box">
+      <div class="security-content">
+        <div class="security-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h2>Segurança em Primeiro Lugar</h2>
+        <p>Essa etapa adicional de segurança garante que apenas você possa acessar sua conta, mesmo que outra pessoa saiba sua senha. Por isso, verifique sua caixa de entrada de e-mail e insira o código de 6 dígitos no campo abaixo.</p>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="right-box">
+      <div class="form-box animated-entry">
+        <div class="icon-security">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h1>Verificação em Duas Etapas</h1>
+        <p class="subtitle">Insira o código de 6 dígitos enviado para você</p>
+
+        <input type="text" id="otpInput" maxlength="6" placeholder="Código de 6 dígitos"/>
+        <span id="error-message" class="error-message"></span>
+        <div id="user-message" class="user-message"></div>
+        <div class="input-help">Não encontrou o e-mail? Verifique a caixa de spam ou clique em <b>Reenviar Código</b>.</div>
+
+        <button id="verifyBtn"><i class="fas fa-check-circle"></i> Verificar Código</button>
+        <button id="cancelBtn" class="cancel-btn"><i class="fas fa-times-circle"></i> Cancelar</button>
+        <button id="resendBtn" class="resend-btn" type="button"><i class="fas fa-sync-alt"></i> Reenviar Código</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cancel-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <p>Tem certeza que deseja cancelar a verificação em duas etapas?</p>
+      <button id="confirm-cancel" class="modal-btn danger">Sim, cancelar</button>
+      <button id="close-modal" class="modal-btn">Não, voltar</button>
+    </div>
+  </div>
+
+  <script src="../public/js/verify-2fa.js"></script>
+</body>
+</html>
