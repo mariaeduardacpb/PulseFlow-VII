@@ -1,3 +1,5 @@
+import { API_URL } from './config.js';
+
 function showUserMessage(msg, type = 'info') {
   const el = document.getElementById('user-message');
   el.textContent = msg;
@@ -43,7 +45,7 @@ document.getElementById('verifyBtn').addEventListener('click', async () => {
   verifyBtn.innerHTML = `<span class="spinner"></span> Verificando...`;
 
   try {
-    const response = await fetch('http://localhost:65432/api/auth/verify-otp', {
+    const response = await fetch(`${API_URL}/api/auth/verify-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, code: otp }),
@@ -101,7 +103,7 @@ if (resendBtn) {
     resendBtn.innerHTML = `<span class="spinner"></span> Reenviando...`;
     try {
       const userId = localStorage.getItem('userId');
-      const response = await fetch('http://localhost:65432/api/auth/send-otp', {
+      const response = await fetch(`${API_URL}/api/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
