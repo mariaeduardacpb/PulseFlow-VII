@@ -323,12 +323,241 @@ document.getElementById('btnImprimir').addEventListener('click', () => {
                 }
             });
 
-            // Pequeno delay para garantir que o popup seja mostrado
+            // Criar um elemento temporário para impressão
+            const printContent = document.createElement('div');
+            printContent.className = 'print-content';
+            
+            // Adicionar estilos base
+            const baseStyles = document.createElement('style');
+            baseStyles.textContent = `
+                @page {
+                    size: A4;
+                    margin: 1.5cm;
+                }
+                body {
+                    font-family: 'Montserrat', Arial, sans-serif;
+                    line-height: 1.5;
+                    color: #333;
+                    background: white;
+                }
+                .print-content {
+                    max-width: 21cm;
+                    margin: 0 auto;
+                    padding: 0;
+                }
+                .print-header {
+                    text-align: center;
+                    margin-bottom: 1cm;
+                    padding-bottom: 0.5cm;
+                    border-bottom: 1px solid #002A42;
+                }
+                .print-header img {
+                    height: 1.5cm;
+                    margin-bottom: 0.3cm;
+                }
+                .print-header h1 {
+                    color: #002A42;
+                    font-size: 0.7cm;
+                    margin: 0;
+                    font-weight: 600;
+                }
+                .print-card {
+                    background: white;
+                    padding: 0.6cm;
+                    margin-bottom: 0.6cm;
+                }
+                .print-card-header {
+                    margin-bottom: 0.6cm;
+                    padding-bottom: 0.3cm;
+                    border-bottom: 1px solid #eee;
+                }
+                .print-card-title {
+                    font-size: 0.6cm;
+                    color: #002A42;
+                    font-weight: 600;
+                    margin: 0;
+                }
+                .print-card-subtitle {
+                    color: #666;
+                    font-size: 0.35cm;
+                    margin-top: 0.1cm;
+                }
+                .print-status-badge {
+                    display: inline-block;
+                    padding: 0.15cm 0.3cm;
+                    border-radius: 0.15cm;
+                    font-size: 0.3cm;
+                    font-weight: 500;
+                    background: #f8f9fa;
+                    color: #002A42;
+                }
+                .print-info-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 0.6cm;
+                    margin-bottom: 0.8cm;
+                }
+                .print-info-item {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 0.3cm;
+                }
+                .print-info-icon {
+                    color: #002A42;
+                    width: 0.4cm;
+                    height: 0.4cm;
+                }
+                .print-info-content {
+                    flex: 1;
+                }
+                .print-info-content strong {
+                    display: block;
+                    color: #002A42;
+                    margin-bottom: 0.1cm;
+                    font-size: 0.3cm;
+                }
+                .print-info-content span {
+                    color: #333;
+                    font-size: 0.35cm;
+                }
+                .print-details-grid {
+                    display: grid;
+                    gap: 0.6cm;
+                }
+                .print-detail-section {
+                    background: #f8f9fa;
+                    padding: 0.4cm;
+                    border-radius: 0.15cm;
+                }
+                .print-detail-section h3 {
+                    color: #002A42;
+                    font-size: 0.35cm;
+                    margin: 0 0 0.2cm 0;
+                    font-weight: 600;
+                }
+                .print-detail-content {
+                    color: #333;
+                    font-size: 0.3cm;
+                    line-height: 1.5;
+                }
+                .print-intensity {
+                    display: inline-block;
+                    padding: 0.08cm 0.2cm;
+                    border-radius: 0.1cm;
+                    font-weight: 500;
+                    font-size: 0.3cm;
+                }
+                .print-intensity.low { background: #e3f2fd; color: #1976d2; }
+                .print-intensity.medium { background: #fff3e0; color: #f57c00; }
+                .print-intensity.high { background: #fce4ec; color: #c2185b; }
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    .print-content, .print-content * {
+                        visibility: visible;
+                    }
+                    .print-content {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                    }
+                    .print-card {
+                        box-shadow: none;
+                        border: 1px solid #ddd;
+                    }
+                }
+            `;
+            
+            // Criar o cabeçalho
+            const header = document.createElement('div');
+            header.className = 'print-header';
+            
+            const logo = document.querySelector('.logo img').cloneNode(true);
+            const title = document.createElement('h1');
+            title.textContent = 'Detalhes do Evento Clínico';
+            
+            header.appendChild(logo);
+            header.appendChild(title);
+            printContent.appendChild(header);
+
+            // Clonar e formatar o conteúdo do evento
+            const eventContent = document.querySelector('.note-card').cloneNode(true);
+            eventContent.className = 'print-card';
+            
+            // Remover os botões do footer
+            const footer = eventContent.querySelector('.card-footer');
+            if (footer) {
+                footer.remove();
+            }
+
+            // Aplicar classes de impressão
+            const cardHeader = eventContent.querySelector('.card-header');
+            cardHeader.className = 'print-card-header';
+            
+            const titleDiv = cardHeader.querySelector('.titulo');
+            if (titleDiv) {
+                const title = titleDiv.querySelector('strong');
+                const subtitle = titleDiv.querySelector('span');
+                if (title) title.className = 'print-card-title';
+                if (subtitle) subtitle.className = 'print-card-subtitle';
+            }
+
+            const statusBadge = cardHeader.querySelector('.status-badge');
+            if (statusBadge) {
+                statusBadge.className = 'print-status-badge';
+            }
+
+            // Formatar grid de informações
+            const infoGrid = eventContent.querySelector('.info-grid');
+            if (infoGrid) {
+                infoGrid.className = 'print-info-grid';
+                infoGrid.querySelectorAll('.info-item').forEach(item => {
+                    item.className = 'print-info-item';
+                    const icon = item.querySelector('.info-icon');
+                    const content = item.querySelector('.info-content');
+                    if (icon) icon.className = 'print-info-icon';
+                    if (content) content.className = 'print-info-content';
+                });
+            }
+
+            // Formatar grid de detalhes
+            const detailsGrid = eventContent.querySelector('.details-grid');
+            if (detailsGrid) {
+                detailsGrid.className = 'print-details-grid';
+                detailsGrid.querySelectorAll('.detail-section').forEach(section => {
+                    section.className = 'print-detail-section';
+                    const content = section.querySelector('.detail-content');
+                    if (content) content.className = 'print-detail-content';
+                });
+            }
+
+            // Formatar intensidade
+            eventContent.querySelectorAll('.intensity').forEach(intensity => {
+                intensity.className = `print-intensity ${intensity.className.split(' ')[1]}`;
+            });
+
+            printContent.appendChild(eventContent);
+
+            // Criar um iframe para impressão
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+
+            // Adicionar estilos e conteúdo ao iframe
+            iframe.contentDocument.head.appendChild(baseStyles);
+            iframe.contentDocument.body.appendChild(printContent);
+
+            // Pequeno delay para garantir que o conteúdo seja carregado
             setTimeout(() => {
-                window.print();
-                // Fechar popup após iniciar a impressão
-                Swal.close();
-            }, 1000);
+                iframe.contentWindow.print();
+                // Limpar após a impressão
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                    Swal.close();
+                }, 1000);
+            }, 500);
         }
     });
 }); 

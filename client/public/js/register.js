@@ -537,10 +537,9 @@ document.addEventListener("DOMContentLoaded", () => {
       allowOutsideClick: false,
       allowEscapeKey: false,
       showConfirmButton: true,
-      timer: 30000, // Aumentado para 30 segundos
+      timer: 5000,
       timerProgressBar: true,
       didOpen: (popup) => {
-        // Adiciona animação suave ao popup
         popup.style.opacity = '0';
         setTimeout(() => {
           popup.style.transition = 'opacity 0.5s ease-in-out';
@@ -548,7 +547,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 100);
       },
       willClose: (popup) => {
-        // Adiciona animação de fade out
         popup.style.transition = 'opacity 0.5s ease-in-out';
         popup.style.opacity = '0';
       },
@@ -560,10 +558,8 @@ document.addEventListener("DOMContentLoaded", () => {
         timerProgressBar: 'custom-swal-timer-progress'
       }
     }).then((result) => {
-      // Adiciona um pequeno delay antes do redirecionamento para permitir a animação de fade out
-      setTimeout(() => {
-        window.location.href = '/client/views/login.html';
-      }, 500);
+      // Redireciona para a página de login
+      window.location.href = '/client/views/login.html';
     });
   }
 
@@ -595,15 +591,51 @@ document.addEventListener("DOMContentLoaded", () => {
       // Adiciona um pequeno delay para melhor experiência do usuário
       await new Promise(resolve => setTimeout(resolve, 1500));
 
+      // Garantir que todos os campos obrigatórios estejam presentes
+      const requiredFields = {
+        nome: formData.nome,
+        cpf: formData.cpf,
+        genero: formData.genero,
+        email: formData.email,
+        senha: formData.senha,
+        crm: formData.crm,
+        areaAtuacao: formData.areaAtuacao,
+        telefonePessoal: formData.telefonePessoal,
+        cep: formData.cep,
+        enderecoConsultorio: formData.enderecoConsultorio,
+        numeroConsultorio: formData.numeroConsultorio
+      };
+
+      // Verificar campos obrigatórios
+      for (const [field, value] of Object.entries(requiredFields)) {
+        if (!value) {
+          throw new Error(`Campo obrigatório não preenchido: ${field}`);
+        }
+      }
+
+      // Limpar formatação dos campos
+      const cleanedData = {
+        ...formData,
+        cpf: formData.cpf.replace(/\D/g, ''),
+        telefonePessoal: formData.telefonePessoal.replace(/\D/g, ''),
+        telefoneConsultorio: formData.telefoneConsultorio.replace(/\D/g, ''),
+        cep: formData.cep.replace(/\D/g, ''),
+        crm: formData.crm.replace(/\W/g, '').toUpperCase(),
+        rqe: Array.isArray(formData.rqe) ? formData.rqe.filter(r => r) : []
+      };
+
+      console.log('Dados a serem enviados:', cleanedData);
+
       const response = await fetch('http://localhost:65432/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(cleanedData)
       });
 
       const data = await response.json();
+      console.log('Resposta do servidor:', data);
 
       if (!response.ok) {
         Swal.close();
@@ -627,6 +659,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return true;
 
     } catch (error) {
+      console.error('Erro detalhado:', error);
       Swal.close();
       showError(null, 'Não foi possível conectar ao servidor. Por favor, verifique sua conexão com a internet e tente novamente.');
       return false;
