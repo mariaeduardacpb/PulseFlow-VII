@@ -29,6 +29,37 @@ router.get('/buscar', authMiddleware, async (req, res) => {
   }
 });
 
+// Buscar paciente por CPF (usado no perfil)
+router.get('/:cpf', authMiddleware, async (req, res) => {
+  const { cpf } = req.params;
+
+  try {
+    const paciente = await Paciente.findOne({ cpf: cpf.replace(/\D/g, '') });
+
+    if (!paciente) {
+      return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
+
+    res.json({
+      nome: paciente.nome,
+      cpf: paciente.cpf,
+      email: paciente.email,
+      genero: paciente.genero,
+      altura: paciente.altura,
+      peso: paciente.peso,
+      dataNascimento: paciente.dataNascimento,
+      nacionalidade: paciente.nacionalidade,
+      profissao: paciente.profissao,
+      telefone: paciente.telefone,
+      observacoes: paciente.observacoes,
+      fotoPerfil: paciente.fotoPerfil
+    });
+  } catch (err) {
+    console.error('Erro ao buscar paciente:', err);
+    res.status(500).json({ message: 'Erro interno do servidor', error: err.message });
+  }
+});
+
 export default router;
 
 // Buscar paciente por ID (usado no perfil)
