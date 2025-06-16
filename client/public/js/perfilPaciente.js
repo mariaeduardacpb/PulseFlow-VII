@@ -386,14 +386,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     registros.forEach(registro => {
       const card = document.createElement('div');
       card.className = 'shortcut-card';
+      
+      // Verifica se a data existe e formata
+      const dataFormatada = registro.data ? new Date(registro.data).toLocaleDateString() : 'Data não informada';
+      
+      // Verifica se o tipo existe e formata
+      const tipo = registro.tipo || 'Não especificado';
+      const tipoLowerCase = tipo.toLowerCase();
+      
+      // Verifica se a descrição e observações existem
+      const descricao = registro.descricao || 'Sem descrição';
+      const observacoes = registro.observacoes || 'Sem observações';
+
       card.innerHTML = `
         <div class="record-header">
-          <h3>${new Date(registro.data).toLocaleDateString()}</h3>
-          <span class="type ${registro.tipo.toLowerCase()}">${registro.tipo}</span>
+          <h3>${dataFormatada}</h3>
+          <span class="type ${tipoLowerCase}">${tipo}</span>
         </div>
         <div class="record-body">
-          <p><strong>Descrição:</strong> ${registro.descricao}</p>
-          <p><strong>Observações:</strong> ${registro.observacoes}</p>
+          <p><strong>Descrição:</strong> ${descricao}</p>
+          <p><strong>Observações:</strong> ${observacoes}</p>
         </div>
       `;
       recordList.appendChild(card);
