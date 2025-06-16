@@ -1,3 +1,5 @@
+import { API_URL } from './config.js';
+
 const inputCPF = document.querySelector('.input-cpf');
 const btnAcesso = document.querySelector('.btn-acesso');
 const msgErro = document.getElementById('mensagem-erro');
@@ -28,7 +30,7 @@ btnAcesso.addEventListener('click', async () => {
   try {
     const token = localStorage.getItem('token');
 
-    const res = await fetch(`http://localhost:65432/api/pacientes/buscar?cpf=${cpfLimpo}`, {
+    const res = await fetch(`${API_URL}/api/pacientes/buscar?cpf=${cpfLimpo}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
