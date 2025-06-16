@@ -61,12 +61,17 @@ app.use('/uploads', express.static(uploadsPath));
 connectDB();
 
 // Arquivos estáticos
-app.use(express.static(path.join(_dirname, 'client')));
-app.use('/client', express.static(path.join(_dirname, 'client')));
+app.use(express.static(path.join(process.cwd(), 'client')));
+app.use('/client', express.static(path.join(process.cwd(), 'client')));
 
 // Rota para a raiz
 app.get('/', (req, res) => {
-  res.sendFile(path.join(_dirname, 'client', 'views', 'index.html'));
+  res.sendFile(path.join(process.cwd(), 'client', 'views', 'index.html'));
+});
+
+// Rota para o perfil do paciente
+app.get('/client/views/perfilPaciente.html', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'client', 'views', 'perfilPaciente.html'));
 });
 
 // Rotas da aplicação
