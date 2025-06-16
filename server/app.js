@@ -40,8 +40,8 @@ const corsOptions = {
     'http://localhost:5501',
     'http://localhost:5900',
     'http://127.0.0.1:5900',
-    'https://pulseflow-vii.onrender.com',
-    'http://pulseflow-vii.onrender.com'
+    'https://pulseflow.onrender.com',
+    'http://pulseflow.onrender.com'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
