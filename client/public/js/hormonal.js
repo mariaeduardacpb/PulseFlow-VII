@@ -336,3 +336,45 @@ ticks: {
     carregarDadosMedico();
   });
   
+  function updateChart(data) {
+    if (!data || !data.data || data.data.length === 0) {
+      document.getElementById('no-data-msg').style.display = 'block';
+      chartHormonal.data.labels = [];
+      chartHormonal.data.datasets = [];
+      chartHormonal.update();
+      return;
+    }
+
+    document.getElementById('no-data-msg').style.display = 'none';
+
+    // Pega todos os dias únicos
+    const diasUnicos = [...new Set(data.data.map(d => d.dia))].sort((a, b) => a - b);
+    chartHormonal.data.labels = diasUnicos;
+
+    // Pega todos os hormônios únicos
+    const nomesHormônios = [...new Set(data.data.map(d => d.hormonio))];
+
+    // Cria um dataset para cada hormônio
+    chartHormonal.data.datasets = nomesHormônios.map((hormonio, index) => {
+      const cor = coresHormônios[index % coresHormônios.length];
+      const dadosHormônio = diasUnicos.map(dia => {
+        const registro = data.data.find(d => d.dia === dia && d.hormonio === hormonio);
+        return registro ? registro.valor : null;
+      });
+
+      return {
+        label: hormonio,
+        data: dadosHormônio,
+        fill: true,
+        borderColor: cor,
+        backgroundColor: cor + '33',
+        tension: 0.3,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        spanGaps: true
+      };
+    });
+
+    chartHormonal.update();
+  }
+  

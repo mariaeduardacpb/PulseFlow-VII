@@ -162,6 +162,29 @@ const toggleButton = document.querySelector(".menu-toggle");
     }
   });
 
+  function updateChart(data) {
+    if (!data || !data.data || data.data.length === 0) {
+      document.getElementById('no-data-msg').style.display = 'block';
+      chartEnxaqueca.data.labels = [];
+      chartEnxaqueca.data.datasets[0].data = [];
+      chartEnxaqueca.update();
+      return;
+    }
+
+    document.getElementById('no-data-msg').style.display = 'none';
+
+    // Extrair dias e intensidades
+    const dias = data.data.map(d => d.dia);
+    const intensidades = data.data.map(d => d.intensidade);
+
+    // Atualizar dados do gráfico
+    chartEnxaqueca.data.labels = dias;
+    chartEnxaqueca.data.datasets[0].data = intensidades;
+
+    // Atualizar o gráfico
+    chartEnxaqueca.update();
+  }
+
   async function loadChartData() {
     const dados = await fetchEnxaquecaData(currentMonthIndex, currentYear);
     const dias = dados.map(d => d.dia);

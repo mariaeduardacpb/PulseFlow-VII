@@ -315,8 +315,35 @@ const toggleButton = document.querySelector(".menu-toggle");
   }
 
   function updateChart(data) {
-    // Implementar a lógica de atualização do gráfico aqui
-    console.log('Dados de insônia recebidos:', data);
+    if (!data || !data.data || data.data.length === 0) {
+      document.getElementById('no-data-msg-horas').style.display = 'block';
+      document.getElementById('no-data-msg-qualidade').style.display = 'block';
+      chartHorasSono.data.labels = [];
+      chartHorasSono.data.datasets[0].data = [];
+      chartQualidadeSono.data.labels = [];
+      chartQualidadeSono.data.datasets[0].data = [];
+      chartHorasSono.update();
+      chartQualidadeSono.update();
+      return;
+    }
+
+    document.getElementById('no-data-msg-horas').style.display = 'none';
+    document.getElementById('no-data-msg-qualidade').style.display = 'none';
+
+    // Extrair dias e valores
+    const dias = data.data.map(d => d.dia);
+    const horasSono = data.data.map(d => d.horasSono);
+    const qualidadeSono = data.data.map(d => d.qualidadeSono);
+
+    // Atualizar dados do gráfico de horas de sono
+    chartHorasSono.data.labels = dias;
+    chartHorasSono.data.datasets[0].data = horasSono;
+    chartHorasSono.update();
+
+    // Atualizar dados do gráfico de qualidade do sono
+    chartQualidadeSono.data.labels = dias;
+    chartQualidadeSono.data.datasets[0].data = qualidadeSono;
+    chartQualidadeSono.update();
   }
 
   function updateMonth(change) {
