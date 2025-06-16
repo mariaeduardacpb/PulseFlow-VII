@@ -1,6 +1,6 @@
 import { API_URL } from './config.js';
 
-window.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Elementos da UI
   const erroBox = document.getElementById('erroPerfil');
   const profileBox = document.querySelector('.profile-box');
@@ -379,7 +379,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   function renderizarRegistros(registros) {
-    const recordList = document.querySelector('.record-list');
+    const recordList = document.querySelector('.shortcut-grid');
     recordList.innerHTML = '';
 
     if (!registros || registros.length === 0) {
@@ -393,7 +393,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     registros.forEach(registro => {
       const card = document.createElement('div');
-      card.className = 'record-card';
+      card.className = 'shortcut-card';
       card.innerHTML = `
         <div class="record-header">
           <h3>${new Date(registro.data).toLocaleDateString()}</h3>
