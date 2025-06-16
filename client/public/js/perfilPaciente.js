@@ -1,6 +1,6 @@
 import { API_URL } from './config.js';
 
-document.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener('DOMContentLoaded', async () => {
   // Elementos da UI
   const erroBox = document.getElementById('erroPerfil');
   const profileBox = document.querySelector('.profile-box');
@@ -24,6 +24,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     transform: translate(-50%, -50%);
     z-index: 1000;
   `;
+
+  const toggleButton = document.querySelector(".menu-toggle");
+  const sidebar = document.querySelector(".sidebar");
+
+  toggleButton.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+    toggleButton.classList.toggle("shifted");
+  });
 
   function mostrarErro(mensagem) {
     const aviso = document.createElement('div');
@@ -371,7 +379,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderizarRegistros(registros) {
-    const recordList = document.querySelector('.shortcut-grid');
+    const recordList = document.querySelector('.record-list');
     recordList.innerHTML = '';
 
     if (!registros || registros.length === 0) {
@@ -385,15 +393,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     registros.forEach(registro => {
       const card = document.createElement('div');
-      card.className = 'shortcut-card';
+      card.className = 'record-card';
       card.innerHTML = `
         <div class="record-header">
           <h3>${new Date(registro.data).toLocaleDateString()}</h3>
-          <span class="type ${registro.tipo ? registro.tipo.toLowerCase() : 'default'}">${registro.tipo || 'Sem tipo'}</span>
+          <span class="type ${registro.tipo.toLowerCase()}">${registro.tipo}</span>
         </div>
         <div class="record-body">
-          <p><strong>Descrição:</strong> ${registro.descricao || 'Sem descrição'}</p>
-          <p><strong>Observações:</strong> ${registro.observacoes || 'Sem observações'}</p>
+          <p><strong>Descrição:</strong> ${registro.descricao}</p>
+          <p><strong>Observações:</strong> ${registro.observacoes}</p>
         </div>
       `;
       recordList.appendChild(card);
