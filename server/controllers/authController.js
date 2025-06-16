@@ -8,12 +8,28 @@ import tokenService from '../services/tokenService.js';
 // Função para registrar um novo usuário
 export const register = async (req, res) => {
   try {
+    console.log('Dados recebidos no registro:', req.body);
     const { senha, email, rqe } = req.body;
 
     // Verificando se o usuário já existe
     const userExists = await User.findOne({ email });
     if (userExists) {
+      console.log('Usuário já existe:', email);
       return res.status(400).json({ message: 'Usuário já existe.' });
+    }
+
+    // Validar campos obrigatórios
+    const requiredFields = [
+      'nome', 'cpf', 'genero', 'email', 'senha', 'crm',
+      'areaAtuacao', 'telefonePessoal', 'cep',
+      'enderecoConsultorio', 'numeroConsultorio'
+    ];
+
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        console.log(`Campo obrigatório ausente: ${field}`);
+        return res.status(400).json({ message: `Campo obrigatório ausente: ${field}` });
+      }
     }
 
     // Criptografando a senha
@@ -29,15 +45,28 @@ export const register = async (req, res) => {
       rqe: rqeArray
     });
 
+    console.log('Novo usuário a ser criado:', { ...newUser.toObject(), senha: '[PROTEGIDO]' });
+
     // Salvando o novo usuário no banco de dados
     await newUser.save();
+    console.log('Usuário salvo com sucesso:', newUser._id);
 
     // Enviando e-mail de boas-vindas
-    await sendWelcomeEmail(email);
+    try {
+      await sendWelcomeEmail(email);
+      console.log('E-mail de boas-vindas enviado para:', email);
+    } catch (emailError) {
+      console.error('Erro ao enviar e-mail de boas-vindas:', emailError);
+      // Não interrompe o fluxo se o e-mail falhar
+    }
 
     res.status(201).json({ message: 'Usuário registrado com sucesso! Um e-mail de boas-vindas foi enviado.' });
   } catch (err) {
-    res.status(500).json({ message: 'Erro ao registrar.', error: err.message });
+    console.error('Erro detalhado no registro:', err);
+    res.status(500).json({ 
+      message: 'Erro ao registrar.',
+      error: process.env.NODE_ENV === 'development' ? err.message : 'Erro interno do servidor'
+    });
   }
 };
 
