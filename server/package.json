@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "build": "npm rebuild bcrypt --build-from-source"
+    "build": "npm rebuild bcrypt --build-from-source && cp -r ../client ./client"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
