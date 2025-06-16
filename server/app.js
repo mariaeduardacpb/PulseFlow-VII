@@ -65,7 +65,7 @@ app.use('/client', express.static(path.join(_dirname, '..', 'client')));
 
 // Rota para a raiz
 app.get('/', (req, res) => {
-  res.sendFile(path.join(_dirname, '..', 'client', 'views', 'index.html'));
+  res.sendFile(path.join(_dirname, 'client', 'views', 'index.html'));
 });
 
 // Rotas da aplicação
