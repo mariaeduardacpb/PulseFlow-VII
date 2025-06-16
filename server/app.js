@@ -32,7 +32,17 @@ const _dirname = path.dirname(__filename);
 
 // Configuração do CORS
 const corsOptions = {
-  origin: ['http://127.0.0.1:65432', 'http://127.0.0.1:65432', 'http://localhost:5500', 'http://127.0.0.1:5501', 'http://localhost:5501', 'http://localhost:5900', 'http://127.0.0.1:5900'],
+  origin: [
+    'http://127.0.0.1:65432',
+    'http://127.0.0.1:65432',
+    'http://localhost:5500',
+    'http://127.0.0.1:5501',
+    'http://localhost:5501',
+    'http://localhost:5900',
+    'http://127.0.0.1:5900',
+    'https://pulseflow-vii.onrender.com',
+    'http://pulseflow-vii.onrender.com'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -53,6 +63,10 @@ connectDB();
 // Arquivos estáticos
 app.use('/client', express.static(path.join(_dirname, '..', 'client')));
 
+// Rota para a raiz
+app.get('/', (req, res) => {
+  res.sendFile(path.join(_dirname, '..', 'client', 'views', 'index.html'));
+});
 
 // Rotas da aplicação
 app.use('/api/auth', authRoutes);
