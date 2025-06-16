@@ -1,3 +1,5 @@
+import { API_URL } from './config.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
   const sidebarToggle = document.getElementById('sidebarToggle');
   const sidebar = document.querySelector('.sidebar');
@@ -160,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   filterDoctor.addEventListener('input', filtrarAnotacoes);
 
   try {
-    const response = await fetch(`http://localhost:65432/api/anotacoes/${cpf}`, {
+    const response = await fetch(`${API_URL}/api/anotacoes/${cpf}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -216,7 +218,7 @@ async function carregarDadosMedico() {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('Token não encontrado. Por favor, faça login novamente.');
 
-    const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+    const res = await fetch(`${API_URL}/api/usuarios/perfil`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
