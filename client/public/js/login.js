@@ -1,3 +1,5 @@
+import { API_URL } from './config.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
   const emailInput = document.getElementById("email");
@@ -182,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSubmitButton(true);
 
     try {
-      const response = await fetch("http://localhost:65432/api/auth/login", {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
