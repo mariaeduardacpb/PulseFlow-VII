@@ -146,6 +146,112 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  async function carregarDadosPaciente() {
+    try {
+      const tokenPaciente = localStorage.getItem('tokenPaciente');
+      if (!tokenPaciente) {
+        throw new Error('Token do paciente não encontrado. Por favor, selecione um paciente.');
+      }
+
+      const decodedPayload = JSON.parse(atob(tokenPaciente));
+      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+
+      if (!cpf) {
+        throw new Error('CPF não encontrado no token do paciente.');
+      }
+
+      const tokenMedico = localStorage.getItem('token');
+      if (!tokenMedico) {
+        throw new Error('Token do médico não encontrado. Por favor, faça login novamente.');
+      }
+
+      const response = await fetch(`${API_URL}/api/pacientes/${cpf}`, {
+        headers: {
+          'Authorization': `Bearer ${tokenMedico}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao carregar dados do paciente.');
+      }
+
+      const paciente = await response.json();
+      preencherPerfil(paciente);
+      return true;
+    } catch (error) {
+      console.error('Erro ao carregar dados do paciente:', error);
+      mostrarErro(error.message);
+      return false;
+    }
+  }
+
+  function preencherPerfil(paciente) {
+    if (!paciente) return;
+
+    // Atualiza a foto do perfil
+    const imagemPerfil = document.querySelector('.profile-box img');
+    if (imagemPerfil) {
+      imagemPerfil.src = paciente.fotoPerfil || '/client/public/assets/User_logonegativo.png';
+      imagemPerfil.onerror = () => {
+        imagemPerfil.src = '/client/public/assets/User_logonegativo.png';
+      };
+    }
+
+    // Formata os dados antes de exibir
+    const dadosFormatados = {
+      nomePaciente: paciente.nome || '-',
+      generoPaciente: paciente.genero || '-',
+      idadePaciente: calcularIdadeTexto(paciente.dataNascimento),
+      nacionalidadePaciente: paciente.nacionalidade || '-',
+      alturaPaciente: paciente.altura ? `${paciente.altura} cm` : '-',
+      pesoPaciente: paciente.peso ? `${paciente.peso} kg` : '-',
+      profissaoPaciente: paciente.profissao || '-',
+      emailPaciente: paciente.email || '-',
+      telefonePaciente: formatarTelefone(paciente.telefone) || '-',
+      observacoesPaciente: paciente.observacoes || 'Nenhuma'
+    };
+
+    // Atualiza cada campo individualmente
+    Object.entries(dadosFormatados).forEach(([id, valor]) => {
+      const elemento = document.getElementById(id);
+      if (elemento) {
+        elemento.textContent = valor;
+      }
+    });
+  }
+
+  function formatarTelefone(telefone) {
+    if (!telefone) return '-';
+    const numeros = telefone.replace(/\D/g, '');
+    return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  }
+
+  function calcularIdadeTexto(dataISO) {
+    if (!dataISO) return '-';
+    try {
+      const nascimento = new Date(dataISO);
+      const hoje = new Date();
+      
+      if (isNaN(nascimento.getTime()) || nascimento > hoje) {
+        return '-';
+      }
+
+      let anos = hoje.getFullYear() - nascimento.getFullYear();
+      let meses = hoje.getMonth() - nascimento.getMonth();
+      
+      if (meses < 0 || (meses === 0 && hoje.getDate() < nascimento.getDate())) {
+        anos--;
+        meses += 12;
+      }
+
+      return `${anos} anos e ${meses} meses`;
+    } catch (error) {
+      console.error("Erro ao calcular idade:", error);
+      return '-';
+    }
+  }
+
   async function carregarUltimosRegistros() {
     try {
       const tokenMedico = localStorage.getItem('token');
@@ -186,13 +292,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderizarRegistros(registros) {
-    const recordList = document.querySelector('.record-list');
-    if (!recordList) return;
+    const shortcutGrid = document.querySelector('.shortcut-grid');
+    if (!shortcutGrid) return;
 
-    recordList.innerHTML = '';
+    shortcutGrid.innerHTML = '';
 
     if (!registros || registros.length === 0) {
-      recordList.innerHTML = `
+      shortcutGrid.innerHTML = `
         <div class="no-data-msg">
           ⚠️ <span>Nenhuma anotação encontrada.</span>
         </div>
@@ -200,24 +306,38 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    registros.forEach(registro => {
+    // Pega apenas os 3 registros mais recentes
+    const registrosRecentes = registros.slice(0, 3);
+
+    registrosRecentes.forEach(registro => {
       const card = document.createElement('div');
-      card.className = 'record-card';
+      card.className = 'shortcut-card';
       card.innerHTML = `
-        <div class="record-header">
-          <h3>${new Date(registro.data).toLocaleDateString()}</h3>
-          <span class="type ${registro.tipo.toLowerCase()}">${registro.tipo}</span>
-        </div>
-        <div class="record-body">
-          <p><strong>Descrição:</strong> ${registro.descricao}</p>
-          <p><strong>Observações:</strong> ${registro.observacoes}</p>
-        </div>
+        <p>
+          <strong>Motivo da Consulta:</strong> ${registro.titulo || 'Não informado'}<br>
+          <strong>Médico Responsável:</strong> ${registro.medico || 'Não informado'}<br>
+          <strong>Especialidade:</strong> ${registro.categoria || 'Não informada'}<br>
+          <strong>Data:</strong> ${new Date(registro.data).toLocaleDateString()}
+        </p>
+        <button onclick="visualizarRegistro('${registro._id}')">Visualizar</button>
       `;
-      recordList.appendChild(card);
+      shortcutGrid.appendChild(card);
     });
   }
 
+  // Função para visualizar um registro específico
+  window.visualizarRegistro = function(id) {
+    if (!id) return;
+    window.location.href = `vizualizacaoAnotacao.html?id=${encodeURIComponent(id)}`;
+  };
+
   // Inicializar
-  await carregarDadosMedico();
-  await carregarUltimosRegistros();
+  try {
+    await carregarDadosMedico();
+    await carregarDadosPaciente();
+    await carregarUltimosRegistros();
+  } catch (error) {
+    console.error("Erro durante a inicialização:", error);
+    mostrarErro("Ocorreu um erro ao carregar os dados. Por favor, tente novamente.");
+  }
 });
