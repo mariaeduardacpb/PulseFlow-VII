@@ -292,8 +292,30 @@ const toggleButton = document.querySelector(".menu-toggle");
   }
 
   function updateChart(data) {
-    // Implementar a lógica de atualização do gráfico aqui
-    console.log('Dados recebidos:', data);
+    if (!data || !data.data || data.data.length === 0) {
+      document.getElementById('no-data-msg-pressao').style.display = 'block';
+      chartPressao.data.labels = [];
+      chartPressao.data.datasets[0].data = [];
+      chartPressao.update();
+      return;
+    }
+
+    document.getElementById('no-data-msg-pressao').style.display = 'none';
+
+    // Extrair dias e valores de pressão arterial
+    const dias = data.data.map(d => d.dia);
+    const valores = data.data.map(d => ({
+      x: d.dia,
+      y: d.sistolica,
+      label: `${d.sistolica}/${d.diastolica}`
+    }));
+
+    // Atualizar dados do gráfico
+    chartPressao.data.labels = dias;
+    chartPressao.data.datasets[0].data = valores;
+
+    // Atualizar o gráfico
+    chartPressao.update();
   }
 
   function updateMonth(change) {

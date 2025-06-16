@@ -25,6 +25,110 @@ window.addEventListener('DOMContentLoaded', async () => {
     z-index: 1000;
   `;
 
+  const toggleButton = document.querySelector(".menu-toggle");
+  const sidebar = document.querySelector(".sidebar");
+
+  toggleButton.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+    toggleButton.classList.toggle("shifted");
+  });
+
+  function mostrarErro(mensagem) {
+    const aviso = document.createElement('div');
+    aviso.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ffffff;
+      color: #002A42;
+      padding: 16px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 42, 66, 0.1);
+      z-index: 1000;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      border: 1px solid #e1e5eb;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      max-width: 400px;
+      animation: slideIn 0.3s ease-out;
+    `;
+
+    const icon = document.createElement('div');
+    icon.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00c3b7;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    `;
+
+    const textContainer = document.createElement('div');
+    textContainer.style.cssText = `
+      flex: 1;
+      line-height: 1.4;
+    `;
+    textContainer.textContent = mensagem;
+
+    const closeButton = document.createElement('button');
+    closeButton.style.cssText = `
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    `;
+    closeButton.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    `;
+    closeButton.onclick = () => {
+      aviso.style.animation = 'slideOut 0.3s ease-out';
+      setTimeout(() => {
+        document.body.removeChild(aviso);
+        document.head.removeChild(style);
+      }, 300);
+    };
+
+    aviso.appendChild(icon);
+    aviso.appendChild(textContainer);
+    aviso.appendChild(closeButton);
+    document.body.appendChild(aviso);
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    setTimeout(() => {
+      if (document.body.contains(aviso)) {
+        aviso.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+          if (document.body.contains(aviso)) {
+            document.body.removeChild(aviso);
+            document.head.removeChild(style);
+          }
+        }, 300);
+      }
+    }, 5000);
+  }
+
   // === 1. PUXA DADOS DO MÉDICO LOGADO ===
   async function carregarDadosMedico() {
     try {
@@ -134,15 +238,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function mostrarErro(mensagem) {
-    if (!erroBox) return;
-    erroBox.textContent = `⚠️ ${mensagem}`;
-    erroBox.style.display = 'block';
-    
-    // Adiciona animação de fade-in
-    erroBox.style.animation = 'fadeIn 0.3s ease-in';
-  }
-
   async function preencherPerfil(paciente) {
     try {
       // Validação dos dados do paciente
@@ -246,84 +341,71 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   async function carregarUltimosRegistros() {
     try {
-      const token = localStorage.getItem('token');
-      const pacienteData = JSON.parse(localStorage.getItem('pacienteSelecionado'));
-      
-      if (!token || !pacienteData || !pacienteData.id) {
-        console.error('Dados necessários:', { token: !!token, pacienteData });
-        throw new Error('Dados necessários não encontrados');
-      }
+      const tokenMedico = localStorage.getItem('token');
+      const tokenPaciente = localStorage.getItem('tokenPaciente');
 
-      // Ajustando a rota da API para buscar as anotações médicas
-      const res = await fetch(`http://localhost:65432/api/anotacoes/${pacienteData.cpf}`, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        console.error('Erro na resposta da API:', errorData);
-        throw new Error(errorData.message || 'Erro ao carregar registros clínicos');
-      }
-
-      const registros = await res.json();
-      console.log('Registros recebidos:', registros); // Debug
-
-      const shortcutGrid = document.querySelector('.shortcut-grid');
-      if (!shortcutGrid) {
-        console.error('Elemento .shortcut-grid não encontrado');
+      if (!tokenMedico || !tokenPaciente) {
+        mostrarErro("Sessão expirada. Faça login novamente!");
         return;
       }
 
-      // Limpa os atalhos existentes
-      shortcutGrid.innerHTML = '';
+      const decodedPayload = JSON.parse(atob(tokenPaciente));
+      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
 
-      if (!registros || registros.length === 0) {
-        shortcutGrid.innerHTML = '<p class="no-records">Nenhum registro clínico encontrado</p>';
+      if (!cpf) {
+        mostrarErro("CPF não encontrado no token do paciente.");
         return;
       }
 
-      // Pega apenas os 3 registros mais recentes
-      const registrosRecentes = registros.slice(0, 3);
-
-      // Cria os cards para cada registro
-      registrosRecentes.forEach(registro => {
-        try {
-          const dataFormatada = registro.data ? new Date(registro.data).toLocaleDateString('pt-BR') : 'Data não informada';
-          const card = document.createElement('div');
-          card.className = 'shortcut-card';
-          card.innerHTML = `
-            <p>
-              <strong>Motivo da Consulta:</strong> ${registro.titulo || 'Não informado'}<br>
-              <strong>Médico Responsável:</strong> ${registro.medico || 'Não informado'}<br>
-              <strong>Especialidade:</strong> ${registro.categoria || 'Não informada'}<br>
-              <strong>Data:</strong> ${dataFormatada}
-            </p>
-            <button onclick="visualizarRegistro('${registro._id}')">Visualizar</button>
-          `;
-          shortcutGrid.appendChild(card);
-        } catch (error) {
-          console.error('Erro ao criar card para registro:', registro, error);
+      const response = await fetch(`${API_URL}/api/anotacoes/${cpf}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${tokenMedico}`,
+          "Content-Type": "application/json"
         }
       });
 
+      if (!response.ok) {
+        mostrarErro("Erro ao buscar anotações!");
+        return;
+      }
+
+      const data = await response.json();
+      renderizarRegistros(data);
     } catch (error) {
       console.error('Erro ao carregar registros:', error);
-      mostrarErro('Erro ao carregar registros clínicos. Por favor, tente novamente.');
-      
-      // Mostra uma mensagem de erro mais amigável na interface
-      const shortcutGrid = document.querySelector('.shortcut-grid');
-      if (shortcutGrid) {
-        shortcutGrid.innerHTML = `
-          <div class="error-message">
-            <p>Não foi possível carregar os registros clínicos.</p>
-            <p>Por favor, tente novamente mais tarde.</p>
-          </div>
-        `;
-      }
+      mostrarErro("Erro interno ao carregar anotações.");
     }
+  }
+
+  function renderizarRegistros(registros) {
+    const recordList = document.querySelector('.record-list');
+    recordList.innerHTML = '';
+
+    if (!registros || registros.length === 0) {
+      recordList.innerHTML = `
+        <div class="no-data-msg">
+          ⚠️ <span>Nenhuma anotação encontrada.</span>
+        </div>
+      `;
+      return;
+    }
+
+    registros.forEach(registro => {
+      const card = document.createElement('div');
+      card.className = 'record-card';
+      card.innerHTML = `
+        <div class="record-header">
+          <h3>${new Date(registro.data).toLocaleDateString()}</h3>
+          <span class="type ${registro.tipo.toLowerCase()}">${registro.tipo}</span>
+        </div>
+        <div class="record-body">
+          <p><strong>Descrição:</strong> ${registro.descricao}</p>
+          <p><strong>Observações:</strong> ${registro.observacoes}</p>
+        </div>
+      `;
+      recordList.appendChild(card);
+    });
   }
 
   // Função para visualizar um registro específico

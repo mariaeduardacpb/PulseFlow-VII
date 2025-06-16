@@ -195,8 +195,26 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateChart(data) {
-    // Implementar a lógica de atualização do gráfico aqui
-    console.log('Dados recebidos:', data);
+    if (!data || !data.data || data.data.length === 0) {
+      document.getElementById('no-data-msg-glicemia').style.display = 'block';
+      chartGlicemia.data.labels = [];
+      chartGlicemia.data.datasets[0].data = [];
+      chartGlicemia.update();
+      return;
+    }
+
+    document.getElementById('no-data-msg-glicemia').style.display = 'none';
+
+    // Extrair dias e valores de glicemia
+    const dias = data.data.map(d => d.dia);
+    const valores = data.data.map(d => d.valor);
+
+    // Atualizar dados do gráfico
+    chartGlicemia.data.labels = dias;
+    chartGlicemia.data.datasets[0].data = valores;
+
+    // Atualizar o gráfico
+    chartGlicemia.update();
   }
 
   carregarDadosMedico();
