@@ -25,14 +25,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     z-index: 1000;
   `;
 
-  const toggleButton = document.querySelector(".menu-toggle");
-  const sidebar = document.querySelector(".sidebar");
-
-  toggleButton.addEventListener("click", () => {
-    sidebar.classList.toggle("active");
-    toggleButton.classList.toggle("shifted");
-  });
-
   function mostrarErro(mensagem) {
     const aviso = document.createElement('div');
     aviso.style.cssText = `
