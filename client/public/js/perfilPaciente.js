@@ -1,3 +1,5 @@
+import { API_URL } from './config.js';
+
 window.addEventListener('DOMContentLoaded', async () => {
   // Elementos da UI
   const erroBox = document.getElementById('erroPerfil');
@@ -31,7 +33,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         throw new Error('Token não encontrado. Por favor, faça login novamente.');
       }
 
-      const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+      const res = await fetch(`${API_URL}/api/usuarios/perfil`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -87,7 +89,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
 
       // Faz a requisição
-      const res = await fetch(`http://localhost:65432/api/pacientes/${pacienteData.id}`, {
+      const res = await fetch(`${API_URL}/api/pacientes/${pacienteData.id}`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -151,9 +153,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       // Atualiza a foto do perfil
       const imagemPerfil = document.querySelector('.profile-box img');
       if (imagemPerfil) {
-        imagemPerfil.src = paciente.fotoPerfil || '../public/assets/User_logonegativo.png';
+        imagemPerfil.src = paciente.fotoPerfil || '/client/public/assets/User_logonegativo.png';
         imagemPerfil.onerror = () => {
-          imagemPerfil.src = '../public/assets/User_logonegativo.png';
+          imagemPerfil.src = '/client/public/assets/User_logonegativo.png';
         };
       }
 
