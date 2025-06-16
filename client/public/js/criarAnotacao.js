@@ -1,3 +1,5 @@
+import { API_URL } from './config.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
   // Toggle da Sidebar
   const sidebarToggle = document.getElementById('sidebarToggle');
@@ -23,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+    const res = await fetch(`${API_URL}/api/usuarios/perfil`, {
       headers: { 
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -241,7 +243,7 @@ document.querySelector("form").addEventListener("submit", async (e) => {
   };
 
   try {
-    const res = await fetch("http://localhost:65432/api/anotacoes/nova", {
+    const res = await fetch(`${API_URL}/api/anotacoes/nova`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -250,16 +252,19 @@ document.querySelector("form").addEventListener("submit", async (e) => {
       body: JSON.stringify(body)
     });
 
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.message || 'Erro ao salvar');
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || 'Erro ao criar anotação');
+    }
 
-    mostrarAviso("Registro clínico salvo com sucesso!");
-    document.querySelector("form").reset();
-    
-    // Redireciona para a página de histórico após salvar
-    window.location.href = 'historicoProntuario.html';
-  } catch (err) {
-    mostrarAviso("Erro ao salvar: " + err.message);
+    mostrarAviso('Anotação criada com sucesso!');
+    setTimeout(() => {
+      window.location.href = 'historicoProntuario.html';
+    }, 2000);
+
+  } catch (error) {
+    console.error('Erro ao criar anotação:', error);
+    mostrarAviso(error.message || 'Erro ao criar anotação. Por favor, tente novamente.');
   }
 });
 
@@ -278,7 +283,7 @@ async function carregarDadosMedico() {
       throw new Error('Token não encontrado. Por favor, faça login novamente.');
     }
 
-    const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+    const res = await fetch(`${API_URL}/api/usuarios/perfil`, {
       headers: { 
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

@@ -1,4 +1,6 @@
-document.addEventListener("DOMContentLoaded", function () {
+import { API_URL } from './config.js';
+
+document.addEventListener("DOMContentLoaded", async () => {
     const ctx = document.getElementById('chartHormonal').getContext('2d');
     const noDataLabel = document.getElementById('no-data-msg');
   
@@ -22,6 +24,102 @@ document.addEventListener("DOMContentLoaded", function () {
       '#0a4466', '#00c3b7', '#f39c12', '#8e44ad', '#e74c3c', '#3498db'
     ];
   
+    function mostrarErro(mensagem) {
+      const aviso = document.createElement('div');
+      aviso.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #ffffff;
+        color: #002A42;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 42, 66, 0.1);
+        z-index: 1000;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 14px;
+        border: 1px solid #e1e5eb;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 300px;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+      `;
+
+      const icon = document.createElement('div');
+      icon.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00c3b7;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      `;
+
+      const textContainer = document.createElement('div');
+      textContainer.style.cssText = `
+        flex: 1;
+        line-height: 1.4;
+      `;
+      textContainer.textContent = mensagem;
+
+      const closeButton = document.createElement('button');
+      closeButton.style.cssText = `
+        background: none;
+        border: none;
+        padding: 4px;
+        cursor: pointer;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s;
+      `;
+      closeButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      `;
+      closeButton.onclick = () => {
+        aviso.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+          document.body.removeChild(aviso);
+          document.head.removeChild(style);
+        }, 300);
+      };
+
+      aviso.appendChild(icon);
+      aviso.appendChild(textContainer);
+      aviso.appendChild(closeButton);
+      document.body.appendChild(aviso);
+
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(100%); opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+
+      setTimeout(() => {
+        if (document.body.contains(aviso)) {
+          aviso.style.animation = 'slideOut 0.3s ease-out';
+          setTimeout(() => {
+            if (document.body.contains(aviso)) {
+              document.body.removeChild(aviso);
+              document.head.removeChild(style);
+            }
+          }, 300);
+        }
+      }, 5000);
+    }
+
     async function carregarDadosMedico() {
     try {
       const token = localStorage.getItem('token');
@@ -29,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
         throw new Error('Token não encontrado. Por favor, faça login novamente.');
       }
 
-      const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+      const res = await fetch(`${API_URL}/api/usuarios/perfil`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -63,23 +161,23 @@ document.addEventListener("DOMContentLoaded", function () {
     // Função para buscar os dados hormonais
     async function fetchHormonalData(month, year) {
       try {
-        const tokenMedico = localStorage.getItem("token");
-        const tokenPaciente = localStorage.getItem("tokenPaciente");
+        const tokenMedico = localStorage.getItem('token');
+        const tokenPaciente = localStorage.getItem('tokenPaciente');
   
         if (!tokenMedico || !tokenPaciente) {
-          console.error("Token não encontrado.");
-          return [];
+          mostrarErro("Sessão expirada. Faça login novamente!");
+          return null;
         }
         const decodedPayload = JSON.parse(atob(tokenPaciente));
         const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, "");
 
   
         if (!cpf) {
-          console.error("CPF não encontrado no token.");
-          return [];
+          mostrarErro("CPF não encontrado no token do paciente.");
+          return null;
         }
   
-        const response = await fetch(`http://127.0.0.1:65432/api/hormonal/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
+        const response = await fetch(`${API_URL}/api/hormonal/medico?cpf=${cpf}&month=${month}&year=${year}`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${tokenMedico}`,
@@ -87,18 +185,17 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
   
-        const result = await response.json();
-  
         if (!response.ok) {
-          console.error("Erro ao buscar dados:", result.message || result);
-          return [];
+          mostrarErro("Erro ao buscar dados hormonais!");
+          return null;
         }
   
-        return result.data || [];
+        return await response.json();
   
       } catch (error) {
         console.error("Erro ao buscar dados hormonais:", error);
-        return [];
+        mostrarErro("Erro interno ao buscar dados hormonais.");
+        return null;
       }
     }
   
@@ -173,39 +270,24 @@ ticks: {
     });
   
     async function loadChartData() {
-      const dados = await fetchHormonalData(currentMonthIndex, currentYear);
+      const data = await fetchHormonalData(currentMonthIndex, currentYear);
   
-      if (!dados.length) {
-        chartHormonal.data.labels = [0]; // Eixo X mínimo
-        chartHormonal.data.datasets = [{
-          label: "",
-          data: [0], // Ponto mínimo no eixo Y
-          borderColor: "transparent",
-          backgroundColor: "transparent",
-          pointRadius: 0,
-          fill: false,
-          tension: 0,
-          spanGaps: true
-        }];
-        chartHormonal.update();
-        noDataLabel.style.display = 'block';
-        return;
-      }
+      if (!data) return;
       
   
       noDataLabel.style.display = 'none';
   
       // Pega todos os dias
-      const diasUnicos = [...new Set(dados.map(d => d.dia))].sort((a, b) => a - b);
+      const diasUnicos = [...new Set(data.data.map(d => d.dia))].sort((a, b) => a - b);
       chartHormonal.data.labels = diasUnicos;
   
       // Pega todos os hormônios
-      const nomesHormônios = [...new Set(dados.map(d => d.hormonio))];
+      const nomesHormônios = [...new Set(data.data.map(d => d.hormonio))];
   
       chartHormonal.data.datasets = nomesHormônios.map((hormonio, index) => {
         const cor = coresHormônios[index % coresHormônios.length];
         const dadosHormônio = diasUnicos.map(dia => {
-          const registro = dados.find(d => d.dia === dia && d.hormonio === hormonio);
+          const registro = data.data.find(d => d.dia === dia && d.hormonio === hormonio);
           return registro ? registro.valor : null;
         });
   

@@ -1,3 +1,5 @@
+import { API_URL } from './config.js';
+
 document.addEventListener("DOMContentLoaded", function () {
   const ctx = document.getElementById("chartPressao").getContext("2d");
   const noDataLabel = document.getElementById("no-data-msg-pressao");
@@ -18,6 +20,102 @@ const toggleButton = document.querySelector(".menu-toggle");
   let currentMonthIndex = today.getMonth();
   const currentYear = today.getFullYear();
 
+  function mostrarErro(mensagem) {
+    const aviso = document.createElement('div');
+    aviso.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ffffff;
+      color: #002A42;
+      padding: 16px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 42, 66, 0.1);
+      z-index: 1000;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      border: 1px solid #e1e5eb;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      max-width: 400px;
+      animation: slideIn 0.3s ease-out;
+    `;
+
+    const icon = document.createElement('div');
+    icon.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00c3b7;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    `;
+
+    const textContainer = document.createElement('div');
+    textContainer.style.cssText = `
+      flex: 1;
+      line-height: 1.4;
+    `;
+    textContainer.textContent = mensagem;
+
+    const closeButton = document.createElement('button');
+    closeButton.style.cssText = `
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    `;
+    closeButton.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    `;
+    closeButton.onclick = () => {
+      aviso.style.animation = 'slideOut 0.3s ease-out';
+      setTimeout(() => {
+        document.body.removeChild(aviso);
+        document.head.removeChild(style);
+      }, 300);
+    };
+
+    aviso.appendChild(icon);
+    aviso.appendChild(textContainer);
+    aviso.appendChild(closeButton);
+    document.body.appendChild(aviso);
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    setTimeout(() => {
+      if (document.body.contains(aviso)) {
+        aviso.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+          if (document.body.contains(aviso)) {
+            document.body.removeChild(aviso);
+            document.head.removeChild(style);
+          }
+        }, 300);
+      }
+    }, 5000);
+  }
+
   async function carregarDadosMedico() {
     try {
       const token = localStorage.getItem('token');
@@ -25,7 +123,7 @@ const toggleButton = document.querySelector(".menu-toggle");
         throw new Error('Token não encontrado. Por favor, faça login novamente.');
       }
 
-      const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
+      const res = await fetch(`${API_URL}/api/usuarios/perfil`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -55,7 +153,6 @@ const toggleButton = document.querySelector(".menu-toggle");
       return false;
     }
   }
-
 
   // 👉 Função de classificação da pressão arterial
   function classificarPressao(sistolica, diastolica) {
@@ -144,101 +241,59 @@ const toggleButton = document.querySelector(".menu-toggle");
   // 👉 Buscar dados da API
   async function fetchPressaoData(month, year) {
     try {
-      const tokenMedico = localStorage.getItem("token");
-      const tokenPaciente = localStorage.getItem("tokenPaciente");
+      const tokenMedico = localStorage.getItem('token');
+      const tokenPaciente = localStorage.getItem('tokenPaciente');
 
       if (!tokenMedico || !tokenPaciente) {
-        console.error("Token não encontrado.");
-        return [];
+        mostrarErro("Sessão expirada. Faça login novamente!");
+        return null;
       }
 
-     const decodedPayload = JSON.parse(atob(tokenPaciente));
-    const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, "");
+      const decodedPayload = JSON.parse(atob(tokenPaciente));
+      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
 
-      if (!cpf) return [];
+      if (!cpf) {
+        mostrarErro("CPF não encontrado no token do paciente.");
+        return null;
+      }
 
-      const response = await fetch(`http://127.0.0.1:65432/api/pressaoArterial/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
-        method: "GET",
+      const response = await fetch(`${API_URL}/api/pressaoArterial/medico?cpf=${cpf}&month=${month}&year=${year}`, {
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${tokenMedico}`,
           "Content-Type": "application/json"
         }
       });
 
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message);
+      if (!response.ok) {
+        mostrarErro("Erro ao buscar dados de pressão arterial!");
+        return null;
+      }
 
-      return result.data || [];
+      return await response.json();
     } catch (error) {
-      console.error("Erro ao buscar dados de pressão arterial:", error);
-      return [];
+      console.error('Erro ao buscar dados de pressão arterial:', error);
+      mostrarErro("Erro interno ao buscar dados de pressão arterial.");
+      return null;
     }
   }
 
   // 👉 Carregar e exibir no gráfico
   async function loadChartData() {
-    const dados = await fetchPressaoData(currentMonthIndex, currentYear);
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
 
-    if (!dados || dados.length === 0) {
-      chartPressao.data.labels = [];
-      chartPressao.data.datasets[0].data = [];
+    const data = await fetchPressaoData(currentMonth, currentYear);
+    if (!data) return;
 
-      chartPressao.options.scales.x = {
-        display: false,
-        grid: { display: false }
-      };
-
-      noDataLabel.style.display = "block";
-      chartPressao.update();
-      return;
-    }
-
-    noDataLabel.style.display = "none";
-
-    const dataset = dados.map(r => ({
-      x: r.dia,
-      y: r.sistolica,
-      label: `${r.sistolica}/${r.diastolica}`
-    }));
-
-    chartPressao.data.labels = dados.map(r => r.dia);
-    const finalData = dataset;
-const currentData = finalData.map(d => ({ x: d.x, y: 0, label: d.label }));
-
-chartPressao.data.datasets[0].data = currentData;
-chartPressao.update();
-
-let progress = 0;
-const duration = 600; // milissegundos
-const startTime = performance.now();
-
-function animate() {
-  const now = performance.now();
-  progress = Math.min((now - startTime) / duration, 1);
-
-  chartPressao.data.datasets[0].data = finalData.map((d, i) => ({
-    x: d.x,
-    y: d.y * progress,
-    label: d.label
-  }));
-
-  chartPressao.update();
-
-  if (progress < 1) {
-    requestAnimationFrame(animate);
+    // Atualizar o gráfico com os dados
+    updateChart(data);
   }
-}
 
-requestAnimationFrame(animate);
-
-
-    chartPressao.options.scales.x = {
-      type: 'linear',
-      title: { display: true, text: 'Dia do Mês' },
-      ticks: { precision: 0 }
-    };
-
-    chartPressao.update();
+  function updateChart(data) {
+    // Implementar a lógica de atualização do gráfico aqui
+    console.log('Dados recebidos:', data);
   }
 
   function updateMonth(change) {
