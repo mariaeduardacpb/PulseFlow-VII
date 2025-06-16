@@ -61,7 +61,8 @@ app.use('/uploads', express.static(uploadsPath));
 connectDB();
 
 // Arquivos estáticos
-app.use('/client', express.static(path.join(_dirname, '..', 'client')));
+app.use(express.static(path.join(_dirname, 'client')));
+app.use('/client', express.static(path.join(_dirname, 'client')));
 
 // Rota para a raiz
 app.get('/', (req, res) => {
