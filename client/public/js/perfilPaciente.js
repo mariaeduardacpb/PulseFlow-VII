@@ -399,13 +399,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const observacoes = registro.observacoes || 'Sem observações';
 
       card.innerHTML = `
-        <div class="record-header">
+        <div class="shortcut-icon">
+          <i class="fas fa-sticky-note"></i>
+        </div>
+        <div class="shortcut-info">
           <h3>${dataFormatada}</h3>
           <span class="type ${tipoLowerCase}">${tipo}</span>
-        </div>
-        <div class="record-body">
-          <p><strong>Descrição:</strong> ${descricao}</p>
-          <p><strong>Observações:</strong> ${observacoes}</p>
+          <p>${descricao}</p>
+          <p class="observacoes">${observacoes}</p>
         </div>
       `;
       recordList.appendChild(card);
