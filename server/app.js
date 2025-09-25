@@ -60,18 +60,19 @@ app.use('/uploads', express.static(uploadsPath));
 // Conexão com o MongoDB
 connectDB();
 
-// Arquivos estáticos
-app.use(express.static(path.join(process.cwd(), 'client')));
-app.use('/client', express.static(path.join(process.cwd(), 'client')));
+// Arquivos estáticos - corrigir caminho para o diretório client no nível raiz
+const clientPath = path.join(process.cwd(), '..', 'client');
+app.use(express.static(clientPath));
+app.use('/client', express.static(clientPath));
 
 // Rota para a raiz
 app.get('/', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'client', 'views', 'index.html'));
+  res.sendFile(path.join(clientPath, 'views', 'index.html'));
 });
 
 // Rota para o perfil do paciente
 app.get('/client/views/perfilPaciente.html', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'client', 'views', 'perfilPaciente.html'));
+  res.sendFile(path.join(clientPath, 'views', 'perfilPaciente.html'));
 });
 
 // Rotas da aplicação
