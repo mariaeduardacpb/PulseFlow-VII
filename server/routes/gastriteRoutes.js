@@ -1,15 +1,16 @@
 import express from 'express';
-import { getCrises, getCrise, createCrise, updateCrise, deleteCrise } from '../controllers/criseGastriteController.js';
-import { auth } from '../middleware/authMiddleware.js';
+import { getCrises, getCrise, createCrise, updateCrise, deleteCrise, buscarCrisesMedico } from '../controllers/criseGastriteController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { CriseGastrite } from '../models/criseGastriteModel.js';
 import Paciente from '../models/Paciente.js';
 
 const router = express.Router();
 
 // Aplica o middleware de autenticação em todas as rotas
-router.use(auth);
+router.use(authMiddleware);
 
 // Rotas para crises de gastrite
+router.get('/medico', buscarCrisesMedico);
 router.get('/crises/:cpf', getCrises);
 router.get('/crises/detalhes/:id', getCrise);
 router.post('/crises', createCrise);
@@ -21,8 +22,20 @@ router.get('/crises/:cpf/:id', async (req, res) => {
     try {
         const { cpf, id } = req.params;
 
-        // Primeiro, encontrar o paciente pelo CPF
-        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        // Tentar buscar com CPF limpo primeiro
+        let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+        
+        // Se não encontrar, tentar com CPF formatado
+        if (!paciente) {
+            const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            paciente = await Paciente.findOne({ cpf: cpfFormatado });
+        }
+        
+        // Se ainda não encontrar, tentar com o CPF original
+        if (!paciente) {
+            paciente = await Paciente.findOne({ cpf: cpf });
+        }
+
         if (!paciente) {
             return res.status(404).json({ message: 'Paciente não encontrado' });
         }
@@ -39,7 +52,6 @@ router.get('/crises/:cpf/:id', async (req, res) => {
 
         res.json(crise);
     } catch (error) {
-        console.error('Erro ao buscar detalhes da crise:', error);
         res.status(500).json({ message: 'Erro ao buscar detalhes da crise' });
     }
 });

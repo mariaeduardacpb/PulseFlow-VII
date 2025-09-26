@@ -151,18 +151,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadEventos() {
     try {
-      const response = await fetch(`${API_URL}/api/eventos-clinicos?cpf=${cpf}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        recordList.innerHTML = '<p style="color: red;">Token não encontrado. Faça login novamente.</p>';
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/eventos-clinicos/medico?cpf=${cpf}`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
-      if (!response.ok) throw new Error('Erro ao buscar eventos clínicos');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao buscar eventos clínicos');
+      }
 
       allEventos = await response.json();
       renderEventos(allEventos);
 
     } catch (error) {
-      console.error(error);
-      recordList.innerHTML = '<p style="color: red;">Erro ao carregar eventos clínicos.</p>';
+      recordList.innerHTML = `<p style="color: red;">Erro ao carregar eventos clínicos: ${error.message}</p>`;
     }
   }
 

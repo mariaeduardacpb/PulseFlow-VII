@@ -25,6 +25,10 @@ router.get('/perfil', authMiddleware, async (req, res) => {
       cep: user.cep,
       enderecoConsultorio: user.enderecoConsultorio,
       numeroConsultorio: user.numeroConsultorio,
+      complemento: user.complemento,
+      bairro: user.bairro,
+      cidade: user.cidade,
+      estado: user.estado,
       foto: user.foto
     });
   } catch (error) {

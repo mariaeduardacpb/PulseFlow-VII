@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
         mask: '00000-000'
     });
 
+    const cpfMask = IMask(document.getElementById('cpf'), {
+        mask: '000.000.000-00'
+    });
+
     // Event listeners
     document.getElementById('profileForm').addEventListener('submit', salvarAlteracoes);
     document.getElementById('editBtn').addEventListener('click', habilitarEdicao);
@@ -82,7 +86,7 @@ async function refreshToken() {
 
 async function carregarDadosMedico() {
     try {
-        const response = await fetch('/api/usuarios/perfil/', {
+        const response = await fetch('http://localhost:65432/api/usuarios/perfil', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -105,6 +109,7 @@ async function carregarDadosMedico() {
 
         // Preencher campos do formulário
         document.getElementById('nome').value = medico.nome || '';
+        document.getElementById('cpf').value = medico.cpf || '';
         document.getElementById('email').value = medico.email || '';
         document.getElementById('genero').value = medico.genero || '';
         document.getElementById('crm').value = medico.crm || '';
@@ -114,6 +119,10 @@ async function carregarDadosMedico() {
         document.getElementById('cep').value = medico.cep || '';
         document.getElementById('endereco').value = medico.enderecoConsultorio || '';
         document.getElementById('numero').value = medico.numeroConsultorio || '';
+        document.getElementById('complemento').value = medico.complemento || '';
+        document.getElementById('bairro').value = medico.bairro || '';
+        document.getElementById('cidade').value = medico.cidade || '';
+        document.getElementById('estado').value = medico.estado || '';
 
         // Aplicar máscaras nos campos
         IMask(document.getElementById('telefone'), {
@@ -126,6 +135,10 @@ async function carregarDadosMedico() {
         
         IMask(document.getElementById('cep'), {
             mask: '00000-000'
+        });
+
+        IMask(document.getElementById('cpf'), {
+            mask: '000.000.000-00'
         });
 
         // Carregar foto do perfil
@@ -474,7 +487,7 @@ async function salvarAlteracoes(event) {
         formData.append('rqe', JSON.stringify(rqeValues));
 
         // Fazer a requisição
-        const response = await fetch('/api/usuarios/perfil/', {
+        const response = await fetch('http://localhost:65432/api/usuarios/perfil', {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`

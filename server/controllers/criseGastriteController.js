@@ -6,12 +6,20 @@ import mongoose from 'mongoose';
 export const getCrises = async (req, res) => {
     try {
         const { cpf } = req.params;
-        console.log('Backend: Buscando crises para CPF:', cpf);
-        console.log('Backend: Query parameters recebidos:', req.query);
 
-        // Busca o paciente pelo CPF
-        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
-        console.log('Paciente encontrado:', paciente ? 'Sim' : 'Não');
+        // Tentar buscar com CPF limpo primeiro
+        let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+        
+        // Se não encontrar, tentar com CPF formatado
+        if (!paciente) {
+            const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            paciente = await Paciente.findOne({ cpf: cpfFormatado });
+        }
+        
+        // Se ainda não encontrar, tentar com o CPF original
+        if (!paciente) {
+            paciente = await Paciente.findOne({ cpf: cpf });
+        }
 
         if (!paciente) {
             return res.status(404).json({ message: 'Paciente não encontrado' });
@@ -52,14 +60,10 @@ export const getCrises = async (req, res) => {
 
         pipeline.push({ $sort: { data: -1 } }); // Sort by data
 
-        console.log('Backend: Pipeline de agregação final:', JSON.stringify(pipeline, null, 2));
-
         const crises = await CriseGastrite.aggregate(pipeline);
-        console.log('Backend: Crises encontradas (' + crises.length + '):', crises.map(c => ({ id: c._id, data: c.data, intensidadeDor: c.intensidadeDor })));
 
         res.json(crises);
     } catch (error) {
-        console.error('Erro ao buscar crises:', error);
         res.status(500).json({ message: 'Erro ao buscar crises' });
     }
 };
@@ -76,7 +80,6 @@ export const getCrise = async (req, res) => {
 
         res.json(crise);
     } catch (error) {
-        console.error('Erro ao buscar crise:', error);
         res.status(500).json({ message: 'Erro ao buscar crise' });
     }
 };
@@ -86,8 +89,20 @@ export const createCrise = async (req, res) => {
     try {
         const { cpfPaciente, data, intensidadeDor, sintomas, alimentosIngeridos, medicacao, alivioMedicacao, observacoes } = req.body;
 
-        // Buscar o paciente pelo CPF
-        const paciente = await Paciente.findOne({ cpf: cpfPaciente.replace(/[^\d]/g, '') });
+        // Tentar buscar com CPF limpo primeiro
+        let paciente = await Paciente.findOne({ cpf: cpfPaciente?.replace(/[^\d]/g, '') });
+        
+        // Se não encontrar, tentar com CPF formatado
+        if (!paciente) {
+            const cpfFormatado = cpfPaciente?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            paciente = await Paciente.findOne({ cpf: cpfFormatado });
+        }
+        
+        // Se ainda não encontrar, tentar com o CPF original
+        if (!paciente) {
+            paciente = await Paciente.findOne({ cpf: cpfPaciente });
+        }
+
         if (!paciente) {
             return res.status(404).json({ message: 'Paciente não encontrado' });
         }
@@ -106,7 +121,6 @@ export const createCrise = async (req, res) => {
         await crise.save();
         res.status(201).json(crise);
     } catch (error) {
-        console.error('Erro ao criar crise:', error);
         res.status(400).json({ message: error.message });
     }
 };
@@ -129,7 +143,6 @@ export const updateCrise = async (req, res) => {
 
         res.json(crise);
     } catch (error) {
-        console.error('Erro ao atualizar crise:', error);
         res.status(500).json({ message: 'Erro ao atualizar crise' });
     }
 };
@@ -146,7 +159,6 @@ export const deleteCrise = async (req, res) => {
 
         res.json({ message: 'Crise deletada com sucesso' });
     } catch (error) {
-        console.error('Erro ao deletar crise:', error);
         res.status(500).json({ message: 'Erro ao deletar crise' });
     }
 };
@@ -156,8 +168,20 @@ export const getCriseDetails = async (req, res) => {
     try {
         const { cpf, id } = req.params;
 
-        // Buscar o paciente pelo CPF
-        const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        // Tentar buscar com CPF limpo primeiro
+        let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+        
+        // Se não encontrar, tentar com CPF formatado
+        if (!paciente) {
+            const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            paciente = await Paciente.findOne({ cpf: cpfFormatado });
+        }
+        
+        // Se ainda não encontrar, tentar com o CPF original
+        if (!paciente) {
+            paciente = await Paciente.findOne({ cpf: cpf });
+        }
+
         if (!paciente) {
             return res.status(404).json({ message: 'Paciente não encontrado' });
         }
@@ -173,7 +197,39 @@ export const getCriseDetails = async (req, res) => {
 
         res.json(crise);
     } catch (error) {
-        console.error('Erro ao buscar detalhes da crise:', error);
         res.status(500).json({ message: 'Erro ao buscar detalhes da crise' });
+    }
+};
+
+// Médico busca crises de um paciente pelo CPF
+export const buscarCrisesMedico = async (req, res) => {
+    try {
+        const { cpf } = req.query;
+
+        // Tentar buscar com CPF limpo primeiro
+        let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+        
+        // Se não encontrar, tentar com CPF formatado
+        if (!paciente) {
+            const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            paciente = await Paciente.findOne({ cpf: cpfFormatado });
+        }
+        
+        // Se ainda não encontrar, tentar com o CPF original
+        if (!paciente) {
+            paciente = await Paciente.findOne({ cpf: cpf });
+        }
+
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente não encontrado' });
+        }
+
+        const crises = await CriseGastrite.find({ paciente: paciente._id })
+            .populate('paciente', 'name nome cpf email')
+            .sort({ data: -1 });
+
+        res.json(crises);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro interno do servidor' });
     }
 };

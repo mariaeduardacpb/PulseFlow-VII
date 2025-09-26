@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
       if (!paciente || !paciente.cpf) throw new Error('Paciente não selecionado');
 
-      let url = `${API_URL}/api/gastrite/crises/${paciente.cpf}`;
+      let url = `${API_URL}/api/gastrite/medico?cpf=${paciente.cpf}`;
       const queryParams = new URLSearchParams();
 
       if (filters.month) {
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       if (queryParams.toString()) {
-        url += `?${queryParams.toString()}`;
+        url += `&${queryParams.toString()}`;
       }
 
       const response = await fetch(url, {

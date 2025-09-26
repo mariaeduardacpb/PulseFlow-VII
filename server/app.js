@@ -9,7 +9,8 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js'; // ✅ NOVO IMPORT
 import connectDB from './config/db.js';
 import enxaquecaRoutes from './routes/enxaquecaRoutes.js';
-import pacienteRoutes from './routes/pacienteAuthRoutes.js';
+import pacienteAuthRoutes from './routes/pacienteAuthRoutes.js';
+import pacienteRoutes from './routes/pacienteRoutes.js';
 import insoniaRoutes from './routes/insoniaRoutes.js';
 import anexoExameRoutes from './routes/anexoExameRoutes.js';
 import hormonalRoutes from './routes/hormonalRoutes.js'; 
@@ -33,7 +34,8 @@ const _dirname = path.dirname(__filename);
 // Configuração do CORS
 const corsOptions = {
   origin: [
-    'http://127.0.0.1:65432',
+    'http://localhost:3000',  // Frontend
+    'http://127.0.0.1:3000',  // Frontend alternativo
     'http://127.0.0.1:65432',
     'http://localhost:5500',
     'http://127.0.0.1:5501',
@@ -78,9 +80,9 @@ app.get('/client/views/perfilPaciente.html', (req, res) => {
 // Rotas da aplicação
 app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', userRoutes); // ✅ NOVA ROTA ATIVADA
-app.use('/api/usuarios/perfil', perfilMedicoRoutes);
 app.use('/api/enxaqueca', enxaquecaRoutes);
-app.use('/api/paciente', pacienteRoutes);
+app.use('/api/paciente-auth', pacienteAuthRoutes);
+app.use('/api/pacientes', pacienteRoutes);
 app.use('/api/insonia', insoniaRoutes);
 app.use('/api/pressaoArterial', pressaoArterialRoutes);
 app.use('/api/anexoExame', anexoExameRoutes);

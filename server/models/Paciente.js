@@ -1,20 +1,45 @@
 import mongoose from 'mongoose';
 
 const pacienteSchema = new mongoose.Schema({
-  nome: { type: String, required: true },
-  fotoPerfil: { type: String, default: '/client/public/assets/User_logonegativo.png' },
-  cpf: { type: String, unique: true, required: true },
-  altura: { type: String, required: true },
-  dataNascimento: { type: String, required: true },
-  genero: { type: String, required: true },
-  nacionalidade: { type: String, required: true },
-  peso: { type: String, required: true },
-  profissao: { type: String, required: true },
-  telefone: { type: String, required: true },
+  // Campos do app mobile
+  name: { type: String, required: true },
   email: { type: String, unique: true, required: true },
-  senha: { type: String, required: true },
+  password: { type: String, required: true },
+  cpf: { type: String, unique: true, required: true },
+  rg: { type: String },
+  phone: { type: String, required: true },
+  secondaryPhone: { type: String },
+  birthDate: { type: String, required: true },
+  gender: { type: String, required: true },
+  maritalStatus: { type: String },
+  nationality: { type: String, required: true },
+  address: { type: String },
+  acceptedTerms: { type: Boolean, default: false },
+  profilePhoto: { type: String, default: '/client/public/assets/User_logonegativo.png' },
+  emergencyContact: { type: String },
+  emergencyPhone: { type: String },
+  isAdmin: { type: Boolean, default: false },
+  twoFactorCode: { type: String },
+  twoFactorExpires: { type: Date },
+  passwordResetCode: { type: String },
+  passwordResetExpires: { type: Date },
+  passwordResetRequired: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+  
+  // Campos legacy para compatibilidade
+  nome: { type: String },
+  fotoPerfil: { type: String },
+  altura: { type: String },
+  dataNascimento: { type: String },
+  genero: { type: String },
+  nacionalidade: { type: String },
+  peso: { type: String },
+  profissao: { type: String },
+  telefone: { type: String },
+  senha: { type: String },
   observacoes: { type: String, default: 'Nenhuma observação registrada' }
 });
 
-const Paciente = mongoose.model('Paciente', pacienteSchema, 'pacientes');
+const Paciente = mongoose.model('Paciente', pacienteSchema, 'patients');
 export default Paciente;

@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         throw new Error('Token do médico não encontrado. Por favor, faça login novamente.');
       }
 
-      const response = await fetch(`${API_URL}/api/pacientes/${cpf}`, {
+      const response = await fetch(`${API_URL}/api/pacientes/perfil/${cpf}`, {
         headers: {
           'Authorization': `Bearer ${tokenMedico}`,
           'Content-Type': 'application/json'
