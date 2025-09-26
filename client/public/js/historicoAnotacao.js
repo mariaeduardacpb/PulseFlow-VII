@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   filterDoctor.addEventListener('input', filtrarAnotacoes);
 
   try {
-    const response = await fetch(`${API_URL}/api/anotacoes/${cpf}`, {
+    const response = await fetch(`${API_URL}/api/anotacoes/medico?cpf=${cpf}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

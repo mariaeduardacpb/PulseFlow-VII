@@ -28,11 +28,13 @@ btnAcesso.addEventListener('click', async () => {
   }
 
   try {
-    const token = localStorage.getItem('token');
+    console.log('Buscando paciente com CPF:', cpfLimpo);
+    console.log('URL:', `${API_URL}/api/pacientes/buscar?cpf=${cpfLimpo}`);
 
     const res = await fetch(`${API_URL}/api/pacientes/buscar?cpf=${cpfLimpo}`, {
+      method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       }
     });
 

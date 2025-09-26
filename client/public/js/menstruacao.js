@@ -45,16 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   recordsContainer.innerHTML = '<p>Carregando registros...</p>';
 
   try {
-    const debugRes = await fetch(`${API_URL}/api/ciclo/debug/${cpf}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    if (debugRes.ok) {
-      const debugData = await debugRes.json();
-      console.log("[DEBUG] Ciclos:", debugData);
-    }
-
-    const resCiclos = await fetch(`${API_URL}/api/ciclo/${cpf}`, {
+    const resCiclos = await fetch(`${API_URL}/api/ciclo/medico?cpf=${cpf}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 

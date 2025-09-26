@@ -4,7 +4,8 @@ import {
   buscarAnotacoesPorPaciente,
   buscarCategorias,
   buscarAnotacaoPorId,
-  deleteAnotacao
+  deleteAnotacao,
+  buscarAnotacoesMedico
 } from '../controllers/anotacaoController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -12,6 +13,9 @@ const router = express.Router();
 
 // 🔁 ESSA ROTA DEVE VIR PRIMEIRO
 router.get('/detalhe/:id', authMiddleware, buscarAnotacaoPorId);
+
+// ✅ Rota específica para médico buscar por CPF
+router.get('/medico', authMiddleware, buscarAnotacoesMedico);
 
 // ✅ DEPOIS as outras
 router.get('/:cpf', authMiddleware, buscarAnotacoesPorPaciente);
