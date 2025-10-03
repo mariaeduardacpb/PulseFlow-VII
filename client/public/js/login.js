@@ -184,6 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSubmitButton(true);
 
     try {
+      console.log("Tentando conectar com:", `${API_URL}/api/auth/login`);
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
@@ -192,12 +193,15 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         body: JSON.stringify({ email, senha }),
       });
+      
+      console.log("Resposta recebida:", response.status, response.statusText);
 
       const result = await response.json();
 
       if (response.ok) {
         showMessage("Código de verificação enviado! Redirecionando...", "sucesso");
         localStorage.setItem("userId", result.userId);
+        localStorage.setItem("email", email);
         setTimeout(() => {
           window.location.href = "/client/views/verify-2fa.html";
         }, 1500);

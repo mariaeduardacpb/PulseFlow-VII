@@ -26,10 +26,6 @@
 
         <div class="welcome-text">
           <h2>Transformando a Gestão da Saúde</h2>
-          <p>
-            Plataforma integrada para monitoramento e gerenciamento de informações de saúde, 
-            proporcionando um acompanhamento contínuo e eficiente dos pacientes.
-          </p>
         </div>
 
         <div class="features-grid" aria-label="Destaques do sistema">
@@ -38,35 +34,26 @@
               <i class="fas fa-chart-line"></i>
             </div>
             <div class="feature-content">
-              <h3>Monitoramento Avançado</h3>
-              <p>Acompanhamento contínuo de indicadores vitais e histórico médico.</p>
+              <h3>Monitoramento Contínuo</h3>
+              <p>Acompanhe indicadores vitais em tempo real</p>
             </div>
           </div>
           <div class="feature-item">
             <div class="feature-icon" aria-hidden="true">
-              <i class="fas fa-shield-alt"></i>
+              <i class="fas fa-file-medical"></i>
             </div>
             <div class="feature-content">
-              <h3>Segurança Garantida</h3>
-              <p>Proteção e privacidade dos dados em conformidade com a LGPD.</p>
+              <h3>Prontuário Digital</h3>
+              <p>Histórico médico organizado</p>
             </div>
           </div>
           <div class="feature-item">
             <div class="feature-icon" aria-hidden="true">
-              <i class="fas fa-user-md"></i>
+              <i class="fas fa-clock"></i>
             </div>
             <div class="feature-content">
-              <h3>Gestão Integrada</h3>
-              <p>Controle eficiente de prontuários, consultas e procedimentos.</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon" aria-hidden="true">
-              <i class="fas fa-brain"></i>
-            </div>
-            <div class="feature-content">
-              <h3>Análise Inteligente</h3>
-              <p>Relatórios e insights automáticos para apoiar decisões clínicas e administrativas.</p>
+              <h3>SmartWatch</h3>
+              <p>Monitoramento contínuo com dispositivos vestíveis</p>
             </div>
           </div>
         </div>
@@ -86,10 +73,10 @@
 
     <!-- Lado Direito -->
     <section class="right">
-      <div class="form-container">
+      <div class="form-content">
         <div class="form-header">
           <h2>Bem-vindo de volta</h2>
-          <p>Entre com suas credenciais para acessar a plataforma</p>
+          <p>Entre com suas credenciais para acessar sua conta</p>
         </div>
 
         <form id="loginForm" novalidate>
@@ -137,13 +124,12 @@
 
           <button type="submit" class="submit-btn">
             <i class="fas fa-sign-in-alt"></i>
-            <span>Acessar Sistema</span>
+            <span>Entrar na Plataforma</span>
           </button>
 
           <div class="form-actions">
             <button type="button" class="register-btn" onclick="window.location.href='/client/views/register.html'">
-              <i class="fas fa-user-plus"></i>
-              <span>Criar Conta</span>
+              <span>+ Criar Nova Conta</span>
             </button>
           </div>
         </form>
@@ -153,13 +139,9 @@
             <i class="fas fa-key" aria-hidden="true"></i>
             <span>Esqueceu sua senha?</span>
           </a>
-          <!-- <div class="help-text">
-            <i class="fas fa-info-circle" aria-hidden="true"></i>
-            <span>Suporte técnico disponível 24/7</span>
-          </div> -->
           <div class="compliance-text">
             <i class="fas fa-shield-alt" aria-hidden="true"></i>
-            <span>Sistema em conformidade com a LGPD</span>
+            <span>100% Seguro e Conforme LGPD</span>
           </div>
         </footer>
       </div>
@@ -167,6 +149,6 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script type="module" src="/client/public/js/login.js"></script>
+  <script type="module" src="../public/js/login.js"></script>
 </body>
 </html>
