@@ -19,9 +19,15 @@
 
     <p class="subtitulo">VEJA A SAÚDE DO SEU PACIENTE AQUI!</p>
 
-    <input type="text" placeholder="CPF DO PACIENTE" class="input-cpf" />
+    <div class="form-group">
+      <input type="text" placeholder="CPF DO PACIENTE" class="input-cpf" />
+    </div>
 
-    <button class="btn-acesso">Solicitar Acesso</button>
+    <div class="form-group" id="codigo-group" style="display: none;">
+      <input type="text" placeholder="CÓDIGO DE ACESSO (6 dígitos)" class="input-codigo" maxlength="6" />
+    </div>
+
+    <button class="btn-acesso" id="btn-acesso">Solicitar Acesso</button>
 
     <div id="mensagem-erro" class="erro-cpf"></div>
   </main>
