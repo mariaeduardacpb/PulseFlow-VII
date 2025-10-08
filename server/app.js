@@ -22,6 +22,7 @@ import cicloRoutes from './routes/cicloRoutes.js';
 import menstruacaoRoutes from './routes/menstruacaoRoutes.js';
 import eventoClinicoRoutes from './routes/eventoClinicoRoutes.js';
 import perfilMedicoRoutes from './routes/perfilMedicoRoutes.js';
+import accessCodeRoutes from './routes/accessCodeRoutes.js';
 
 
 
@@ -56,7 +57,6 @@ app.use(express.json());
 
 // Servir arquivos estáticos
 const uploadsPath = path.join(process.cwd(), 'public', 'uploads');
-console.log('Diretório de uploads:', uploadsPath);
 app.use('/uploads', express.static(uploadsPath));
 
 // Conexão com o MongoDB
@@ -93,6 +93,7 @@ app.use('/api/ciclo', cicloRoutes);
 app.use('/api/gastrite', criseGastriteRoutes);
 app.use('/api/menstruacao', menstruacaoRoutes);
 app.use('/api/eventos-clinicos', eventoClinicoRoutes);
+app.use('/api/access-code', accessCodeRoutes);
 
 
 // Middleware de erro

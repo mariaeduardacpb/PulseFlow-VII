@@ -24,6 +24,8 @@ const pacienteSchema = new mongoose.Schema({
   passwordResetCode: { type: String },
   passwordResetExpires: { type: Date },
   passwordResetRequired: { type: Boolean, default: false },
+  accessCode: { type: String },
+  accessCodeExpires: { type: Date },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   

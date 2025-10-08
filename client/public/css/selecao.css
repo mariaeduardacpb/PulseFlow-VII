@@ -53,22 +53,35 @@ header {
   padding: 0 15px;
 }
 
-.input-cpf {
+.form-group {
   width: 100%;
   max-width: 320px;
+  margin-bottom: 20px;
+}
+
+.input-cpf,
+.input-codigo {
+  width: 100%;
   padding: 14px;
   font-size: 16px;
   border: none;
   border-radius: 8px;
-  margin-bottom: 10px;
   text-align: center;
   color: #333;
   transition: transform 0.3s ease;
+  box-sizing: border-box;
 }
 
-.input-cpf:focus {
+.input-cpf:focus,
+.input-codigo:focus {
   outline: none;
   transform: scale(1.02);
+}
+
+.input-codigo {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  letter-spacing: 2px;
 }
 
 .btn-acesso {
@@ -191,4 +204,9 @@ header {
     font-size: 13px;
     padding: 8px 12px;
   }
+}
+
+/* Estilo para mensagem de sucesso */
+.erro-cpf.ativo[style*="color: #4CAF50"] {
+  color: #4CAF50 !important;
 }
