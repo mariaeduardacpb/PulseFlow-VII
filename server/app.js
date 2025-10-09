@@ -34,18 +34,31 @@ const _dirname = path.dirname(__filename);
 
 // Configuração do CORS
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',  // Frontend
-    'http://127.0.0.1:3000',  // Frontend alternativo
-    'http://127.0.0.1:65432',
-    'http://localhost:5500',
-    'http://127.0.0.1:5501',
-    'http://localhost:5501',
-    'http://localhost:5900',
-    'http://127.0.0.1:5900',
-    'https://pulseflow-vii.onrender.com',
-    'http://pulseflow-vii.onrender.com'
-  ],
+  origin: function (origin, callback) {
+    // Permitir requisições sem origem (apps mobile, Postman, etc)
+    if (!origin) return callback(null, true);
+    
+    // Lista de origens permitidas
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:65432',
+      'http://localhost:5500',
+      'http://127.0.0.1:5501',
+      'http://localhost:5501',
+      'http://localhost:5900',
+      'http://127.0.0.1:5900',
+      'https://pulseflow-vii.onrender.com',
+      'http://pulseflow-vii.onrender.com'
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      // Para desenvolvimento, permitir todas as origens
+      callback(null, true);
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true

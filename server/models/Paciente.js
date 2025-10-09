@@ -14,10 +14,14 @@ const pacienteSchema = new mongoose.Schema({
   maritalStatus: { type: String },
   nationality: { type: String, required: true },
   address: { type: String },
+  height: { type: Number }, // Altura em cm
+  weight: { type: Number }, // Peso em kg
+  profession: { type: String }, // Profissão
   acceptedTerms: { type: Boolean, default: false },
   profilePhoto: { type: String, default: '/client/public/assets/User_logonegativo.png' },
   emergencyContact: { type: String },
   emergencyPhone: { type: String },
+  fcmToken: { type: String }, // Token para notificações push
   isAdmin: { type: Boolean, default: false },
   twoFactorCode: { type: String },
   twoFactorExpires: { type: Date },
