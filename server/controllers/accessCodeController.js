@@ -1,4 +1,5 @@
 import Paciente from '../models/Paciente.js';
+import SolicitacaoAcesso from '../models/SolicitacaoAcesso.js';
 
 // Gerar código de acesso para o paciente
 export const gerarCodigoAcesso = async (req, res) => {
@@ -78,15 +79,18 @@ export const gerarCodigoAcesso = async (req, res) => {
 
 // Verificar se código de acesso é válido
 export const verificarCodigoAcesso = async (req, res) => {
-  const { codigoAcesso, patientId } = req.body;
+  const { codigoAcesso, accessCode, patientId } = req.body;
 
-  if (!codigoAcesso) {
+  // Aceitar tanto codigoAcesso (web) quanto accessCode (app)
+  const codigo = codigoAcesso || accessCode;
+
+  if (!codigo) {
     return res.status(400).json({ message: 'Código de acesso é obrigatório' });
   }
 
   try {
     // Validar se código tem 6 dígitos
-    if (codigoAcesso.length !== 6) {
+    if (codigo.length !== 6) {
       return res.status(400).json({ message: 'Código de acesso deve ter 6 dígitos' });
     }
 
@@ -100,12 +104,12 @@ export const verificarCodigoAcesso = async (req, res) => {
       }
       
       // Verificar se o código do paciente corresponde
-      if (paciente.accessCode !== codigoAcesso) {
+      if (paciente.accessCode !== codigo) {
         return res.status(401).json({ message: 'Código de acesso inválido' });
       }
     } else {
       // Buscar paciente pelo código de acesso
-      paciente = await Paciente.findOne({ accessCode: codigoAcesso });
+      paciente = await Paciente.findOne({ accessCode: codigo });
       if (!paciente) {
         return res.status(404).json({ message: 'Código de acesso não encontrado' });
       }
@@ -126,6 +130,126 @@ export const verificarCodigoAcesso = async (req, res) => {
       }
     });
   } catch (error) {
+    res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+  }
+};
+
+// Notificar paciente quando médico solicita acesso
+export const notificarSolicitacaoAcesso = async (req, res) => {
+  const { cpf, medicoNome, especialidade } = req.body;
+
+  if (!cpf) {
+    return res.status(400).json({ message: 'CPF é obrigatório' });
+  }
+
+  try {
+    // Limpar CPF
+    const cpfLimpo = cpf.replace(/\D/g, '');
+    
+    // Buscar paciente
+    let paciente = await Paciente.findOne({ cpf: cpfLimpo });
+    
+    if (!paciente) {
+      const cpfFormatado = cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+
+    if (!paciente) {
+      return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
+
+    // Criar registro de solicitação de acesso
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10); // Expira em 10 minutos
+
+    const solicitacao = new SolicitacaoAcesso({
+      pacienteId: paciente._id.toString(),
+      pacienteCpf: paciente.cpf,
+      medicoNome: medicoNome || 'Não informado',
+      medicoEspecialidade: especialidade || 'Não informada',
+      dataHora: new Date(),
+      visualizada: false,
+      expiresAt: expiresAt
+    });
+
+    await solicitacao.save();
+
+    console.log('✅ Solicitação de acesso registrada:', {
+      paciente: paciente.name || paciente.nome,
+      medico: medicoNome,
+      especialidade: especialidade
+    });
+
+    res.json({
+      message: 'Solicitação de acesso registrada. O paciente será notificado.',
+      notificacaoRegistrada: true,
+      paciente: {
+        nome: paciente.name || paciente.nome,
+        cpf: paciente.cpf
+      }
+    });
+  } catch (error) {
+    console.error('❌ Erro ao registrar solicitação:', error);
+    res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+  }
+};
+
+// Buscar solicitações de acesso pendentes para um paciente
+export const buscarSolicitacoesPendentes = async (req, res) => {
+  const { patientId } = req.params;
+
+  if (!patientId) {
+    return res.status(400).json({ message: 'ID do paciente é obrigatório' });
+  }
+
+  try {
+    // Buscar solicitações não visualizadas e não expiradas
+    const solicitacoes = await SolicitacaoAcesso.find({
+      pacienteId: patientId,
+      visualizada: false,
+      expiresAt: { $gt: new Date() }
+    }).sort({ dataHora: -1 });
+
+    res.json({
+      total: solicitacoes.length,
+      solicitacoes: solicitacoes.map(s => ({
+        id: s._id,
+        medicoNome: s.medicoNome,
+        especialidade: s.medicoEspecialidade,
+        dataHora: s.dataHora,
+        visualizada: s.visualizada
+      }))
+    });
+  } catch (error) {
+    console.error('❌ Erro ao buscar solicitações:', error);
+    res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+  }
+};
+
+// Marcar solicitação como visualizada
+export const marcarSolicitacaoVisualizada = async (req, res) => {
+  const { solicitacaoId } = req.params;
+
+  try {
+    const solicitacao = await SolicitacaoAcesso.findByIdAndUpdate(
+      solicitacaoId,
+      { visualizada: true },
+      { new: true }
+    );
+
+    if (!solicitacao) {
+      return res.status(404).json({ message: 'Solicitação não encontrada' });
+    }
+
+    res.json({
+      message: 'Solicitação marcada como visualizada',
+      solicitacao: {
+        id: solicitacao._id,
+        visualizada: solicitacao.visualizada
+      }
+    });
+  } catch (error) {
+    console.error('❌ Erro ao marcar solicitação:', error);
     res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
   }
 };

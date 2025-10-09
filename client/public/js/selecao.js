@@ -46,6 +46,43 @@ btnAcesso.addEventListener('click', async () => {
   }
 });
 
+// Função para enviar notificação ao paciente
+async function enviarNotificacaoPaciente(cpfLimpo) {
+  try {
+    // Buscar dados do médico logado
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const resMedico = await fetch(`${API_URL}/api/usuarios/perfil`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (resMedico.ok) {
+      const medico = await resMedico.json();
+      
+      // Enviar notificação
+      await fetch(`${API_URL}/api/access-code/notificar-solicitacao`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          cpf: cpfLimpo,
+          medicoNome: medico.nome,
+          especialidade: medico.areaAtuacao || medico.especialidade
+        })
+      });
+      
+      console.log('✅ Notificação enviada ao paciente');
+    }
+  } catch (error) {
+    console.log('⚠️ Não foi possível enviar notificação:', error);
+  }
+}
+
 // Função para verificar se o CPF existe
 async function verificarCPF(cpfLimpo) {
   try {
@@ -72,6 +109,9 @@ async function verificarCPF(cpfLimpo) {
     msgErro.textContent = '✅ CPF encontrado! Digite o código de acesso do paciente.';
     msgErro.classList.add('ativo');
     msgErro.style.color = '#4CAF50';
+
+    // Enviar notificação ao paciente
+    await enviarNotificacaoPaciente(cpfLimpo);
 
   } catch (err) {
     console.error(err);
