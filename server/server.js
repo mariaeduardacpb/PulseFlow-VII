@@ -1,9 +1,10 @@
 import app from './app.js';
 import dotenv from "dotenv";
+import { CONFIG } from './config/ports.js';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 65432;
+const PORT = CONFIG.BACKEND_PORT;
 
 // Error handling
 process.on('uncaughtException', (err) => {
@@ -19,6 +20,3 @@ process.on('unhandledRejection', (err) => {
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
-
-import pacienteRoutes from './routes/pacienteRoutes.js';
-app.use('/api/pacientes', pacienteRoutes);
