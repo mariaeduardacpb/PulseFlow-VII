@@ -1,12 +1,19 @@
+import { API_URL } from './config.js';
+
 document.addEventListener("DOMContentLoaded", function () {
-  const ctx1 = document.getElementById('chartEnxaqueca').getContext('2d');
-  const noDataLabel = document.getElementById('no-data-msg');
+  const canvas = document.getElementById("chartEnxaqueca");
+  
+  if (!canvas) {
+    return;
+  }
+  
+  const ctx = canvas.getContext("2d");
 
   const months = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
   ];
-const toggleButton = document.querySelector(".menu-toggle");
+  const toggleButton = document.querySelector(".menu-toggle");
   const sidebar = document.querySelector(".sidebar");
 
   toggleButton.addEventListener("click", () => {
@@ -15,152 +22,200 @@ const toggleButton = document.querySelector(".menu-toggle");
   });
   
   const today = new Date();
-  let currentMonthIndex = today.getMonth();
-  const currentYear = today.getFullYear();
+  let currentMonthIndex = 9; // Outubro (0-indexed)
+  const currentYear = 2025;
+
+  function mostrarErro(mensagem) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = mensagem;
+    errorDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #f44336;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 5px;
+      z-index: 1000;
+      font-family: 'Montserrat', sans-serif;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    `;
+    document.body.appendChild(errorDiv);
+    setTimeout(() => errorDiv.remove(), 5000);
+  }
 
   async function carregarDadosMedico() {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token não encontrado. Por favor, faça login novamente.');
-      }
-
-      const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Erro ao carregar dados do médico');
-      }
-
-      const medico = await res.json();
-      const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
-      const nomeFormatado = `${prefixo} ${medico.nome}`;
-      
-      const tituloSidebar = document.querySelector('.sidebar .profile h3');
-      if (tituloSidebar) {
-        tituloSidebar.textContent = nomeFormatado;
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Erro ao carregar dados do médico:", error);
-      const fallback = document.querySelector('.sidebar .profile h3');
-      if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
-      mostrarErro("Erro ao carregar dados do médico. Por favor, faça login novamente.");
-      return false;
-    }
-  }
-
-
-  async function fetchEnxaquecaData(month, year) {
-    try {
-      const tokenMedico = localStorage.getItem("token");
-      const tokenPaciente = localStorage.getItem("tokenPaciente");
+      const tokenMedico = localStorage.getItem('token');
+      const tokenPaciente = localStorage.getItem('tokenPaciente');
 
       if (!tokenMedico || !tokenPaciente) {
-        console.error("Token não encontrado.");
-        return [];
+        mostrarErro("Sessão expirada. Faça login novamente!");
+        return;
       }
 
-     const decodedPayload = JSON.parse(atob(tokenPaciente));
-      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, "");
-
+      const decodedPayload = JSON.parse(atob(tokenPaciente));
+      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
 
       if (!cpf) {
-        console.error("CPF não encontrado no token.");
-        return [];
+        mostrarErro("CPF não encontrado no token do paciente.");
+        return;
       }
 
-      const response = await fetch(`http://127.0.0.1:65432/api/enxaqueca/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
-        method: "GET",
+      const response = await fetch(`${API_URL}/api/enxaqueca/medico?cpf=${cpf}&month=${currentMonthIndex + 1}&year=${currentYear}`, {
+        method: 'GET',
         headers: {
-          "Authorization": `Bearer ${tokenMedico}`,
+          Authorization: `Bearer ${tokenMedico}`,
           "Content-Type": "application/json"
         }
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
-        console.error("Erro ao buscar dados:", result.message || result);
-        return [];
+        mostrarErro("Erro ao buscar dados de enxaqueca!");
+        return;
       }
 
-      return result.data || [];
-
+      const data = await response.json();
+      updateChart(data);
     } catch (error) {
-      console.error("Erro ao buscar dados de enxaqueca:", error);
-      return [];
+      console.error('Erro ao buscar dados de enxaqueca:', error);
+      mostrarErro("Erro interno ao buscar dados de enxaqueca.");
     }
   }
 
-  const chartEnxaqueca = new Chart(ctx1, {
+  function classificarIntensidade(intensidade) {
+    const valor = parseInt(intensidade);
+    if (valor >= 1 && valor <= 3) {
+      return 'Leve';
+    } else if (valor >= 4 && valor <= 6) {
+      return 'Moderada';
+    } else if (valor >= 7 && valor <= 8) {
+      return 'Severa';
+    } else if (valor >= 9 && valor <= 10) {
+      return 'Intolerável';
+    } else {
+      return 'Desconhecida';
+    }
+  }
+
+  // Gráfico Chart.js
+  const chartEnxaqueca = new Chart(ctx, {
     type: 'line',
     data: {
       labels: [],
       datasets: [{
-        label: 'Intensidade da Dor',
+        label: "Intensidade da Enxaqueca",
         data: [],
-        fill: true, // <<< ESSENCIAL PARA O PREENCHIMENTO
-        borderColor: '#0a4466',
-        backgroundColor: 'rgba(10, 68, 102, 0.1)',
+        borderColor: "#E91E63",
+        backgroundColor: "rgba(233, 30, 99, 0.1)",
         tension: 0.3,
-        pointRadius: 4,
-        pointHoverRadius: 6
-        
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        spanGaps: true
       }]
-    
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1200,
+        easing: 'easeOutQuart',
+        animations: {
+          y: {
+            type: 'number',
+            easing: 'easeOutBounce',
+            from: 0
+          }
+        }
+      },
       plugins: {
         legend: { display: false },
         tooltip: {
-        usePointStyle: false,
-        displayColors: false,
-        callbacks: {
-        title: function (context) {
-        const dia = context[0].label;
-        return `Dia ${dia}`;
-    },
-    label: function (context) {
-      const nota = context.raw;
-      let categoria = '';
-      if (nota <= 3) categoria = 'Baixa';
-      else if (nota <= 6) categoria = 'Moderada';
-      else if (nota <= 8) categoria = 'Alta';
-      else categoria = 'Muito Alta';
-      return [`Nota: ${nota}`, `Categoria: ${categoria}`];
+          displayColors: false,
+          callbacks: {
+            title: context => `Dia ${context[0].parsed.x}`,
+            label: () => '',
+            afterBody: context => {
+              const raw = context[0].raw;
+              const intensidade = raw.intensidade;
+              const duracao = raw.duracao;
+              const classificacao = classificarIntensidade(intensidade);
+              return [
+                `Intensidade: ${intensidade}/10`,
+                `Classificação: ${classificacao}`,
+                `Duração: ${duracao}h`
+              ];
             }
           }
         }
       },
       scales: {
         x: {
-          title: { display: true, text: 'Dia do Mês' }
+          type: 'linear',
+          title: { display: true, text: 'Dia do Mês' },
+          ticks: { precision: 0 }
         },
         y: {
           min: 0,
-          max: 11,
-          ticks: {
-            stepSize: 1,
-            callback: function (val) {
-              if (val === 9) return 'Muito Alta';
-              if (val === 8) return 'Alta';
-              if (val === 6) return 'Moderada';
-              if (val === 3) return 'Baixa';
-              return '';
-            }
-          }
+          max: 10,
+          title: { display: true, text: 'Intensidade (0-10)' },
+          ticks: { stepSize: 1 }
         }
       }
     }
   });
+
+  // Buscar dados da API
+  async function fetchEnxaquecaData(month, year) {
+    try {
+      const tokenMedico = localStorage.getItem('token');
+      const tokenPaciente = localStorage.getItem('tokenPaciente');
+
+      if (!tokenMedico || !tokenPaciente) {
+        mostrarErro("Sessão expirada. Faça login novamente!");
+        return null;
+      }
+
+      const decodedPayload = JSON.parse(atob(tokenPaciente));
+      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+
+      if (!cpf) {
+        mostrarErro("CPF não encontrado no token do paciente.");
+        return null;
+      }
+
+      const response = await fetch(`${API_URL}/api/enxaqueca/medico?cpf=${cpf}&month=${month}&year=${year}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${tokenMedico}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        mostrarErro("Erro ao buscar dados de enxaqueca!");
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao buscar dados de enxaqueca:', error);
+      mostrarErro("Erro interno ao buscar dados de enxaqueca.");
+      return null;
+    }
+  }
+
+  // Carregar e exibir no gráfico
+  async function loadChartData() {
+    const month = currentMonthIndex + 1; // Converter para 1-indexed
+    const data = await fetchEnxaquecaData(month, currentYear);
+    if (!data) return;
+
+    // Atualizar o gráfico com os dados
+    updateChart(data);
+  }
 
   function updateChart(data) {
     if (!data || !data.data || data.data.length === 0) {
@@ -173,35 +228,20 @@ const toggleButton = document.querySelector(".menu-toggle");
 
     document.getElementById('no-data-msg').style.display = 'none';
 
-    // Extrair dias e intensidades
+    // Extrair dias e valores de enxaqueca
     const dias = data.data.map(d => d.dia);
-    const intensidades = data.data.map(d => d.intensidade);
+    const valores = data.data.map(d => ({
+      x: d.dia,
+      y: parseInt(d.intensidade),
+      intensidade: d.intensidade,
+      duracao: d.duracao
+    }));
 
     // Atualizar dados do gráfico
     chartEnxaqueca.data.labels = dias;
-    chartEnxaqueca.data.datasets[0].data = intensidades;
+    chartEnxaqueca.data.datasets[0].data = valores;
 
     // Atualizar o gráfico
-    chartEnxaqueca.update();
-  }
-
-  async function loadChartData() {
-    const dados = await fetchEnxaquecaData(currentMonthIndex, currentYear);
-    const dias = dados.map(d => d.dia);
-    const intensidades = dados.map(d => d.intensidade);
-
-    const hasData = intensidades.length > 0;
-
-    if (!hasData) {
-      chartEnxaqueca.data.labels = [];
-      chartEnxaqueca.data.datasets[0].data = [];
-      noDataLabel.style.display = 'block';
-    } else {
-      chartEnxaqueca.data.labels = dias;
-      chartEnxaqueca.data.datasets[0].data = intensidades;
-      noDataLabel.style.display = 'none';
-    }
-
     chartEnxaqueca.update();
   }
 

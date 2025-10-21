@@ -182,11 +182,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function loadChartData() {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1;
-    const currentYear = currentDate.getFullYear();
+  let currentMonth = new Date().getMonth() + 1;
+  let currentYear = new Date().getFullYear();
 
+  function updateMonthLabel() {
+    const monthNames = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    const monthLabel = document.querySelector('.month-label');
+    if (monthLabel) {
+      monthLabel.textContent = `${monthNames[currentMonth - 1]} • ${currentYear}`;
+    }
+  }
+
+  async function loadChartData() {
     const data = await fetchGlicemiaData(currentMonth, currentYear);
     if (!data) return;
 
@@ -194,29 +204,171 @@ document.addEventListener("DOMContentLoaded", () => {
     updateChart(data);
   }
 
+  // Configurar navegação de mês
+  function setupMonthNavigation() {
+    const prevBtn = document.querySelector('[data-direction="prev"]');
+    const nextBtn = document.querySelector('[data-direction="next"]');
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', async () => {
+        currentMonth--;
+        if (currentMonth < 1) {
+          currentMonth = 12;
+          currentYear--;
+        }
+        updateMonthLabel();
+        await loadChartData();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', async () => {
+        currentMonth++;
+        if (currentMonth > 12) {
+          currentMonth = 1;
+          currentYear++;
+        }
+        updateMonthLabel();
+        await loadChartData();
+      });
+    }
+  }
+
   function updateChart(data) {
     if (!data || !data.data || data.data.length === 0) {
       document.getElementById('no-data-msg-glicemia').style.display = 'block';
-      chartGlicemia.data.labels = [];
       chartGlicemia.data.datasets[0].data = [];
-      chartGlicemia.update();
+      chartGlicemia.update('none');
       return;
     }
 
     document.getElementById('no-data-msg-glicemia').style.display = 'none';
 
-    // Extrair dias e valores de glicemia
-    const dias = data.data.map(d => d.dia);
-    const valores = data.data.map(d => d.valor);
+    // Criar pontos de dados com coordenadas x,y
+    const pontos = data.data.map(d => ({
+      x: d.dia,
+      y: d.nivelGlicemia
+    }));
 
-    // Atualizar dados do gráfico
-    chartGlicemia.data.labels = dias;
-    chartGlicemia.data.datasets[0].data = valores;
+    // Verificar se os dados são diferentes antes de atualizar
+    const currentData = chartGlicemia.data.datasets[0].data;
+    const dataChanged = JSON.stringify(currentData) !== JSON.stringify(pontos);
 
-    // Atualizar o gráfico
-    chartGlicemia.update();
+    if (dataChanged) {
+      // Atualizar dados do gráfico
+      chartGlicemia.data.datasets[0].data = pontos;
+
+      // Atualizar o gráfico sem animação
+      chartGlicemia.update('none');
+    }
   }
 
+  // Configurar o gráfico de glicemia
+  const ctxGlicemia = document.getElementById('chartGlicemia');
+  const chartGlicemia = new Chart(ctxGlicemia, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Glicemia (mg/dL)',
+        data: [],
+        borderColor: '#00c3b7',
+        backgroundColor: 'rgba(0, 195, 183, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#00c3b7',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        spanGaps: false,
+        clip: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 0
+      },
+      layout: {
+        padding: {
+          top: 10,
+          bottom: 10,
+          left: 10,
+          right: 10
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 42, 66, 0.9)',
+          titleColor: '#ffffff',
+          bodyColor: '#ffffff',
+          borderColor: '#00c3b7',
+          borderWidth: 1,
+          cornerRadius: 8,
+          displayColors: false,
+          callbacks: {
+            title: function(context) {
+              return `Dia ${context[0].label}`;
+            },
+            label: function(context) {
+              return `${context.parsed.y} mg/dL`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          grid: {
+            color: 'rgba(0, 42, 66, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#002A42',
+            font: {
+              family: 'Montserrat',
+              size: 12
+            },
+            stepSize: 1
+          },
+          min: 1,
+          max: 31
+        },
+        y: {
+          grid: {
+            color: 'rgba(0, 42, 66, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#002A42',
+            font: {
+              family: 'Montserrat',
+              size: 12
+            },
+            callback: function(value) {
+              return `${value} mg/dL`;
+            }
+          },
+          min: 0,
+          max: 200,
+          beginAtZero: true
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      }
+    }
+  });
+
   carregarDadosMedico();
+  updateMonthLabel();
+  setupMonthNavigation();
   loadChartData();
 });
