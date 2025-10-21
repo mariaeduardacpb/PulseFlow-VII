@@ -4,22 +4,22 @@ import Paciente from '../models/Paciente.js';
 
 // Paciente registra sua enxaqueca
 export const registrarEnxaqueca = async (req, res) => {
-  const { data, intensidade } = req.body;
+  const { data, intensidade, duracao } = req.body;
   const pacienteId = req.user.id;
 
   try {
-    // Corrigindo para salvar com fuso correto
-    const [ano, mes, dia] = data.split('-'); // exemplo: "2025-04-06"
-    const dataCorrigida = new Date(ano, mes - 1, dia, 12); // meio-dia para evitar UTC alterar o dia
+    const [ano, mes, dia] = data.split('-');
+    const dataCorrigida = new Date(ano, mes - 1, dia, 12);
 
     const novoRegistro = new Enxaqueca({
-      paciente: pacienteId,
+      pacienteId: pacienteId,
       data: dataCorrigida,
-      intensidade
+      intensidade: String(intensidade),
+      duracao: Number(duracao)
     });
 
     await novoRegistro.save();
-    res.status(201).json({ message: 'Registro salvo com sucesso' });
+    res.status(201).json({ message: 'Registro de enxaqueca salvo com sucesso' });
   } catch (error) {
     console.error('Erro ao salvar registro de enxaqueca:', error);
     res.status(500).json({ error: 'Erro ao salvar registro' });
@@ -31,7 +31,12 @@ export const buscarEnxaquecaMedico = async (req, res) => {
   const { cpf, month, year } = req.query;
 
   try {
-    const paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '').trim() });
+    let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    if (!paciente) {
+      const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+    
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
@@ -40,13 +45,14 @@ export const buscarEnxaquecaMedico = async (req, res) => {
     const endDate = new Date(year, month, 1);
 
     const registros = await Enxaqueca.find({
-      paciente: paciente._id,
+      pacienteId: paciente._id.toString(),
       data: { $gte: startDate, $lt: endDate }
     }).sort({ data: 1 });
 
     const data = registros.map((r) => ({
       dia: new Date(r.data).getDate(),
-      intensidade: r.intensidade
+      intensidade: r.intensidade,
+      duracao: r.duracao
     }));
 
     res.json({ paciente: paciente.nome, data });
@@ -66,16 +72,17 @@ export const buscarEnxaquecaPaciente = async (req, res) => {
     const endDate = new Date(year, month, 1);
 
     const registros = await Enxaqueca.find({
-      paciente: pacienteId,
+      pacienteId: pacienteId,
       data: { $gte: startDate, $lt: endDate }
     }).sort({ data: 1 });
 
-    const dataFiltrada = registros.map(r => ({
+    const data = registros.map(r => ({
       dia: new Date(r.data).getDate(),
-      intensidade: r.intensidade
+      intensidade: r.intensidade,
+      duracao: r.duracao
     }));
 
-    res.json({ data: dataFiltrada });
+    res.json({ data });
   } catch (error) {
     console.error('Erro ao buscar dados do próprio paciente:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });

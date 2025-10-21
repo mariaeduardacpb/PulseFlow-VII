@@ -36,7 +36,12 @@ export const buscarPressaoMedico = async (req, res) => {
   const { cpf, month, year } = req.query;
 
   try {
-    const paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    if (!paciente) {
+      const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+    
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
