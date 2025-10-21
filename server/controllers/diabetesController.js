@@ -5,7 +5,7 @@ import Paciente from '../models/Paciente.js';
 
 // Paciente registra sua glicemia
 export const registrarDiabetes = async (req, res) => {
-  const { data, nivelGlicemia } = req.body;
+  const { data, glicemia } = req.body;
   const pacienteId = req.user.id;
 
   try {
@@ -15,7 +15,7 @@ export const registrarDiabetes = async (req, res) => {
     const novoRegistro = new Diabetes({
       paciente: pacienteId,
       data: dataCorrigida,
-      nivelGlicemia: Number(nivelGlicemia)
+      glicemia: Number(glicemia)
     });
 
     await novoRegistro.save();
@@ -31,7 +31,15 @@ export const buscarDiabetesMedico = async (req, res) => {
   const { cpf, month, year } = req.query;
 
   try {
-    const paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    // Tentar buscar com CPF limpo primeiro
+    let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    
+    // Se não encontrar, tentar com CPF formatado
+    if (!paciente) {
+      const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+    
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
@@ -40,14 +48,15 @@ export const buscarDiabetesMedico = async (req, res) => {
     const endDate = new Date(year, month, 1);
 
     const registros = await Diabetes.find({
-      paciente: paciente._id,
+      paciente: paciente._id.toString(),
       data: { $gte: startDate, $lt: endDate }
     }).sort({ data: 1 });
 
-    const data = registros.map(r => ({
-      dia: new Date(r.data).getDate(),
-      nivelGlicemia: r.nivelGlicemia
-    }));
+    const data = registros.map(r => {
+      const dia = new Date(r.data).getDate();
+      const nivelGlicemia = r.nivelGlicemia || r.glicemia || r._doc?.nivelGlicemia || r._doc?.glicemia;
+      return { dia, nivelGlicemia };
+    });
 
     res.json({ paciente: paciente.nome, data });
   } catch (error) {
@@ -70,10 +79,11 @@ export const buscarDiabetesPaciente = async (req, res) => {
       data: { $gte: startDate, $lt: endDate }
     }).sort({ data: 1 });
 
-    const data = registros.map(r => ({
-      dia: new Date(r.data).getDate(),
-      nivelGlicemia: r.nivelGlicemia
-    }));
+    const data = registros.map(r => {
+      const dia = new Date(r.data).getDate();
+      const nivelGlicemia = r.nivelGlicemia || r.glicemia || r._doc?.nivelGlicemia || r._doc?.glicemia;
+      return { dia, nivelGlicemia };
+    });
 
     res.json({ data });
   } catch (error) {

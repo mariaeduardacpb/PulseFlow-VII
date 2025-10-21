@@ -34,7 +34,7 @@ router.post('/upload', authPacienteMiddleware, upload.single('arquivo'), uploadE
 router.get('/medico', authMiddleware, buscarExamesMedico);
 router.get('/paciente', authPacienteMiddleware, buscarExamesPaciente);
 
-// NOVA ROTA DE DOWNLOAD PROTEGIDO
+// ROTA DE DOWNLOAD PROTEGIDO
 router.get('/download/:id', authMiddleware, downloadExame);
 
 export default router;
