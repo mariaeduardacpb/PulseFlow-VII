@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const telefoneConsultorioMask = IMask(document.getElementById('telefoneConsultorio'), {
-        mask: '(00) 00000-0000'
+        mask: [
+            { mask: '(00) 0000-0000' }, // Telefone fixo
+            { mask: '(00) 00000-0000' } // Celular
+        ]
     });
 
     const cepMask = IMask(document.getElementById('cep'), {
@@ -130,7 +133,10 @@ async function carregarDadosMedico() {
         });
         
         IMask(document.getElementById('telefoneConsultorio'), {
-            mask: '(00) 0000-0000'
+            mask: [
+                { mask: '(00) 0000-0000' }, // Telefone fixo
+                { mask: '(00) 00000-0000' } // Celular
+            ]
         });
         
         IMask(document.getElementById('cep'), {
@@ -183,8 +189,17 @@ function criarCampoRQE(valor = '') {
     const rqeGroup = document.createElement('div');
     rqeGroup.className = 'rqe-group';
     
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'input-group';
+    
     const label = document.createElement('label');
     label.textContent = 'RQE';
+    
+    const inputWrapper = document.createElement('div');
+    inputWrapper.className = 'input-wrapper';
+    
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-certificate input-icon';
     
     const input = document.createElement('input');
     input.type = 'text';
@@ -211,8 +226,12 @@ function criarCampoRQE(valor = '') {
         atualizarBotoesRQE();
     };
     
-    rqeGroup.appendChild(label);
-    rqeGroup.appendChild(input);
+    // Montar a estrutura corretamente
+    inputWrapper.appendChild(icon);
+    inputWrapper.appendChild(input);
+    inputGroup.appendChild(label);
+    inputGroup.appendChild(inputWrapper);
+    rqeGroup.appendChild(inputGroup);
     rqeGroup.appendChild(removeBtn);
     rqeRow.appendChild(rqeGroup);
     
@@ -297,7 +316,10 @@ function preencherFormulario(user) {
     telefoneMask.value = user.telefonePessoal || '';
     
     const telefoneConsultorioMask = IMask(document.getElementById('telefoneConsultorio'), {
-        mask: '(00) 00000-0000'
+        mask: [
+            { mask: '(00) 0000-0000' }, // Telefone fixo
+            { mask: '(00) 00000-0000' } // Celular
+        ]
     });
     telefoneConsultorioMask.value = user.telefoneConsultorio || '';
     
@@ -466,44 +488,60 @@ async function salvarAlteracoes(event) {
     });
 
     try {
-        const formData = new FormData();
         const token = localStorage.getItem('token');
 
         // Coletar dados do formulário
-        formData.append('nome', document.getElementById('nome').value);
-        formData.append('email', document.getElementById('email').value);
-        formData.append('genero', document.getElementById('genero').value);
-        formData.append('crm', document.getElementById('crm').value);
-        formData.append('areaAtuacao', document.getElementById('especialidade').value);
-        formData.append('telefonePessoal', document.getElementById('telefone').value.replace(/\D/g, ''));
-        formData.append('telefoneConsultorio', document.getElementById('telefoneConsultorio').value.replace(/\D/g, ''));
-        formData.append('cep', document.getElementById('cep').value.replace(/\D/g, ''));
-        formData.append('enderecoConsultorio', document.getElementById('endereco').value);
-        formData.append('numeroConsultorio', document.getElementById('numero').value);
+        const dadosPerfil = {
+            nome: document.getElementById('nome').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            genero: document.getElementById('genero').value.trim(),
+            crm: document.getElementById('crm').value.trim(),
+            areaAtuacao: document.getElementById('especialidade').value.trim(),
+            telefonePessoal: document.getElementById('telefone').value.replace(/\D/g, ''),
+            telefoneConsultorio: document.getElementById('telefoneConsultorio').value.replace(/\D/g, ''),
+            cep: document.getElementById('cep').value.replace(/\D/g, ''),
+            enderecoConsultorio: document.getElementById('endereco').value.trim(),
+            numeroConsultorio: document.getElementById('numero').value.trim(),
+            complemento: document.getElementById('complemento').value.trim(),
+            bairro: document.getElementById('bairro').value.trim(),
+            cidade: document.getElementById('cidade').value.trim(),
+            estado: document.getElementById('estado').value.trim()
+        };
 
         // Coletar RQEs
         const rqeInputs = document.querySelectorAll('#rqeContainer input');
-        const rqeValues = Array.from(rqeInputs).map(input => input.value.replace(/\D/g, ''));
-        formData.append('rqe', JSON.stringify(rqeValues));
+        const rqeValues = Array.from(rqeInputs)
+            .map(input => input.value.replace(/\D/g, ''))
+            .filter(rqe => rqe && rqe.trim() !== '');
+        
+        dadosPerfil.rqe = rqeValues;
 
-        // Fazer a requisição
+        console.log('Dados a serem enviados:', dadosPerfil);
+
+        // Fazer a requisição com JSON
         const response = await fetch('http://localhost:65432/api/usuarios/perfil', {
             method: 'PUT',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             },
-            body: formData
+            body: JSON.stringify(dadosPerfil)
         });
 
+        const responseData = await response.json();
+
         if (!response.ok) {
-            throw new Error('Erro ao salvar alterações');
+            // Se a resposta não for ok, lançar erro com a mensagem do servidor
+            const errorMessage = responseData.message || responseData.error || 'Erro ao salvar alterações';
+            throw new Error(errorMessage);
         }
 
         // Fechar popup de salvamento e mostrar sucesso
+        Swal.close();
         Swal.fire({
             icon: 'success',
             title: 'Sucesso!',
-            text: 'Suas informações foram salvas com sucesso.',
+            text: responseData.message || 'Suas informações foram salvas com sucesso.',
             confirmButtonColor: '#002A42'
         });
 
@@ -511,40 +549,105 @@ async function salvarAlteracoes(event) {
         await carregarDadosMedico();
 
     } catch (error) {
-        console.error('Erro:', error);
-        // Fechar popup de salvamento e mostrar erro
+        console.error('Erro ao salvar:', error);
+        Swal.close();
+        
+        // Mostrar mensagem de erro específica
+        let errorMessage = 'Não foi possível salvar as alterações. Por favor, tente novamente.';
+        
+        if (error.message) {
+            errorMessage = error.message;
+        } else if (error.response && error.response.data) {
+            errorMessage = error.response.data.message || errorMessage;
+        }
+
+        // Verificar se é erro de autenticação
+        if (errorMessage.includes('Token') || errorMessage.includes('não autorizado') || errorMessage.includes('expirou')) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sessão Expirada',
+                text: 'Sua sessão expirou. Por favor, faça login novamente.',
+                confirmButtonText: 'Ir para Login',
+                confirmButtonColor: '#002A42'
+            }).then(() => {
+                window.location.href = '../views/login.html';
+            });
+            return;
+        }
+
         Swal.fire({
             icon: 'error',
             title: 'Erro',
-            text: 'Não foi possível salvar as alterações. Por favor, tente novamente.',
+            text: errorMessage,
             confirmButtonColor: '#002A42'
         });
     }
 }
 
 async function buscarCep() {
-    const cep = document.getElementById('cep').value.replace(/\D/g, '');
+    const cepInput = document.getElementById('cep');
+    
+    // Só buscar CEP se o campo estiver editável
+    if (cepInput.readOnly) {
+        return;
+    }
+    
+    const cep = cepInput.value.replace(/\D/g, '');
     
     if (cep.length !== 8) {
         return;
     }
 
     try {
+        // Mostrar loading
+        Swal.fire({
+            title: 'Buscando CEP...',
+            text: 'Por favor, aguarde.',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await response.json();
+
+        Swal.close();
 
         if (data.erro) {
             throw new Error('CEP não encontrado');
         }
 
-        document.getElementById('endereco').value = data.logradouro;
-        document.getElementById('numero').value = '';
+        // Preencher todos os campos do endereço
+        document.getElementById('endereco').value = data.logradouro || '';
+        document.getElementById('bairro').value = data.bairro || '';
+        document.getElementById('cidade').value = data.localidade || '';
+        document.getElementById('estado').value = data.uf || '';
+        
+        // Limpar o campo número apenas se não estiver preenchido
+        if (!document.getElementById('numero').value) {
+            document.getElementById('numero').value = '';
+        }
+
+        // Mostrar mensagem de sucesso
+        Swal.fire({
+            title: 'CEP encontrado!',
+            text: 'Os dados do endereço foram preenchidos automaticamente.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false,
+            confirmButtonColor: '#002A42'
+        });
 
     } catch (error) {
         console.error('Erro ao buscar CEP:', error);
         Swal.fire({
             title: 'Erro',
-            text: 'Não foi possível buscar o CEP. Por favor, verifique se o CEP está correto.',
+            text: error.message === 'CEP não encontrado' 
+                ? 'CEP não encontrado. Por favor, verifique se o CEP está correto.' 
+                : 'Não foi possível buscar o CEP. Por favor, verifique sua conexão e tente novamente.',
             icon: 'error',
             confirmButtonText: 'OK',
             confirmButtonColor: '#002A42'
@@ -581,6 +684,10 @@ function habilitarEdicao() {
         'cep',
         'endereco',
         'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'estado',
         'especialidade'
     ];
     
@@ -596,7 +703,10 @@ function habilitarEdicao() {
                 });
             } else if (campo === 'telefoneConsultorio') {
                 IMask(input, {
-                    mask: '(00) 00000-0000'
+                    mask: [
+                        { mask: '(00) 0000-0000' }, // Telefone fixo
+                        { mask: '(00) 00000-0000' } // Celular
+                    ]
                 });
             } else if (campo === 'cep') {
                 IMask(input, {

@@ -23,6 +23,7 @@ import menstruacaoRoutes from './routes/menstruacaoRoutes.js';
 import eventoClinicoRoutes from './routes/eventoClinicoRoutes.js';
 import perfilMedicoRoutes from './routes/perfilMedicoRoutes.js';
 import accessCodeRoutes from './routes/accessCodeRoutes.js';
+import geminiRoutes from './routes/geminiRoutes.js';
 
 
 
@@ -107,6 +108,7 @@ app.use('/api/gastrite', criseGastriteRoutes);
 app.use('/api/menstruacao', menstruacaoRoutes);
 app.use('/api/eventos-clinicos', eventoClinicoRoutes);
 app.use('/api/access-code', accessCodeRoutes);
+app.use('/api/gemini', geminiRoutes);
 
 
 // Middleware de erro

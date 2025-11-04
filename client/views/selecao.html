@@ -5,32 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PulseFlow | Seleção Paciente</title>
   <link rel="stylesheet" href="../public/css/selecao.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
   <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
 </head>
 <body>
-  <header>
-    <a href="perfilMedico.html" class="perfil-link">Meu Perfil →</a>
+  <header class="main-header">
+    <div class="header-content">
+      <a href="perfilMedico.html" class="perfil-link">
+        <i class="fas fa-user-circle"></i>
+        <span>Meu Perfil</span>
+      </a>
+      <button class="logout-btn" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Sair</span>
+      </button>
+    </div>
   </header>
 
   <main class="container">
-    <!-- Logo como imagem -->
-    <img src="../public/assets/PulseNegativo.png" alt="Logo PulseFlow" class="logo-img" />
+    <div class="content-wrapper">
+      <!-- Logo -->
+      <div class="logo-container">
+        <img src="../public/assets/pulseLogo.png" alt="Logo PulseFlow" class="logo-img" />
+      </div>
 
-    <p class="subtitulo">VEJA A SAÚDE DO SEU PACIENTE AQUI!</p>
+      <!-- Título -->
+      <div class="title-section">
+        <h1 class="titulo-principal">Buscar Paciente</h1>
+        <p class="subtitulo">Acesse o perfil do seu paciente de forma rápida e segura</p>
+      </div>
 
-    <div class="form-group">
-      <input type="text" placeholder="CPF DO PACIENTE" class="input-cpf" />
+      <!-- Formulário -->
+      <div class="form-container">
+        <div class="input-group">
+          <label for="input-cpf">CPF do Paciente</label>
+          <div class="input-icon">
+            <i class="fas fa-id-card"></i>
+            <input type="text" id="input-cpf" placeholder="000.000.000-00" class="input-cpf" />
+          </div>
+        </div>
+
+        <div class="input-group" id="codigo-group" style="display: none;">
+          <label for="input-codigo">Código de Acesso</label>
+          <div class="input-icon">
+            <i class="fas fa-key"></i>
+            <input type="text" id="input-codigo" placeholder="000000" class="input-codigo" maxlength="6" />
+          </div>
+          <small class="input-hint">Digite o código de 6 dígitos enviado ao paciente</small>
+        </div>
+
+        <button type="button" class="submit-btn" id="btn-acesso">
+          <i class="fas fa-search"></i>
+          <span>Solicitar Acesso</span>
+        </button>
+
+        <div id="mensagem-erro" class="erro-cpf"></div>
+      </div>
     </div>
-
-    <div class="form-group" id="codigo-group" style="display: none;">
-      <input type="text" placeholder="CÓDIGO DE ACESSO (6 dígitos)" class="input-codigo" maxlength="6" />
-    </div>
-
-    <button class="btn-acesso" id="btn-acesso">Solicitar Acesso</button>
-
-    <div id="mensagem-erro" class="erro-cpf"></div>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
   <script type="module" src="/client/public/js/selecao.js"></script>
 </body>
 </html>

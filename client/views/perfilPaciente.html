@@ -44,23 +44,87 @@
       </div>
     </aside>
     <main class="content">
+      <header class="main-page-header">
+        <div class="header-logo">
+          <img src="../public/assets/pulseLogo.png" alt="PulseFlow Logo">
+        </div>
+      </header>
       <section class="patient-header">
-        <h1>👤 Perfil do Paciente</h1>
-        <div id="erroPerfil" class="erro-mensagem" style="display: none; background-color: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center;"></div>
+        <div class="header-top">
+          <h1>👤 Perfil do Paciente</h1>
+        </div>
+        <div id="erroPerfil" class="erro-mensagem" style="display: none;"></div>
         <div class="profile-box">
-          <img src="/client/public/assets/User_logonegativo.png" alt="Foto do Paciente" />
-          <div class="info">
-            <p><strong>Nome do Paciente</strong><span id="nomePaciente"></span></p>
-            <p><strong>Gênero</strong><span id="generoPaciente"></span></p>
-            <p><strong>Idade</strong><span id="idadePaciente"></span></p>
-            <p><strong>Nacionalidade</strong><span id="nacionalidadePaciente"></span></p>
-            <p><strong>Altura</strong><span id="alturaPaciente"></span></p>
-            <p><strong>Peso</strong><span id="pesoPaciente"></span></p>
-            <p><strong>Profissão</strong><span id="profissaoPaciente"></span></p>
-            <p><strong>E-mail</strong><span id="emailPaciente"></span></p>
-            <p><strong>Telefone</strong><span id="telefonePaciente"></span></p>
-            <p><strong>Observações</strong><span id="observacoesPaciente"></span></p>
+          <div class="profile-photo-wrapper">
+            <img src="/client/public/assets/User_logonegativo.png" alt="Foto do Paciente" id="fotoPaciente" />
+            <button id="editarPerfilBtn" class="btn-editar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              <span>Editar</span>
+            </button>
           </div>
+          <div class="info">
+            <div class="info-item">
+              <label>Nome do Paciente</label>
+              <span id="nomePaciente" class="info-value">-</span>
+              <input type="text" id="inputNomePaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Gênero</label>
+              <span id="generoPaciente" class="info-value">-</span>
+              <select id="inputGeneroPaciente" class="info-input" style="display: none;">
+                <option value="">Selecione</option>
+                <option value="masculino">Masculino</option>
+                <option value="feminino">Feminino</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="info-item">
+              <label>Idade</label>
+              <span id="idadePaciente" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <label>Nacionalidade</label>
+              <span id="nacionalidadePaciente" class="info-value">-</span>
+              <input type="text" id="inputNacionalidadePaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Altura</label>
+              <span id="alturaPaciente" class="info-value">-</span>
+              <input type="text" id="inputAlturaPaciente" class="info-input" placeholder="cm" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Peso</label>
+              <span id="pesoPaciente" class="info-value">-</span>
+              <input type="text" id="inputPesoPaciente" class="info-input" placeholder="kg" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Profissão</label>
+              <span id="profissaoPaciente" class="info-value">-</span>
+              <input type="text" id="inputProfissaoPaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>E-mail</label>
+              <span id="emailPaciente" class="info-value">-</span>
+              <input type="email" id="inputEmailPaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Telefone</label>
+              <span id="telefonePaciente" class="info-value">-</span>
+              <input type="tel" id="inputTelefonePaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item full-width">
+              <label>Observações</label>
+              <span id="observacoesPaciente" class="info-value">-</span>
+              <textarea id="inputObservacoesPaciente" class="info-input" rows="3" style="display: none;"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="profile-actions" id="profileActions" style="display: none;">
+          <button id="salvarPerfilBtn" class="btn-salvar">Salvar</button>
+          <button id="cancelarEdicaoBtn" class="btn-cancelar">Cancelar</button>
         </div>
       </section>
 
@@ -69,6 +133,25 @@
         <div class="shortcut-grid">
           <!-- Os cards serão inseridos dinamicamente via JavaScript -->
         </div>
+      </section>
+
+      <section class="insights-section">
+        <div class="insights-header">
+          <h2><span class="ai-icon">🤖</span> Insights Inteligentes</h2>
+          <button id="gerarInsightsBtn" class="btn-gerar-insights">
+            <span class="btn-icon">✨</span>
+            <span>Gerar Insights</span>
+          </button>
+        </div>
+        <div id="insightsLoading" class="insights-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p>Analisando dados do paciente...</p>
+        </div>
+        <div id="insightsContent" class="insights-content" style="display: none;">
+          <div class="insights-summary"></div>
+          <div class="insights-text"></div>
+        </div>
+        <div id="insightsError" class="insights-error" style="display: none;"></div>
       </section>
     </main>
   </div>

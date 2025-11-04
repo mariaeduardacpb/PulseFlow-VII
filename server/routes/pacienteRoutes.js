@@ -204,6 +204,89 @@ router.get('/id/:id', authMiddleware, async (req, res) => {
   }
 });
 
+// Atualizar perfil do paciente (médico pode editar)
+router.put('/perfil/:cpf', authMiddleware, async (req, res) => {
+  const { cpf } = req.params;
+
+  try {
+    const cpfLimpo = cpf.replace(/\D/g, '');
+    
+    if (cpfLimpo.length !== 11) {
+      return res.status(400).json({ message: 'CPF inválido' });
+    }
+
+    // Buscar paciente
+    let paciente = await Paciente.findOne({ cpf: cpfLimpo });
+    
+    if (!paciente) {
+      const cpfFormatado = cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+
+    if (!paciente) {
+      return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
+
+    // Atualizar campos permitidos
+    const { nome, genero, nacionalidade, altura, peso, profissao, email, telefone, observacoes } = req.body;
+
+    if (nome !== undefined) {
+      paciente.name = nome;
+      paciente.nome = nome; // Compatibilidade
+    }
+    if (genero !== undefined) {
+      paciente.gender = genero;
+      paciente.genero = genero; // Compatibilidade
+    }
+    if (nacionalidade !== undefined) {
+      paciente.nationality = nacionalidade;
+      paciente.nacionalidade = nacionalidade; // Compatibilidade
+    }
+    if (altura !== undefined) {
+      paciente.height = altura ? parseFloat(altura) : null;
+      paciente.altura = altura ? altura.toString() : null; // Compatibilidade
+    }
+    if (peso !== undefined) {
+      paciente.weight = peso ? parseFloat(peso) : null;
+      paciente.peso = peso ? peso.toString() : null; // Compatibilidade
+    }
+    if (profissao !== undefined) {
+      paciente.profession = profissao;
+      paciente.profissao = profissao; // Compatibilidade
+    }
+    if (email !== undefined && email.trim() !== '') {
+      paciente.email = email;
+    }
+    if (telefone !== undefined) {
+      paciente.phone = telefone;
+      paciente.telefone = telefone; // Compatibilidade
+    }
+    if (observacoes !== undefined) {
+      paciente.observacoes = observacoes;
+    }
+
+    await paciente.save();
+
+    res.json({
+      message: 'Perfil atualizado com sucesso',
+      paciente: {
+        nome: paciente.name || paciente.nome,
+        genero: paciente.gender || paciente.genero,
+        nacionalidade: paciente.nationality || paciente.nacionalidade,
+        altura: paciente.height || paciente.altura,
+        peso: paciente.weight || paciente.peso,
+        profissao: paciente.profession || paciente.profissao,
+        email: paciente.email,
+        telefone: paciente.phone || paciente.telefone,
+        observacoes: paciente.observacoes
+      }
+    });
+  } catch (err) {
+    console.error('Erro ao atualizar perfil do paciente:', err);
+    res.status(500).json({ message: 'Erro interno do servidor', error: err.message });
+  }
+});
+
 // Rota de teste para listar todos os pacientes
 router.get('/teste', async (req, res) => {
   try {

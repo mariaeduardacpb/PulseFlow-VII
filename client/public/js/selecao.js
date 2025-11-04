@@ -1,12 +1,45 @@
 import { API_URL } from './config.js';
 
-const inputCPF = document.querySelector('.input-cpf');
-const inputCodigo = document.querySelector('.input-codigo');
+const inputCPF = document.getElementById('input-cpf');
+const inputCodigo = document.getElementById('input-codigo');
 const btnAcesso = document.querySelector('#btn-acesso');
 const msgErro = document.getElementById('mensagem-erro');
 const codigoGroup = document.getElementById('codigo-group');
+const logoutBtn = document.getElementById('logoutBtn');
 
 let cpfValido = false;
+
+// Função de logout
+logoutBtn.addEventListener('click', () => {
+  Swal.fire({
+    title: 'Sair da conta?',
+    text: 'Tem certeza que deseja fazer logout?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Sim, Sair',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#00324A',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('pacienteSelecionado');
+      localStorage.removeItem('tokenPaciente');
+      
+      Swal.fire({
+        title: 'Logout realizado!',
+        text: 'Você foi desconectado com sucesso.',
+        icon: 'success',
+        confirmButtonColor: '#00324A',
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        window.location.href = 'login.html';
+      });
+    }
+  });
+});
 
 // Máscara de CPF (formata conforme digita)
 inputCPF.addEventListener('input', () => {

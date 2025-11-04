@@ -4,11 +4,12 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js",
+    "dev": "./kill-port.sh && nodemon server.js",
+    "start": "./kill-port.sh && node server.js",
     "build": "mkdir -p client && cp -r ../client/* ./client/"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
