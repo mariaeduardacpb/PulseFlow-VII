@@ -1,4 +1,4 @@
-import { API_URL } from './config.js';
+const API_URL = 'http://localhost:65432';
 
 document.addEventListener("DOMContentLoaded", function () {
   const canvas = document.getElementById("chartEnxaqueca");
@@ -13,13 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
   ];
-  const toggleButton = document.querySelector(".menu-toggle");
-  const sidebar = document.querySelector(".sidebar");
-
-  toggleButton.addEventListener("click", () => {
-    sidebar.classList.toggle("active");
-    toggleButton.classList.toggle("shifted");
-  });
+  // Elementos de menu foram movidos para componentes de header/sidebar
+  // Não precisamos mais gerenciar o toggle aqui
   
   const today = new Date();
   let currentMonthIndex = 9; // Outubro (0-indexed)
@@ -219,14 +214,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateChart(data) {
     if (!data || !data.data || data.data.length === 0) {
-      document.getElementById('no-data-msg').style.display = 'block';
+      const noDataMsg = document.getElementById('no-data-msg-enxaqueca');
+      if (noDataMsg) {
+        noDataMsg.style.display = 'block';
+      }
       chartEnxaqueca.data.labels = [];
       chartEnxaqueca.data.datasets[0].data = [];
       chartEnxaqueca.update();
       return;
     }
 
-    document.getElementById('no-data-msg').style.display = 'none';
+    const noDataMsg = document.getElementById('no-data-msg-enxaqueca');
+    if (noDataMsg) {
+      noDataMsg.style.display = 'none';
+    }
 
     // Extrair dias e valores de enxaqueca
     const dias = data.data.map(d => d.dia);
@@ -269,5 +270,61 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   loadChartData();
-  carregarDadosMedico();
+  atualizarEstatisticas();
 });
+
+// Função para atualizar estatísticas
+async function atualizarEstatisticas() {
+  try {
+    const tokenMedico = localStorage.getItem('token');
+    const tokenPaciente = localStorage.getItem('tokenPaciente');
+
+    if (!tokenMedico || !tokenPaciente) {
+      return;
+    }
+
+    const decodedPayload = JSON.parse(atob(tokenPaciente));
+    const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+
+    if (!cpf) {
+      return;
+    }
+
+    // Buscar dados do mês atual
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    
+    const response = await fetch(`${API_URL}/api/enxaqueca/medico?cpf=${cpf}&month=${currentMonth}&year=${currentYear}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${tokenMedico}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+    
+    if (data && data.data && data.data.length > 0) {
+      // Atualizar estatísticas
+      document.getElementById('totalEpisodesCount').textContent = data.data.length;
+      
+      const intensidades = data.data.map(d => parseFloat(d.intensidade || 0)).filter(i => i > 0);
+      const mediaIntensidade = intensidades.length > 0 ? intensidades.reduce((sum, val) => sum + val, 0) / intensidades.length : 0;
+      document.getElementById('avgIntensity').textContent = mediaIntensidade.toFixed(1);
+      
+      const duracoes = data.data.map(d => parseFloat(d.duracao || 0)).filter(d => d > 0);
+      const mediaDuracao = duracoes.length > 0 ? duracoes.reduce((sum, val) => sum + val, 0) / duracoes.length : 0;
+      document.getElementById('avgDuration').textContent = mediaDuracao.toFixed(1) + 'h';
+      
+      // Contar crises severas (intensidade >= 7)
+      const crisesSeveras = intensidades.filter(i => i >= 7).length;
+      document.getElementById('severeEpisodesCount').textContent = crisesSeveras;
+    }
+  } catch (error) {
+    console.error('Erro ao atualizar estatísticas:', error);
+  }
+}

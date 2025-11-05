@@ -1,4 +1,4 @@
-import { API_URL } from './config.js';
+const API_URL = 'http://localhost:65432';
 
 document.addEventListener("DOMContentLoaded", function () {
   const canvasHoras = document.getElementById("chartHorasSono");
@@ -15,13 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
   ];
-  const toggleButton = document.querySelector(".menu-toggle");
-  const sidebar = document.querySelector(".sidebar");
-
-  toggleButton.addEventListener("click", () => {
-    sidebar.classList.toggle("active");
-    toggleButton.classList.toggle("shifted");
-  });
+  // Elementos de menu foram movidos para componentes de header/sidebar
+  // Não precisamos mais gerenciar o toggle aqui
   
   const today = new Date();
   let currentMonthIndex = 8; // Setembro (0-indexed)
@@ -330,5 +325,61 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   loadChartData();
-  carregarDadosMedico();
+  atualizarEstatisticas();
 });
+
+// Função para atualizar estatísticas
+async function atualizarEstatisticas() {
+  try {
+    const tokenMedico = localStorage.getItem('token');
+    const tokenPaciente = localStorage.getItem('tokenPaciente');
+
+    if (!tokenMedico || !tokenPaciente) {
+      return;
+    }
+
+    const decodedPayload = JSON.parse(atob(tokenPaciente));
+    const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+
+    if (!cpf) {
+      return;
+    }
+
+    // Buscar dados do mês atual
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    
+    const response = await fetch(`${API_URL}/api/insonia/medico?cpf=${cpf}&month=${currentMonth}&year=${currentYear}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${tokenMedico}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+    
+    if (data && data.data && data.data.length > 0) {
+      // Atualizar estatísticas
+      document.getElementById('totalRecordsCount').textContent = data.data.length;
+      
+      const horasSono = data.data.map(d => parseFloat(d.horasSono || 0)).filter(h => h > 0);
+      const mediaHoras = horasSono.length > 0 ? horasSono.reduce((sum, val) => sum + val, 0) / horasSono.length : 0;
+      document.getElementById('avgSleepHours').textContent = mediaHoras.toFixed(1);
+      
+      const qualidades = data.data.map(d => parseFloat(d.qualidadeSono || 0)).filter(q => q > 0);
+      const mediaQualidade = qualidades.length > 0 ? qualidades.reduce((sum, val) => sum + val, 0) / qualidades.length : 0;
+      document.getElementById('avgSleepQuality').textContent = mediaQualidade.toFixed(1);
+      
+      // Contar noites com qualidade boa (>= 4)
+      const boasNoites = qualidades.filter(q => q >= 4).length;
+      document.getElementById('goodSleepCount').textContent = boasNoites;
+    }
+  } catch (error) {
+    console.error('Erro ao atualizar estatísticas:', error);
+  }
+}

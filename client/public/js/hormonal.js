@@ -1,4 +1,4 @@
-import { API_URL } from './config.js';
+const API_URL = 'http://localhost:65432';
 
 document.addEventListener("DOMContentLoaded", function () {
   const canvas = document.getElementById("chartHormonal");
@@ -8,20 +8,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   
   const ctx = canvas.getContext("2d");
-  const noDataLabel = document.getElementById("no-data-msg");
+  const noDataLabel = document.getElementById("no-data-msg-hormonal");
 
   const months = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
   ];
 
-  const toggleButton = document.querySelector(".menu-toggle");
-  const sidebar = document.querySelector(".sidebar");
-
-  toggleButton.addEventListener("click", () => {
-    sidebar.classList.toggle("active");
-    toggleButton.classList.toggle("shifted");
-  });
+  // Elementos de menu foram movidos para componentes de header/sidebar
+  // Não precisamos mais gerenciar o toggle aqui
   
   const today = new Date();
   let currentMonthIndex = 5; // Junho (0-indexed)
@@ -143,19 +138,11 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const medico = await res.json();
-      const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
-      const nomeFormatado = `${prefixo} ${medico.nome}`;
-      
-      const tituloSidebar = document.querySelector('.sidebar .profile h3');
-      if (tituloSidebar) {
-        tituloSidebar.textContent = nomeFormatado;
-      }
+      console.log('Dados do médico carregados:', medico);
 
       return true;
     } catch (error) {
       console.error("Erro ao carregar dados do médico:", error);
-      const fallback = document.querySelector('.sidebar .profile h3');
-      if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
       mostrarErro("Erro ao carregar dados do médico. Por favor, faça login novamente.");
       return false;
     }
@@ -208,13 +195,20 @@ document.addEventListener("DOMContentLoaded", function () {
       datasets: [{
         label: "Níveis Hormonais",
         data: [],
-        borderColor: "#8B5CF6",
-        backgroundColor: "rgba(139, 92, 246, 0.1)",
-        tension: 0.3,
-        pointRadius: 5,
-        pointHoverRadius: 7,
+        borderColor: "#667eea",
+        backgroundColor: "rgba(102, 126, 234, 0.1)",
+        borderWidth: 3,
+        tension: 0.4,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointBackgroundColor: "#667eea",
+        pointBorderColor: "#ffffff",
+        pointBorderWidth: 2,
         fill: true,
-        spanGaps: true
+        spanGaps: true,
+        pointHoverBackgroundColor: "#764ba2",
+        pointHoverBorderColor: "#ffffff",
+        pointHoverBorderWidth: 3
       }]
     },
     options: {
@@ -318,14 +312,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateChart(data) {
     if (!data || !data.data || data.data.length === 0) {
-      document.getElementById('no-data-msg').style.display = 'block';
+      if (noDataLabel) {
+        noDataLabel.style.display = 'block';
+      }
       chartHormonal.data.labels = [];
       chartHormonal.data.datasets[0].data = [];
       chartHormonal.update();
       return;
     }
 
-    document.getElementById('no-data-msg').style.display = 'none';
+    if (noDataLabel) {
+      noDataLabel.style.display = 'none';
+    }
 
     // Extrair dias e valores hormonais
     const dias = data.data.map(d => d.dia);
@@ -367,5 +365,57 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   loadChartData();
-  carregarDadosMedico();
+  atualizarEstatisticas();
 });
+
+// Função para atualizar estatísticas
+async function atualizarEstatisticas() {
+  try {
+    const tokenMedico = localStorage.getItem('token');
+    const tokenPaciente = localStorage.getItem('tokenPaciente');
+
+    if (!tokenMedico || !tokenPaciente) {
+      return;
+    }
+
+    const decodedPayload = JSON.parse(atob(tokenPaciente));
+    const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+
+    if (!cpf) {
+      return;
+    }
+
+    // Buscar dados do mês atual
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    
+    const response = await fetch(`${API_URL}/api/hormonal/medico?cpf=${cpf}&month=${currentMonth}&year=${currentYear}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${tokenMedico}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+    
+    if (data && data.data && data.data.length > 0) {
+      // Atualizar estatísticas
+      document.getElementById('totalReadingsCount').textContent = data.data.length;
+      
+      const valores = data.data.map(d => parseFloat(d.valor));
+      const media = valores.reduce((sum, val) => sum + val, 0) / valores.length;
+      document.getElementById('avgHormonalLevel').textContent = media.toFixed(1);
+      
+      // Contar leituras normais (assumindo que valores entre 10-50 são normais)
+      const normais = valores.filter(val => val >= 10 && val <= 50).length;
+      document.getElementById('normalReadingsCount').textContent = normais;
+    }
+  } catch (error) {
+    console.error('Erro ao atualizar estatísticas:', error);
+  }
+}

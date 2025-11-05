@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Função para formatar a data
     function formatDate(dateString) {

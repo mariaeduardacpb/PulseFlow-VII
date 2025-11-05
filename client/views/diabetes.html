@@ -1,91 +1,168 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PulseFlow | Diabetes</title>
-  <link rel="stylesheet" href="../public/css/diabetes.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFlow | Monitoramento de Diabetes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/css/diabetes.css">
+  <link rel="stylesheet" href="../public/css/sidebar.css">
+  <link rel="stylesheet" href="../public/css/header.css">
   <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 </head>
 <body>
-  <button class="menu-toggle" aria-label="Abrir menu">☰</button>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
+  
   <div class="container">
-    <aside class="sidebar">
-      <div class="profile">
-        <h3></h3>
-      </div>
-      <nav class="specialties">
-        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
-        <details><summary><span><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
-        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
-        <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
-        <details open><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
-          <ul>
-            <!-- Condições Crônicas -->
-            <li style="font-weight: bold;"><a href="diabetes.html">Diabetes</a></li>
-            <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
-            <li><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
-            
-            <!-- Saúde Hormonal e Reprodutiva -->
-            <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
-            <li><a href="hormonal.html">Hormonal</a></li>
-            
-            <!-- Saúde Mental e Sono -->
-            <li><a href="insonia.html">Insônia</a></li>
-            <li><a href="enxaqueca.html">Enxaqueca</a></li>
-          </ul>
-        </details>
-      </nav>
-      <div class="change-patient">
-        <a href="selecao.html">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
-          Trocar de Paciente
-        </a>
-      </div>
-    </aside>
-
     <main class="content">
-      <header class="header">
-        <h1>Níveis de Glicemia</h1>
-        <div class="logo">
-          <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
-        </div>
-      </header>
-
-      <section class="chart-section">
-        <div class="chart">
-          <div class="chart-header">
-            <h4>Dados de Glicemia</h4>
-            <div class="month-selector">
-              <button class="arrow-btn" data-direction="prev">‹</button>
-              <span class="month-label">Abril • 2025</span>
-              <button class="arrow-btn" data-direction="next">›</button>
+      <!-- Card Principal do Diabetes -->
+      <section class="diabetes-card">
+        <div class="card-header">
+          <div class="title-section">
+            <h1 class="page-title">Monitoramento de Diabetes</h1>
+            <p class="page-subtitle">Acompanhamento dos níveis de glicemia do paciente</p>
+          </div>
+          <div class="stats-section">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="totalReadingsCount">0</span>
+                <span class="stat-label">Total de Leituras</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="avgGlucoseLevel">0</span>
+                <span class="stat-label">Média Glicêmica</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
+                  <path d="M16 2l4 4-4 4"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="normalReadingsCount">0</span>
+                <span class="stat-label">Leituras Normais</span>
+              </div>
             </div>
           </div>
-          <div id="no-data-msg-glicemia" class="no-data-msg">
-            ⚠️ <span>Nenhum dado de glicemia encontrado para este mês.</span>
+        </div>
+
+        <!-- Gráfico de Glicemia -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <div class="chart-title">
+              <div class="title-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                </svg>
+              </div>
+              <div class="title-text">
+                <h2>Gráfico de Glicemia</h2>
+                <p>Níveis de glicose ao longo do tempo</p>
+              </div>
+            </div>
+            <div class="month-selector">
+              <button class="arrow-btn" data-direction="prev">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+              </button>
+              <span class="month-label">Abril • 2025</span>
+              <button class="arrow-btn" data-direction="next">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 18l6-6-6-6"></path>
+                </svg>
+              </button>
+            </div>
           </div>
-          <canvas id="chartGlicemia"></canvas>
+          
+          <div id="no-data-msg-glicemia" class="no-data-message">
+            <div class="no-data-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"></path>
+                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+              </svg>
+            </div>
+            <h3>Nenhum dado encontrado</h3>
+            <p>Não há registros de glicemia para este mês.</p>
+          </div>
+          
+          <div class="chart-container">
+            <canvas id="chartGlicemia"></canvas>
+          </div>
+        </div>
+
+        <!-- Referências de Glicemia -->
+        <div class="info-section">
+          <div class="info-header">
+            <div class="info-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <h3>Referências de Glicemia</h3>
+          </div>
+          <div class="info-content">
+            <div class="reference-item">
+              <div class="reference-label">Glicemia de jejum normal:</div>
+              <div class="reference-value normal">Inferior a 100 mg/dL</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Glicemia pós-prandial normal:</div>
+              <div class="reference-value normal">Inferior a 140 mg/dL</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Hipoglicemia:</div>
+              <div class="reference-value low">Inferior a 70 mg/dL</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Hiperglicemia:</div>
+              <div class="reference-value high">Superior a 180 mg/dL</div>
+            </div>
+          </div>
+          <div class="info-footer">
+            <a href="https://lavoisier.com.br/saude/glicemia#:~:text=Glicemia%20de%20jejum%20normal%3A%20inferior,inferior%20a%2070%20mg%2FdL." 
+               target="_blank" rel="noopener noreferrer" class="reference-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15,3 21,3 21,9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              Saiba mais sobre níveis glicêmicos
+            </a>
+          </div>
         </div>
       </section>
-
-      <footer class="referencia-dor">
-        <p>
-          🔎 Saiba mais sobre níveis glicêmicos saudáveis:
-          <a href="https://lavoisier.com.br/saude/glicemia#:~:text=Glicemia%20de%20jejum%20normal%3A%20inferior,inferior%20a%2070%20mg%2FdL."
-             target="_blank" rel="noopener noreferrer">
-            Artigo
-          </a>
-        </p>
-      </footer>
     </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/client/public/js/diabetes.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0/dist/chartjs-plugin-annotation.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script src="../public/js/header.js"></script>
+  <script src="../public/js/sidebar.js"></script>
+  <script src="../public/js/diabetes.js"></script>
 </body>
 </html>
-

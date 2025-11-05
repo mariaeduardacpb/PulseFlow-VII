@@ -536,6 +536,46 @@ async function salvarAlteracoes(event) {
             throw new Error(errorMessage);
         }
 
+        // Atualizar Firestore se disponível (para monitoramento em tempo real)
+        // Fazer de forma não-bloqueante (não esperar, apenas tentar)
+        if (window.firebaseDb && typeof firebase !== 'undefined') {
+            // Executar em background, não bloquear o fluxo
+            (async () => {
+                try {
+                    const token = localStorage.getItem('token');
+                    if (token) {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        const userId = payload._id || payload.id || payload.userId;
+                        
+                        if (userId) {
+                            // Usar os dados retornados ou montar objeto com os dados salvos
+                            const firestoreData = responseData.usuario || responseData || dadosPerfil;
+                            
+                            // Criar objeto de atualização
+                            const updateData = {
+                                ...firestoreData,
+                                updatedAt: typeof firebase !== 'undefined' && firebase.firestore 
+                                    ? firebase.firestore.FieldValue.serverTimestamp() 
+                                    : new Date()
+                            };
+                            
+                            // Tentar atualizar com timeout
+                            const updatePromise = window.firebaseDb.collection('medicos').doc(userId).set(updateData, { merge: true });
+                            const timeoutPromise = new Promise((_, reject) => 
+                                setTimeout(() => reject(new Error('Timeout')), 3000)
+                            );
+                            
+                            await Promise.race([updatePromise, timeoutPromise]);
+                            console.log('✅ Dados atualizados no Firestore');
+                        }
+                    }
+                } catch (firestoreError) {
+                    // Silenciar erros do Firestore - não é crítico, o polling vai detectar mudanças
+                    console.log('ℹ️ Firestore não disponível para atualização (usando polling)');
+                }
+            })();
+        }
+
         // Fechar popup de salvamento e mostrar sucesso
         Swal.close();
         Swal.fire({

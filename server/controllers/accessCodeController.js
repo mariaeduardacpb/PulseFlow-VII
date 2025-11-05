@@ -5,18 +5,27 @@ import SolicitacaoAcesso from '../models/SolicitacaoAcesso.js';
 export const gerarCodigoAcesso = async (req, res) => {
   const { cpf, patientId, accessCode, expiresAt } = req.body;
 
+  console.log('📥 [accessCodeController] Requisição recebida:', { patientId, accessCode, expiresAt, cpf });
+
   // Se vem do app mobile (com patientId e accessCode)
   if (patientId && accessCode && expiresAt) {
     try {
+      console.log('📱 [accessCodeController] Buscando paciente por ID:', patientId);
       const paciente = await Paciente.findById(patientId);
+      
       if (!paciente) {
+        console.log('❌ [accessCodeController] Paciente não encontrado:', patientId);
         return res.status(404).json({ message: 'Paciente não encontrado' });
       }
 
-      // Atualizar paciente com o código recebido do app
+      console.log('✅ [accessCodeController] Paciente encontrado:', paciente._id);
+      console.log('💾 [accessCodeController] Salvando código de acesso...');
+
       paciente.accessCode = accessCode;
       paciente.accessCodeExpires = new Date(expiresAt);
       await paciente.save();
+
+      console.log('✅ [accessCodeController] Código salvo com sucesso');
 
       res.json({
         message: 'Código de acesso salvo com sucesso',
@@ -24,6 +33,7 @@ export const gerarCodigoAcesso = async (req, res) => {
         expiraEm: paciente.accessCodeExpires
       });
     } catch (error) {
+      console.error('❌ [accessCodeController] Erro ao salvar código:', error);
       res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
     }
     return;

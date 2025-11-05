@@ -12,22 +12,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  function mostrarErro(mensagem, tipo = 'error') {
+  function mostrarErro(mensagem) {
     const aviso = document.createElement('div');
-    const isSuccess = tipo === 'success';
     aviso.style.cssText = `
       position: fixed;
       top: 20px;
       right: 20px;
-      background-color: ${isSuccess ? '#e8f5e9' : '#ffffff'};
-      color: ${isSuccess ? '#2e7d32' : '#002A42'};
+      background-color: #ffffff;
+      color: #002A42;
       padding: 16px 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px ${isSuccess ? 'rgba(46, 125, 50, 0.2)' : 'rgba(0, 42, 66, 0.1)'};
+      box-shadow: 0 4px 12px rgba(0, 42, 66, 0.1);
       z-index: 1000;
       font-family: 'Montserrat', sans-serif;
       font-size: 14px;
-      border: 1px solid ${isSuccess ? '#4caf50' : '#e1e5eb'};
+      border: 1px solid #e1e5eb;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -37,22 +36,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
 
     const icon = document.createElement('div');
-    if (isSuccess) {
-      icon.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #4caf50;">
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-          <polyline points="22 4 12 14.01 9 11.01"></polyline>
-        </svg>
-      `;
-    } else {
-      icon.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00c3b7;">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-      `;
-    }
+    icon.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00c3b7;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    `;
 
     const textContainer = document.createElement('div');
     textContainer.style.cssText = `
@@ -196,15 +186,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  let pacienteAtual = null; // Armazenar dados do paciente
-
   function preencherPerfil(paciente) {
     if (!paciente) return;
-    
-    pacienteAtual = paciente; // Salvar dados do paciente
 
     // Atualiza a foto do perfil
-    const imagemPerfil = document.getElementById('fotoPaciente');
+    const imagemPerfil = document.querySelector('.profile-box img');
     if (imagemPerfil) {
       imagemPerfil.src = paciente.fotoPerfil || '/client/public/assets/User_logonegativo.png';
       imagemPerfil.onerror = () => {
@@ -226,24 +212,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       observacoesPaciente: paciente.observacoes || 'Nenhuma'
     };
 
-    // Preenche valores exibidos
+    // Atualiza cada campo individualmente
     Object.entries(dadosFormatados).forEach(([id, valor]) => {
       const elemento = document.getElementById(id);
-      if (elemento && elemento.classList.contains('info-value')) {
+      if (elemento) {
         elemento.textContent = valor;
       }
     });
-
-    // Preenche inputs com valores brutos (sem formatação)
-    document.getElementById('inputNomePaciente').value = paciente.nome || '';
-    document.getElementById('inputGeneroPaciente').value = paciente.genero || '';
-    document.getElementById('inputNacionalidadePaciente').value = paciente.nacionalidade || '';
-    document.getElementById('inputAlturaPaciente').value = paciente.altura ? paciente.altura.toString().replace(' cm', '') : '';
-    document.getElementById('inputPesoPaciente').value = paciente.peso ? paciente.peso.toString().replace(' kg', '') : '';
-    document.getElementById('inputProfissaoPaciente').value = paciente.profissao || '';
-    document.getElementById('inputEmailPaciente').value = paciente.email || '';
-    document.getElementById('inputTelefonePaciente').value = paciente.telefone ? paciente.telefone.replace(/\D/g, '') : '';
-    document.getElementById('inputObservacoesPaciente').value = paciente.observacoes || '';
   }
 
   function formatarTelefone(telefone) {

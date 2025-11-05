@@ -1,594 +1,924 @@
 import { API_URL } from './config.js';
 
-document.addEventListener("DOMContentLoaded", () => {
-  const examGrid = document.getElementById("examGrid");
-  const semExamesMsg = document.getElementById("no-data-msg");
-  const contadorExames = document.getElementById("contador-exames");
+// Elementos DOM
+let examsGrid, emptyState, loadingState, examsCount, totalExames, examesMes, categorias;
+let filtroNome, filtroCategoria, filtroData, btnLimparFiltros, btnNovoExame, btnNovoExameEmpty;
+let examModal, modalClose, modalTitle, modalNomeExame, modalCategoria, modalData, modalDescricao, modalImage;
+let btnDownload, btnImprimir;
 
-  const toggleButton = document.querySelector(".menu-toggle");
-  const sidebar = document.querySelector(".sidebar");
+// Variáveis globais
+let allExames = [];
+let filteredExames = [];
+let currentExamId = null;
+let selectedPatient = null;
 
-  toggleButton.addEventListener("click", () => {
-    sidebar.classList.toggle("active");
-    toggleButton.classList.toggle("shifted");
+document.addEventListener('DOMContentLoaded', async () => {
+  // Aguardar carregamento dos componentes
+  setTimeout(async () => {
+    await inicializarPagina();
+  }, 100);
+});
+
+async function inicializarPagina() {
+  try {
+    // Inicializar elementos DOM
+    inicializarElementosDOM();
+    
+    // Configurar event listeners
+    configurarEventListeners();
+    
+    // Carregar dados
+    await carregarExames();
+    
+    // Atualizar estatísticas
+    atualizarEstatisticas();
+    
+  } catch (error) {
+    console.error('Erro ao inicializar página:', error);
+    mostrarErro('Erro ao inicializar a página');
+  }
+}
+
+function inicializarElementosDOM() {
+  // Elementos principais
+  examsGrid = document.getElementById('examsGrid');
+  emptyState = document.getElementById('emptyState');
+  loadingState = document.getElementById('loadingState');
+  examsCount = document.getElementById('examsCount');
+  
+  // Estatísticas
+  totalExames = document.getElementById('totalExames');
+  examesMes = document.getElementById('examesMes');
+  categorias = document.getElementById('categorias');
+  
+  // Filtros
+  filtroNome = document.getElementById('filtroNome');
+  filtroCategoria = document.getElementById('filtroCategoria');
+  filtroData = document.getElementById('filtroData');
+  btnLimparFiltros = document.getElementById('btnLimparFiltros');
+  btnNovoExame = document.getElementById('btnNovoExame');
+  btnNovoExameEmpty = document.getElementById('btnNovoExameEmpty');
+  
+  // Modal
+  examModal = document.getElementById('examModal');
+  modalClose = document.getElementById('modalClose');
+  modalTitle = document.getElementById('modalTitle');
+  modalNomeExame = document.getElementById('modalNomeExame');
+  modalCategoria = document.getElementById('modalCategoria');
+  modalData = document.getElementById('modalData');
+  modalDescricao = document.getElementById('modalDescricao');
+  modalImage = document.getElementById('modalImage');
+  btnDownload = document.getElementById('btnDownload');
+  btnImprimir = document.getElementById('btnImprimir');
+}
+
+function configurarEventListeners() {
+  // Filtros
+  if (filtroNome) filtroNome.addEventListener('input', aplicarFiltros);
+  if (filtroCategoria) filtroCategoria.addEventListener('change', aplicarFiltros);
+  if (filtroData) filtroData.addEventListener('change', aplicarFiltros);
+  
+  // Botões
+  if (btnLimparFiltros) btnLimparFiltros.addEventListener('click', limparFiltros);
+  if (btnNovoExame) btnNovoExame.addEventListener('click', criarNovoExame);
+  if (btnNovoExameEmpty) btnNovoExameEmpty.addEventListener('click', criarNovoExame);
+  
+  // Modal
+  if (modalClose) modalClose.addEventListener('click', fecharModal);
+  if (btnDownload) btnDownload.addEventListener('click', downloadExame);
+  if (btnImprimir) btnImprimir.addEventListener('click', imprimirExame);
+  
+  // Fechar modal com ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && examModal.classList.contains('show')) {
+      fecharModal();
+    }
   });
-
-  let examesCarregados = []; // <<< variável global para armazenar exames
-
-  function mostrarErro(mensagem) {
-    const aviso = document.createElement('div');
-    aviso.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #ffffff;
-      color: #002A42;
-      padding: 16px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 42, 66, 0.1);
-      z-index: 1000;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 14px;
-      border: 1px solid #e1e5eb;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 300px;
-      max-width: 400px;
-      animation: slideIn 0.3s ease-out;
-    `;
-
-    const icon = document.createElement('div');
-    icon.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00c3b7;">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-    `;
-
-    const textContainer = document.createElement('div');
-    textContainer.style.cssText = `
-      flex: 1;
-      line-height: 1.4;
-    `;
-    textContainer.textContent = mensagem;
-
-    const closeButton = document.createElement('button');
-    closeButton.style.cssText = `
-      background: none;
-      border: none;
-      padding: 4px;
-      cursor: pointer;
-      color: #94a3b8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s;
-    `;
-    closeButton.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    `;
-    closeButton.onclick = () => {
-      aviso.style.animation = 'slideOut 0.3s ease-out';
-      setTimeout(() => {
-        document.body.removeChild(aviso);
-        document.head.removeChild(style);
-      }, 300);
-    };
-
-    aviso.appendChild(icon);
-    aviso.appendChild(textContainer);
-    aviso.appendChild(closeButton);
-    document.body.appendChild(aviso);
-
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+  
+  // Fechar modal clicando fora
+  if (examModal) {
+    examModal.addEventListener('click', (e) => {
+      if (e.target === examModal) {
+        fecharModal();
       }
-      @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
+    });
+  }
+}
 
-    setTimeout(() => {
-      if (document.body.contains(aviso)) {
-        aviso.style.animation = 'slideOut 0.3s ease-out';
-        setTimeout(() => {
-          if (document.body.contains(aviso)) {
-            document.body.removeChild(aviso);
-            document.head.removeChild(style);
+async function carregarExames() {
+  try {
+    mostrarLoading(true);
+    
+    const token = localStorage.getItem('token');
+    
+    // Tentar diferentes chaves possíveis para o paciente
+    let paciente = null;
+    const chavesPaciente = ['selectedPatient', 'pacienteSelecionado', 'selectedPatientData'];
+    
+    for (const chave of chavesPaciente) {
+      const dados = localStorage.getItem(chave);
+      if (dados) {
+        try {
+          paciente = JSON.parse(dados);
+          if (paciente && (paciente.cpf || paciente.id)) {
+            break;
           }
-        }, 300);
-      }
-    }, 5000);
-  }
-
-  async function carregarDadosMedico() {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token não encontrado. Por favor, faça login novamente.');
-      }
-
-      const res = await fetch(`${API_URL}/api/usuarios/perfil`, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+        } catch (e) {
+          continue;
         }
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Erro ao carregar dados do médico');
       }
-
-      const medico = await res.json();
-      const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
-      const nomeFormatado = `${prefixo} ${medico.nome}`;
-      
-      const tituloSidebar = document.querySelector('.sidebar .profile h3');
-      if (tituloSidebar) {
-        tituloSidebar.textContent = nomeFormatado;
+    }
+    
+    if (!token) {
+      throw new Error('Token não encontrado');
+    }
+    
+    if (!paciente || (!paciente.cpf && !paciente.id)) {
+      throw new Error('Paciente não selecionado. Redirecionando para seleção de paciente.');
+    }
+    
+    // Definir paciente selecionado globalmente
+    selectedPatient = paciente;
+    
+    // Buscar exames da API usando CPF do paciente
+    const cpfPaciente = paciente.cpf || paciente.id;
+    const response = await fetch(`${API_URL}/api/anexoExame/medico?cpf=${cpfPaciente}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
-
-      return true;
-    } catch (error) {
-      console.error("Erro ao carregar dados do médico:", error);
-      const fallback = document.querySelector('.sidebar .profile h3');
-      if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
-      mostrarErro("Erro ao carregar dados do médico. Por favor, faça login novamente.");
-      return false;
-    }
-  }
-
-  function renderizarExames(listaExames) {
-    examGrid.innerHTML = "";
-
-    if (listaExames.length === 0) {
-      semExamesMsg.style.display = "block";
-      contadorExames.style.display = "none";
-    } else {
-      semExamesMsg.style.display = "none";
-      contadorExames.style.display = "block";
-      contadorExames.textContent = `🔎 ${listaExames.length} exame${listaExames.length > 1 ? 's' : ''} encontrado${listaExames.length > 1 ? 's' : ''}.`;
-
-      // Ordenar exames por data (mais recentes primeiro)
-      const examesOrdenados = listaExames.sort((a, b) => new Date(b.data) - new Date(a.data));
-
-      examesOrdenados.forEach((exame) => {
-        const card = document.createElement("div");
-        card.className = "exam-card";
-        
-        // Determinar ícone baseado no tipo de arquivo
-        const extensao = exame.filePath.split('.').pop().toLowerCase();
-        let icone = '📄';
-        if (extensao === 'pdf') icone = '📕';
-        else if (['jpg', 'jpeg', 'png', 'heic'].includes(extensao)) icone = '🖼️';
-        
-        // Formatar data
-        const dataFormatada = new Date(exame.data).toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        });
-
-        card.innerHTML = `
-          <div class="exam-header">
-            <span class="exam-icon">${icone}</span>
-            <div class="exam-info">
-              <h3>${exame.nome}</h3>
-              <p class="exam-category">${exame.categoria}</p>
-              <p class="exam-date">📅 ${dataFormatada}</p>
-            </div>
-          </div>
-          <div class="exam-actions">
-            <button class="btn-view" onclick="visualizarExame('${exame._id}', '${exame.nome}', '${extensao}')">
-              👁️ Visualizar
-            </button>
-            <button class="btn-download" onclick="baixarExame('${exame._id}', '${exame.nome}')">
-              ⬇️ Baixar
-            </button>
-          </div>
-        `;
-        examGrid.appendChild(card);
-      });
-    }
-  }
-
-  async function buscarExamesPaciente() {
-    try {
-      const tokenMedico = localStorage.getItem('token');
-      const tokenPaciente = localStorage.getItem('tokenPaciente');
-
-      // Verificar se os tokens existem
-      if (!tokenMedico || !tokenPaciente) {
-        console.error('Tokens ausentes:', {
-          tokenMedico: !tokenMedico,
-          tokenPaciente: !tokenPaciente
-        });
-        mostrarErro("Sessão expirada. Faça login novamente!");
+    });
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        // Nenhum exame encontrado - não é erro
+        allExames = [];
+        filteredExames = [];
+        atualizarEstatisticas();
+        mostrarLoading(false);
         return;
       }
-
-      try {
-        // Decodificar o token JWT simples
-        let decodedPayload;
-        try {
-          // JWT simples com apenas payload (sem header e signature)
-          decodedPayload = JSON.parse(atob(tokenPaciente));
-        } catch (decodeError) {
-          console.error('Erro ao decodificar token:', decodeError);
-          console.log('Token recebido:', tokenPaciente);
-          mostrarErro("Erro ao decodificar token do paciente.");
-          return;
-        }
-        
-        const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
-
-        if (!cpf) {
-          mostrarErro("CPF não encontrado no token do paciente.");
-          return;
-        }
-        
-        const response = await fetch(`${API_URL}/api/anexoExame/medico?cpf=${cpf}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${tokenMedico}`,
-            "Content-Type": "application/json"
-          }
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          mostrarErro(`Erro ao buscar exames: ${response.status} - ${errorText}`);
-          return;
-        }
-
-        const exames = await response.json();
-
-        examesCarregados = exames;
-        renderizarExames(examesCarregados);
-
-      } catch (error) {
-        console.error('Erro ao buscar exames:', error);
-        mostrarErro("Erro interno ao buscar exames.");
-      }
-    } catch (error) {
-      console.error('Erro ao buscar exames:', error);
-      mostrarErro("Erro interno ao buscar exames.");
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
     }
+    
+    const data = await response.json();
+    
+    // Processar dados da API
+    if (Array.isArray(data)) {
+      allExames = data.map(exame => ({
+        id: exame._id?.$oid || exame._id,
+        nome: exame.nome || 'Exame sem nome',
+        categoria: exame.categoria || 'Sem categoria',
+        data: exame.data,
+        filePath: exame.filePath,
+        paciente: exame.paciente?.$oid || exame.paciente,
+        descricao: `Exame de ${exame.categoria || 'categoria não especificada'}`
+      }));
+    } else {
+      allExames = [];
+    }
+    
+    filteredExames = [...allExames];
+    atualizarEstatisticas();
+    
+    if (allExames.length > 0) {
+      mostrarAviso(`${allExames.length} exame${allExames.length !== 1 ? 's' : ''} carregado${allExames.length !== 1 ? 's' : ''} com sucesso!`, 'success');
+    }
+    
+  } catch (error) {
+    console.error('Erro ao carregar exames:', error);
+    mostrarErro(`Erro ao carregar exames: ${error.message}`);
+    allExames = [];
+    filteredExames = [];
+  } finally {
+    mostrarLoading(false);
   }
+}
 
-  // Função para visualizar exame
-  window.visualizarExame = async function (idExame, nomeExame, extensao) {
-    try {
-      const token = localStorage.getItem('token');
-      
-      // Mostrar modal de carregamento
-      const modal = document.createElement('div');
-      modal.className = 'exam-modal';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>${nomeExame}</h3>
-            <button class="close-modal" onclick="fecharModal()">&times;</button>
+function renderizarExames(exames = filteredExames) {
+  if (!examsGrid) return;
+  
+  // Atualizar contador
+  if (examsCount) {
+    examsCount.textContent = `${exames.length} exame${exames.length !== 1 ? 's' : ''} encontrado${exames.length !== 1 ? 's' : ''}`;
+  }
+  
+  // Sempre ocultar estados primeiro
+  if (emptyState) emptyState.style.display = 'none';
+  if (loadingState) loadingState.style.display = 'none';
+  
+  if (exames.length === 0) {
+    examsGrid.style.display = 'none';
+    if (emptyState) emptyState.style.display = 'flex';
+    return;
+  }
+  
+  // Mostrar grid e renderizar exames
+  examsGrid.style.display = 'grid';
+  examsGrid.innerHTML = exames.map(exame => criarCardExame(exame)).join('');
+  
+  // Adicionar event listeners aos cards
+  document.querySelectorAll('.exam-card').forEach(card => {
+    card.addEventListener('click', () => abrirModalExame(card.dataset.id));
+  });
+  
+  // Adicionar event listeners aos botões
+  document.querySelectorAll('.btn-view').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      abrirModalExame(btn.dataset.id);
+    });
+  });
+  
+  document.querySelectorAll('.btn-download').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      downloadExame(btn.dataset.id);
+    });
+  });
+}
+
+function criarCardExame(exame) {
+  const dataFormatada = formatarData(exame.data);
+  
+  return `
+    <div class="exam-card" data-id="${exame.id}">
+      <div class="exam-header">
+        <h3 class="exam-title">${exame.nome}</h3>
+        <span class="exam-category">${exame.categoria}</span>
+      </div>
+      <div class="exam-info">
+        <div class="exam-date">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          ${dataFormatada}
+        </div>
+        <p class="exam-description">${exame.descricao}</p>
+      </div>
+      <div class="exam-actions">
+        <button class="btn-view" data-id="${exame.id}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          Visualizar
+        </button>
+        <button class="btn-download" data-id="${exame.id}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7,10 12,15 17,10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function aplicarFiltros() {
+  const nome = filtroNome?.value.toLowerCase() || '';
+  const categoria = filtroCategoria?.value || '';
+  const data = filtroData?.value || '';
+  
+  filteredExames = allExames.filter(exame => {
+    const matchNome = !nome || exame.nome.toLowerCase().includes(nome);
+    const matchCategoria = !categoria || exame.categoria === categoria;
+    
+    let matchData = true;
+    if (data && exame.data) {
+      const dataExame = new Date(exame.data).toISOString().split('T')[0]; // YYYY-MM-DD
+      matchData = dataExame === data;
+    }
+    
+    return matchNome && matchCategoria && matchData;
+  });
+  
+  renderizarExames();
+}
+
+function limparFiltros() {
+  if (filtroNome) filtroNome.value = '';
+  if (filtroCategoria) filtroCategoria.value = '';
+  if (filtroData) filtroData.value = '';
+  
+  filteredExames = [...allExames];
+  renderizarExames();
+}
+
+function atualizarEstatisticas() {
+  if (totalExames) totalExames.textContent = allExames.length;
+  
+  // Exames deste mês
+  const mesAtual = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const examesMesAtual = allExames.filter(exame => {
+    if (!exame.data) return false;
+    const dataExame = new Date(exame.data).toISOString().slice(0, 7);
+    return dataExame === mesAtual;
+  });
+  if (examesMes) examesMes.textContent = examesMesAtual.length;
+  
+  // Categorias únicas
+  const categoriasUnicas = [...new Set(allExames.map(exame => exame.categoria))];
+  if (categorias) categorias.textContent = categoriasUnicas.length;
+}
+
+function abrirModalExame(exameId) {
+  const exame = allExames.find(e => e.id === exameId);
+  if (!exame) return;
+  
+  // Definir exame atual para download/impressão
+  currentExamId = exameId;
+  
+  if (modalTitle) modalTitle.textContent = exame.nome;
+  if (modalNomeExame) modalNomeExame.textContent = exame.nome;
+  if (modalCategoria) modalCategoria.textContent = exame.categoria;
+  if (modalData) modalData.textContent = formatarData(exame.data);
+  if (modalDescricao) modalDescricao.textContent = exame.descricao;
+  
+  if (modalImage) {
+    if (exame.filePath) {
+      // Se for um caminho local do dispositivo móvel, mostrar placeholder
+      if (exame.filePath.includes('/data/user/') || exame.filePath.includes('app_flutter/')) {
+        modalImage.innerHTML = `
+          <div style="text-align: center; color: #94a3b8;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21,15 16,10 5,21"></polyline>
+            </svg>
+            <p style="margin-top: 12px;">Imagem do exame não disponível para visualização</p>
+            <p style="font-size: 12px; color: #64748b;">Arquivo: ${exame.filePath.split('/').pop()}</p>
           </div>
-          <div class="modal-body">
-            <div class="loading-spinner">
-              <div class="spinner"></div>
-              <p>Carregando exame...</p>
-            </div>
-          </div>
+        `;
+      } else {
+        modalImage.innerHTML = `<img src="${exame.filePath}" alt="${exame.nome}">`;
+      }
+    } else {
+      modalImage.innerHTML = `
+        <div style="text-align: center; color: #94a3b8;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10,9 9,9 8,9"></polyline>
+          </svg>
+          <p style="margin-top: 12px;">Nenhuma imagem disponível</p>
         </div>
       `;
-      document.body.appendChild(modal);
+    }
+  }
+  
+  if (examModal) {
+    examModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+}
 
-      const response = await fetch(`${API_URL}/api/anexoExame/download/${idExame}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`
+function fecharModal() {
+  if (examModal) {
+    examModal.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+}
+
+function downloadExame(exameId = null) {
+  const exameIdToUse = exameId || currentExamId;
+  const exame = allExames.find(e => e.id === exameIdToUse);
+  if (!exame) {
+    mostrarAviso('Nenhum exame selecionado para download.', 'warning');
+    return;
+  }
+  
+  const token = localStorage.getItem('token');
+  if (!token) {
+    mostrarAviso('Token não encontrado. Faça login novamente.', 'error');
+    return;
+  }
+  
+  // Usar o endpoint de download do backend
+  const downloadUrl = `${API_URL}/api/anexoExame/download/${exameId}`;
+  
+  // Criar link temporário para download
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.download = `${exame.nome}.pdf`; // Assumir PDF por padrão
+  
+  // Adicionar headers de autorização via fetch
+  fetch(downloadUrl, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+    return response.blob();
+  })
+  .then(blob => {
+    // Criar URL temporária para o blob
+    const url = window.URL.createObjectURL(blob);
+    link.href = url;
+    
+    // Adicionar ao DOM, clicar e remover
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Limpar URL temporária
+    window.URL.revokeObjectURL(url);
+    
+    mostrarAviso(`Download do exame "${exame.nome}" iniciado!`, 'success');
+  })
+  .catch(error => {
+    console.error('Erro ao fazer download:', error);
+    mostrarAviso(`Erro ao fazer download: ${error.message}`, 'error');
+  });
+}
+
+function imprimirExame() {
+  const exame = allExames.find(e => e.id === currentExamId);
+  if (!exame) {
+    mostrarAviso('Nenhum exame selecionado para impressão.', 'warning');
+    return;
+  }
+  
+  // Criar conteúdo para impressão
+  const printContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Relatório Médico - ${exame.nome}</title>
+      <meta charset="UTF-8">
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
         }
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao carregar o exame');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      // Atualizar modal com conteúdo
-      const modalBody = modal.querySelector('.modal-body');
-      
-      if (extensao === 'pdf') {
-        modalBody.innerHTML = `
-          <iframe src="${url}" width="100%" height="600px" style="border: none;"></iframe>
-          <div class="modal-actions">
-            <button class="btn-download" onclick="baixarExame('${idExame}', '${nomeExame}')">
-              ⬇️ Baixar PDF
-            </button>
-          </div>
-        `;
-      } else if (['jpg', 'jpeg', 'png', 'heic'].includes(extensao)) {
-        modalBody.innerHTML = `
-          <div class="image-container">
-            <img src="${url}" alt="${nomeExame}" style="max-width: 100%; max-height: 70vh; object-fit: contain;">
-          </div>
-          <div class="modal-actions">
-            <button class="btn-download" onclick="baixarExame('${idExame}', '${nomeExame}')">
-              ⬇️ Baixar Imagem
-            </button>
-          </div>
-        `;
-      } else {
-        modalBody.innerHTML = `
-          <div class="unsupported-file">
-            <p>⚠️ Tipo de arquivo não suportado para visualização</p>
-            <p>Extensão: .${extensao}</p>
-            <div class="modal-actions">
-              <button class="btn-download" onclick="baixarExame('${idExame}', '${nomeExame}')">
-                ⬇️ Baixar Arquivo
-              </button>
+        
+        body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          line-height: 1.5;
+          color: #1a1a1a;
+          background: #ffffff;
+          font-size: 13px;
+          max-height: 100vh;
+          overflow: hidden;
+        }
+        
+        .page {
+          width: 100%;
+          height: 100vh;
+          padding: 25px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+        
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 30px;
+          padding-bottom: 20px;
+        }
+        
+        .logo-section {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+        }
+        
+        .logo {
+          width: 45px;
+          height: 45px;
+          background: url('/client/public/assets/pulseLogo.png') no-repeat center;
+          background-size: contain;
+        }
+        
+        .brand-info {
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .brand-name {
+          font-size: 20px;
+          font-weight: 700;
+          color: #3b82f6;
+          margin-bottom: 2px;
+        }
+        
+        .brand-subtitle {
+          font-size: 11px;
+          color: #666;
+          font-weight: 400;
+        }
+        
+        .document-info {
+          text-align: right;
+          font-size: 11px;
+          color: #666;
+        }
+        
+        .document-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #1a1a1a;
+          text-align: center;
+          margin: 30px 0;
+          padding: 20px 0;
+        }
+        
+        .content-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 40px;
+          flex: 1;
+          margin-bottom: 30px;
+        }
+        
+        .left-column {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+        }
+        
+        .right-column {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+        }
+        
+        .section {
+          background: #ffffff;
+        }
+        
+        .section-title {
+          font-size: 12px;
+          font-weight: 600;
+          color: #3b82f6;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+          margin-bottom: 15px;
+        }
+        
+        .info-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+        
+        .info-item {
+          display: flex;
+          flex-direction: column;
+          padding: 15px;
+          background: #f8f9fa;
+        }
+        
+        .info-label {
+          font-size: 10px;
+          font-weight: 500;
+          color: #6b7280;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 6px;
+        }
+        
+        .info-value {
+          font-size: 13px;
+          font-weight: 500;
+          color: #1a1a1a;
+        }
+        
+        .image-container {
+          text-align: center;
+          margin: 20px 0;
+        }
+        
+        .exam-image {
+          max-width: 100%;
+          max-height: 350px;
+          height: auto;
+          object-fit: contain;
+        }
+        
+        .no-image {
+          padding: 50px 20px;
+          background: #f8f9fa;
+          color: #6b7280;
+          font-size: 12px;
+          text-align: center;
+        }
+        
+        .signature-section {
+          margin-top: 30px;
+          padding: 25px 0;
+          background: #f8f9fa;
+        }
+        
+        .signature-line {
+          text-align: center;
+          max-width: 350px;
+          margin: 0 auto;
+        }
+        
+        .signature-space {
+          border-bottom: 2px solid #1a1a1a;
+          width: 100%;
+          margin: 0 auto 10px;
+          height: 25px;
+          position: relative;
+        }
+        
+        .signature-space::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 50%;
+          height: 1px;
+          background: repeating-linear-gradient(
+            to right,
+            transparent 0px,
+            transparent 8px,
+            #1a1a1a 8px,
+            #1a1a1a 10px
+          );
+        }
+        
+        .signature-label {
+          font-size: 11px;
+          color: #666;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-top: 8px;
+        }
+        
+        .signature-info {
+          font-size: 9px;
+          color: #999;
+          margin-top: 8px;
+          font-style: italic;
+        }
+        
+        .footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: 20px;
+          font-size: 10px;
+          color: #666;
+        }
+        
+        .footer-left {
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .footer-right {
+          text-align: right;
+        }
+        
+        @media print {
+          body { 
+            margin: 0; 
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          .page {
+            height: 100vh;
+            padding: 20px;
+          }
+          .content-grid {
+            gap: 25px;
+          }
+          .exam-image {
+            max-height: 300px;
+          }
+        }
+        
+        @media screen and (max-width: 600px) {
+          .content-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+          .header {
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+          }
+          .logo-section {
+            justify-content: center;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="page">
+        <div class="header">
+          <div class="logo-section">
+            <div class="logo"></div>
+            <div class="brand-info">
+              <div class="brand-name">PulseFlow</div>
+              <div class="brand-subtitle">Sistema de Monitoramento Médico</div>
             </div>
           </div>
-        `;
-      }
-
-    } catch (error) {
-      console.error('Erro ao visualizar exame:', error);
-      mostrarErro("Erro ao carregar o exame para visualização.");
-      
-      // Fechar modal se existir
-      const modal = document.querySelector('.exam-modal');
-      if (modal) {
-        document.body.removeChild(modal);
-      }
-    }
-  };
-
-  // Função para fechar modal
-  window.fecharModal = function() {
-    const modal = document.querySelector('.exam-modal');
-    if (modal) {
-      document.body.removeChild(modal);
-    }
-  };
-
-  // Função para baixar exame
-  window.baixarExame = async function (idExame, nomeExame) {
-    try {
-      const token = localStorage.getItem('token');
-  
-      const response = await fetch(`${API_URL}/api/anexoExame/download/${idExame}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-  
-      if (!response.ok) {
-        mostrarErro("Erro ao baixar o exame!");
-        return;
-      }
-  
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-  
-      // Pega a extensão real pelo tipo MIME retornado
-      const contentType = response.headers.get("Content-Type");
-      let extensao = '';
-  
-      if (contentType.includes('pdf')) {
-        extensao = 'pdf';
-      } else if (contentType.includes('jpeg')) {
-        extensao = 'jpg'; // para imagens JPEG ou JFIF
-      } else if (contentType.includes('jfif')) {
-        extensao = 'jfif';
-      } else if (contentType.includes('png')) {
-        extensao = 'png';
-      } else {
-        extensao = 'file'; // fallback
-      }
-  
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${nomeExame}.${extensao}`; // agora usa a extensão real!
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Erro ao baixar exame:', error);
-      mostrarErro("Erro interno ao baixar exame.");
-    }
-  };
-
-  // Filtro local dos exames carregados
-  document.getElementById("buscarExameBtn").addEventListener("click", () => {
-    const nomeBusca = document.getElementById('nomeExame').value.trim().toLowerCase();
-    const especialidadeBusca = document.getElementById('especialidade').value.trim().toLowerCase();
-    const dataBusca = document.getElementById('dataExame').value;
-
-    const examesFiltrados = examesCarregados.filter(exame => {
-      const nomeExame = exame.nome.toLowerCase();
-      const categoriaExame = exame.categoria.toLowerCase();
-      const dataExame = new Date(exame.data);
-      const dataExameFormatada = `${dataExame.getFullYear()}-${String(dataExame.getMonth() + 1).padStart(2, '0')}-${String(dataExame.getDate()).padStart(2, '0')}`;
-
-      let nomeCombina = true;
-      let especialidadeCombina = true;
-      let dataCombina = true;
-
-      if (nomeBusca) {
-        nomeCombina = nomeExame.includes(nomeBusca);
-      }
-
-      if (especialidadeBusca) {
-        especialidadeCombina = categoriaExame.includes(especialidadeBusca);
-      }
-
-      if (dataBusca) {
-        dataCombina = dataBusca === dataExameFormatada;
-      }
-
-      return nomeCombina && especialidadeCombina && dataCombina;
-    });
-
-    renderizarExames(examesFiltrados);
-  });
-
-  // Busca em tempo real nos campos de filtro
-  document.getElementById('nomeExame').addEventListener('input', () => {
-    aplicarFiltros();
-  });
-
-  document.getElementById('especialidade').addEventListener('input', () => {
-    aplicarFiltros();
-  });
-
-  document.getElementById('dataExame').addEventListener('change', () => {
-    aplicarFiltros();
-  });
-
-  // Função para aplicar filtros automaticamente
-  function aplicarFiltros() {
-    const nomeBusca = document.getElementById('nomeExame').value.trim().toLowerCase();
-    const especialidadeBusca = document.getElementById('especialidade').value.trim().toLowerCase();
-    const dataBusca = document.getElementById('dataExame').value;
-
-    const examesFiltrados = examesCarregados.filter(exame => {
-      const nomeExame = exame.nome.toLowerCase();
-      const categoriaExame = exame.categoria.toLowerCase();
-      const dataExame = new Date(exame.data);
-      const dataExameFormatada = `${dataExame.getFullYear()}-${String(dataExame.getMonth() + 1).padStart(2, '0')}-${String(dataExame.getDate()).padStart(2, '0')}`;
-
-      let nomeCombina = true;
-      let especialidadeCombina = true;
-      let dataCombina = true;
-
-      if (nomeBusca) {
-        nomeCombina = nomeExame.includes(nomeBusca);
-      }
-
-      if (especialidadeBusca) {
-        especialidadeCombina = categoriaExame.includes(especialidadeBusca);
-      }
-
-      if (dataBusca) {
-        dataCombina = dataBusca === dataExameFormatada;
-      }
-
-      return nomeCombina && especialidadeCombina && dataCombina;
-    });
-
-    renderizarExames(examesFiltrados);
-  }
-
-  // Função para limpar filtros
-  function limparFiltros() {
-    document.getElementById('nomeExame').value = '';
-    document.getElementById('especialidade').value = '';
-    document.getElementById('dataExame').value = '';
-    renderizarExames(examesCarregados);
-  }
-
-  // Adicionar botão de limpar filtros
-  document.addEventListener("DOMContentLoaded", () => {
-    const formActions = document.querySelector('.form-actions');
-    if (formActions) {
-      const clearButton = document.createElement('button');
-      clearButton.className = 'btn-secondary';
-      clearButton.textContent = 'Limpar Filtros';
-      clearButton.onclick = limparFiltros;
-      formActions.appendChild(clearButton);
-    }
-  });
-
-  // Função de debug para testar a API
-  async function debugAPI() {
-    try {
-      console.log('=== TESTANDO ROTA DE DEBUG ===');
-      const response = await fetch(`${API_URL}/api/anexoExame/debug`);
-      const data = await response.json();
-      console.log('Debug API response:', data);
-      
-      if (data.totalExames === 0) {
-        mostrarErro("Nenhum exame encontrado no banco de dados. Verifique se há exames cadastrados.");
-      } else {
-        console.log(`Encontrados ${data.totalExames} exames no banco de dados`);
+          <div class="document-info">
+            <div>Relatório Médico</div>
+            <div>${new Date().toLocaleDateString('pt-BR')}</div>
+          </div>
+        </div>
         
-        // Testar com o primeiro paciente encontrado
-        if (data.pacientes && data.pacientes.length > 0) {
-          const primeiroPaciente = data.pacientes[0];
-          console.log('Testando com paciente:', primeiroPaciente);
-          await testarBuscaComCPF(primeiroPaciente.cpf);
-        }
-      }
-    } catch (error) {
-      console.error('Erro no debug da API:', error);
-    }
-  }
-
-  // Função para testar busca com CPF específico
-  async function testarBuscaComCPF(cpf) {
-    try {
-      console.log('=== TESTANDO BUSCA COM CPF ===');
-      console.log('CPF para teste:', cpf);
-      
-      const tokenMedico = localStorage.getItem('token');
-      const cpfLimpo = cpf.replace(/[^\d]/g, '');
-      
-      const response = await fetch(`${API_URL}/api/anexoExame/medico?cpf=${cpfLimpo}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${tokenMedico}`,
-          "Content-Type": "application/json"
-        }
-      });
-
-      console.log('Status da resposta:', response.status);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Erro na resposta:', errorText);
-        return;
-      }
-
-      const exames = await response.json();
-      console.log('Exames encontrados para o paciente:', exames);
-      
-      if (exames.length > 0) {
-        console.log('✅ SUCESSO: Exames encontrados!');
-        examesCarregados = exames;
-        renderizarExames(examesCarregados);
-      } else {
-        console.log('⚠️ Nenhum exame encontrado para este paciente');
-      }
-    } catch (error) {
-      console.error('Erro ao testar busca:', error);
-    }
-  }
-
-  // Função global para testar API (chamada pelo botão)
-  window.testarAPI = async function() {
-    console.log('=== TESTE MANUAL DA API ===');
-    
-    // Testar com CPF conhecido do debug
-    const cpfTeste = '51232056839'; // CPF da Manuela Tagliatti
-    console.log('Testando com CPF:', cpfTeste);
-    
-    await testarBuscaComCPF(cpfTeste);
+        <div class="document-title">${exame.nome}</div>
+        
+              <div class="content-grid">
+                <div class="left-column">
+                  <div class="section">
+                    <div class="section-title">Dados do Exame</div>
+                    <div class="info-grid">
+                      <div class="info-item">
+                        <div class="info-label">Categoria</div>
+                        <div class="info-value">${exame.categoria}</div>
+                      </div>
+                      <div class="info-item">
+                        <div class="info-label">Data</div>
+                        <div class="info-value">${formatarData(exame.data)}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="section">
+                    <div class="section-title">Dados do Paciente</div>
+                    <div class="info-grid">
+                      <div class="info-item">
+                        <div class="info-label">Nome</div>
+                        <div class="info-value">${selectedPatient?.nome || 'N/A'}</div>
+                      </div>
+                      <div class="info-item">
+                        <div class="info-label">CPF</div>
+                        <div class="info-value">${selectedPatient?.cpf || 'N/A'}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="right-column">
+                  <div class="image-container">
+                    ${exame.filePath ? `
+                      <img src="${exame.filePath}" alt="${exame.nome}" class="exam-image">
+                    ` : `
+                      <div class="no-image">
+                        <div>📄</div>
+                        <div>Nenhuma imagem disponível</div>
+                      </div>
+                    `}
+                  </div>
+                </div>
+              </div>
+        
+        <div class="signature-section">
+          <div class="signature-line">
+            <div class="signature-space"></div>
+            <div class="signature-label">Assinatura do Médico Responsável</div>
+            <div class="signature-info">Nome completo e CRM</div>
+          </div>
+        </div>
+        
+        <div class="footer">
+          <div class="footer-left">
+            <div>Documento gerado em: ${new Date().toLocaleString('pt-BR')}</div>
+            <div>PulseFlow - Sistema de Monitoramento Médico</div>
+          </div>
+          <div class="footer-right">
+            <div>Documento médico oficial</div>
+            <div>Válido com assinatura</div>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  // Criar janela de impressão
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(printContent);
+  printWindow.document.close();
+  
+  // Aguardar carregamento e imprimir
+  printWindow.onload = function() {
+    printWindow.print();
+    printWindow.close();
   };
+  
+  mostrarAviso(`Impressão do exame "${exame.nome}" iniciada!`, 'success');
+}
 
-  carregarDadosMedico();
-  // Carrega os exames assim que a página abrir
-  buscarExamesPaciente();
-});
+function criarNovoExame() {
+  mostrarAviso('Função de criar novo exame em desenvolvimento!', 'info');
+}
+
+function mostrarLoading(show) {
+  if (loadingState) {
+    loadingState.style.display = show ? 'flex' : 'none';
+  }
+  
+  if (show) {
+    // Durante loading, ocultar outros estados
+    if (examsGrid) examsGrid.style.display = 'none';
+    if (emptyState) emptyState.style.display = 'none';
+  } else {
+    // Após loading, renderizar exames normalmente
+    renderizarExames();
+  }
+}
+
+function formatarData(data) {
+  if (!data) return '-';
+  const date = new Date(data);
+  return date.toLocaleDateString('pt-BR');
+}
+
+function mostrarAviso(mensagem, tipo = 'success') {
+  if (typeof Swal !== 'undefined') {
+    Swal.fire({
+      title: tipo === 'success' ? 'Sucesso!' : tipo === 'error' ? 'Erro!' : 'Informação',
+      text: mensagem,
+      icon: tipo,
+      timer: 3000,
+      showConfirmButton: false,
+      toast: true,
+      position: 'top-end'
+    });
+  } else {
+    console.log(`${tipo.toUpperCase()}: ${mensagem}`);
+  }
+}
+
+// Função de debug para verificar localStorage
+window.debugPaciente = function() {
+  console.log('=== DEBUG PACIENTE ===');
+  console.log('Token:', localStorage.getItem('token'));
+  
+  const chavesPaciente = ['selectedPatient', 'pacienteSelecionado', 'selectedPatientData'];
+  chavesPaciente.forEach(chave => {
+    const dados = localStorage.getItem(chave);
+    console.log(`${chave}:`, dados);
+    if (dados) {
+      try {
+        const parsed = JSON.parse(dados);
+        console.log(`${chave} (parsed):`, parsed);
+      } catch (e) {
+        console.log(`${chave} (erro ao parsear):`, e.message);
+      }
+    }
+  });
+  
+  // Listar todas as chaves do localStorage
+  console.log('Todas as chaves do localStorage:');
+  for (let i = 0; i < localStorage.length; i++) {
+    const chave = localStorage.key(i);
+    console.log(`- ${chave}: ${localStorage.getItem(chave)}`);
+  }
+};
+
+function mostrarErro(mensagem) {
+  mostrarAviso(mensagem, 'error');
+}
+
+// Funções globais para debug
+window.debugExames = function() {
+  console.log('=== DEBUG EXAMES ===');
+  console.log('Total de exames:', allExames.length);
+  console.log('Exames filtrados:', filteredExames.length);
+  console.log('Elementos DOM:', {
+    examsGrid: !!examsGrid,
+    emptyState: !!emptyState,
+    loadingState: !!loadingState,
+    examsCount: !!examsCount
+  });
+};
+
+window.forcarCarregamentoExames = async function() {
+  console.log('=== FORÇANDO CARREGAMENTO DE EXAMES ===');
+  await carregarExames();
+};
+
+window.testarRenderizacao = function() {
+  if (allExames.length > 0) {
+    renderizarExames(allExames);
+  } else {
+    console.log('Nenhum exame para renderizar');
+  }
+};

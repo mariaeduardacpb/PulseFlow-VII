@@ -86,6 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok && data.token) {
         localStorage.setItem('token', data.token);
         
+        // Atualizar nome do médico no sidebar após login bem-sucedido
+        if (typeof window.onDoctorLogin === 'function') {
+          window.onDoctorLogin();
+        }
+        
         Swal.fire({
           title: 'Sucesso!',
           text: 'Verificação realizada com sucesso!',
@@ -124,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } finally {
       // Restaura botão
       verifyBtn.disabled = false;
-      buttonText.textContent = '→ Verificar Código';
+      buttonText.textContent = 'Verificar Código';
       buttonIcon.className = 'fas fa-check-circle';
     }
   });

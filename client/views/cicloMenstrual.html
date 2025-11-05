@@ -1,111 +1,201 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PulseFlow | Ciclo Menstrual</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../public/css/cicloMenstrual.css">
-  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseFlow | Ciclo Menstrual</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../public/css/cicloMenstrual.css">
+    <link rel="stylesheet" href="../public/css/sidebar.css">
+    <link rel="stylesheet" href="../public/css/header.css">
+    <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 </head>
 <body>
-  <div class="container">
-    <aside class="sidebar">
-      <div class="profile">
-        <h3></h3>
-      </div>
-      <nav class="specialties">
-        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
-        <details><summary><span><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
-        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
-        <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
-        <details open><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
-          <ul>
-            <!-- Condições Crônicas -->
-            <li><a href="diabetes.html">Diabetes</a></li>
-            <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
-            <li><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
-            
-            <!-- Saúde Hormonal e Reprodutiva -->
-            <li style="font-weight: bold;"><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
-            <li><a href="hormonal.html">Hormonal</a></li>
-            
-            <!-- Saúde Mental e Sono -->
-            <li><a href="insonia.html">Insônia</a></li>
-            <li><a href="enxaqueca.html">Enxaqueca</a></li>
-          </ul>
-        </details>
-      </nav>
-      <div class="change-patient">
-        <a href="selecao.html">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
-          Trocar de Paciente
-        </a>
-      </div>
-    </aside>
+    <div id="header-component"></div>
+    <div id="sidebar-component"></div>
+    
+    <div class="container">
+        <main class="content">
+            <!-- Card Principal do Ciclo Menstrual -->
+            <section class="ciclo-card">
+                <div class="card-header">
+                    <div class="title-section">
+                        <h1 class="page-title">Ciclo Menstrual</h1>
+                        <p class="page-subtitle">Acompanhamento do ciclo menstrual e registros de menstruação</p>
+                    </div>
+                    <div class="stats-section">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14,2 14,8 20,8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10,9 9,9 8,9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="totalRecords">0</span>
+                                <span class="stat-label">Total de Registros</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="avgCycleLength">0</span>
+                                <span class="stat-label">Ciclo Médio</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="avgDuration">0</span>
+                                <span class="stat-label">Duração Média</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 12l2 2 4-4"></path>
+                                    <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
+                                    <path d="M16 2l4 4-4 4"></path>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="lastMenstruationDays">0</span>
+                                <span class="stat-label">Dias desde última</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="main-content">
-      <header class="page-header">
-        <div class="top-bar">
-          <div class="calendar-title">
-            <h1>Ciclo Menstrual</h1>
-          </div>
-          <div class="logo">
-            <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
-          </div>
-        </div>
-      </header>
+                <!-- Calendário Menstrual -->
+                <div class="calendar-section">
+                    <div class="calendar-header">
+                        <div class="calendar-title">
+                            <div class="title-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <div class="title-text">
+                                <h2>Calendário Menstrual</h2>
+                                <p>Visualização mensal do ciclo menstrual</p>
+                            </div>
+                        </div>
+                        <div class="calendar-controls">
+                            <button class="nav-btn" id="prevMonth">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M15 18l-6-6 6-6"></path>
+                                </svg>
+                            </button>
+                            <span class="month-year" id="monthYear">Janeiro 2025</span>
+                            <button class="nav-btn" id="nextMonth">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 18l6-6-6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
 
-      <section class="menstruation-stats">
-        <h3>Estatísticas do Ciclo</h3>
-        <div class="stats-container">
-          <div class="stat-item">
-            <span class="stat-label">Última Menstruação:</span>
-            <span class="stat-value" id="last-menstruation">--</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Duração Média:</span>
-            <span class="stat-value" id="avg-duration">--</span>
-          </div>
-        </div>
-      </section>
+                    <div class="calendar-container">
+                        <div class="calendar-grid">
+                            <div class="calendar-header-row">
+                                <div class="day-header">Dom</div>
+                                <div class="day-header">Seg</div>
+                                <div class="day-header">Ter</div>
+                                <div class="day-header">Qua</div>
+                                <div class="day-header">Qui</div>
+                                <div class="day-header">Sex</div>
+                                <div class="day-header">Sáb</div>
+                            </div>
+                            <div class="calendar-body" id="calendarBody">
+                                <!-- Dias preenchidos via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
 
-      <div class="calendar-controls">
-        <div class="calendar-nav">
-          <button id="prev-month">&lt;</button>
-          <span id="month-year">Abril • 2025</span>
-          <button id="next-month">&gt;</button>
-        </div>
-      </div>
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <div class="legend-color menstrual"></div>
+                            <span>Menstruação</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color cycle"></div>
+                            <span>Período do Ciclo</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color normal"></div>
+                            <span>Dia Normal</span>
+                        </div>
+                    </div>
+                </div>
 
-      <section class="calendar">
-        <table>
-          <thead>
-            <tr>
-              <th>Domingo</th>
-              <th>Segunda</th>
-              <th>Terça</th>
-              <th>Quarta</th>
-              <th>Quinta</th>
-              <th>Sexta</th>
-              <th>Sábado</th>
-            </tr>
-          </thead>
-          <tbody id="calendar-body">
-            <!-- Dias preenchidos via JS -->
-          </tbody>
-        </table>
-      </section>
+                <!-- Registros de Menstruação -->
+                <div class="records-section">
+                    <div class="records-header">
+                        <div class="records-title">
+                            <div class="title-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14,2 14,8 20,8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10,9 9,9 8,9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="title-text">
+                                <h2>Registros de Menstruação</h2>
+                                <p>Histórico completo dos registros menstruais</p>
+                            </div>
+                        </div>
+                        <div class="records-count">
+                            <span id="recordsCount">0</span> registros encontrados
+                        </div>
+                    </div>
 
-      <section class="menstruation-records hidden">
-        <h2>Registros de Menstruação</h2>
-        <div id="records-container">
-          <!-- Registros serão preenchidos via JS -->
-        </div>
-      </section>
+                    <div class="records-grid" id="recordsGrid">
+                        <!-- Registros serão inseridos aqui via JavaScript -->
+                    </div>
+
+                    <div class="no-records" id="noRecords" style="display: none;">
+                        <div class="no-records-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14,2 14,8 20,8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10,9 9,9 8,9"></polyline>
+                            </svg>
+                        </div>
+                        <h3>Nenhum registro encontrado</h3>
+                        <p>Não há registros de menstruação para exibir.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-  </div>
 
-  <script type="module" src="/client/public/js/menstruacao.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script src="../public/js/header.js"></script>
+    <script src="../public/js/sidebar.js"></script>
+    <script src="../public/js/cicloMenstrual.js"></script>
 </body>
 </html>
