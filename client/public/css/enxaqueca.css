@@ -1,358 +1,452 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
-
 * {
-  font-family: 'Montserrat', sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  background-color: #f2f2f2;
-  overflow-y: auto;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: #1e293b;
+    line-height: 1.6;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .container {
-  display: flex;
-  flex-direction: row;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-.sidebar {
-  width: 240px;
-  background-color: #002A42;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 30px 20px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  overflow-y: auto;
-  z-index: 10;
-}
-
-.profile h3 {
-  font-size: 16px;
-  margin-bottom: 30px;
-  font-weight: 600;
-}
-
-.specialties details {
-  margin-bottom: 12px;
-  border-bottom: 1px solid #1c4a7d;
-  padding-bottom: 8px;
-}
-
-.specialties summary {
-  list-style: none;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #f0f0f0;
-}
-
-.specialties summary::-webkit-details-marker {
-  display: none;
-}
-
-.specialties .chevron {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-  transform: rotate(45deg);
-  transition: transform 0.3s ease;
-  margin-left: 10px;
-}
-
-.specialties details[open] .chevron {
-  transform: rotate(225deg);
-}
-
-.specialties ul {
-  margin-top: 10px;
-  margin-left: 10px;
-  list-style: none;
-  padding-left: 0;
-}
-
-.specialties li {
-  margin: 8px 0;
-}
-
-.specialties a {
-  color: white;
-  font-size: 14px;
-  text-decoration: none;
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: background 0.2s ease;
-}
-
-.specialties a:hover {
-  background-color: rgba(0, 195, 183, 0.15);
-}
-
-.change-patient {
-  margin-top: auto;
-}
-
-.change-patient a {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #FFF;
-  font-weight: bold;
-  font-size: 14px;
-  text-decoration: none;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .content {
-  margin-left: 240px;
-  width: calc(100% - 240px);
-  max-width: 1280px;
-  padding: 30px 40px;
+  width: calc(100vw - 300px);
+  max-width: calc(100vw - 300px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding: 24px;
+  margin-left: 300px;
+  padding-top: 100px;
 }
 
-.patient-header h1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #002A42;
-  font-size: 26px;
-  margin-bottom: 20px;
+/* Card Principal da Enxaqueca */
+.enxaqueca-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
 }
 
-.profile-box {
-  background-color: #003954;
-  color: #fff;
-  border-radius: 8px;
-  display: flex;
-  gap: 30px;
-  padding: 30px;
-  align-items: center;
-  margin-bottom: 40px;
-}
-
-.profile-box img {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 100%;
-  border: 3px solid #f2f2f2;
-}
-
-.profile-box .info p {
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-
-.profile-box .separator {
-  width: 2px;
-  height: 100%;
-  background-color: #ffffff;
-  margin: 0 20px;
-  border-radius: 1px;
-}
-
-.header {
+.card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 24px;
 }
 
-.header h1 {
-  font-size: 24px;
-  color: #1f1f1f;
-}
-
-.logo img {
-  height: 50px;
-}
-
-.chart-section {
-  margin-top: 30px;
-}
-
-.chart {
-  background-color: white;
-  padding: 20px;
-  margin-bottom: 30px;
-  border-radius: 10px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  height: 400px;
+.title-section {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+}
+
+.stats-section {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  min-width: 160px;
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Seção do Gráfico */
+.chart-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
 }
 
 .chart-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  flex-shrink: 0;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
-canvas {
-  width: 100%;
-  height: 100%;
-  flex: 1;
-  min-height: 0;
+.chart-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.title-text h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.title-text p {
+  font-size: 14px;
+  color: #64748b;
 }
 
 .month-selector {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  flex-wrap: nowrap;
-  white-space: nowrap;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
-
 .arrow-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  color: #00324A;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  color: #64748b;
 }
 
 .arrow-btn:hover {
-  color: #00c3b7;
+  background: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
 }
 
-.bold {
-  font-weight: 1000;
+.month-label {
+  font-weight: 600;
+  color: #1e293b;
+  min-width: 120px;
+  text-align: center;
+  font-size: 14px;
 }
 
-/* ========== RESPONSIVIDADE ========== */
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-  }
+/* Mensagem de Sem Dados */
+.no-data-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  display: none;
+}
 
-  .menu-toggle {
-    display: flex !important;
-  }
-  
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: -100%;
-    width: 240px;
-    height: 100vh;
-    background-color: #00324A;
-    z-index: 1000;
-    padding: 30px 20px;
-    transition: left 0.3s ease;
-    overflow-y: auto;
-  }
-  
-  .sidebar.active {
-    left: 0;
-  }
+.no-data-icon {
+  margin-bottom: 16px;
+  color: #cbd5e1;
+}
 
+.no-data-message h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1e293b;
+}
+
+.no-data-message p {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Container do Gráfico */
+.chart-container {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  min-height: 400px;
+  position: relative;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 350px !important;
+}
+
+/* Seção de Informações */
+.info-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.info-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.info-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.info-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.reference-item {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.reference-item:hover {
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.reference-label {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.reference-value {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.reference-value.mild {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.reference-value.moderate {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.reference-value.severe {
+  background: #fed7d7;
+  color: #c53030;
+}
+
+.reference-value.very-severe {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.info-footer {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f Jenkins
+}
+
+.reference-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.reference-link:hover {
+  background: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
   .content {
     margin-left: 0;
     width: 100%;
     padding: 20px;
-    margin-top: 64px;
+    padding-top: 80px;
   }
   
-  .chart {
-    height: 300px;
+  .stats-section {
+    justify-content: center;
+  }
+  
+  .chart-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+  
+  .month-selector {
+    justify-content: center;
   }
 }
 
-.no-data-msg {
-  color: #d32f2f;
-  font-weight: 500;
-  text-align: center;
-  margin: 0 auto 15px auto;
-  width: 60%;
-  display: none;
-  font-size: 13px;
-  animation: fadeIn 0.5s ease-in-out;
-  background-color: #fdecea;
-  padding: 8px 12px;
-  border-radius: 5px;
-  border: 1px solid #f5c6cb;
-  box-shadow: 0 0 4px rgba(211, 47, 47, 0.2);
-  flex-shrink: 0;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
+@media (max-width: 768px) {
+  .content {
+    padding: 16px;
+    padding-top: 60px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .enxaqueca-card {
+    padding: 20px;
+  }
+  
+  .stats-section {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .stat-card {
+    min-width: auto;
+  }
+  
+  .chart-section,
+  .info-section {
+    padding: 20px;
+  }
+  
+  .info-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .stat-value {
+    font-size: 20px;
   }
 }
 
-.referencia-dor {
-  text-align: center;
-  font-size: 13px;
-  color: #444;
-  margin-top: 30px;
-  padding: 10px;
-  background-color: #f6f6f6;
-  border-top: 1px solid #ddd;
-}
-
-.referencia-dor a {
-  color: #003366;
-  font-weight: 500;
-  text-decoration: underline;
-  transition: color 0.3s ease;
-}
-
-.referencia-dor a:hover {
-  color: #00c3b7;
-}
-
-/* MENU TOGGLE */
-.menu-toggle {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  background-color: #00324A;
-  color: white;
-  width: 38px;
-  height: 38px;
-  border: none;
-  border-radius: 6px;
-  font-size: 18px;
-  font-weight: bold;
-  z-index: 1101;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  transition: left 0.3s ease;
-}
-
-.menu-toggle.shifted {
-  left: 260px;
+@media (max-width: 480px) {
+  .content {
+    padding: 12px;
+    padding-top: 50px;
+  }
+  
+  .enxaqueca-card {
+    padding: 16px;
+  }
+  
+  .chart-section,
+  .info-section {
+    padding: 16px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .chart-container {
+    padding: 16px;
+  }
+  
+  .chart-container canvas {
+    height: 250px !important;
+  }
 }
