@@ -453,6 +453,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Formatar e exibir os insights
       const insightsFormatados = formatarInsights(data.insights);
       textEl.innerHTML = insightsFormatados;
+      
+      // Limpar chat anterior e armazenar contexto dos insights
+      const chatMessagesEl = document.getElementById('chatMessages');
+      if (chatMessagesEl) {
+        chatMessagesEl.innerHTML = '';
+        // Armazenar contexto dos insights para usar nas perguntas
+        chatMessagesEl.dataset.contextoInsights = data.insights;
+      }
 
       btnEl.disabled = false;
     } catch (error) {
@@ -494,22 +502,57 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Função para formatar os insights
+  // Função para formatar os insights (markdown básico para HTML)
   function formatarInsights(texto) {
-    // Converter quebras de linha em <br>
-    let formatado = texto.replace(/\n/g, '<br>');
+    if (!texto) return '';
     
-    // Converter títulos (linhas que começam com números ou são muito curtas e em maiúsculas)
-    formatado = formatado.replace(/<br>(<br>)?([A-ZÁÉÍÓÚÂÊÔÇ][^:]+):/g, '<br><h3>$2</h3>');
+    let formatado = texto;
     
-    // Converter listas
-    formatado = formatado.replace(/(\d+\.\s+[^<]+)/g, '<li>$1</li>');
+    // Escape HTML primeiro
+    formatado = formatado.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     
-    // Envolver listas em <ul>
-    formatado = formatado.replace(/(<li>.*?<\/li>)/g, '<ul>$1</ul>');
+    // Converter títulos (## Título ou linhas em maiúsculas seguidas de :)
+    formatado = formatado.replace(/^##\s+(.+)$/gm, '<h3 class="insight-title">$1</h3>');
+    formatado = formatado.replace(/^###\s+(.+)$/gm, '<h4 class="insight-subtitle">$1</h4>');
     
-    // Remover <br> duplicados
-    formatado = formatado.replace(/<br><br>/g, '<br>');
+    // Títulos sem markdown (linhas que são curtas e terminam com :)
+    formatado = formatado.replace(/^([A-ZÁÉÍÓÚÂÊÔÇ][^:]{2,50}):$/gm, '<h3 class="insight-title">$1</h3>');
+    
+    // Converter listas numeradas (1. item ou - item)
+    formatado = formatado.replace(/^\d+\.\s+(.+)$/gm, '<li class="insight-item">$1</li>');
+    formatado = formatado.replace(/^[-•]\s+(.+)$/gm, '<li class="insight-item">$1</li>');
+    
+    // Envolver listas consecutivas em <ul>
+    formatado = formatado.replace(/(<li class="insight-item">.*?<\/li>)(\s*<li class="insight-item">)/g, 
+      function(match, first, second) {
+        return '<ul class="insight-list">' + first;
+      });
+    formatado = formatado.replace(/(<\/li>)(\s*)(?!<li|<h|<p)/g, '</li></ul>$2');
+    
+    // Converter negrito **texto** ou __texto__
+    formatado = formatado.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    formatado = formatado.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    
+    // Converter itálico *texto* ou _texto_
+    formatado = formatado.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    formatado = formatado.replace(/_(.+?)_/g, '<em>$1</em>');
+    
+    // Converter quebras de linha
+    formatado = formatado.replace(/\n/g, '<br>');
+    
+    // Converter parágrafos (quebras duplas)
+    formatado = formatado.replace(/(<br>\s*){2,}/g, '</p><p class="insight-paragraph">');
+    formatado = '<p class="insight-paragraph">' + formatado + '</p>';
+    
+    // Limpar tags vazias
+    formatado = formatado.replace(/<p class="insight-paragraph"><\/p>/g, '');
+    formatado = formatado.replace(/<p class="insight-paragraph">(<h[34])/g, '$1');
+    formatado = formatado.replace(/(<\/h[34]>)<\/p>/g, '$1');
+    formatado = formatado.replace(/<p class="insight-paragraph">(<ul)/g, '$1');
+    formatado = formatado.replace(/(<\/ul>)<\/p>/g, '$1');
+    
+    // Remover <br> antes de tags de bloco
+    formatado = formatado.replace(/<br>\s*(<h[34]|<ul|<p)/g, '$1');
     
     return formatado;
   }
@@ -518,6 +561,159 @@ document.addEventListener("DOMContentLoaded", async () => {
   const gerarInsightsBtn = document.getElementById('gerarInsightsBtn');
   if (gerarInsightsBtn) {
     gerarInsightsBtn.addEventListener('click', gerarInsights);
+  }
+
+  // ========== FUNCIONALIDADE DE CHAT/PERGUNTAS ==========
+  
+  // Função para enviar pergunta
+  async function enviarPergunta() {
+    const chatInput = document.getElementById('chatInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const sendBtn = document.getElementById('sendQuestionBtn');
+    const chatLoading = document.getElementById('chatLoading');
+    
+    if (!chatInput || !chatMessages || !sendBtn) return;
+    
+    const pergunta = chatInput.value.trim();
+    
+    if (!pergunta) {
+      chatInput.focus();
+      return;
+    }
+    
+    // Obter CPF do paciente (mesma lógica do gerarInsights)
+    const tokenPaciente = localStorage.getItem('tokenPaciente');
+    if (!tokenPaciente) {
+      alert('Token do paciente não encontrado. Faça login como paciente primeiro.');
+      return;
+    }
+    
+    let cpf;
+    try {
+      const decodedPayload = JSON.parse(atob(tokenPaciente));
+      cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+      
+      if (!cpf) {
+        throw new Error('CPF não encontrado no token do paciente');
+      }
+      
+      if (cpf.length !== 11) {
+        throw new Error('CPF inválido. O CPF deve ter 11 dígitos.');
+      }
+    } catch (error) {
+      console.error('Erro ao obter CPF:', error);
+      alert(error.message || 'Erro ao obter CPF do paciente. Faça login novamente.');
+      return;
+    }
+    
+    // Desabilitar input e botão
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+    chatLoading.style.display = 'flex';
+    
+    // Adicionar pergunta ao chat
+    const perguntaHTML = `
+      <div class="chat-message chat-message-user">
+        <div class="chat-message-content">
+          <strong>Você:</strong>
+          <p>${escapeHtml(pergunta)}</p>
+        </div>
+      </div>
+    `;
+    chatMessages.innerHTML += perguntaHTML;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Limpar input
+    chatInput.value = '';
+    
+    try {
+      const tokenMedico = localStorage.getItem('token');
+      if (!tokenMedico) {
+        throw new Error('Token do médico não encontrado');
+      }
+      
+      // Obter contexto dos insights se disponível
+      const contextoInsights = chatMessages.dataset.contextoInsights || '';
+      
+      const response = await fetch(`${API_URL}/api/gemini/pergunta/${cpf}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${tokenMedico}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          pergunta: pergunta,
+          contextoInsights: contextoInsights
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
+        throw new Error(errorData.error || errorData.message || 'Erro ao processar pergunta');
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Erro ao processar pergunta');
+      }
+      
+      // Adicionar resposta ao chat
+      const respostaFormatada = formatarInsights(data.resposta);
+      const respostaHTML = `
+        <div class="chat-message chat-message-ai">
+          <div class="chat-message-content">
+            <strong>🤖 IA:</strong>
+            <div class="chat-response">${respostaFormatada}</div>
+          </div>
+        </div>
+      `;
+      chatMessages.innerHTML += respostaHTML;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+    } catch (error) {
+      console.error('Erro ao enviar pergunta:', error);
+      const errorHTML = `
+        <div class="chat-message chat-message-error">
+          <div class="chat-message-content">
+            <strong>❌ Erro:</strong>
+            <p>${escapeHtml(error.message || 'Erro ao processar pergunta')}</p>
+          </div>
+        </div>
+      `;
+      chatMessages.innerHTML += errorHTML;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    } finally {
+      // Reabilitar input e botão
+      chatInput.disabled = false;
+      sendBtn.disabled = false;
+      chatLoading.style.display = 'none';
+      chatInput.focus();
+    }
+  }
+  
+  // Função auxiliar para escapar HTML
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // Event listeners para o chat
+  const sendQuestionBtn = document.getElementById('sendQuestionBtn');
+  const chatInput = document.getElementById('chatInput');
+  
+  if (sendQuestionBtn) {
+    sendQuestionBtn.addEventListener('click', enviarPergunta);
+  }
+  
+  if (chatInput) {
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        enviarPergunta();
+      }
+    });
   }
 
   // ========== FUNCIONALIDADE DE EDIÇÃO ==========

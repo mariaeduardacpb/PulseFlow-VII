@@ -1001,3 +1001,248 @@ body {
 .error-message p:first-child {
   font-weight: 600;
 }
+
+/* Estilos para melhor formatação dos insights */
+.insights-text .insight-title {
+  color: #002A42;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #5594B2;
+}
+
+.insights-text .insight-subtitle {
+  color: #004d99;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.insights-text .insight-paragraph {
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  color: #2C3E50;
+}
+
+.insights-text .insight-list {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.insights-text .insight-item {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.insights-text strong {
+  color: #002A42;
+  font-weight: 600;
+}
+
+.insights-text em {
+  font-style: italic;
+  color: #5594B2;
+}
+
+/* Seção de Chat */
+.chat-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #E5E5E5;
+}
+
+.chat-header {
+  margin-bottom: 1.5rem;
+}
+
+.chat-header h3 {
+  color: #002A42;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chat-icon {
+  font-size: 1.3rem;
+}
+
+.chat-messages {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: #F8FAFC;
+  border-radius: 12px;
+  border: 1px solid #E5E5E5;
+}
+
+.chat-message {
+  margin-bottom: 1rem;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-message-content {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  line-height: 1.6;
+}
+
+.chat-message-user .chat-message-content {
+  background-color: #E3F2FD;
+  border-left: 4px solid #2196F3;
+  margin-left: auto;
+  max-width: 80%;
+}
+
+.chat-message-ai .chat-message-content {
+  background-color: #FFFFFF;
+  border-left: 4px solid #5594B2;
+  border: 1px solid #E5E5E5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chat-message-error .chat-message-content {
+  background-color: #FFEBEE;
+  border-left: 4px solid #E74C3C;
+  color: #C62828;
+}
+
+.chat-message-content strong {
+  color: #002A42;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.chat-message-content p {
+  margin: 0;
+  color: #2C3E50;
+}
+
+.chat-response {
+  color: #2C3E50;
+  line-height: 1.7;
+}
+
+.chat-response .insight-title,
+.chat-response .insight-subtitle,
+.chat-response .insight-paragraph,
+.chat-response .insight-list {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.chat-input-container {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #E5E5E5;
+  border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 50px;
+  max-height: 120px;
+  transition: border-color 0.3s ease;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: #5594B2;
+  box-shadow: 0 0 0 3px rgba(85, 148, 178, 0.1);
+}
+
+.chat-input:disabled {
+  background-color: #F5F5F5;
+  cursor: not-allowed;
+}
+
+.btn-send-question {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #5594B2 0%, #004d99 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  height: fit-content;
+}
+
+.btn-send-question:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(85, 148, 178, 0.3);
+}
+
+.btn-send-question:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.chat-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  color: #5594B2;
+  font-size: 0.9rem;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #E5E5E5;
+  border-top-color: #5594B2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Scrollbar personalizada para chat */
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #F1F1F1;
+  border-radius: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #5594B2;
+  border-radius: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #004d99;
+}

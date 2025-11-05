@@ -150,6 +150,30 @@
         <div id="insightsContent" class="insights-content" style="display: none;">
           <div class="insights-summary"></div>
           <div class="insights-text"></div>
+          
+          <!-- Seção de Chat para Perguntas -->
+          <div class="chat-section">
+            <div class="chat-header">
+              <h3><span class="chat-icon">💬</span> Faça uma pergunta sobre os insights</h3>
+            </div>
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input-container">
+              <textarea 
+                id="chatInput" 
+                class="chat-input" 
+                placeholder="Ex: Quais são os principais fatores de risco identificados?"
+                rows="2"
+              ></textarea>
+              <button id="sendQuestionBtn" class="btn-send-question">
+                <span class="btn-icon">📤</span>
+                <span>Enviar</span>
+              </button>
+            </div>
+            <div id="chatLoading" class="chat-loading" style="display: none;">
+              <div class="spinner-small"></div>
+              <span>IA está pensando...</span>
+            </div>
+          </div>
         </div>
         <div id="insightsError" class="insights-error" style="display: none;"></div>
       </section>

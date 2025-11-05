@@ -15,24 +15,63 @@ let genAI = null;
 function getGenAI() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.trim() === '') {
-    throw new Error('GEMINI_API_KEY não configurada');
+    throw new Error('GEMINI_API_KEY não configurada. Configure a variável GEMINI_API_KEY no arquivo .env');
   }
+  
+  const apiKeyTrimmed = apiKey.trim();
+  
+  // Validar formato básico da API key (geralmente começa com "AIza")
+  if (apiKeyTrimmed.length < 30) {
+    console.warn('⚠️ API key parece muito curta. Verifique se está completa.');
+  }
+  
   // Recriar a instância para garantir que está usando a API key atualizada
-  genAI = new GoogleGenerativeAI(apiKey.trim());
-  return genAI;
+  try {
+    genAI = new GoogleGenerativeAI(apiKeyTrimmed);
+    return genAI;
+  } catch (error) {
+    console.error('❌ Erro ao inicializar GoogleGenerativeAI:', error.message);
+    throw new Error(`Erro ao inicializar cliente do Gemini: ${error.message}`);
+  }
 }
 
 // Função para listar modelos disponíveis via API REST
 async function listarModelosDisponiveis() {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return [];
+    if (!apiKey || apiKey.trim() === '') {
+      console.warn('⚠️ API key não configurada, não é possível listar modelos');
+      return [];
+    }
+    
+    const apiKeyTrimmed = apiKey.trim();
     
     // Tentar listar modelos via API REST diretamente
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKeyTrimmed}`);
     
     if (!response.ok) {
-      console.log(`⚠️ Não foi possível listar modelos via API (status ${response.status})`);
+      const status = response.status;
+      const errorText = await response.text().catch(() => '');
+      
+      // Se for erro de autenticação, não continuar
+      if (status === 401 || status === 403) {
+        console.error(`❌ Erro de autenticação ao listar modelos (status ${status})`);
+        console.error('   Verifique se a API key está correta e ativa');
+        // Não retornar erro aqui, deixar o código principal tratar
+        return [];
+      }
+      
+      console.log(`⚠️ Não foi possível listar modelos via API (status ${status})`);
+      if (errorText) {
+        try {
+          const errorData = JSON.parse(errorText);
+          if (errorData.error?.message) {
+            console.log(`   Mensagem: ${errorData.error.message}`);
+          }
+        } catch (e) {
+          // Ignorar erro de parsing
+        }
+      }
       return [];
     }
     
@@ -43,24 +82,36 @@ async function listarModelosDisponiveis() {
     
     // Extrair nomes dos modelos que suportam generateContent
     const modelNames = [];
+    const modelNamesShort = [];
+    
     for (const model of models) {
       if (model.name) {
         // Verificar se suporta generateContent
         const supportedMethods = model.supportedGenerationMethods || [];
         if (supportedMethods.includes('generateContent')) {
+          // Adicionar nome completo
           modelNames.push(model.name);
-          // Extrair nome curto
+          
+          // Extrair nome curto (última parte após /)
           const parts = model.name.split('/');
           if (parts.length > 1) {
-            modelNames.push(parts[parts.length - 1]);
+            const shortName = parts[parts.length - 1];
+            // Adicionar apenas se não for duplicata
+            if (!modelNamesShort.includes(shortName)) {
+              modelNamesShort.push(shortName);
+            }
           }
+          
           console.log(`  ✅ ${model.name} - suporta generateContent`);
         }
       }
     }
     
-    console.log('📋 Modelos disponíveis com generateContent:', modelNames.slice(0, 10));
-    return modelNames;
+    // Priorizar nomes curtos (mais fáceis de usar)
+    const finalList = [...modelNamesShort, ...modelNames];
+    
+    console.log('📋 Modelos disponíveis com generateContent:', finalList.slice(0, 15));
+    return finalList;
   } catch (error) {
     console.error('❌ Erro ao listar modelos:', error.message);
     // Continuar mesmo se falhar ao listar
@@ -223,14 +274,43 @@ export const gerarInsightsPaciente = async (req, res) => {
     }
 
     // Verificar se a API key do Gemini está configurada
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.trim() === '') {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey.trim() === '') {
       console.error('❌ GEMINI_API_KEY não encontrada ou vazia');
+      console.error('   Verifique se o arquivo .env existe na raiz do projeto server/');
+      console.error('   E se contém a linha: GEMINI_API_KEY=sua_api_key_aqui');
       return res.status(500).json({ 
-        message: 'API key do Gemini não configurada. Configure a variável GEMINI_API_KEY no arquivo .env' 
+        success: false,
+        message: 'API key do Gemini não configurada',
+        error: 'Configure a variável GEMINI_API_KEY no arquivo .env na raiz do diretório server/',
+        details: 'Verifique se o arquivo .env existe e contém a chave GEMINI_API_KEY com sua API key do Google AI Studio'
       });
     }
     
-    console.log('🔑 API Key encontrada:', process.env.GEMINI_API_KEY.substring(0, 15) + '...');
+    // Validar formato da API key
+    const apiKeyTrimmed = apiKey.trim();
+    
+    // Validar formato básico (geralmente começa com "AIza" e tem 39 caracteres)
+    if (!apiKeyTrimmed.startsWith('AIza')) {
+      console.warn('⚠️ API key não começa com "AIza" - pode estar incorreta');
+    }
+    
+    if (apiKeyTrimmed.length < 35 || apiKeyTrimmed.length > 45) {
+      console.warn('⚠️ API key parece ter tamanho incomum:', apiKeyTrimmed.length, 'caracteres (esperado: 39)');
+    }
+    
+    // Verificar se há caracteres especiais ou espaços que possam causar problemas
+    if (apiKeyTrimmed.includes(' ') || apiKeyTrimmed.includes('\n') || apiKeyTrimmed.includes('\r')) {
+      console.error('❌ API key contém espaços ou quebras de linha - remova-os!');
+      return res.status(500).json({ 
+        success: false,
+        message: 'API key inválida',
+        error: 'A API key contém espaços ou quebras de linha. Remova espaços e quebras de linha da variável GEMINI_API_KEY no arquivo .env',
+        details: 'A API key deve estar em uma única linha, sem espaços extras'
+      });
+    }
+    
+    console.log('🔑 API Key encontrada:', apiKeyTrimmed.substring(0, 15) + '...' + apiKeyTrimmed.substring(apiKeyTrimmed.length - 5) + ' (total:', apiKeyTrimmed.length, 'caracteres)');
 
     // Preparar prompt para o Gemini
     console.log('📝 Criando prompt para Gemini...');
@@ -251,6 +331,37 @@ export const gerarInsightsPaciente = async (req, res) => {
     
     let insights;
     try {
+      // Primeiro, testar a API key fazendo uma requisição simples
+      console.log('🧪 Testando API key...');
+      try {
+        const testResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKeyTrimmed}`);
+        if (!testResponse.ok) {
+          const errorText = await testResponse.text();
+          let errorMessage = `Erro ${testResponse.status}`;
+          try {
+            const errorData = JSON.parse(errorText);
+            if (errorData.error?.message) {
+              errorMessage = errorData.error.message;
+            }
+          } catch (e) {
+            // Ignorar erro de parsing
+          }
+          
+          if (testResponse.status === 401 || testResponse.status === 403) {
+            console.error('❌ API key inválida ou sem permissão');
+            throw new Error(`API key inválida ou sem permissão. Verifique se a chave está correta e ativa no Google AI Studio. Erro: ${errorMessage}`);
+          }
+        } else {
+          console.log('✅ API key válida - teste de autenticação bem-sucedido');
+        }
+      } catch (testError) {
+        // Se o erro já foi tratado acima, relançar
+        if (testError.message.includes('API key inválida')) {
+          throw testError;
+        }
+        console.warn('⚠️ Não foi possível testar a API key:', testError.message);
+      }
+      
       // Obter instância do Gemini AI com a API key atualizada
       const genAIInstance = getGenAI();
       
@@ -259,38 +370,62 @@ export const gerarInsightsPaciente = async (req, res) => {
       const modelosDisponiveis = await listarModelosDisponiveis();
       
       // Lista de modelos para tentar (ordem de preferência)
-      // Tentar diferentes formatos e versões
       const modelosParaTentar = [];
       
-      // Se temos modelos disponíveis da lista, usar apenas esses
+      // Se temos modelos disponíveis da lista, usar APENAS esses (não usar fallback)
       if (modelosDisponiveis.length > 0) {
-        // Priorizar modelos que suportam generateContent
-        const modelosComGenerateContent = modelosDisponiveis.filter(name => 
-          name.includes('gemini') && !name.includes('embedding') && !name.includes('embed')
+        console.log('📋 Usando apenas modelos listados como disponíveis:', modelosDisponiveis.length);
+        
+        // Filtrar apenas modelos Gemini (excluir embeddings)
+        const modelosGemini = modelosDisponiveis.filter(name => 
+          name.includes('gemini') && 
+          !name.includes('embedding') && 
+          !name.includes('embed') &&
+          !name.includes('text-embedding')
         );
         
-        if (modelosComGenerateContent.length > 0) {
-          modelosParaTentar.push(...modelosComGenerateContent);
+        if (modelosGemini.length > 0) {
+          // Priorizar modelos flash (mais rápidos) se disponíveis
+          const modelosFlash = modelosGemini.filter(name => 
+            name.includes('flash') || name.includes('Flash')
+          );
+          const modelosPro = modelosGemini.filter(name => 
+            name.includes('pro') || name.includes('Pro')
+          );
+          
+          // Ordem: Flash primeiro, depois Pro, depois outros
+          if (modelosFlash.length > 0) {
+            modelosParaTentar.push(...modelosFlash);
+          }
+          if (modelosPro.length > 0) {
+            modelosParaTentar.push(...modelosPro);
+          }
+          // Adicionar outros modelos Gemini que não são flash nem pro
+          const outros = modelosGemini.filter(name => 
+            !name.includes('flash') && !name.includes('Flash') &&
+            !name.includes('pro') && !name.includes('Pro')
+          );
+          if (outros.length > 0) {
+            modelosParaTentar.push(...outros);
+          }
         } else {
+          // Se não encontrou modelos Gemini, usar todos os disponíveis
           modelosParaTentar.push(...modelosDisponiveis);
         }
+      } else {
+        // Fallback: apenas se não conseguiu listar modelos
+        console.warn('⚠️ Não foi possível listar modelos, usando fallback');
+        modelosParaTentar.push(
+          'gemini-pro',                // Modelo mais básico
+          'gemini-1.5-flash',
+          'gemini-1.5-pro'
+        );
       }
-      
-      // Adicionar modelos padrão como fallback (removendo gemini-pro que não funciona)
-      // Priorizando modelos mais recentes que estão disponíveis
-      modelosParaTentar.push(
-        'gemini-1.5-flash',           // Modelo mais rápido e comum no plano gratuito
-        'gemini-1.5-flash-002',       // Versão específica mais recente
-        'gemini-1.5-flash-001',       // Versão específica anterior
-        'gemini-1.5-pro',             // Modelo mais poderoso
-        'gemini-1.5-pro-002',         // Versão específica mais recente
-        'gemini-1.5-pro-001',         // Versão específica anterior
-        'gemini-1.5-flash-latest',    // Alias para versão mais recente
-        'gemini-1.5-pro-latest'       // Alias para versão mais recente
-      );
       
       // Remover duplicatas mantendo a ordem
       const modelosUnicos = [...new Set(modelosParaTentar)];
+      
+      console.log(`📋 Modelos que serão tentados (${modelosUnicos.length}):`, modelosUnicos.slice(0, 10));
       
       let model = null;
       let ultimoErro = null;
@@ -302,10 +437,26 @@ export const gerarInsightsPaciente = async (req, res) => {
           console.log(`📦 Tentando modelo: ${nomeModelo}...`);
           model = genAIInstance.getGenerativeModel({ model: nomeModelo });
           console.log(`✅ Modelo ${nomeModelo} inicializado com sucesso`);
+          // Se chegou aqui, o modelo foi inicializado - vamos usar ele
           break;
         } catch (modelError) {
-          console.log(`⚠️ Modelo ${nomeModelo} não disponível:`, modelError.message?.substring(0, 150));
+          const errorMsg = modelError.message || modelError.toString();
+          const errorMsgLower = errorMsg.toLowerCase();
+          
+          // Verificar se é erro 404 (modelo não encontrado) - não é fatal, apenas tenta próximo
+          const is404Error = errorMsgLower.includes('404') || 
+                             errorMsgLower.includes('not found') ||
+                             errorMsgLower.includes('is not found') ||
+                             (modelError.cause && JSON.stringify(modelError.cause).includes('404'));
+          
+          if (is404Error) {
+            console.log(`⚠️ Modelo ${nomeModelo} não encontrado (404) - tentando próximo modelo...`);
+          } else {
+            console.log(`⚠️ Modelo ${nomeModelo} não disponível:`, errorMsg.substring(0, 200));
+          }
+          
           ultimoErro = modelError;
+          model = null; // Resetar para próxima tentativa
           continue;
         }
       }
@@ -325,8 +476,20 @@ export const gerarInsightsPaciente = async (req, res) => {
       console.log(`🎯 Usando modelo: ${model.model || 'modelo selecionado'}`);
       
       console.log('🔄 Enviando requisição para o Gemini...');
-      const result = await model.generateContent(promptFinal);
-      const response = await result.response;
+      console.log('📏 Tamanho do prompt final:', promptFinal.length, 'caracteres');
+      
+      let result, response;
+      try {
+        result = await model.generateContent(promptFinal);
+        console.log('✅ Requisição enviada, aguardando resposta...');
+        response = await result.response;
+        console.log('✅ Resposta recebida do Gemini');
+      } catch (generateError) {
+        console.error('❌ Erro ao gerar conteúdo:', generateError);
+        console.error('   Tipo:', generateError.constructor.name);
+        console.error('   Mensagem:', generateError.message);
+        throw generateError;
+      }
       
       // Verificar se há bloqueios de segurança
       if (response.candidates && response.candidates[0] && response.candidates[0].finishReason) {
@@ -353,61 +516,135 @@ export const gerarInsightsPaciente = async (req, res) => {
       console.error('   Código:', geminiError.code);
       console.error('   Status:', geminiError.status);
       console.error('   Status Code:', geminiError.statusCode);
+      
+      // Capturar resposta completa do erro
+      let errorResponse = null;
       if (geminiError.response) {
-        console.error('   Response:', JSON.stringify(geminiError.response, null, 2));
+        errorResponse = geminiError.response;
+        console.error('   Response:', JSON.stringify(errorResponse, null, 2));
       }
+      
+      // Tentar capturar erro do SDK do Google Generative AI
+      if (geminiError.cause) {
+        console.error('   Cause:', JSON.stringify(geminiError.cause, null, 2));
+        errorResponse = geminiError.cause;
+      }
+      
+      // Tentar capturar todas as propriedades do erro
+      console.error('   Todas as propriedades do erro:', Object.keys(geminiError));
+      if (geminiError.message) {
+        console.error('   Mensagem completa:', geminiError.message);
+      }
+      
+      // Tentar obter status code do erro de várias formas
+      let statusCode = geminiError.status || geminiError.statusCode;
+      if (errorResponse) {
+        if (errorResponse.status) {
+          statusCode = errorResponse.status;
+        }
+        if (errorResponse.statusCode) {
+          statusCode = errorResponse.statusCode;
+        }
+        // Tentar obter status de dentro de error
+        if (errorResponse.error?.status) {
+          statusCode = errorResponse.error.status;
+        }
+        if (errorResponse.error?.code) {
+          statusCode = errorResponse.error.code;
+        }
+      }
+      
       if (geminiError.stack) {
-        console.error('   Stack:', geminiError.stack.substring(0, 500));
+        console.error('   Stack:', geminiError.stack.substring(0, 1000));
       }
       
       // Extrair mensagem de erro mais específica
       let errorMessage = geminiError.message || geminiError.toString();
       
       // Verificar se há informações de erro no response
-      if (geminiError.response) {
-        const responseData = geminiError.response;
-        if (responseData.error) {
-          errorMessage = responseData.error.message || responseData.error || errorMessage;
+      if (errorResponse) {
+        if (errorResponse.error) {
+          const errorObj = errorResponse.error;
+          errorMessage = errorObj.message || errorObj.status || errorObj.code || errorObj || errorMessage;
+          console.error('   Erro do response:', JSON.stringify(errorObj, null, 2));
+        }
+        if (errorResponse.message) {
+          errorMessage = errorResponse.message;
+        }
+        // Tentar obter mensagem de dentro de error.message
+        if (errorResponse.error?.message) {
+          errorMessage = errorResponse.error.message;
         }
       }
       
-      // Verificar se é erro de autenticação
-      if (errorMessage && (
-        errorMessage.includes('API_KEY') || 
-        errorMessage.includes('authentication') ||
-        errorMessage.includes('401') ||
-        errorMessage.includes('403') ||
-        errorMessage.includes('API key not valid') ||
-        errorMessage.includes('INVALID_API_KEY')
-      )) {
-        throw new Error('Erro de autenticação com a API do Gemini. Verifique se a API key está correta e ativa no Google AI Studio.');
+      // Converter para string para fazer busca case-insensitive
+      const errorMessageLower = errorMessage.toLowerCase();
+      const errorString = JSON.stringify(errorResponse || geminiError).toLowerCase();
+      
+      // Verificar se a API key foi reportada como vazada/comprometida
+      if (errorMessageLower.includes('leaked') || 
+          errorMessageLower.includes('reported as leaked') ||
+          errorString.includes('leaked')) {
+        console.error('❌ API key reportada como vazada/comprometida');
+        throw new Error('Sua API key foi reportada como vazada/comprometida pelo Google. Por segurança, você precisa criar uma nova API key no Google AI Studio (https://aistudio.google.com/app/apikey) e atualizar a variável GEMINI_API_KEY no arquivo .env');
+      }
+      
+      // Verificar se é erro de autenticação (401, 403, API_KEY_INVALID, etc)
+      if (statusCode === 401 || statusCode === 403 || 
+          errorMessageLower.includes('api_key') || 
+          errorMessageLower.includes('authentication') ||
+          errorMessageLower.includes('api key not valid') ||
+          errorMessageLower.includes('invalid_api_key') ||
+          errorMessageLower.includes('invalid api key') ||
+          errorMessageLower.includes('unauthorized') ||
+          errorMessageLower.includes('permission denied') ||
+          errorMessageLower.includes('forbidden') ||
+          errorString.includes('api_key') ||
+          errorString.includes('authentication') ||
+          errorString.includes('401') ||
+          errorString.includes('403')) {
+        console.error('❌ Erro de autenticação detectado');
+        console.error('   Status Code:', statusCode);
+        console.error('   Mensagem de erro:', errorMessage);
+        const detalhesErro = process.env.NODE_ENV === 'development' 
+          ? ` Detalhes técnicos: ${errorMessage}` 
+          : '';
+        throw new Error(`Erro de autenticação com a API do Gemini. Verifique se a API key está correta e ativa no Google AI Studio.${detalhesErro}`);
       }
       
       // Verificar se é erro de quota
-      if (errorMessage && (
-        errorMessage.includes('quota') ||
-        errorMessage.includes('rate limit') ||
-        errorMessage.includes('429') ||
-        errorMessage.includes('RESOURCE_EXHAUSTED')
-      )) {
+      if (statusCode === 429 ||
+          errorMessageLower.includes('quota') ||
+          errorMessageLower.includes('rate limit') ||
+          errorMessageLower.includes('resource_exhausted') ||
+          errorString.includes('quota') ||
+          errorString.includes('429')) {
         throw new Error('Limite de requisições excedido no plano gratuito. Aguarde alguns minutos ou considere atualizar seu plano no Google AI Studio.');
       }
       
-      // Verificar se é erro de modelo não disponível
-      if (errorMessage && (
-        errorMessage.includes('model') ||
-        errorMessage.includes('MODEL_NOT_FOUND') ||
-        errorMessage.includes('not found')
-      )) {
+      // Verificar se é erro de modelo não disponível (404)
+      if (statusCode === 404 ||
+          errorMessageLower.includes('not found') ||
+          errorMessageLower.includes('model_not_found') ||
+          errorMessageLower.includes('is not found') ||
+          errorMessageLower.includes('not supported for generatecontent') ||
+          errorString.includes('not found') ||
+          errorString.includes('404')) {
+        throw new Error(`O modelo de IA não está disponível no seu plano. O código tentará automaticamente outros modelos disponíveis. Detalhes: ${errorMessage.substring(0, 300)}`);
+      }
+      
+      // Verificar se é erro de modelo não disponível (genérico)
+      if (errorMessageLower.includes('model') && 
+          (errorMessageLower.includes('not available') || 
+           errorMessageLower.includes('not supported'))) {
         throw new Error(`Modelo não disponível no seu plano: ${errorMessage}`);
       }
       
       // Verificar se é erro de segurança/bloqueio
-      if (errorMessage && (
-        errorMessage.includes('SAFETY') ||
-        errorMessage.includes('safety') ||
-        errorMessage.includes('blocked')
-      )) {
+      if (errorMessageLower.includes('safety') ||
+          errorMessageLower.includes('blocked') ||
+          errorString.includes('safety') ||
+          errorString.includes('blocked')) {
         throw new Error('A resposta foi bloqueada por filtros de segurança do Gemini. O conteúdo pode ter sido considerado sensível.');
       }
       
@@ -522,4 +759,160 @@ INSTRUÇÕES:
 Formate a resposta em português brasileiro, de forma clara e profissional.`;
 
 }
+
+// Função para responder perguntas do médico sobre o paciente
+export const responderPergunta = async (req, res) => {
+  try {
+    const { cpf } = req.params;
+    const { pergunta, contextoInsights } = req.body;
+    
+    if (!pergunta || pergunta.trim() === '') {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Pergunta não fornecida',
+        error: 'É necessário fornecer uma pergunta'
+      });
+    }
+    
+    console.log('❓ Pergunta recebida para CPF:', cpf);
+    console.log('📝 Pergunta:', pergunta.substring(0, 100));
+    
+    // Buscar dados do paciente
+    const dadosPaciente = await buscarTodosDadosPaciente(cpf);
+    
+    if (!dadosPaciente) {
+      return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
+    
+    // Verificar se a API key está configurada
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey.trim() === '') {
+      return res.status(500).json({ 
+        success: false,
+        message: 'API key do Gemini não configurada'
+      });
+    }
+    
+    const apiKeyTrimmed = apiKey.trim();
+    
+    // Preparar contexto para a pergunta
+    let contexto = `Você é um assistente médico especializado em análise de dados de saúde. Um médico está fazendo uma pergunta sobre um paciente.
+    
+DADOS DO PACIENTE:
+- Nome: ${dadosPaciente.perfil.nome}
+- Idade: ${dadosPaciente.perfil.idade || 'Não informado'} anos
+- Gênero: ${dadosPaciente.perfil.genero || 'Não informado'}
+- Altura: ${dadosPaciente.perfil.altura || 'Não informado'} cm
+- Peso: ${dadosPaciente.perfil.peso || 'Não informado'} kg
+`;
+    
+    // Adicionar contexto dos insights se fornecido
+    if (contextoInsights) {
+      contexto += `\nCONTEXTO DOS INSIGHTS ANTERIORES:\n${contextoInsights}\n`;
+    }
+    
+    // Adicionar resumo dos dados disponíveis
+    contexto += `\nDADOS DISPONÍVEIS:\n`;
+    contexto += `- ${dadosPaciente.diabetes.length} registros de glicemia\n`;
+    contexto += `- ${dadosPaciente.insonia.length} registros de insônia\n`;
+    contexto += `- ${dadosPaciente.pressaoArterial.length} registros de pressão arterial\n`;
+    contexto += `- ${dadosPaciente.anotacoes.length} anotações clínicas\n`;
+    contexto += `- ${dadosPaciente.eventosClinicos.length} eventos clínicos\n`;
+    contexto += `- ${dadosPaciente.gastrite.length} crises de gastrite\n`;
+    contexto += `- ${dadosPaciente.enxaqueca.length} registros de enxaqueca\n`;
+    contexto += `- ${dadosPaciente.cicloMenstrual.length} registros de ciclo menstrual\n`;
+    
+    const prompt = `${contexto}\n\nPERGUNTA DO MÉDICO:\n${pergunta}\n\nINSTRUÇÕES:
+1.⁠ ⁠Responda a pergunta do médico de forma clara e objetiva
+2.⁠ ⁠Baseie sua resposta nos dados disponíveis do paciente
+3.⁠ ⁠Se não houver dados suficientes, mencione isso
+4.⁠ ⁠Use linguagem médica apropriada
+5.⁠ ⁠Seja conciso mas completo
+6.⁠ ⁠Se a pergunta for sobre algo que não está nos dados, informe isso claramente
+
+Formate a resposta em português brasileiro, de forma clara e profissional.`;
+    
+    // Gerar resposta com Gemini
+    let resposta;
+    try {
+      const genAIInstance = getGenAI();
+      
+      // Listar modelos disponíveis
+      const modelosDisponiveis = await listarModelosDisponiveis();
+      
+      // Selecionar modelo (mesma lógica dos insights)
+      const modelosParaTentar = [];
+      
+      if (modelosDisponiveis.length > 0) {
+        const modelosGemini = modelosDisponiveis.filter(name => 
+          name.includes('gemini') && 
+          !name.includes('embedding') && 
+          !name.includes('embed')
+        );
+        
+        if (modelosGemini.length > 0) {
+          const modelosFlash = modelosGemini.filter(name => name.includes('flash') || name.includes('Flash'));
+          const modelosPro = modelosGemini.filter(name => name.includes('pro') || name.includes('Pro'));
+          
+          if (modelosFlash.length > 0) modelosParaTentar.push(...modelosFlash);
+          if (modelosPro.length > 0) modelosParaTentar.push(...modelosPro);
+        } else {
+          modelosParaTentar.push(...modelosDisponiveis);
+        }
+      } else {
+        modelosParaTentar.push('gemini-pro', 'gemini-1.5-flash', 'gemini-1.5-pro');
+      }
+      
+      const modelosUnicos = [...new Set(modelosParaTentar)];
+      let model = null;
+      
+      for (const nomeModelo of modelosUnicos) {
+        try {
+          model = genAIInstance.getGenerativeModel({ model: nomeModelo });
+          break;
+        } catch (e) {
+          continue;
+        }
+      }
+      
+      if (!model) {
+        throw new Error('Nenhum modelo disponível');
+      }
+      
+      console.log('🤖 Gerando resposta para a pergunta...');
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      resposta = response.text();
+      
+      if (!resposta || resposta.trim() === '') {
+        throw new Error('Resposta vazia do Gemini');
+      }
+      
+      console.log('✅ Resposta gerada com sucesso');
+    } catch (geminiError) {
+      console.error('❌ Erro ao gerar resposta:', geminiError);
+      throw geminiError;
+    }
+    
+    res.json({
+      success: true,
+      resposta: resposta,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('❌ Erro ao responder pergunta:', error);
+    
+    if (!res.headersSent) {
+      const errorMessage = error.message || 'Erro desconhecido ao responder pergunta';
+      
+      res.status(500).json({ 
+        success: false,
+        message: 'Erro ao responder pergunta', 
+        error: errorMessage
+      });
+    }
+  }
+};
+
 

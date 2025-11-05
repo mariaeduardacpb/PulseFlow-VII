@@ -27,11 +27,41 @@ import geminiRoutes from './routes/geminiRoutes.js';
 
 
 
-dotenv.config();
+// Carregar variáveis de ambiente
+// dotenv.config() será chamado depois de definir __dirname
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
-const _dirname = path.dirname(__filename);
+const __dirname = path.dirname(__filename);
+
+// Configurar dotenv para procurar o arquivo .env no diretório server e na raiz
+const envPathServer = path.join(__dirname, '.env');
+const envPathRoot = path.join(__dirname, '..', '.env');
+
+// Tentar carregar do diretório server primeiro
+const resultServer = dotenv.config({ path: envPathServer });
+// Depois tentar da raiz do projeto (sobrescreve se existir)
+const resultRoot = dotenv.config({ path: envPathRoot });
+
+// Log para diagnóstico
+if (resultServer.error && resultRoot.error) {
+  console.warn('⚠️ Arquivo .env não encontrado em:', envPathServer);
+  console.warn('⚠️ Arquivo .env não encontrado em:', envPathRoot);
+  console.warn('⚠️ Certifique-se de criar um arquivo .env com a variável GEMINI_API_KEY');
+} else {
+  if (!resultServer.error) {
+    console.log('✅ Arquivo .env carregado de:', envPathServer);
+  }
+  if (!resultRoot.error) {
+    console.log('✅ Arquivo .env carregado de:', envPathRoot);
+  }
+}
+
+// Verificar se a API key do Gemini está configurada
+if (!process.env.GEMINI_API_KEY) {
+  console.warn('⚠️ GEMINI_API_KEY não encontrada nas variáveis de ambiente');
+  console.warn('   Configure a variável GEMINI_API_KEY no arquivo .env');
+}
 
 // Configuração do CORS
 const corsOptions = {
