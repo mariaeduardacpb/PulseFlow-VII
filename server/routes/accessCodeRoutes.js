@@ -1,11 +1,13 @@
 import express from 'express';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { 
   gerarCodigoAcesso, 
   verificarCodigoAcesso, 
   testConnection, 
   notificarSolicitacaoAcesso,
   buscarSolicitacoesPendentes,
-  marcarSolicitacaoVisualizada 
+  marcarSolicitacaoVisualizada,
+  buscarTodasSolicitacoes
 } from '../controllers/accessCodeController.js';
 
 const router = express.Router();
@@ -24,6 +26,9 @@ router.get('/solicitacoes/:patientId', buscarSolicitacoesPendentes);
 
 // Marcar solicitação como visualizada
 router.put('/solicitacoes/:solicitacaoId/visualizar', marcarSolicitacaoVisualizada);
+
+// Buscar todas as solicitações de acesso do médico logado
+router.get('/solicitacoes', authMiddleware, buscarTodasSolicitacoes);
 
 // Teste de conexão
 router.get('/test', testConnection);

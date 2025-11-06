@@ -264,6 +264,39 @@ export const marcarSolicitacaoVisualizada = async (req, res) => {
   }
 };
 
+// Buscar todas as solicitações de acesso (para médico ver suas solicitações)
+export const buscarTodasSolicitacoes = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user || !user.nome) {
+      return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
+
+    const solicitacoes = await SolicitacaoAcesso.find({
+      medicoNome: user.nome
+    })
+      .sort({ dataHora: -1 })
+      .limit(100);
+
+    res.json({
+      total: solicitacoes.length,
+      solicitacoes: solicitacoes.map(s => ({
+        id: s._id,
+        pacienteId: s.pacienteId,
+        pacienteCpf: s.pacienteCpf,
+        medicoNome: s.medicoNome,
+        especialidade: s.medicoEspecialidade,
+        dataHora: s.dataHora,
+        visualizada: s.visualizada,
+        expiresAt: s.expiresAt
+      }))
+    });
+  } catch (error) {
+    console.error('❌ Erro ao buscar solicitações:', error);
+    res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+  }
+};
+
 // Rota de teste para verificar conexão
 export const testConnection = async (req, res) => {
   res.json({ 

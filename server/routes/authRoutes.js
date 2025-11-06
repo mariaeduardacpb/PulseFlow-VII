@@ -12,6 +12,11 @@ router.post('/confirm-reset-password', authController.confirmResetPassword);
 router.post('/send-otp', authController.sendOtp);
 router.post('/verify-otp', authController.verifyOTP);
 
+router.get('/me', authMiddleware, authController.getMe);
+router.put('/update-profile', authMiddleware, authController.updateProfile);
+router.put('/change-password', authMiddleware, authController.changePassword);
+router.delete('/delete-account', authMiddleware, authController.deleteAccount);
+
 // Rota para refresh do token
 router.post('/refresh-token', async (req, res) => {
   try {

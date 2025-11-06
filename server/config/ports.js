@@ -1,23 +1,23 @@
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const envPath = path.resolve(__dirname, '../.env');
+dotenv.config({ path: envPath });
+
 export const CONFIG = {
-  // PORTAS
-  BACKEND_PORT: process.env.PORT_BACKEND || 65432,
-  FRONTEND_PORT: process.env.PORT_FRONTEND || 3000,
-  MONGODB_PORT: process.env.PORT_MONGODB || 27017,
-  
-  // URLs
-  API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:65432',
-  MONGODB_URI: process.env.MONGODB_URI || 'mongodb+srv://pulseflow:projetointegrador@pulseflow.uesi5bb.mongodb.net/?retryWrites=true&w=majority&appName=PulseFlow',
-  MONGO_URI: process.env.MONGO_URI || 'mongodb+srv://pulseflow:projetointegrador@pulseflow.uesi5bb.mongodb.net/?retryWrites=true&w=majority&appName=PulseFlow',
-  
-  // JWT
-  JWT_SECRET: process.env.JWT_SECRET || 'PulseFlowSuperSecretKey123',
-  
-  // EMAIL
-  EMAIL_USER: process.env.EMAIL_USER || 'pulseflowsaude@gmail.com',
-  EMAIL_PASS: process.env.EMAIL_PASS || 'gpoe ovit bjgs zesn',
-  
-  // AMBIENTE
-  NODE_ENV: process.env.NODE_ENV || 'development'
+  BACKEND_PORT: process.env.PORT_BACKEND,
+  FRONTEND_PORT: process.env.PORT_FRONTEND,
+  MONGODB_PORT: process.env.PORT_MONGODB,
+  API_BASE_URL: process.env.API_BASE_URL,
+  MONGO_URI: process.env.MONGO_URI,
+  JWT_SECRET: process.env.JWT_SECRET,
+  EMAIL_USER: process.env.EMAIL_USER,
+  EMAIL_PASS: process.env.EMAIL_PASS,
+  NODE_ENV: process.env.NODE_ENV
 };
 
 export default CONFIG;
