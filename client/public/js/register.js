@@ -600,7 +600,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       console.log('Dados a serem enviados:', cleanedData);
 
-      const response = await fetch('http://localhost:65432/api/auth/register', {
+      const API_URL = window.API_URL || 'http://localhost:65432';
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -608,7 +609,18 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(cleanedData)
       });
 
-      const data = await response.json();
+      let data = {};
+      try {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          data = await response.json();
+        } else {
+          const text = await response.text();
+          console.warn('Resposta não é JSON:', text);
+        }
+      } catch (parseError) {
+        console.error('Erro ao parsear resposta:', parseError);
+      }
       console.log('Resposta do servidor:', data);
 
       if (!response.ok) {

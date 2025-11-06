@@ -1,5 +1,5 @@
 // Configuração da API
-const API_URL = 'http://localhost:65432';
+const API_URL = window.API_URL || 'http://localhost:65432';
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log('Página de diabetes carregada, iniciando...');

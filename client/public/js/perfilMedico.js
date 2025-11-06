@@ -89,7 +89,8 @@ async function refreshToken() {
 
 async function carregarDadosMedico() {
     try {
-        const response = await fetch('http://localhost:65432/api/usuarios/perfil', {
+        const API_URL = window.API_URL || 'http://localhost:65432';
+        const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -519,7 +520,8 @@ async function salvarAlteracoes(event) {
         console.log('Dados a serem enviados:', dadosPerfil);
 
         // Fazer a requisição com JSON
-        const response = await fetch('http://localhost:65432/api/usuarios/perfil', {
+        const API_URL = window.API_URL || 'http://localhost:65432';
+        const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,

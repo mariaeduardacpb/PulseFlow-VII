@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:65432';
+const API_URL = window.API_URL || 'http://localhost:65432';
 
 document.addEventListener('DOMContentLoaded', async () => {
   await carregarDadosMedico();

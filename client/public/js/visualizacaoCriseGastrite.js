@@ -45,13 +45,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Paciente não selecionado');
         }
 
+        const API_URL = window.API_URL || 'http://localhost:65432';
         console.log('Buscando crise:', {
             cpf: paciente.cpf,
             criseId: criseId,
-            url: `http://localhost:65432/api/gastrite/crises/${paciente.cpf}/${criseId}`
+            url: `${API_URL}/api/gastrite/crises/${paciente.cpf}/${criseId}`
         });
 
-        const response = await fetch(`http://localhost:65432/api/gastrite/crises/${paciente.cpf}/${criseId}`, {
+        const response = await fetch(`${API_URL}/api/gastrite/crises/${paciente.cpf}/${criseId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

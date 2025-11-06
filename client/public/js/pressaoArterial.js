@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 500);
 });
 
-const API_URL = 'http://localhost:65432';
+const API_URL = window.API_URL || 'http://localhost:65432';
 
 function mostrarErro(mensagem) {
     const Toast = Swal.mixin({
