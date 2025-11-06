@@ -10,6 +10,20 @@ body {
   color: #334155;
   line-height: 1.6;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+}
+
+#header-component .main-header {
+  background: #002A42;
 }
 
 .container {
@@ -17,6 +31,16 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+@media (max-width: 768px) {
+  .container {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+  }
 }
 
 .content {
@@ -26,6 +50,22 @@ body {
   padding: 100px 30px 30px 30px;
   box-sizing: border-box;
   overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .content {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    padding: 80px 15px 15px 15px !important;
+    overflow-x: hidden !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 70px 10px 10px 10px !important;
+  }
 }
 
 .patient-header {
@@ -498,99 +538,416 @@ body {
 }
 
 @media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-    width: 200px;
-  }
-
-  .sidebar.active {
-    transform: translateX(0);
-  }
-
   .content {
-    margin-left: 0;
-    width: 100%;
-    padding: 15px;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    padding: 80px 15px 15px 15px !important;
+    overflow-x: hidden !important;
+  }
+
+  .patient-header {
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    border-radius: 12px !important;
+  }
+
+  .patient-header h1 {
+    font-size: 22px !important;
+    gap: 8px !important;
   }
 
   .header-top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 15px !important;
   }
 
   .btn-editar {
-    width: 100%;
-    justify-content: center;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 16px !important;
+    font-size: 13px !important;
   }
 
   .profile-box {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 20px;
-    padding: 25px;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 20px !important;
+    padding: 20px !important;
+    border-radius: 12px !important;
   }
 
   .profile-photo-wrapper {
-    align-self: center;
-    padding-top: 0;
+    align-self: center !important;
+    padding-top: 0 !important;
+    width: 100% !important;
+    max-width: 130px !important;
   }
 
   .profile-box img {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 5px;
+    width: 100px !important;
+    height: 100px !important;
+    margin-bottom: 5px !important;
   }
 
   .profile-box .info {
-    grid-template-columns: 1fr;
-    text-align: left;
-    width: 100%;
+    grid-template-columns: 1fr !important;
+    text-align: left !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .profile-box .info-item {
+    width: 100% !important;
+  }
+
+  .profile-box .info-item label {
+    font-size: 8px !important;
+  }
+
+  .profile-box .info-item .info-value {
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+  }
+
+  .profile-box .info-item .info-input {
+    font-size: 12px !important;
+    padding: 6px 10px !important;
   }
 
   .profile-actions {
-    width: 100%;
-    flex-direction: column;
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 15px 0 0 0 !important;
   }
 
   .profile-actions button {
-    width: 100%;
+    width: 100% !important;
+  }
+
+  .shortcuts {
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    border-radius: 12px !important;
   }
 
   .shortcuts h2 {
-    font-size: 20px;
+    font-size: 20px !important;
+    margin-bottom: 20px !important;
+    gap: 10px !important;
   }
 
   .shortcut-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .shortcut-card {
+    padding: 15px !important;
   }
 
   .shortcut-card strong {
-    min-width: 120px;
+    min-width: auto !important;
+    font-size: 12px !important;
+  }
+
+  .shortcut-card p {
+    font-size: 12px !important;
+  }
+
+  .shortcut-card button {
+    padding: 8px 16px !important;
+    font-size: 12px !important;
+  }
+
+  .insights-section {
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    border-radius: 12px !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  .insights-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .insights-header h2 {
+    font-size: 20px !important;
+    gap: 10px !important;
+  }
+
+  .btn-gerar-insights {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 18px !important;
+    font-size: 13px !important;
+  }
+
+  .insights-text {
+    padding: 15px !important;
+    font-size: 12px !important;
+  }
+
+  .chat-section {
+    margin-top: 20px !important;
+    padding-top: 20px !important;
+  }
+
+  .chat-header h3 {
+    font-size: 16px !important;
+  }
+
+  .chat-messages {
+    max-height: 300px !important;
+    padding: 12px !important;
+  }
+
+  .chat-input-container {
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+  }
+
+  .chat-input {
+    width: 100% !important;
+    font-size: 14px !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .btn-send-question {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+  }
+
+  .profile-box .info-item .info-value,
+  .profile-box .info-item .info-input {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
   }
 }
 
 @media (max-width: 480px) {
-  .profile-box img {
-    width: 100px;
-    height: 100px;
+  .content {
+    padding: 70px 10px 10px 10px !important;
   }
 
-  .profile-box .info p {
-    font-size: 13px;
+  .patient-header {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    border-radius: 10px !important;
   }
 
   .patient-header h1 {
-    font-size: 20px;
+    font-size: 18px !important;
+    gap: 6px !important;
+  }
+
+  .header-top {
+    gap: 12px !important;
+  }
+
+  .btn-editar {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+  }
+
+  .profile-box {
+    padding: 16px !important;
+    gap: 16px !important;
+    border-radius: 10px !important;
+  }
+
+  .profile-photo-wrapper {
+    max-width: 110px !important;
+  }
+
+  .profile-box img {
+    width: 90px !important;
+    height: 90px !important;
+  }
+
+  .profile-box .info {
+    gap: 8px !important;
+  }
+
+  .profile-box .info-item label {
+    font-size: 7px !important;
+  }
+
+  .profile-box .info-item .info-value {
+    font-size: 11px !important;
+    padding: 5px 8px !important;
+  }
+
+  .profile-box .info-item .info-input {
+    font-size: 11px !important;
+    padding: 5px 8px !important;
+  }
+
+  .profile-actions {
+    gap: 8px !important;
+    padding: 12px 0 0 0 !important;
+  }
+
+  .btn-salvar, .btn-cancelar {
+    padding: 8px 20px !important;
+    font-size: 13px !important;
+  }
+
+  .shortcuts {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    border-radius: 10px !important;
   }
 
   .shortcuts h2 {
-    font-size: 18px;
+    font-size: 18px !important;
+    margin-bottom: 16px !important;
+    gap: 8px !important;
+  }
+
+  .shortcut-grid {
+    gap: 12px !important;
   }
 
   .shortcut-card {
-    padding: 15px;
+    padding: 12px !important;
+  }
+
+  .shortcut-card strong {
+    font-size: 11px !important;
+  }
+
+  .shortcut-card p {
+    font-size: 11px !important;
+  }
+
+  .shortcut-card button {
+    padding: 8px 14px !important;
+    font-size: 11px !important;
+  }
+
+  .insights-section {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    border-radius: 10px !important;
+  }
+
+  .insights-header {
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .insights-header h2 {
+    font-size: 18px !important;
+    gap: 8px !important;
+  }
+
+  .ai-icon {
+    font-size: 18px !important;
+  }
+
+  .btn-gerar-insights {
+    padding: 8px 16px !important;
+    font-size: 12px !important;
+  }
+
+  .insights-text {
+    padding: 12px !important;
+    font-size: 11px !important;
+  }
+
+  .insights-summary {
+    padding: 12px !important;
+  }
+
+  .insights-summary h3 {
+    font-size: 13px !important;
+  }
+
+  .insights-summary p {
+    font-size: 11px !important;
+  }
+
+  .chat-section {
+    margin-top: 16px !important;
+    padding-top: 16px !important;
+  }
+
+  .chat-header h3 {
+    font-size: 14px !important;
+  }
+
+  .chat-icon {
+    font-size: 16px !important;
+  }
+
+  .chat-messages {
+    max-height: 250px !important;
+    padding: 10px !important;
+  }
+
+  .chat-message-content {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .chat-input {
+    font-size: 13px !important;
+    padding: 8px !important;
+    min-height: 44px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .btn-send-question {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .chat-loading {
+    font-size: 12px !important;
+    padding: 8px !important;
+  }
+
+  .spinner-small {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .profile-box .info-item .info-value,
+  .profile-box .info-item .info-input {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .insights-text {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+  }
+
+  .chat-message-content {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
   }
 }
 
@@ -758,24 +1115,16 @@ body {
 }
 
 @media (max-width: 768px) {
-  .insights-section {
-    padding: 20px;
-    margin-top: 30px;
+  .insights-error {
+    padding: 16px !important;
+    font-size: 13px !important;
   }
+}
 
-  .insights-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .btn-gerar-insights {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .insights-text {
-    padding: 20px;
-    font-size: 14px;
+@media (max-width: 480px) {
+  .insights-error {
+    padding: 12px !important;
+    font-size: 12px !important;
   }
 }
 

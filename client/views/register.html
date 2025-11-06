@@ -17,30 +17,8 @@
         <img src="../public/assets/PulseNegativo.png" alt="PulseFlow Logo" class="logo-img">
       </header>
       <div class="security-content">
-        <h2>Bem-vindo ao PulseFlow</h2>
-        <p>Junte-se à plataforma que está transformando a gestão em saúde. Preencha seus dados com segurança e comece a usar todas as funcionalidades.</p>
-        
-        <div class="feature-cards">
-          <div class="feature-card">
-            <i class="fas fa-user-check"></i>
-            <h3>Cadastro Rápido</h3>
-            <p>Preencha seus dados pessoais e profissionais em poucos minutos.</p>
-          </div>
-          <div class="feature-card">
-            <i class="fas fa-shield-alt"></i>
-            <h3>Verificação Segura</h3>
-            <p>Seus dados são verificados e protegidos.</p>
-          </div>
-          <div class="feature-card">
-            <i class="fas fa-clipboard-check"></i>
-            <h3>Pronto para Usar</h3>
-            <p>Após o cadastro, você já pode começar a usar todas as funcionalidades.</p>
-          </div>
-        </div>
-
-        <button class="back-btn" onclick="window.location.href='/client/views/login.html'">
-          <i class="fas fa-arrow-left"></i> Voltar ao Login
-        </button>
+        <h2>Cadastre-se no PulseFlow</h2>
+        <p>Crie sua conta de profissional de saúde em poucos passos. Preencha suas informações pessoais, profissionais e do consultório para começar a utilizar a plataforma que conecta médicos e pacientes de forma segura e eficiente.</p>
       </div>
     </div>
 
@@ -149,13 +127,15 @@
 
               <div class="input-row">
                 <div class="input-group rqe-container">
-                  <label>RQE</label>
-                  <div id="rqeContainer"></div>
-                  <button type="button" id="addRqe" class="add-rqe-btn">
-                    <i class="fas fa-plus"></i> Adicionar RQE
-                  </button>
+                  <label for="rqe1">RQE*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-certificate input-icon"></i>
+                    <input type="text" id="rqe1" name="rqe[]" placeholder="000000" required>
+                  </div>
                 </div>
+              </div>
 
+              <div class="input-row">
                 <div class="input-group">
                   <label for="areaAtuacao">Especialidade*</label>
                   <div class="input-wrapper">
@@ -163,6 +143,16 @@
                     <select id="areaAtuacao" name="areaAtuacao" required>
                       <option value="">Selecione sua especialidade</option>
                     </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-row" id="outraEspecialidadeRow" style="display: none;">
+                <div class="input-group">
+                  <label for="outraEspecialidade">Informe sua especialidade*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-user-md input-icon"></i>
+                    <input type="text" id="outraEspecialidade" name="outraEspecialidade" placeholder="Digite sua especialidade">
                   </div>
                 </div>
               </div>
@@ -218,7 +208,7 @@
                 <div class="terms-group">
                   <input type="checkbox" id="termsAccept" name="termsAccept" required>
                   <label for="termsAccept">
-                    Li e aceito os <a href="/client/views/termodeAceite.html" target="_blank">Termos de Uso e Política de Privacidade</a>
+                    Li e aceito os <a href="/client/views/termos.html" target="_blank">Termos de Uso e Política de Privacidade</a>
                   </label>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 // Função global para mostrar mensagem de erro
 function showError(field, message) {
-  Swal.fire({
+  const swalPromise = Swal.fire({
     icon: 'error',
     title: 'Atenção',
     text: message,
@@ -27,6 +27,8 @@ function showError(field, message) {
       }, 8000);
     }
   }
+  
+  return swalPromise;
 }
 
 // Função global para limpar erro
@@ -70,13 +72,28 @@ document.addEventListener("DOMContentLoaded", () => {
     "Nutrologia", "Oftalmologia", "Oncologia Clínica", "Ortopedia e Traumatologia",
     "Otorrinolaringologia", "Patologia", "Patologia Clínica/Medicina Laboratorial",
     "Pediatria", "Pneumologia", "Psiquiatria", "Radiologia e Diagnóstico por Imagem",
-    "Radioterapia", "Reumatologia", "Urologia"
+    "Radioterapia", "Reumatologia", "Urologia", "Outros"
   ];
   especialidades.forEach((nome) => {
     const option = document.createElement("option");
     option.value = nome;
     option.textContent = nome;
     areaSelect.appendChild(option);
+  });
+
+  // Mostrar/ocultar campo de outra especialidade
+  const outraEspecialidadeRow = document.getElementById("outraEspecialidadeRow");
+  const outraEspecialidadeInput = document.getElementById("outraEspecialidade");
+  
+  areaSelect.addEventListener("change", function() {
+    if (this.value === "Outros") {
+      outraEspecialidadeRow.style.display = "flex";
+      outraEspecialidadeInput.required = true;
+    } else {
+      outraEspecialidadeRow.style.display = "none";
+      outraEspecialidadeInput.required = false;
+      outraEspecialidadeInput.value = "";
+    }
   });
 
   const maskCPF = (input) => {
@@ -215,26 +232,9 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePasswordStrength(passwordInput.value);
   }
 
-  // Funcionalidade de adicionar/remover RQE
-  const rqeContainer = document.getElementById("rqeContainer");
-  const addRqeBtn = document.getElementById("addRqe");
-  let rqeCount = 0;
-
-  function createRqeGroup() {
-    rqeCount++;
-    const rqeGroup = document.createElement("div");
-    rqeGroup.className = "rqe-group";
-    rqeGroup.innerHTML = `
-      <div class="input-group">
-        <input type="text" id="rqe${rqeCount}" name="rqe[]">
-      </div>
-      <button type="button" class="remove-rqe">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
-
-    // Aplicar máscara numérica ao novo campo RQE
-    const rqeInput = rqeGroup.querySelector(`#rqe${rqeCount}`);
+  // Aplicar máscara ao campo RQE
+  const rqeInput = document.getElementById("rqe1");
+  if (rqeInput) {
     IMask(rqeInput, {
       mask: '000000',
       maxLength: 6,
@@ -242,37 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return str.replace(/[^\d]/g, '');
       }
     });
-
-    const removeBtn = rqeGroup.querySelector(".remove-rqe");
-    removeBtn.addEventListener("click", () => {
-      rqeGroup.remove();
-    });
-
-    return rqeGroup;
   }
-
-  // Aplicar máscara ao RQE inicial
-  const initialRqeInput = document.getElementById("rqe1");
-  if (initialRqeInput) {
-    IMask(initialRqeInput, {
-      mask: '000000',
-      maxLength: 6,
-      prepare: function(str) {
-        return str.replace(/[^\d]/g, '');
-      }
-    });
-  }
-
-  // Estilizar o botão de adicionar RQE
-  if (addRqeBtn) {
-    addRqeBtn.innerHTML = '<i class="fas fa-plus"></i> Adicionar RQE';
-    addRqeBtn.classList.add('add-rqe-btn');
-  }
-
-  addRqeBtn.addEventListener("click", () => {
-    const newRqeGroup = createRqeGroup();
-    rqeContainer.appendChild(newRqeGroup);
-  });
 
   // Busca de CEP
   const enderecoInput = document.getElementById("enderecoConsultorio");
@@ -392,9 +362,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (stepIndex === 1) {
       const crm = document.getElementById('crm');
       const area = document.getElementById('areaAtuacao');
-      const rqeInputs = document.querySelectorAll('input[name="rqe[]"]');
+      const rqe = document.getElementById('rqe1');
+      const outraEspecialidade = document.getElementById('outraEspecialidade');
 
-      if (!crm || !area) {
+      if (!crm || !area || !rqe) {
         console.error('Campos não encontrados na etapa 2');
         return false;
       }
@@ -409,13 +380,16 @@ document.addEventListener("DOMContentLoaded", () => {
         area.focus();
         return false;
       }
-      let rqeValido = false;
-      rqeInputs.forEach(input => {
-        if (input.value.trim()) rqeValido = true;
-      });
-      if (!rqeValido) {
-        showError(rqeInputs[0], 'Por favor, adicione pelo menos um RQE.');
-        rqeInputs[0]?.focus();
+      if (area.value === 'Outros') {
+        if (!outraEspecialidade || !outraEspecialidade.value.trim()) {
+          showError(outraEspecialidade, 'Por favor, informe sua especialidade.');
+          outraEspecialidade?.focus();
+          return false;
+        }
+      }
+      if (!rqe.value.trim()) {
+        showError(rqe, 'Por favor, preencha seu RQE.');
+        rqe.focus();
         return false;
       }
     }
@@ -621,7 +595,7 @@ document.addEventListener("DOMContentLoaded", () => {
         telefoneConsultorio: formData.telefoneConsultorio.replace(/\D/g, ''),
         cep: formData.cep.replace(/\D/g, ''),
         crm: formData.crm.replace(/\W/g, '').toUpperCase(),
-        rqe: Array.isArray(formData.rqe) ? formData.rqe.filter(r => r) : []
+        rqe: formData.rqe ? [formData.rqe.replace(/\D/g, '')] : []
       };
 
       console.log('Dados a serem enviados:', cleanedData);
@@ -638,18 +612,32 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log('Resposta do servidor:', data);
 
       if (!response.ok) {
-        Swal.close();
+        let errorMessage = 'Não foi possível processar seu cadastro neste momento. Por favor, tente novamente em alguns instantes.';
+        
         if (response.status === 400) {
-          if (Array.isArray(data.errors)) {
-            showError(null, data.errors.join('\n'));
-          } else {
-            showError(null, data.message || 'Por favor, verifique os dados informados e tente novamente.');
+          if (data.message && (data.message.includes('já existe') || data.message.includes('Usuário já existe'))) {
+            errorMessage = 'Este e-mail já está cadastrado em nossa plataforma. Por favor, faça login ou entre em contato com o suporte.';
+          } else if (Array.isArray(data.errors)) {
+            errorMessage = data.errors.join('\n');
+          } else if (data.message) {
+            errorMessage = data.message;
           }
         } else if (response.status === 409) {
-          showError(null, 'Este usuário já está cadastrado em nossa plataforma. Por favor, faça login ou entre em contato com o suporte.');
-        } else {
-          showError(null, 'Não foi possível processar seu cadastro neste momento. Por favor, tente novamente em alguns instantes.');
+          errorMessage = 'Este usuário já está cadastrado em nossa plataforma. Por favor, faça login ou entre em contato com o suporte.';
+        } else if (response.status === 500) {
+          if (data.error && data.error.includes('duplicate key') && data.error.includes('cpf')) {
+            errorMessage = 'Este CPF já está cadastrado em nossa plataforma. Por favor, faça login ou entre em contato com o suporte.';
+          } else if (data.message && (data.message.includes('já existe') || data.message.includes('Usuário já existe'))) {
+            errorMessage = 'Este e-mail já está cadastrado em nossa plataforma. Por favor, faça login ou entre em contato com o suporte.';
+          } else if (data.error && data.error.includes('duplicate key') && data.error.includes('email')) {
+            errorMessage = 'Este e-mail já está cadastrado em nossa plataforma. Por favor, faça login ou entre em contato com o suporte.';
+          } else if (data.message) {
+            errorMessage = data.message;
+          }
         }
+        
+        Swal.close();
+        await showError(null, errorMessage);
         return false;
       }
 
@@ -693,10 +681,12 @@ document.addEventListener("DOMContentLoaded", () => {
       email: document.getElementById('email')?.value?.toLowerCase().trim() || '',
       senha: document.getElementById('senha')?.value || '',
       crm: document.getElementById('crm')?.value?.trim() || '',
-      rqe: Array.from(document.querySelectorAll('input[name="rqe[]"]'))
-        .map(input => input.value.trim())
-        .filter(value => value),
-      areaAtuacao: document.getElementById('areaAtuacao')?.value?.trim() || '',
+      rqe: document.getElementById('rqe1')?.value?.trim() || '',
+      areaAtuacao: (() => {
+        const area = document.getElementById('areaAtuacao')?.value?.trim() || '';
+        const outra = document.getElementById('outraEspecialidade')?.value?.trim() || '';
+        return area === 'Outros' ? outra : area;
+      })(),
       genero: document.getElementById('genero')?.value || '',
       cep: document.getElementById('cep')?.value?.replace(/\D/g, '') || '',
       enderecoConsultorio: document.getElementById('enderecoConsultorio')?.value?.trim() || '',
@@ -729,14 +719,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const success = await processForm(formData);
       console.log('Resultado do processamento:', success); // Log para debug
 
-      // Fechar loading
-      Swal.close();
-
       if (!success) {
-        // Se houver erro, voltar para o primeiro passo
-        currentStep = 0;
-        showStep(currentStep);
+        Swal.close();
+        return;
       }
+      
+      Swal.close();
     } catch (error) {
       console.error('Erro detalhado no processamento:', error); // Log mais detalhado
       Swal.close();

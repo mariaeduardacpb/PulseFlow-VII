@@ -175,50 +175,144 @@
       font-weight: 300;
       margin-bottom: 2rem;
     }
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
       .page-hero {
-        padding: 8rem 2rem 6rem;
+        padding: 10rem 3rem 8rem;
       }
       .page-content {
-        padding: 5rem 2rem;
+        padding: 6rem 3rem;
       }
       .stats-section {
-        padding: 4rem 2rem;
-        margin: 5rem 0;
+        padding: 5rem 3rem;
       }
       .stats-grid {
         gap: 3rem;
       }
+    }
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+      .main-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        gap: 1rem;
+        z-index: 1000;
+      }
+      .main-nav.active {
+        display: flex;
+      }
+      .page-hero {
+        padding: 8rem 2rem 6rem;
+      }
+      .page-hero h1 {
+        font-size: 2.5rem;
+      }
+      .page-hero p {
+        font-size: 1.125rem;
+      }
+      .page-content {
+        padding: 4rem 2rem;
+      }
+      .content-section {
+        margin-bottom: 5rem;
+      }
+      .content-section h2 {
+        font-size: 2rem;
+      }
+      .content-section p {
+        font-size: 1rem;
+      }
+      .stats-section {
+        padding: 4rem 2rem;
+        margin: 4rem 0;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.5rem;
+      }
+      .stat-number {
+        font-size: 2.5rem;
+      }
+      .values-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
       .value-card {
-        padding: 2.5rem;
+        padding: 2.5rem 2rem;
       }
       .commitment-section {
-        padding: 5rem 2rem;
-        margin-top: 5rem;
+        padding: 4rem 2rem;
+        margin-top: 4rem;
+      }
+      .commitment-section h2 {
+        font-size: 2rem;
+      }
+      .commitment-section p {
+        font-size: 1.125rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .page-hero {
+        padding: 6rem 1.5rem 4rem;
+      }
+      .page-hero h1 {
+        font-size: 2rem;
+      }
+      .page-hero p {
+        font-size: 1rem;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .stat-number {
+        font-size: 2.25rem;
+      }
+      .stat-label {
+        font-size: 1rem;
+      }
+      .content-section h2 {
+        font-size: 1.75rem;
+      }
+      .value-card {
+        padding: 2rem 1.5rem;
+      }
+      .commitment-section {
+        padding: 3rem 1.5rem;
+      }
+      .commitment-section h2 {
+        font-size: 1.75rem;
       }
     }
   </style>
 </head>
 <body>
-  <header>
+  <header class="main-header">
     <div class="logo">
       <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
     </div>
-    <div class="menu-toggle" id="menuToggle">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <nav id="mainNav">
-      <a href="homePage.html">HOME</a>
-      <a href="#features">ÁREAS DE ATUAÇÃO</a>
-      <a href="sobreNos.html">SOBRE</a>
-      <a href="servicos.html">SERVIÇOS</a>
-      <a href="contato.html">CONTATO</a>
+    <nav class="main-nav" id="mainNav">
+      <a href="homePage.html" class="nav-link">HOME</a>
+      <a href="homePage.html#features" class="nav-link">ÁREAS DE ATUAÇÃO</a>
+      <a href="sobreNos.html" class="nav-link">SOBRE</a>
+      <a href="contato.html" class="nav-link">CONTATO</a>
     </nav>
     <div class="btn-container">
       <a href="login.html" class="login-button">Entrar</a>
     </div>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </header>
 
   <section class="page-hero">
@@ -285,57 +379,51 @@
     </div>
   </section>
 
-  <footer>
-    <div class="footer-main">
-      <div class="footer-column">
-        <div class="footer-logo-section">
-          <img src="../public/assets/pulseLogo.png" alt="Logo PulseFlow" class="footer-logo">
-          <p class="footer-tagline">Tecnologia que conecta pacientes e médicos para um cuidado de saúde mais eficiente.</p>
-        </div>
-      </div>
-
-      <div class="footer-column">
-        <h4 class="footer-title">Institucional</h4>
-        <ul class="footer-links">
-          <li><a href="sobreNos.html">Sobre Nós</a></li>
-          <li><a href="servicos.html">Serviços</a></li>
-          <li><a href="contato.html">Contato</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-column">
-        <h4 class="footer-title">Recursos</h4>
-        <ul class="footer-links">
-          <li><a href="privacidade.html">Privacidade</a></li>
-          <li><a href="termos.html">Termos de Uso</a></li>
-          <li><a href="faq.html">FAQ</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-column">
-        <h4 class="footer-title">Baixe o App</h4>
-        <div class="download-links">
-          <a href="#" class="app-icon">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.07-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-            </svg>
-            <span>App Store</span>
-          </a>
-          <a href="#" class="app-icon">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L16.81,15.12L14.54,12.85L20.16,10.81M20.16,10.19L14.54,7.15L16.81,4.88L20.16,10.19M16.81,8.88L14.54,11.15L6.05,2.66L16.81,8.88Z"/>
-            </svg>
-            <span>Play Store</span>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p>&copy; 2025 PulseFlow. Todos os direitos reservados.</p>
-    </div>
-  </footer>
+  <div id="footer-container"></div>
   <script src="../public/js/homePage.js"></script>
+  <script src="../public/js/footer.js"></script>
+  <script>
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mainNav = document.getElementById('mainNav');
+    
+    if (mobileMenuToggle && mainNav) {
+      mobileMenuToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        mainNav.classList.toggle('active');
+      });
+      
+      document.addEventListener('click', function(event) {
+        const isClickInsideNav = mainNav.contains(event.target);
+        const isClickOnToggle = mobileMenuToggle.contains(event.target);
+        
+        if (!isClickInsideNav && !isClickOnToggle && mainNav.classList.contains('active')) {
+          mainNav.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+        }
+      });
+      
+      const navLinks = mainNav.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          mainNav.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+        });
+      });
+    }
+    
+    const header = document.querySelector('.main-header');
+    if (header) {
+      window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll > 100) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+    }
+  </script>
 </body>
 </html>
 

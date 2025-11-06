@@ -521,14 +521,9 @@ function atualizarEstatisticas(eventos) {
 function renderizarEventos(eventos) {
   const eventGrid = document.getElementById('eventGrid');
   const emptyState = document.getElementById('emptyState');
-  const contadorEventos = document.getElementById('contadorEventos');
 
-  if (!eventGrid || !emptyState || !contadorEventos) return;
+  if (!eventGrid || !emptyState) return;
 
-  // Atualizar contador
-  contadorEventos.textContent = `${eventos.length} evento${eventos.length !== 1 ? 's' : ''} encontrado${eventos.length !== 1 ? 's' : ''}`;
-
-  // Limpar grid
   eventGrid.innerHTML = '';
 
   if (eventos.length === 0) {

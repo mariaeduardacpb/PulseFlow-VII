@@ -1,1 +1,66 @@
- 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFlow | Notificações</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/css/perfilPaciente.css">
+  <link rel="stylesheet" href="../public/css/sidebar.css">
+  <link rel="stylesheet" href="../public/css/header.css">
+  <link rel="stylesheet" href="../public/css/notificacoes.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+</head>
+<body>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
+  
+  <div class="container">
+    <main class="content">
+      <section class="notifications-header">
+        <div class="header-top">
+          <h1><i class="fas fa-bell"></i> Notificações</h1>
+          <div class="header-actions">
+            <button id="markAllReadBtn" class="btn-mark-all">
+              <i class="fas fa-check-double"></i> Marcar todas como lidas
+            </button>
+            <button id="clearAllBtn" class="btn-clear-all">
+              <i class="fas fa-trash"></i> Limpar todas
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div class="notifications-filters">
+        <button class="filter-btn active" data-filter="all">
+          <i class="fas fa-list"></i> Todas
+        </button>
+        <button class="filter-btn" data-filter="unread">
+          <i class="fas fa-circle"></i> Não lidas
+        </button>
+        <button class="filter-btn" data-filter="read">
+          <i class="fas fa-check-circle"></i> Lidas
+        </button>
+        <button class="filter-btn" data-filter="archived">
+          <i class="fas fa-archive"></i> Arquivadas
+        </button>
+      </div>
+
+      <section class="notifications-container">
+        <div id="notificationsList" class="notifications-list">
+          <div class="loading-spinner" id="loadingSpinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Carregando notificações...</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script src="../public/js/header.js"></script>
+  <script src="../public/js/sidebar.js"></script>
+  <script src="../public/js/notificacoes.js"></script>
+</body>
+</html>

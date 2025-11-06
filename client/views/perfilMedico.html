@@ -8,14 +8,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
   <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="header-component"></div>
   <div class="container">
-    <div class="logo">
-      <img src="../public/assets/pulseLogo.png" alt="PulseFlow Logo">
-    </div>
     <h1>Meu Perfil</h1>
     <form id="profileForm">
       <div class="form-section">
@@ -67,10 +64,6 @@
             <label for="crm">CRM</label>
             <input type="text" id="crm" name="crm" readonly>
           </div>
-          <div class="input-group">
-            <label for="especialidade">Especialidade</label>
-            <input type="text" id="especialidade" name="especialidade" readonly>
-          </div>
         </div>
         <div id="rqeContainer">
           <!-- Os campos RQE serão adicionados dinamicamente aqui -->
@@ -79,6 +72,12 @@
           <button type="button" id="addRqeBtn" class="add-rqe-btn">
             <i class="fas fa-plus"></i> Adicionar RQE
           </button>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="especialidade">Especialidade</label>
+            <input type="text" id="especialidade" name="especialidade" readonly>
+          </div>
         </div>
       </div>
 

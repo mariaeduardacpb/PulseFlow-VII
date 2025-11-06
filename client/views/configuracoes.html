@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFlow | Configurações</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/css/perfilPaciente.css">
+  <link rel="stylesheet" href="../public/css/sidebar.css">
+  <link rel="stylesheet" href="../public/css/header.css">
+  <link rel="stylesheet" href="../public/css/configuracoes.css">
+  <link rel="stylesheet" href="../public/css/dark-theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+</head>
+<body>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
+  
+  <div class="container">
+    <main class="content">
+      <section class="settings-header">
+        <div class="header-top">
+          <h1><i class="fas fa-cog"></i> Configurações</h1>
+          <p class="subtitle">Gerencie suas preferências e configurações da conta</p>
+        </div>
+      </section>
+
+      <div class="settings-container">
+        <div class="settings-section">
+          <div class="section-header">
+            <h2><i class="fas fa-user"></i> Perfil</h2>
+          </div>
+          <div class="settings-card">
+            <div class="profile-info-item">
+              <label>Nome Completo</label>
+              <span id="userNameDisplay" class="setting-value">Carregando...</span>
+            </div>
+            <div class="profile-info-item">
+              <label>Email</label>
+              <span id="userEmailDisplay" class="setting-value">Carregando...</span>
+            </div>
+            <div class="setting-item-action">
+              <button class="btn-edit-profile" id="editProfileBtn">
+                <i class="fas fa-edit"></i> Editar Dados
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-header">
+            <h2><i class="fas fa-lock"></i> Segurança</h2>
+          </div>
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Alterar Senha</label>
+                <span class="setting-value">••••••••</span>
+              </div>
+              <button class="btn-edit" id="changePasswordBtn">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Autenticação de Dois Fatores</label>
+                <span class="setting-value">Desativado</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="twoFactorToggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-header">
+            <h2><i class="fas fa-bell"></i> Notificações</h2>
+          </div>
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Notificações por Email</label>
+                <span class="setting-value">Receber notificações importantes</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="emailNotificationsToggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Notificações Push</label>
+                <span class="setting-value">Receber notificações em tempo real</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pushNotificationsToggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-header">
+            <h2><i class="fas fa-palette"></i> Aparência</h2>
+          </div>
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Tema</label>
+                <span class="setting-value" id="themeDisplay">Claro</span>
+              </div>
+              <select class="theme-select" id="themeSelect">
+                <option value="light">Claro</option>
+                <option value="dark">Escuro</option>
+                <option value="auto">Automático</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-header">
+            <h2><i class="fas fa-info-circle"></i> Sobre</h2>
+          </div>
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Versão do Aplicativo</label>
+                <span class="setting-value">1.0.0</span>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Termos de Uso</label>
+                <span class="setting-value">Ver termos e condições</span>
+              </div>
+              <a href="termos.html" class="btn-link">
+                <i class="fas fa-external-link-alt"></i>
+              </a>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Política de Privacidade</label>
+                <span class="setting-value">Ler política de privacidade</span>
+              </div>
+              <a href="privacidade.html" class="btn-link">
+                <i class="fas fa-external-link-alt"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section danger-zone">
+          <div class="section-header">
+            <h2><i class="fas fa-exclamation-triangle"></i> Zona Perigosa</h2>
+          </div>
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Excluir Conta</label>
+                <span class="setting-value danger-text">Esta ação não pode ser desfeita</span>
+              </div>
+              <button class="btn-danger" id="deleteAccountBtn">
+                <i class="fas fa-trash"></i> Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Editar</h3>
+        <button class="modal-close" id="closeModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <div class="form-group">
+            <label id="editLabel">Campo</label>
+            <input type="text" id="editInput" class="form-input">
+            <span class="form-error" id="editError"></span>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" id="cancelEdit">Cancelar</button>
+            <button type="submit" class="btn-save">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="changePasswordModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Alterar Senha</h3>
+        <button class="modal-close" id="closePasswordModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="changePasswordForm">
+          <div class="form-group">
+            <label for="currentPassword">Senha Atual</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="currentPassword" class="form-input" placeholder="Digite sua senha atual">
+              <button type="button" class="password-toggle" data-target="currentPassword">
+                <i class="fas fa-eye" id="currentPasswordIcon"></i>
+              </button>
+            </div>
+            <span class="form-error" id="currentPasswordError"></span>
+          </div>
+          <div class="form-group">
+            <label for="newPassword">Nova Senha</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="newPassword" class="form-input" placeholder="Digite a nova senha">
+              <button type="button" class="password-toggle" data-target="newPassword">
+                <i class="fas fa-eye" id="newPasswordIcon"></i>
+              </button>
+            </div>
+            <span class="form-error" id="newPasswordError"></span>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirmar Nova Senha</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="confirmPassword" class="form-input" placeholder="Digite a nova senha novamente">
+              <button type="button" class="password-toggle" data-target="confirmPassword">
+                <i class="fas fa-eye" id="confirmPasswordIcon"></i>
+              </button>
+            </div>
+            <span class="form-error" id="confirmPasswordError"></span>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" id="cancelPassword">Cancelar</button>
+            <button type="submit" class="btn-save">Alterar Senha</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script src="../public/js/theme.js"></script>
+  <script src="../public/js/header.js"></script>
+  <script src="../public/js/sidebar.js"></script>
+  <script src="../public/js/configuracoes.js"></script>
+</body>
+</html>
+
