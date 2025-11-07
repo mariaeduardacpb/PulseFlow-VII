@@ -121,12 +121,30 @@ async function carregarDadosMedico() {
         document.getElementById('telefone').value = telefones.pessoal;
         document.getElementById('telefoneConsultorio').value = telefones.consultorio;
         document.getElementById('cep').value = medico.cep || '';
-        document.getElementById('endereco').value = medico.enderecoConsultorio || '';
-        document.getElementById('numero').value = medico.numeroConsultorio || '';
-        document.getElementById('complemento').value = medico.complemento || '';
-        document.getElementById('bairro').value = medico.bairro || '';
-        document.getElementById('cidade').value = medico.cidade || '';
-        document.getElementById('estado').value = medico.estado || '';
+        
+        const enderecoCompleto = medico.enderecoCompleto || {};
+        document.getElementById('endereco').value = enderecoCompleto.logradouro || medico.enderecoConsultorio || '';
+        document.getElementById('numero').value = enderecoCompleto.numero || medico.numeroConsultorio || '';
+        document.getElementById('complemento').value = enderecoCompleto.complemento || medico.complemento || '';
+        document.getElementById('bairro').value = enderecoCompleto.bairro || medico.bairro || '';
+        document.getElementById('cidade').value = enderecoCompleto.cidade || medico.cidade || '';
+        document.getElementById('estado').value = enderecoCompleto.estado || medico.estado || '';
+        
+        if (!document.getElementById('bairro').value && medico.enderecoConsultorio) {
+          const enderecoStr = medico.enderecoConsultorio;
+          const partes = enderecoStr.split(',').map(p => p.trim());
+          if (partes.length >= 3) {
+            document.getElementById('endereco').value = partes[0] || '';
+            document.getElementById('bairro').value = partes[1] || '';
+            const cidadeEstado = partes[2] ? partes[2].split('-').map(p => p.trim()) : [];
+            if (cidadeEstado.length >= 2) {
+              document.getElementById('cidade').value = cidadeEstado[0] || '';
+              document.getElementById('estado').value = cidadeEstado[1] || '';
+            } else if (cidadeEstado.length === 1) {
+              document.getElementById('cidade').value = cidadeEstado[0] || '';
+            }
+          }
+        }
 
         // Aplicar máscaras nos campos
         IMask(document.getElementById('telefone'), {

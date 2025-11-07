@@ -1,6 +1,8 @@
 // routes/pacienteRoutes.js
 import express from 'express';
 import Paciente from '../models/Paciente.js';
+import ConexaoMedicoPaciente from '../models/ConexaoMedicoPaciente.js';
+import User from '../models/User.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -64,6 +66,7 @@ router.get('/buscar', async (req, res) => {
 // Médico busca paciente pelo CPF e código de acesso
 router.post('/buscar-com-codigo', async (req, res) => {
   const { cpf, codigoAcesso } = req.body;
+  const authHeader = req.headers.authorization;
 
   if (!cpf || !codigoAcesso) {
     return res.status(400).json({ message: 'CPF e código de acesso são obrigatórios' });
@@ -105,6 +108,40 @@ router.post('/buscar-com-codigo', async (req, res) => {
       return res.status(401).json({ message: 'Código de acesso expirado' });
     }
 
+    // Se tiver token de autenticação, registrar conexão médico-paciente
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const jwt = (await import('jsonwebtoken')).default;
+        const token = authHeader.substring(7);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        if (decoded.id || decoded._id) {
+          const medicoId = decoded.id || decoded._id;
+          const medico = await User.findById(medicoId);
+          if (medico) {
+            // Desativar conexões anteriores do mesmo paciente
+            await ConexaoMedicoPaciente.updateMany(
+              { pacienteId: paciente._id, isActive: true },
+              { isActive: false, disconnectedAt: new Date() }
+            );
+            
+            // Criar nova conexão
+            const novaConexao = new ConexaoMedicoPaciente({
+              pacienteId: paciente._id,
+              medicoId: medico._id,
+              medicoNome: medico.nome,
+              medicoEspecialidade: medico.areaAtuacao,
+              connectedAt: new Date(),
+              isActive: true
+            });
+            await novaConexao.save();
+          }
+        }
+      } catch (tokenError) {
+        console.log('Não foi possível verificar token médico:', tokenError.message);
+      }
+    }
+
     // Código válido - retornar dados do paciente
     res.json({
       id: paciente._id,
@@ -125,6 +162,123 @@ router.post('/buscar-com-codigo', async (req, res) => {
       isAdmin: paciente.isAdmin
     });
   } catch (err) {
+    res.status(500).json({ message: 'Erro interno do servidor', error: err.message });
+  }
+});
+
+// Endpoint para paciente consultar médico conectado (deve vir antes de rotas genéricas)
+router.get('/:patientId/conexao-ativa', async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    
+    const conexaoAtiva = await ConexaoMedicoPaciente.findOne({
+      pacienteId: patientId,
+      isActive: true
+    }).sort({ connectedAt: -1 });
+    
+    if (!conexaoAtiva) {
+      return res.json({
+        conectado: false,
+        medico: null,
+        tempoConectado: null
+      });
+    }
+    
+    const tempoConectado = Math.floor((new Date() - conexaoAtiva.connectedAt) / 1000);
+    
+    res.json({
+      conectado: true,
+      medico: {
+        id: conexaoAtiva.medicoId,
+        nome: conexaoAtiva.medicoNome,
+        especialidade: conexaoAtiva.medicoEspecialidade
+      },
+      tempoConectado: tempoConectado,
+      connectedAt: conexaoAtiva.connectedAt
+    });
+  } catch (err) {
+    console.error('Erro ao buscar conexão ativa:', err);
+    res.status(500).json({ message: 'Erro interno do servidor', error: err.message });
+  }
+});
+
+// Endpoint para verificar se médico logado está conectado ao paciente (por CPF)
+router.get('/verificar-conexao/:cpf', async (req, res) => {
+  try {
+    const { cpf } = req.params;
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.json({ conectado: false, mensagem: 'Token não fornecido' });
+    }
+    
+    try {
+      const jwt = (await import('jsonwebtoken')).default;
+      const token = authHeader.substring(7);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const medicoId = decoded.id || decoded._id;
+      
+      if (!medicoId) {
+        return res.json({ conectado: false });
+      }
+      
+      const cpfLimpo = cpf.replace(/\D/g, '');
+      let paciente = await Paciente.findOne({ cpf: cpfLimpo });
+      
+      if (!paciente) {
+        const cpfFormatado = cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        paciente = await Paciente.findOne({ cpf: cpfFormatado });
+      }
+      
+      if (!paciente) {
+        return res.json({ conectado: false, mensagem: 'Paciente não encontrado' });
+      }
+      
+      const conexaoAtiva = await ConexaoMedicoPaciente.findOne({
+        pacienteId: paciente._id,
+        medicoId: medicoId,
+        isActive: true
+      }).sort({ connectedAt: -1 });
+      
+      if (!conexaoAtiva) {
+        return res.json({ conectado: false });
+      }
+      
+      res.json({ conectado: true });
+    } catch (tokenError) {
+      return res.json({ conectado: false, mensagem: 'Token inválido' });
+    }
+  } catch (err) {
+    console.error('Erro ao verificar conexão:', err);
+    res.status(500).json({ message: 'Erro interno do servidor', error: err.message });
+  }
+});
+
+// Endpoint para desconectar médico (deve vir antes de rotas genéricas)
+router.post('/:patientId/desconectar-medico', async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    
+    const resultado = await ConexaoMedicoPaciente.updateMany(
+      { pacienteId: patientId, isActive: true },
+      { 
+        isActive: false, 
+        disconnectedAt: new Date() 
+      }
+    );
+    
+    if (resultado.modifiedCount === 0) {
+      return res.status(404).json({ 
+        message: 'Nenhuma conexão ativa encontrada para este paciente' 
+      });
+    }
+    
+    res.json({
+      message: 'Médico desconectado com sucesso',
+      desconectado: true
+    });
+  } catch (err) {
+    console.error('Erro ao desconectar médico:', err);
     res.status(500).json({ message: 'Erro interno do servidor', error: err.message });
   }
 });

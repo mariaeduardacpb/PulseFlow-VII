@@ -1,4 +1,5 @@
 import { API_URL } from './config.js';
+import { iniciarVerificacaoConexao, pararVerificacaoConexao } from './conexaoMonitor.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Verificar se os elementos existem antes de adicionar event listeners
@@ -795,13 +796,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const data = await response.json();
       
-      // Atualizar dados do paciente
-      pacienteAtual = { ...pacienteAtual, ...dadosAtualizados };
+      pacienteAtual = JSON.parse(localStorage.getItem('pacienteSelecionado'));
+      if (pacienteAtual) {
+        pacienteAtual = { ...pacienteAtual, ...dadosAtualizados };
+        localStorage.setItem('pacienteSelecionado', JSON.stringify(pacienteAtual));
+      }
       
-      // Recarregar dados do paciente
       await carregarDadosPaciente();
       
-      // Desabilitar edição
       desabilitarEdicao();
       
       mostrarErro('Dados atualizados com sucesso!', 'success');
@@ -827,11 +829,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     cancelarEdicaoBtn.addEventListener('click', desabilitarEdicao);
   }
 
+  let pacienteAtual = null;
+
+  window.addEventListener('beforeunload', () => {
+    pararVerificacaoConexao();
+  });
+
   // Inicializar
   try {
     await carregarDadosMedico();
     await carregarDadosPaciente();
     await carregarUltimosRegistros();
+    
+    pacienteAtual = JSON.parse(localStorage.getItem('pacienteSelecionado'));
+    
+    if (localStorage.getItem('tokenPaciente')) {
+      iniciarVerificacaoConexao();
+    }
   } catch (error) {
     console.error("Erro durante a inicialização:", error);
     mostrarErro("Ocorreu um erro ao carregar os dados. Por favor, tente novamente.");

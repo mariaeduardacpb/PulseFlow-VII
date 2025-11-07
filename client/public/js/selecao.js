@@ -169,11 +169,18 @@ async function buscarComCodigo(cpfLimpo) {
       codigoAcesso: codigoAcesso
     };
 
+    const token = localStorage.getItem('token');
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const res = await fetch(`${API_URL}/api/pacientes/buscar-com-codigo`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: headers,
       body: JSON.stringify(requestBody)
     });
 
