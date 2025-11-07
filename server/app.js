@@ -24,6 +24,7 @@ import eventoClinicoRoutes from './routes/eventoClinicoRoutes.js';
 import perfilMedicoRoutes from './routes/perfilMedicoRoutes.js';
 import accessCodeRoutes from './routes/accessCodeRoutes.js';
 import geminiRoutes from './routes/geminiRoutes.js';
+import agendamentoRoutes from './routes/agendamentoRoutes.js';
 
 
 
@@ -107,7 +108,7 @@ app.use('/uploads', express.static(uploadsPath));
 connectDB();
 
 // Arquivos estáticos - corrigir caminho para o diretório client no nível raiz
-const clientPath = path.join(process.cwd(), '..', 'client');
+const clientPath = path.join(__dirname, '..', 'client');
 app.use(express.static(clientPath));
 app.use('/client', express.static(clientPath));
 
@@ -119,6 +120,11 @@ app.get('/', (req, res) => {
 // Rota para o perfil do paciente
 app.get('/client/views/perfilPaciente.html', (req, res) => {
   res.sendFile(path.join(clientPath, 'views', 'perfilPaciente.html'));
+});
+
+// Rota para agendamentos
+app.get('/client/views/agendamentos.html', (req, res) => {
+  res.sendFile(path.join(clientPath, 'views', 'agendamentos.html'));
 });
 
 // Rotas da aplicação
@@ -139,6 +145,7 @@ app.use('/api/menstruacao', menstruacaoRoutes);
 app.use('/api/eventos-clinicos', eventoClinicoRoutes);
 app.use('/api/access-code', accessCodeRoutes);
 app.use('/api/gemini', geminiRoutes);
+app.use('/api/agendamentos', agendamentoRoutes);
 
 
 // Middleware de erro

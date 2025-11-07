@@ -4,19 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PulseFlow | Seleção Paciente</title>
-  <link rel="stylesheet" href="../public/css/selecao.css" />
+  <link rel="stylesheet" href="/client/public/css/selecao.css" />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
-  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
 </head>
 <body>
   <header class="main-header">
     <div class="header-content">
-      <a href="perfilMedico.html" class="perfil-link">
-        <i class="fas fa-user-circle"></i>
-        <span>Meu Perfil</span>
-      </a>
+      <div class="header-links">
+        <a href="perfilMedico.html" class="perfil-link">
+          <i class="fas fa-user-circle"></i>
+          <span>Meu Perfil</span>
+        </a>
+        <a href="agendamentos.html" class="perfil-link">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Minha Agenda</span>
+        </a>
+      </div>
       <button class="logout-btn" id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i>
         <span>Sair</span>
@@ -28,7 +34,7 @@
     <div class="content-wrapper">
       <!-- Logo -->
       <div class="logo-container">
-        <img src="../public/assets/pulseLogo.png" alt="Logo PulseFlow" class="logo-img" />
+        <img src="/client/public/assets/pulseLogo.png" alt="Logo PulseFlow" class="logo-img" />
       </div>
 
       <!-- Título -->

@@ -441,6 +441,28 @@ router.put('/perfil/:cpf', authMiddleware, async (req, res) => {
   }
 });
 
+// Rota para listar pacientes conectados ao médico
+router.get('/', authMiddleware, async (req, res) => {
+  try {
+    const medicoId = req.user._id;
+    
+    // Buscar conexões ativas do médico
+    const conexoes = await ConexaoMedicoPaciente.find({
+      medicoId,
+      isActive: true
+    }).populate('pacienteId', 'name email phone profilePhoto');
+
+    const pacientes = conexoes
+      .map(conexao => conexao.pacienteId)
+      .filter(paciente => paciente !== null);
+
+    res.json(pacientes);
+  } catch (err) {
+    console.error('Erro ao listar pacientes:', err);
+    res.status(500).json({ message: 'Erro interno do servidor', error: err.message });
+  }
+});
+
 // Rota de teste para listar todos os pacientes
 router.get('/teste', async (req, res) => {
   try {

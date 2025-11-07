@@ -4,8 +4,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "./kill-port.sh && nodemon server.js",
-    "start": "./kill-port.sh && node server.js",
+    "dev": "npx kill-port 65432 && nodemon server.js",
+    "start": "npx kill-port 65432 && node server.js",
     "build": "mkdir -p client && cp -r ../client/* ./client/"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "twilio": "^5.5.2"
   },
   "devDependencies": {
+    "kill-port": "^2.0.1",
     "nodemon": "^3.1.10"
   }
 }

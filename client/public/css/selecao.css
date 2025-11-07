@@ -58,6 +58,12 @@ body, html {
   gap: 1rem;
 }
 
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .perfil-link {
   display: flex;
   align-items: center;

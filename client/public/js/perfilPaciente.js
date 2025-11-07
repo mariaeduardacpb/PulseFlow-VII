@@ -1,5 +1,5 @@
 import { API_URL } from './config.js';
-import { iniciarVerificacaoConexao, pararVerificacaoConexao } from './conexaoMonitor.js';
+// import { iniciarVerificacaoConexao, pararVerificacaoConexao } from './conexaoMonitor.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Verificar se os elementos existem antes de adicionar event listeners
@@ -832,7 +832,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let pacienteAtual = null;
 
   window.addEventListener('beforeunload', () => {
-    pararVerificacaoConexao();
+    // pararVerificacaoConexao();
   });
 
   // Inicializar
@@ -844,7 +844,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     pacienteAtual = JSON.parse(localStorage.getItem('pacienteSelecionado'));
     
     if (localStorage.getItem('tokenPaciente')) {
-      iniciarVerificacaoConexao();
+      // iniciarVerificacaoConexao();
     }
   } catch (error) {
     console.error("Erro durante a inicialização:", error);
