@@ -2,7 +2,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Montserrat', sans-serif;
-    background-color: #00324A;
+    background: linear-gradient(135deg, #002A42 0%, #00324A 100%);
+    min-height: 100vh;
   }
   
   .full-screen {
@@ -14,58 +15,82 @@ body {
   }
   
   .card {
-    background-color: #00324A;
-    color: white;
-    padding: 40px;
-    max-width: 900px; /* aumentei de 480px para 900px */
+    background-color: white;
+    color: #002A42;
+    padding: 50px;
+    max-width: 1000px;
     width: 100%;
-    border-radius: 8px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #00c3b7, #002A42);
   }
   
   .logo {
     display: block;
-    margin: 0 auto 20px;
-    max-width: 160px;
+    margin: 0 auto 30px;
+    max-width: 180px;
+    transition: transform 0.3s ease;
+  }
+  
+  .logo:hover {
+    transform: scale(1.05);
   }
   
   h2 {
-    font-size: 18px; /* Aumentado de 14px para 18px */
+    font-size: 24px;
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 30px;
     text-transform: uppercase;
-    font-weight: 600;
+    font-weight: 700;
+    color: #002A42;
+    letter-spacing: 0.5px;
   }
   
   p {
     font-size: 16px;
     line-height: 1.8;
-    margin-bottom: 16px;
-    text-align: justify; /* <-- Alinha os dois lados do texto */
+    margin-bottom: 20px;
+    text-align: justify;
+    color: #4a5568;
   }
   
+  @media (max-width: 768px) {
+    .card {
+      padding: 30px 20px;
+    }
   
-  .checkbox {
-    display: flex;
-    align-items: start;
-    font-size: 15px;
-    margin: 24px 0 16px;
-    gap: 10px;
+    h2 {
+      font-size: 20px;
+    }
+  
+    p {
+      font-size: 15px;
+    }
   }
   
-  .btn {
-    display: block;
-    margin: 40px auto 0; /* Aumentei a margem superior para 40px */
-    background-color: #E0E0E0;
-    color: #00324A;
-    padding: 12px 24px;
-    font-weight: bold;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-  }
+  @media (max-width: 480px) {
+    .card {
+      padding: 25px 15px;
+    }
   
-  .btn:hover {
-    background-color: #cfcfcf;
+    h2 {
+      font-size: 18px;
+    }
+  
+    p {
+      font-size: 14px;
+      line-height: 1.6;
+    }
   }
   

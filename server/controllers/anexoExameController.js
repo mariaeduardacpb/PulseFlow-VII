@@ -34,13 +34,35 @@ export const uploadExame = async (req, res) => {
 // Médico busca exames de um paciente via CPF
 export const buscarExamesMedico = async (req, res) => {
   const { cpf } = req.query;
+  
   try {
-    const paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    if (!cpf) {
+      return res.status(400).json({ message: 'CPF é obrigatório' });
+    }
+
+    // Limpar CPF removendo caracteres não numéricos
+    const cpfLimpo = cpf.replace(/[^\d]/g, '');
+    
+    // Validar se CPF tem 11 dígitos
+    if (cpfLimpo.length !== 11) {
+      return res.status(400).json({ message: 'CPF deve ter 11 dígitos' });
+    }
+
+    // Tentar buscar com CPF limpo
+    let paciente = await Paciente.findOne({ cpf: cpfLimpo });
+    
+    // Se não encontrar, tentar com CPF formatado
+    if (!paciente) {
+      const cpfFormatado = cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+    
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
 
     const exames = await Exame.find({ paciente: paciente._id }).sort({ data: -1 });
+    
     res.json(exames);
   } catch (error) {
     console.error('Erro ao buscar exames:', error);
@@ -69,7 +91,12 @@ export const downloadExame = async (req, res) => {
       return res.status(404).json({ message: 'Exame não encontrado' });
     }
 
-    const filePath = path.join(process.cwd(), exame.filePath); // <<< Corrigido, sem 'server'
+    // Corrigir o caminho do arquivo
+    const fileName = path.basename(exame.filePath);
+    const pacienteId = exame.paciente._id ? exame.paciente._id.toString() : exame.paciente.toString();
+    
+    // Construir o caminho correto no servidor
+    const filePath = path.join(process.cwd(), 'uploads', `paciente_${pacienteId}`, fileName);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: 'Arquivo não encontrado no servidor' });

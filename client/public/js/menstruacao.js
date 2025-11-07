@@ -1,301 +1,618 @@
+import { API_URL } from './config.js';
+
 let ciclos = [];
 let registrosMenstruacao = [];
 let currentDate = new Date();
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const calendarBody = document.getElementById('calendar-body');
-  const monthYear = document.getElementById('month-year');
-  const prevMonthBtn = document.getElementById('prev-month');
-  const nextMonthBtn = document.getElementById('next-month');
-  const recordsContainer = document.getElementById('records-container');
-  const toggleButton = document.querySelector('.menu-toggle');
-  const sidebar = document.querySelector('.sidebar');
-
-  toggleButton?.addEventListener("click", () => {
-    sidebar?.classList.toggle("active");
-    toggleButton?.classList.toggle("shifted");
-  });
-
-  await carregarDadosMedico(); // <-- Nome do médico na sidebar
-
-  // Navegação entre os meses
-  prevMonthBtn.addEventListener('click', () => {
-    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-    renderCalendar(currentDate, ciclos, registrosMenstruacao);
-  });
-
-  nextMonthBtn.addEventListener('click', () => {
-    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-    renderCalendar(currentDate, ciclos, registrosMenstruacao);
-  });
-
-  const paciente = JSON.parse(localStorage.getItem("pacienteSelecionado"));
-  const cpf = paciente?.cpf;
-  const token = localStorage.getItem("token");
-
-  if (!cpf) {
-    calendarBody.innerHTML = '<tr><td colspan="7" style="color: red;">Paciente não selecionado.</td></tr>';
-    recordsContainer.innerHTML = '<p style="color: red;">Paciente não selecionado.</p>';
-    return;
-  }
-
-  calendarBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Carregando dados...</td></tr>';
-  recordsContainer.innerHTML = '<p>Carregando registros...</p>';
-
-  try {
-    const debugRes = await fetch(`http://localhost:65432/api/ciclo/debug/${cpf}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    if (debugRes.ok) {
-      const debugData = await debugRes.json();
-      console.log("[DEBUG] Ciclos:", debugData);
-    }
-
-    const resCiclos = await fetch(`http://localhost:65432/api/ciclo/${cpf}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!resCiclos.ok) throw new Error(`Erro ao carregar ciclos: ${resCiclos.statusText}`);
-    const ciclosResponse = await resCiclos.json();
-    ciclos = Array.isArray(ciclosResponse) ? ciclosResponse : [];
-
-    const resMenstruacao = await fetch(`http://localhost:65432/api/menstruacao/${cpf}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!resMenstruacao.ok) throw new Error(`Erro ao carregar registros de menstruação: ${resMenstruacao.statusText}`);
-    const registrosResponse = await resMenstruacao.json();
-    registrosMenstruacao = Array.isArray(registrosResponse) ? registrosResponse : [];
-
-    if ((!Array.isArray(ciclos) || ciclos.length === 0) && 
-        (!Array.isArray(registrosMenstruacao) || registrosMenstruacao.length === 0)) {
-      calendarBody.innerHTML = '<tr><td colspan="7">Nenhum registro encontrado.</td></tr>';
-      recordsContainer.innerHTML = '<p>Nenhum registro encontrado.</p>';
-      document.getElementById('last-menstruation').textContent = '--';
-      document.getElementById('avg-duration').textContent = '--';
-      document.getElementById('avg-cycle-length').textContent = '--';
-      return;
-    }
-
-    renderCalendar(currentDate, ciclos, registrosMenstruacao);
-    renderRecords(registrosMenstruacao);
-    displayStats(registrosMenstruacao, ciclos);
-  } catch (err) {
-    console.error('Erro ao carregar dados:', err);
-    calendarBody.innerHTML = `<tr><td colspan="7" style="color: red;">Erro ao buscar dados: ${err.message}</td></tr>`;
-    recordsContainer.innerHTML = `<p style="color: red;">Erro ao buscar dados: ${err.message}</p>`;
-  }
+    // Aguardar carregamento dos componentes
+    setTimeout(async () => {
+        await carregarDadosMedico();
+        await inicializarPagina();
+    }, 500);
 });
 
-async function carregarDadosMedico() {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('Token não encontrado. Por favor, faça login novamente.');
-
-    const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+function mostrarAviso(mensagem, tipo = 'info') {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
     });
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || 'Erro ao carregar dados do médico');
+    const config = {
+        info: { icon: 'info', iconColor: '#3b82f6' },
+        success: { icon: 'success', iconColor: '#10b981' },
+        error: { icon: 'error', iconColor: '#ef4444' },
+        warning: { icon: 'warning', iconColor: '#f59e0b' }
+    };
+
+    Toast.fire({
+        title: mensagem,
+        ...config[tipo]
+    });
+}
+
+async function carregarDadosMedico() {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Token não encontrado. Por favor, faça login novamente.');
+        }
+
+        const res = await fetch(`${API_URL}/api/usuarios/perfil`, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Erro ao carregar dados do médico');
+        }
+
+        const medico = await res.json();
+        console.log('Dados do médico carregados:', medico);
+        
+        return true;
+    } catch (error) {
+        console.error("Erro ao carregar dados do médico:", error);
+        mostrarAviso("Erro ao carregar dados do médico. Por favor, faça login novamente.", 'error');
+        return false;
+    }
+}
+
+function formatarData(dataString) {
+    const data = new Date(dataString);
+    return data.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
+function calcularEstatisticas(registros, ciclos) {
+    if (!registros || registros.length === 0) {
+        return {
+            totalRecords: 0,
+            avgCycleLength: 0,
+            avgDuration: 0,
+            lastMenstruationDays: 0
+        };
     }
 
-    const medico = await res.json();
-    const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
-    const nomeFormatado = `${prefixo} ${medico.nome}`;
+    const totalRecords = registros.length;
     
-    const tituloSidebar = document.querySelector('.sidebar .profile h3');
-    if (tituloSidebar) {
-      tituloSidebar.textContent = nomeFormatado;
+    // Calcular duração média
+    const totalDuration = registros.reduce((sum, registro) => {
+        const inicio = new Date(registro.dataInicio);
+        const fim = new Date(registro.dataFim);
+        const durationMs = fim.getTime() - inicio.getTime();
+        const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24)) + 1;
+        return sum + durationDays;
+    }, 0);
+    const avgDuration = Math.round(totalDuration / registros.length);
+
+    // Calcular ciclo médio
+    let avgCycleLength = 0;
+    if (registros.length > 1) {
+        const sortedRegistros = [...registros].sort((a, b) => new Date(a.dataInicio) - new Date(b.dataInicio));
+        const cycleLengths = [];
+        
+        for (let i = 1; i < sortedRegistros.length; i++) {
+            const prevStart = new Date(sortedRegistros[i - 1].dataInicio);
+            const currStart = new Date(sortedRegistros[i].dataInicio);
+            const cycleLength = Math.ceil((currStart.getTime() - prevStart.getTime()) / (1000 * 60 * 60 * 24));
+            cycleLengths.push(cycleLength);
+        }
+        
+        if (cycleLengths.length > 0) {
+            avgCycleLength = Math.round(cycleLengths.reduce((sum, length) => sum + length, 0) / cycleLengths.length);
+        }
     }
 
-    return true;
-  } catch (error) {
-    console.error("Erro ao carregar dados do médico:", error);
-    const fallback = document.querySelector('.sidebar .profile h3');
-    if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
-    return false;
-  }
-}
-
-function formatDate(date) {
-  return new Date(date).toLocaleDateString('pt-BR');
-}
-
-function renderRecords(registros) {
-  const recordsContainer = document.getElementById('records-container');
-  
-  if (!Array.isArray(registros) || registros.length === 0) {
-    recordsContainer.innerHTML = '<p>Nenhum registro encontrado.</p>';
-    return;
-  }
-
-  registros.sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
-
-  const recordsHTML = registros.map(registro => `
-    <div class="record-card">
-      <div class="date-range">
-        ${formatDate(registro.dataInicio)} - ${formatDate(registro.dataFim)}
-      </div>
-      <div class="details">
-        <div class="detail-item">
-          <span class="detail-label">Fluxo</span>
-          <span class="detail-value">${registro.fluxo || 'Não informado'}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Humor</span>
-          <span class="detail-value">${registro.humor || 'Não informado'}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Cólica</span>
-          <span class="detail-value">${registro.teveColica ? 'Sim' : 'Não'}</span>
-        </div>
-        ${registro.teveColica ? `
-          <div class="detail-item">
-            <span class="detail-label">Intensidade da Cólica</span>
-            <span class="detail-value">${registro.intensidadeColica}/10</span>
-          </div>
-        ` : ''}
-      </div>
-      ${registro.observacoes ? `
-        <div class="observacoes">
-          <span class="detail-label">Observações</span>
-          <span class="detail-value">${registro.observacoes}</span>
-        </div>
-      ` : ''}
-    </div>
-  `).join('');
-
-  recordsContainer.innerHTML = recordsHTML;
-}
-
-function renderCalendar(date, ciclos, registrosMenstruacao) {
-  const monthYear = document.getElementById('month-year');
-  const calendarBody = document.getElementById('calendar-body');
-
-  const year = date.getFullYear();
-  const month = date.getMonth();
-
-  const monthNames = [
-    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-  ];
-
-  monthYear.textContent = `${monthNames[month]} - ${year}`;
-
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  calendarBody.innerHTML = "";
-  let row = document.createElement('tr');
-
-  for (let i = 0; i < firstDay; i++) {
-    row.appendChild(document.createElement('td'));
-  }
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    if (row.children.length === 7) {
-      calendarBody.appendChild(row);
-      row = document.createElement('tr');
-    }
-
-    const cell = document.createElement('td');
-    const currentDate = new Date(year, month, day);
-    currentDate.setHours(0, 0, 0, 0);
-
-    let cicloAtivo = false;
-    let registroAtivo = false;
-    let registroInfo = null;
-
-    for (const ciclo of ciclos) {
-      const periodStart = new Date(ciclo.dataInicio);
-      const periodEnd = new Date(ciclo.dataFim);
-      const dayAfterPeriodEnd = new Date(periodEnd);
-      dayAfterPeriodEnd.setUTCDate(periodEnd.getUTCDate() + 1);
-      const currentDateUTC = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
-
-      if (currentDateUTC >= periodStart && currentDateUTC < dayAfterPeriodEnd) {
-        cicloAtivo = true;
-        break;
-      }
-    }
-
-    for (const registro of registrosMenstruacao) {
-      const periodStart = new Date(registro.dataInicio);
-      const periodEnd = new Date(registro.dataFim);
-      const dayAfterPeriodEnd = new Date(periodEnd);
-      dayAfterPeriodEnd.setUTCDate(periodEnd.getUTCDate() + 1);
-      const currentDateUTC = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
-
-      if (currentDateUTC >= periodStart && currentDateUTC < dayAfterPeriodEnd) {
-        registroAtivo = true;
-        registroInfo = registro;
-        break;
-      }
-    }
-
-    if (registroAtivo) {
-      const tooltipTitle = `Dia de menstruação\nFluxo: ${registroInfo.fluxo || 'Não informado'}\nCólicas: ${registroInfo.teveColica ? 'Sim' + (registroInfo.intensidadeColica ? ' (' + registroInfo.intensidadeColica + '/10)' : '') : 'Não'}\nHumor: ${registroInfo.humor || 'Não informado'}`;
-      cell.innerHTML = `
-        <div class="day menstrual" title="${tooltipTitle}">
-          <span class="day-number">${day}</span>
-          <svg class="drop-icon" viewBox="0 0 24 24" width="24" height="24">
-            <path fill="#e74c3c" d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
-          </svg>
-        </div>
-      `;
-    } else if (cicloAtivo) {
-      cell.innerHTML = `
-        <div class="day cycle" title="Período do ciclo">
-          <span class="day-number">${day}</span>
-          <div class="cycle-indicator"></div>
-        </div>
-      `;
-    } else {
-      cell.innerHTML = `<div class="day"><span class="day-number">${day}</span></div>`;
-    }
-
-    row.appendChild(cell);
-  }
-
-  if (row.children.length > 0) {
-    while (row.children.length < 7) {
-      row.appendChild(document.createElement('td'));
-    }
-    calendarBody.appendChild(row);
-  }
-}
-
-function displayStats(registros, ciclos) {
-  const lastMenstruationEl = document.getElementById('last-menstruation');
-  const avgDurationEl = document.getElementById('avg-duration');
-
-  if (registros.length > 0) {
+    // Calcular dias desde última menstruação
     const sortedRegistros = [...registros].sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
     const ultimoRegistro = sortedRegistros[0];
-    const dataInicioFormatada = formatDate(ultimoRegistro.dataInicio);
-    const dataFimFormatada = formatDate(ultimoRegistro.dataFim);
-    lastMenstruationEl.textContent = `${dataInicioFormatada} a ${dataFimFormatada}`;
-  } else {
-    lastMenstruationEl.textContent = 'N/A';
-  }
+    const ultimaData = new Date(ultimoRegistro.dataInicio);
+    const hoje = new Date();
+    const diasDesdeUltima = Math.ceil((hoje.getTime() - ultimaData.getTime()) / (1000 * 60 * 60 * 24));
 
-  if (registros.length > 0) {
-    const totalDuration = registros.reduce((sum, registro) => {
-      const inicio = new Date(registro.dataInicio);
-      const fim = new Date(registro.dataFim);
-      const durationMs = fim.getTime() - inicio.getTime();
-      const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
-      return sum + durationDays;
-    }, 0);
-    const avgDuration = (totalDuration / registros.length).toFixed(1);
-    avgDurationEl.textContent = `${avgDuration} dias`;
-  } else {
-    avgDurationEl.textContent = 'N/A';
-  }
+    return {
+        totalRecords,
+        avgCycleLength,
+        avgDuration,
+        lastMenstruationDays: Math.max(0, diasDesdeUltima)
+    };
 }
+
+function atualizarEstatisticas(registros, ciclos) {
+    const stats = calcularEstatisticas(registros, ciclos);
+    
+    const totalRecordsEl = document.getElementById('totalRecords');
+    const avgCycleLengthEl = document.getElementById('avgCycleLength');
+    const avgDurationEl = document.getElementById('avgDuration');
+    const lastMenstruationDaysEl = document.getElementById('lastMenstruationDays');
+
+    if (totalRecordsEl) totalRecordsEl.textContent = stats.totalRecords;
+    if (avgCycleLengthEl) avgCycleLengthEl.textContent = `${stats.avgCycleLength} dias`;
+    if (avgDurationEl) avgDurationEl.textContent = `${stats.avgDuration} dias`;
+    if (lastMenstruationDaysEl) lastMenstruationDaysEl.textContent = `${stats.lastMenstruationDays} dias`;
+}
+
+async function buscarDadosMenstruacao(cpf) {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Token não encontrado');
+
+        console.log('Buscando dados para CPF:', cpf);
+        console.log('API URL:', API_URL);
+
+        // Buscar ciclos e registros em paralelo
+        const [resCiclos, resMenstruacao] = await Promise.all([
+            fetch(`${API_URL}/api/ciclo/medico?cpf=${cpf}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }),
+            fetch(`${API_URL}/api/menstruacao/${cpf}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+        ]);
+
+        console.log('Status da resposta ciclos:', resCiclos.status);
+        console.log('Status da resposta menstruação:', resMenstruacao.status);
+
+        let ciclosResponse = [];
+        let registrosResponse = [];
+
+        // Processar resposta de ciclos
+        if (resCiclos.ok) {
+            ciclosResponse = await resCiclos.json();
+            console.log('Ciclos carregados com sucesso:', ciclosResponse);
+        } else {
+            const errorText = await resCiclos.text();
+            console.warn('Erro ao carregar ciclos:', resCiclos.status, errorText);
+            // Não falhar completamente, apenas logar o erro
+        }
+
+        // Processar resposta de menstruação
+        if (resMenstruacao.ok) {
+            registrosResponse = await resMenstruacao.json();
+            console.log('Registros de menstruação carregados com sucesso:', registrosResponse);
+        } else {
+            const errorText = await resMenstruacao.text();
+            console.warn('Erro ao carregar registros de menstruação:', resMenstruacao.status, errorText);
+            // Se for 404, significa que não há registros para este paciente
+            if (resMenstruacao.status === 404) {
+                console.log('Paciente não possui registros de menstruação ainda');
+                registrosResponse = [];
+            }
+        }
+
+        return {
+            ciclos: Array.isArray(ciclosResponse) ? ciclosResponse : [],
+            registros: Array.isArray(registrosResponse) ? registrosResponse : []
+        };
+
+    } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        mostrarAviso(`Erro ao carregar dados: ${error.message}`, 'error');
+        return { ciclos: [], registros: [] };
+    }
+}
+
+function renderizarCalendario(date, ciclos, registros) {
+    const monthYear = document.getElementById('monthYear');
+    const calendarBody = document.getElementById('calendarBody');
+
+    if (!monthYear || !calendarBody) return;
+
+    const year = date.getFullYear();
+    const month = date.getMonth();
+
+    const monthNames = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+
+    monthYear.textContent = `${monthNames[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+
+    calendarBody.innerHTML = '';
+
+    // Criar dias vazios para o início do mês
+    for (let i = 0; i < firstDay; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day';
+        calendarBody.appendChild(emptyDay);
+    }
+
+    // Criar dias do mês
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = document.createElement('div');
+        const currentDate = new Date(year, month, day);
+        currentDate.setHours(0, 0, 0, 0);
+
+        let isMenstrual = false;
+        let isCycle = false;
+        let isToday = currentDate.getTime() === today.setHours(0, 0, 0, 0);
+
+        // Verificar se é dia de menstruação
+        for (const registro of registros) {
+            const periodStart = new Date(registro.dataInicio);
+            const periodEnd = new Date(registro.dataFim);
+            const dayAfterPeriodEnd = new Date(periodEnd);
+            dayAfterPeriodEnd.setUTCDate(periodEnd.getUTCDate() + 1);
+
+            if (currentDate >= periodStart && currentDate < dayAfterPeriodEnd) {
+                isMenstrual = true;
+                break;
+            }
+        }
+
+        // Verificar se é período do ciclo
+        if (!isMenstrual) {
+            for (const ciclo of ciclos) {
+                const periodStart = new Date(ciclo.dataInicio);
+                const periodEnd = new Date(ciclo.dataFim);
+                const dayAfterPeriodEnd = new Date(periodEnd);
+                dayAfterPeriodEnd.setUTCDate(periodEnd.getUTCDate() + 1);
+
+                if (currentDate >= periodStart && currentDate < dayAfterPeriodEnd) {
+                    isCycle = true;
+                    break;
+                }
+            }
+        }
+
+        // Aplicar classes CSS
+        if (isMenstrual) {
+            dayElement.className = 'calendar-day menstrual';
+        } else if (isCycle) {
+            dayElement.className = 'calendar-day cycle';
+        } else if (isToday) {
+            dayElement.className = 'calendar-day today';
+        } else {
+            dayElement.className = 'calendar-day';
+        }
+
+        dayElement.innerHTML = `
+            <span class="day-number">${day}</span>
+            ${isMenstrual || isCycle ? '<div class="day-indicator"></div>' : ''}
+        `;
+
+        calendarBody.appendChild(dayElement);
+    }
+}
+
+function renderizarRegistros(registros) {
+    const recordsGrid = document.getElementById('recordsGrid');
+    const noRecords = document.getElementById('noRecords');
+    const recordsCount = document.getElementById('recordsCount');
+
+    if (!recordsGrid || !noRecords || !recordsCount) return;
+
+    // Atualizar contador
+    recordsCount.textContent = registros.length;
+
+    // Limpar grid
+    recordsGrid.innerHTML = '';
+
+    if (registros.length === 0) {
+        noRecords.style.display = 'block';
+        return;
+    }
+
+    noRecords.style.display = 'none';
+
+    // Ordenar registros por data (mais recente primeiro)
+    const sortedRegistros = [...registros].sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
+
+    sortedRegistros.forEach(registro => {
+        const recordCard = document.createElement('div');
+        recordCard.className = 'record-card';
+
+        const dataInicio = formatarData(registro.dataInicio);
+        const dataFim = formatarData(registro.dataFim);
+
+        recordCard.innerHTML = `
+            <div class="record-header">
+                <div class="record-date">${dataInicio} - ${dataFim}</div>
+                <div class="record-status">Registrado</div>
+            </div>
+            
+            <div class="record-details">
+                <div class="detail-item">
+                    <span class="detail-label">Fluxo</span>
+                    <span class="detail-value">${registro.fluxo || 'Não informado'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Humor</span>
+                    <span class="detail-value">${registro.humor || 'Não informado'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Cólica</span>
+                    <span class="detail-value">${registro.teveColica ? 'Sim' : 'Não'}</span>
+                </div>
+                ${registro.teveColica && registro.intensidadeColica ? `
+                    <div class="detail-item">
+                        <span class="detail-label">Intensidade</span>
+                        <span class="detail-value">${registro.intensidadeColica}/10</span>
+                    </div>
+                ` : ''}
+            </div>
+            
+            ${registro.observacoes ? `
+                <div class="record-observations">
+                    <span class="detail-label">Observações</span>
+                    <span class="detail-value">${registro.observacoes}</span>
+                </div>
+            ` : ''}
+        `;
+
+        recordsGrid.appendChild(recordCard);
+    });
+}
+
+function configurarEventListeners() {
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+            renderizarCalendario(currentDate, ciclos, registrosMenstruacao);
+        });
+    }
+
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+            renderizarCalendario(currentDate, ciclos, registrosMenstruacao);
+        });
+    }
+}
+
+async function inicializarPagina() {
+    try {
+        console.log('Iniciando página de ciclo menstrual...');
+        
+        const pacienteData = localStorage.getItem("pacienteSelecionado");
+        console.log('Dados do paciente no localStorage:', pacienteData);
+
+        if (!pacienteData) {
+            mostrarAviso('Nenhum paciente selecionado', 'error');
+            return;
+        }
+
+        const paciente = JSON.parse(pacienteData);
+        const cpf = paciente?.cpf;
+        
+        console.log('Paciente selecionado:', paciente);
+        console.log('CPF:', cpf);
+
+        if (!cpf) {
+            mostrarAviso('CPF do paciente não encontrado', 'error');
+            return;
+        }
+
+        // Configurar event listeners
+        configurarEventListeners();
+
+        // Mostrar loading
+        mostrarAviso('Carregando dados do ciclo menstrual...', 'info');
+
+        // Buscar dados
+        const dados = await buscarDadosMenstruacao(cpf);
+        ciclos = dados.ciclos;
+        registrosMenstruacao = dados.registros;
+
+        console.log('Dados carregados - Ciclos:', ciclos.length, 'Registros:', registrosMenstruacao.length);
+
+        // Renderizar componentes
+        renderizarCalendario(currentDate, ciclos, registrosMenstruacao);
+        renderizarRegistros(registrosMenstruacao);
+        atualizarEstatisticas(registrosMenstruacao, ciclos);
+
+        if (ciclos.length === 0 && registrosMenstruacao.length === 0) {
+            mostrarAviso('Este paciente ainda não possui registros de ciclo menstrual. Os dados aparecerão aqui quando forem adicionados.', 'info');
+        } else {
+            const totalDados = ciclos.length + registrosMenstruacao.length;
+            mostrarAviso(`${totalDados} registro(s) de ciclo menstrual carregado(s) com sucesso!`, 'success');
+        }
+
+        console.log('Página de ciclo menstrual inicializada com sucesso');
+    } catch (error) {
+        console.error('Erro ao inicializar página:', error);
+        mostrarAviso(`Erro ao carregar dados do ciclo menstrual: ${error.message}`, 'error');
+    }
+}
+
+// Funções globais para debug
+window.debugCicloMenstrual = function() {
+    console.log('=== DEBUG CICLO MENSTRUAL ===');
+    console.log('Ciclos:', ciclos);
+    console.log('Registros:', registrosMenstruacao);
+    console.log('Data atual:', currentDate);
+    console.log('Token:', localStorage.getItem('token'));
+    console.log('Paciente:', localStorage.getItem('pacienteSelecionado'));
+    console.log('API URL:', API_URL);
+};
+
+window.forcarCarregamentoDados = async function() {
+    console.log('Forçando carregamento de dados...');
+    await inicializarPagina();
+};
+
+window.testarAPI = async function() {
+    try {
+        console.log('=== TESTE DE CONECTIVIDADE API ===');
+        const token = localStorage.getItem('token');
+        const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
+        
+        if (!token) {
+            console.error('Token não encontrado');
+            return;
+        }
+        
+        if (!paciente?.cpf) {
+            console.error('Paciente não encontrado');
+            return;
+        }
+        
+        console.log('Testando endpoint de ciclos...');
+        const resCiclos = await fetch(`${API_URL}/api/ciclo/medico?cpf=${paciente.cpf}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        console.log('Status ciclos:', resCiclos.status);
+        console.log('Headers ciclos:', resCiclos.headers);
+        
+        if (resCiclos.ok) {
+            const dados = await resCiclos.json();
+            console.log('Dados de ciclos:', dados);
+        } else {
+            const errorText = await resCiclos.text();
+            console.error('Erro ciclos:', errorText);
+        }
+        
+        console.log('Testando endpoint de menstruação...');
+        const resMenstruacao = await fetch(`${API_URL}/api/menstruacao/${paciente.cpf}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        console.log('Status menstruação:', resMenstruacao.status);
+        console.log('Headers menstruação:', resMenstruacao.headers);
+        
+        if (resMenstruacao.ok) {
+            const dados = await resMenstruacao.json();
+            console.log('Dados de menstruação:', dados);
+        } else {
+            const errorText = await resMenstruacao.text();
+            console.error('Erro menstruação:', errorText);
+        }
+        
+    } catch (error) {
+        console.error('Erro no teste da API:', error);
+    }
+};
+
+        const paciente = JSON.parse(pacienteData);
+        const cpf = paciente?.cpf;
+        
+        console.log('Paciente selecionado:', paciente);
+        console.log('CPF:', cpf);
+
+        if (!cpf) {
+            mostrarAviso('CPF do paciente não encontrado', 'error');
+            return;
+        }
+
+        // Configurar event listeners
+        configurarEventListeners();
+
+        // Mostrar loading
+        mostrarAviso('Carregando dados do ciclo menstrual...', 'info');
+
+        // Buscar dados
+        const dados = await buscarDadosMenstruacao(cpf);
+        ciclos = dados.ciclos;
+        registrosMenstruacao = dados.registros;
+
+        console.log('Dados carregados - Ciclos:', ciclos.length, 'Registros:', registrosMenstruacao.length);
+
+        // Renderizar componentes
+        renderizarCalendario(currentDate, ciclos, registrosMenstruacao);
+        renderizarRegistros(registrosMenstruacao);
+        atualizarEstatisticas(registrosMenstruacao, ciclos);
+
+        if (ciclos.length === 0 && registrosMenstruacao.length === 0) {
+            mostrarAviso('Este paciente ainda não possui registros de ciclo menstrual. Os dados aparecerão aqui quando forem adicionados.', 'info');
+        } else {
+            const totalDados = ciclos.length + registrosMenstruacao.length;
+            mostrarAviso(`${totalDados} registro(s) de ciclo menstrual carregado(s) com sucesso!`, 'success');
+        }
+
+        console.log('Página de ciclo menstrual inicializada com sucesso');
+    } catch (error) {
+        console.error('Erro ao inicializar página:', error);
+        mostrarAviso(`Erro ao carregar dados do ciclo menstrual: ${error.message}`, 'error');
+    }
+}
+
+// Funções globais para debug
+window.debugCicloMenstrual = function() {
+    console.log('=== DEBUG CICLO MENSTRUAL ===');
+    console.log('Ciclos:', ciclos);
+    console.log('Registros:', registrosMenstruacao);
+    console.log('Data atual:', currentDate);
+    console.log('Token:', localStorage.getItem('token'));
+    console.log('Paciente:', localStorage.getItem('pacienteSelecionado'));
+    console.log('API URL:', API_URL);
+};
+
+window.forcarCarregamentoDados = async function() {
+    console.log('Forçando carregamento de dados...');
+    await inicializarPagina();
+};
+
+window.testarAPI = async function() {
+    try {
+        console.log('=== TESTE DE CONECTIVIDADE API ===');
+        const token = localStorage.getItem('token');
+        const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
+        
+        if (!token) {
+            console.error('Token não encontrado');
+            return;
+        }
+        
+        if (!paciente?.cpf) {
+            console.error('Paciente não encontrado');
+            return;
+        }
+        
+        console.log('Testando endpoint de ciclos...');
+        const resCiclos = await fetch(`${API_URL}/api/ciclo/medico?cpf=${paciente.cpf}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        console.log('Status ciclos:', resCiclos.status);
+        console.log('Headers ciclos:', resCiclos.headers);
+        
+        if (resCiclos.ok) {
+            const dados = await resCiclos.json();
+            console.log('Dados de ciclos:', dados);
+        } else {
+            const errorText = await resCiclos.text();
+            console.error('Erro ciclos:', errorText);
+        }
+        
+        console.log('Testando endpoint de menstruação...');
+        const resMenstruacao = await fetch(`${API_URL}/api/menstruacao/${paciente.cpf}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        console.log('Status menstruação:', resMenstruacao.status);
+        console.log('Headers menstruação:', resMenstruacao.headers);
+        
+        if (resMenstruacao.ok) {
+            const dados = await resMenstruacao.json();
+            console.log('Dados de menstruação:', dados);
+        } else {
+            const errorText = await resMenstruacao.text();
+            console.error('Erro menstruação:', errorText);
+        }
+        
+    } catch (error) {
+        console.error('Erro no teste da API:', error);
+    }
+};

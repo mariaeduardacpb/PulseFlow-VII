@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Termos de Uso</title>
+  <link rel="stylesheet" href="/client/public/css/homePage.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <style>
+    .page-hero {
+      background: linear-gradient(135deg, #052b3b 0%, #0d1117 100%);
+      padding: 12rem 5rem 10rem;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    .page-hero h1 {
+      font-size: clamp(3rem, 7vw, 5rem);
+      font-weight: 200;
+      margin-bottom: 2rem;
+      letter-spacing: -0.04em;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .page-hero p {
+      font-size: 1.375rem;
+      line-height: 1.8;
+      color: #c9d1d9;
+      font-weight: 300;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .page-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 8rem 5rem;
+      animation: fadeIn 1s ease;
+    }
+    .update-date {
+      text-align: center;
+      font-size: 0.9375rem;
+      color: #718096;
+      font-weight: 300;
+      margin-bottom: 4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .content-section {
+      margin-bottom: 5rem;
+    }
+    .content-section h2 {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 300;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
+      color: #0d1117;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+    .content-section h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: #052b3b;
+    }
+    .content-section p {
+      font-size: 1.1875rem;
+      line-height: 2;
+      color: #2d3748;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+    }
+    .content-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 2rem 0;
+    }
+    .content-section ul li {
+      font-size: 1.125rem;
+      line-height: 2;
+      color: #4a5568;
+      font-weight: 300;
+      margin-bottom: 1rem;
+      padding-left: 2rem;
+      position: relative;
+    }
+    .content-section ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: #052b3b;
+      font-weight: 400;
+    }
+    .highlight-box {
+      background: #f8fafc;
+      border-left: 4px solid #052b3b;
+      padding: 2.5rem;
+      margin: 3rem 0;
+      border-radius: 4px;
+    }
+    .highlight-box p {
+      margin-bottom: 0;
+      font-size: 1.0625rem;
+      color: #1a202c;
+      font-weight: 400;
+    }
+    @media (max-width: 1024px) {
+      .page-hero {
+        padding: 10rem 3rem 8rem;
+      }
+      .page-content {
+        padding: 6rem 3rem;
+      }
+    }
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+      .main-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        gap: 1rem;
+        z-index: 1000;
+      }
+      .main-nav.active {
+        display: flex;
+      }
+      .page-hero {
+        padding: 8rem 2rem 6rem;
+      }
+      .page-hero h1 {
+        font-size: 2.5rem;
+      }
+      .page-hero p {
+        font-size: 1.125rem;
+      }
+      .page-content {
+        padding: 4rem 2rem;
+      }
+      .content-section {
+        margin-bottom: 4rem;
+      }
+      .content-section h2 {
+        font-size: 2rem;
+      }
+      .content-section p {
+        font-size: 1rem;
+      }
+      .content-section ul li {
+        font-size: 0.95rem;
+      }
+      .highlight-box {
+        padding: 2rem 1.5rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .page-hero {
+        padding: 6rem 1.5rem 4rem;
+      }
+      .page-hero h1 {
+        font-size: 2rem;
+      }
+      .page-hero p {
+        font-size: 1rem;
+      }
+      .page-content {
+        padding: 3rem 1.5rem;
+      }
+      .content-section h2 {
+        font-size: 1.75rem;
+      }
+      .content-section p {
+        font-size: 0.95rem;
+      }
+      .content-section ul li {
+        font-size: 0.9rem;
+        padding-left: 1.5rem;
+      }
+      .highlight-box {
+        padding: 1.5rem 1rem;
+      }
+      .highlight-box p {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">
+      <img src="/client/public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+    </div>
+    <nav class="main-nav" id="mainNav">
+      <a href="homePage.html" class="nav-link">HOME</a>
+      <a href="homePage.html#features" class="nav-link">ÁREAS DE ATUAÇÃO</a>
+      <a href="sobreNos.html" class="nav-link">SOBRE</a>
+      <a href="contato.html" class="nav-link">CONTATO</a>
+    </nav>
+    <div class="btn-container">
+      <a href="login.html" class="login-button">Entrar</a>
+    </div>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <section class="page-hero">
+    <h1>Termos de Uso</h1>
+    <p>Conheça os termos e condições que regem o uso da nossa plataforma de saúde digital.</p>
+  </section>
+
+  <div class="page-content">
+    <p class="update-date">Última atualização: Janeiro de 2025</p>
+
+    <div class="content-section">
+      <h2>Aceitação dos Termos</h2>
+      <p>Ao acessar e usar o PulseFlow, você concorda em cumprir e estar vinculado aos seguintes termos e condições de uso. Se você não concorda com qualquer parte destes termos, não deve utilizar nossos serviços.</p>
+      <p>Estes termos podem ser atualizados periodicamente, e continuar a usar o serviço após as alterações significa que você aceita os novos termos.</p>
+    </div>
+
+    <div class="content-section">
+      <h2>Uso do Serviço</h2>
+      <p>O PulseFlow é destinado exclusivamente para uso médico e profissional. O serviço deve ser utilizado de forma responsável e em conformidade com as normas éticas médicas vigentes. É proibido:</p>
+      <ul>
+        <li>Usar a plataforma para fins que não sejam médicos ou de saúde</li>
+        <li>Tentar acessar áreas restritas ou dados de outros usuários não autorizados</li>
+        <li>Transmitir vírus, malware ou qualquer código malicioso</li>
+        <li>Realizar engenharia reversa ou tentar copiar o software</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>Responsabilidades do Usuário</h2>
+      <p>Os usuários são responsáveis por:</p>
+      <ul>
+        <li>Manter a confidencialidade de suas credenciais de acesso</li>
+        <li>Por todas as atividades que ocorram sob sua conta</li>
+        <li>Garantir que as informações fornecidas sejam verdadeiras e atualizadas</li>
+        <li>Notificar imediatamente sobre qualquer uso não autorizado de sua conta</li>
+      </ul>
+      <div class="highlight-box">
+        <p>A segurança da sua conta é de sua responsabilidade. Use senhas fortes e não compartilhe suas credenciais com terceiros.</p>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <h2>Propriedade Intelectual</h2>
+      <p>Todo o conteúdo do PulseFlow, incluindo:</p>
+      <ul>
+        <li>Software e código-fonte</li>
+        <li>Design e interface</li>
+        <li>Textos, imagens e marca</li>
+        <li>Funcionalidades e algoritmos</li>
+      </ul>
+      <p>São propriedade da PulseFlow e protegidos por direitos autorais e outras leis de propriedade intelectual.</p>
+    </div>
+
+    <div class="content-section">
+      <h2>Limitação de Responsabilidade</h2>
+      <p>O PulseFlow fornece informações e ferramentas para auxiliar profissionais de saúde, mas:</p>
+      <ul>
+        <li>Não substitui o julgamento clínico profissional</li>
+        <li>Não oferece diagnóstico ou tratamento médico</li>
+        <li>Não se responsabiliza por decisões tomadas com base nas informações da plataforma</li>
+        <li>As decisões clínicas finais são de responsabilidade do profissional de saúde</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>Modificações do Serviço</h2>
+      <p>Reservamo-nos o direito de modificar, suspender ou descontinuar qualquer parte do serviço a qualquer momento, com ou sem aviso prévio. Não seremos responsáveis por qualquer perda resultante de tais modificações.</p>
+    </div>
+
+    <div class="content-section">
+      <h2>Contato</h2>
+      <p>Para dúvidas sobre estes termos ou sobre nossos serviços, entre em contato através do e-mail pulseflowsaude@gmail.com.</p>
+    </div>
+  </div>
+
+  <div id="footer-container"></div>
+  <script src="/client/public/js/homePage.js"></script>
+  <script src="/client/public/js/footer.js"></script>
+  <script>
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mainNav = document.getElementById('mainNav');
+    
+    if (mobileMenuToggle && mainNav) {
+      mobileMenuToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        mainNav.classList.toggle('active');
+      });
+      
+      document.addEventListener('click', function(event) {
+        const isClickInsideNav = mainNav.contains(event.target);
+        const isClickOnToggle = mobileMenuToggle.contains(event.target);
+        
+        if (!isClickInsideNav && !isClickOnToggle && mainNav.classList.contains('active')) {
+          mainNav.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+        }
+      });
+      
+      const navLinks = mainNav.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          mainNav.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+        });
+      });
+    }
+    
+    const header = document.querySelector('.main-header');
+    if (header) {
+      window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll > 100) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+

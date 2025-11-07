@@ -33,13 +33,40 @@ document.addEventListener("DOMContentLoaded", () => {
         const result = await response.json();
   
         if (response.ok) {
-          alert("Verifique seu e-mail para redefinir a senha.");
-          window.location.href = "/client/views/login.html";
+          Swal.fire({
+            title: 'Email Enviado!',
+            text: 'Verifique seu e-mail para redefinir a senha.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#00324A',
+            background: '#FFFFFF',
+            customClass: {
+              title: 'swal-title-custom',
+              content: 'swal-content-custom',
+              confirmButton: 'swal-button-custom'
+            }
+          }).then(() => {
+            window.location.href = "/client/views/login.html";
+          });
         } else {
-          alert(result.message || "Erro ao enviar link de redefinição");
+          Swal.fire({
+            title: 'Erro',
+            text: result.message || 'Erro ao enviar link de redefinição',
+            icon: 'error',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#00324A',
+            background: '#FFFFFF'
+          });
         }
       } catch (err) {
-        alert("Erro na requisição");
+        Swal.fire({
+          title: 'Erro',
+          text: 'Erro na requisição',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#00324A',
+          background: '#FFFFFF'
+        });
         console.error(err);
       }
     });

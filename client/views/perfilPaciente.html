@@ -3,64 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Perfil do Paciente</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../public/css/perfilPaciente.css">
-  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+  <title>PulseFlow | Perfil do Paciente</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/client/public/css/perfilPaciente.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
 </head>
 <body>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
+  
   <div class="container">
-    <aside class="sidebar">
-      <div class="profile">
-        <h3></h3>
-      </div>
-      <nav class="specialties">
-        <details><summary><span style="font-weight: bold;"><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
-        <details><summary><span><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
-        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
-        <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
-        <details><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
-          <ul>
-            <!-- Condições Crônicas -->
-            <li><a href="diabetes.html">Diabetes</a></li>
-            <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
-            <li><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
-            
-            <!-- Saúde Hormonal e Reprodutiva -->
-            <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
-            <li><a href="hormonal.html">Hormonal</a></li>
-            
-            <!-- Saúde Mental e Sono -->
-            <li><a href="insonia.html">Insônia</a></li>
-            <li><a href="enxaqueca.html">Enxaqueca</a></li>
-          </ul>
-        </details>
-      </nav>
-      <div class="change-patient">
-        <a href="selecao.html">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
-          Trocar de Paciente
-        </a>
-      </div>
-    </aside>
     <main class="content">
       <section class="patient-header">
-        <h1>👤 Perfil do Paciente</h1>
-        <div id="erroPerfil" class="erro-mensagem" style="display: none; background-color: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center;"></div>
+        <div class="header-top">
+          <h1>👤 Perfil do Paciente</h1>
+        </div>
+        <div id="erroPerfil" class="erro-mensagem" style="display: none;"></div>
         <div class="profile-box">
-          <img src="{fotoPerfil}" alt="Foto do Paciente" />
-          <div class="info">
-            <p><strong>Nome do Paciente</strong><span id="nomePaciente"></span></p>
-            <p><strong>Gênero</strong><span id="generoPaciente"></span></p>
-            <p><strong>Idade</strong><span id="idadePaciente"></span></p>
-            <p><strong>Nacionalidade</strong><span id="nacionalidadePaciente"></span></p>
-            <p><strong>Altura</strong><span id="alturaPaciente"></span></p>
-            <p><strong>Peso</strong><span id="pesoPaciente"></span></p>
-            <p><strong>Profissão</strong><span id="profissaoPaciente"></span></p>
-            <p><strong>E-mail</strong><span id="emailPaciente"></span></p>
-            <p><strong>Telefone</strong><span id="telefonePaciente"></span></p>
-            <p><strong>Observações</strong><span id="observacoesPaciente"></span></p>
+          <div class="profile-photo-wrapper">
+            <img src="/client/public/assets/User_logonegativo.png" alt="Foto do Paciente" id="fotoPaciente" />
+            <button id="editarPerfilBtn" class="btn-editar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              <span>Editar</span>
+            </button>
           </div>
+          <div class="info">
+            <div class="info-item">
+              <label>Nome do Paciente</label>
+              <span id="nomePaciente" class="info-value">-</span>
+              <input type="text" id="inputNomePaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Gênero</label>
+              <span id="generoPaciente" class="info-value">-</span>
+              <select id="inputGeneroPaciente" class="info-input" style="display: none;">
+                <option value="">Selecione</option>
+                <option value="masculino">Masculino</option>
+                <option value="feminino">Feminino</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="info-item">
+              <label>Idade</label>
+              <span id="idadePaciente" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <label>Nacionalidade</label>
+              <span id="nacionalidadePaciente" class="info-value">-</span>
+              <input type="text" id="inputNacionalidadePaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Altura</label>
+              <span id="alturaPaciente" class="info-value">-</span>
+              <input type="text" id="inputAlturaPaciente" class="info-input" placeholder="cm" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Peso</label>
+              <span id="pesoPaciente" class="info-value">-</span>
+              <input type="text" id="inputPesoPaciente" class="info-input" placeholder="kg" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Profissão</label>
+              <span id="profissaoPaciente" class="info-value">-</span>
+              <input type="text" id="inputProfissaoPaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>E-mail</label>
+              <span id="emailPaciente" class="info-value">-</span>
+              <input type="email" id="inputEmailPaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item">
+              <label>Telefone</label>
+              <span id="telefonePaciente" class="info-value">-</span>
+              <input type="tel" id="inputTelefonePaciente" class="info-input" style="display: none;">
+            </div>
+            <div class="info-item full-width">
+              <label>Observações</label>
+              <span id="observacoesPaciente" class="info-value">-</span>
+              <textarea id="inputObservacoesPaciente" class="info-input" rows="3" style="display: none;"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="profile-actions" id="profileActions" style="display: none;">
+          <button id="salvarPerfilBtn" class="btn-salvar">Salvar</button>
+          <button id="cancelarEdicaoBtn" class="btn-cancelar">Cancelar</button>
         </div>
       </section>
 
@@ -70,8 +100,52 @@
           <!-- Os cards serão inseridos dinamicamente via JavaScript -->
         </div>
       </section>
+
+      <section class="insights-section">
+        <div class="insights-header">
+          <h2><span class="ai-icon">🤖</span> Insights Inteligentes</h2>
+          <button id="gerarInsightsBtn" class="btn-gerar-insights">
+            <span class="btn-icon">✨</span>
+            <span>Gerar Insights</span>
+          </button>
+        </div>
+        <div id="insightsLoading" class="insights-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p>Analisando dados do paciente...</p>
+        </div>
+        <div id="insightsContent" class="insights-content" style="display: none;">
+          <div class="insights-summary"></div>
+          <div class="insights-text"></div>
+          
+          <!-- Seção de Chat para Perguntas -->
+          <div class="chat-section">
+            <div class="chat-header">
+              <h3><span class="chat-icon">💬</span> Faça uma pergunta sobre os insights</h3>
+            </div>
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input-container">
+              <textarea 
+                id="chatInput" 
+                class="chat-input" 
+                placeholder="Ex: Quais são os principais fatores de risco identificados?"
+                rows="2"
+              ></textarea>
+              <button id="sendQuestionBtn" class="btn-send-question">
+                <span class="btn-icon">📤</span>
+                <span>Enviar</span>
+              </button>
+            </div>
+            <div id="chatLoading" class="chat-loading" style="display: none;">
+              <div class="spinner-small"></div>
+              <span>IA está pensando...</span>
+            </div>
+          </div>
+        </div>
+        <div id="insightsError" class="insights-error" style="display: none;"></div>
+      </section>
     </main>
   </div>
-  <script src="../public/js/perfilPaciente.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script type="module" src="/client/public/js/perfilPaciente.js"></script>
 </body>
 </html>

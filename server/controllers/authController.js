@@ -8,32 +8,50 @@ import tokenService from '../services/tokenService.js';
 // Função para registrar um novo usuário
 export const register = async (req, res) => {
   try {
-    const { senha, email } = req.body;
+    const { senha, email, rqe } = req.body;
 
-    // Verificando se o usuário já existe
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'Usuário já existe.' });
     }
 
-    // Criptografando a senha
+    const requiredFields = [
+      'nome', 'cpf', 'genero', 'email', 'senha', 'crm',
+      'areaAtuacao', 'telefonePessoal', 'cep',
+      'enderecoConsultorio', 'numeroConsultorio'
+    ];
+
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        return res.status(400).json({ message: `Campo obrigatório ausente: ${field}` });
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(senha, 10);
 
-    // Criando um novo usuário
+    const rqeArray = Array.isArray(rqe) ? rqe.filter(r => r) : [];
+
     const newUser = new User({
       ...req.body,
       senha: hashedPassword,
+      rqe: rqeArray
     });
 
-    // Salvando o novo usuário no banco de dados
     await newUser.save();
 
-    // Enviando e-mail de boas-vindas
-    await sendWelcomeEmail(email);
+    try {
+      await sendWelcomeEmail(email);
+    } catch (emailError) {
+      console.error('Erro ao enviar e-mail de boas-vindas:', emailError);
+    }
 
     res.status(201).json({ message: 'Usuário registrado com sucesso! Um e-mail de boas-vindas foi enviado.' });
   } catch (err) {
-    res.status(500).json({ message: 'Erro ao registrar.', error: err.message });
+    console.error('Erro detalhado no registro:', err);
+    res.status(500).json({ 
+      message: 'Erro ao registrar.',
+      error: process.env.NODE_ENV === 'development' ? err.message : 'Erro interno do servidor'
+    });
   }
 };
 
@@ -50,18 +68,24 @@ const sendWelcomeEmail = async (email) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: 'Bem-vindo ao PulseFlow!',
+    subject: '🎉 Bem-vindo(a) ao PulseFlow!',
     html: `
-      <div style="max-width: 600px; margin: auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; padding: 30px; border-radius: 10px; border: 1px solid #e0e0e0;">
+      <div style="max-width: 600px; margin: auto; padding: 40px; background-color: #ffffff; border-radius: 10px; border: 1px solid #e0e0e0; font-family: 'Segoe UI', sans-serif;">
         <div style="text-align: center;">
-          <h1 style="color: #007bff; font-size: 28px;">PulseFlow</h1>
-          <h2 style="color: #333; font-size: 22px;">Olá, ${email} 👋</h2>
+          <img src="https://imgur.com/8WWX04s" alt="Logo Pulse Flow" style="max-width: 200px;" />
+          <h2 style="color: #333;">Olá, ${email} 👋</h2>
         </div>
-        <p style="font-size: 16px; color: #555;">Bem-vindo à nossa plataforma PulseFlow! Estamos muito felizes em tê-lo conosco.</p>
-        <p style="font-size: 16px; color: #555;">Se você tiver alguma dúvida, nossa equipe está à disposição para ajudar.</p>
-        <p style="font-size: 16px; color: #555;">Atenciosamente, <br /> Equipe PulseFlow 🚀</p>
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;" />
-        <p style="font-size: 14px; color: #aaa;">Esta mensagem foi enviada automaticamente. Por favor, não responda.</p>
+        <p style="font-size: 16px; color: #444; line-height: 1.6;">
+          Seja muito bem-vindo(a) à nossa plataforma! Agora você pode acompanhar sua saúde de forma integrada e inteligente com o PulseFlow.
+        </p>
+        <p style="font-size: 16px; color: #444;">
+          Caso tenha dúvidas, nossa equipe está pronta para te ajudar.
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="https://pulseflow.app" style="background-color: #0D6EFD; color: #ffffff; padding: 12px 24px; font-size: 16px; border-radius: 6px; text-decoration: none;">🌐 Acessar Plataforma</a>
+        </div>
+        <hr style="margin-top: 30px; border: none; border-top: 1px solid #ddd;" />
+        <p style="font-size: 12px; color: #999; text-align: center;">Esta é uma mensagem automática. Por favor, não responda.</p>
       </div>
     `,
   };
@@ -158,19 +182,26 @@ const sendOTPByEmail = async (email, otpCode) => {
     },
   });
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: 'Código de Verificação',
-    html: `
-      <div style="font-family: Arial, sans-serif; color: #333; text-align: center;">
-        <h2 style="color: #007bff;">Código de Verificação</h2>
-        <p style="font-size: 16px;">Seu código de verificação é:</p>
-        <h3 style="font-size: 24px; color: #333;">${otpCode}</h3>
-        <p style="font-size: 14px;">Este código é válido por 10 minutos.</p>
+const mailOptions = {
+  from: process.env.EMAIL_USER,
+  to: email,
+  subject: '🔐 Seu Código de Verificação - PulseFlow',
+  html: `
+    <div style="max-width: 600px; margin: auto; padding: 40px; background-color: #fefefe; border-radius: 10px; border: 1px solid #ccc; font-family: Arial, sans-serif;">
+      <img src="https://imgur.com/8WWX04s" alt="Logo Pulse Flow" style="max-width: 200px;" />
+      <h2 style="color: #0D6EFD; text-align: center;">Código de Verificação</h2>
+      <p style="text-align: center; font-size: 16px; color: #333;">Utilize o código abaixo para continuar seu login:</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <span style="font-size: 36px; font-weight: bold; color: #222; background-color: #eee; padding: 10px 20px; border-radius: 8px; display: inline-block;">
+          ${otpCode}
+        </span>
       </div>
-    `,
-  };
+      <p style="font-size: 14px; text-align: center; color: #666;">Este código é válido por 10 minutos.</p>
+      <hr style="margin-top: 30px; border: none; border-top: 1px solid #ddd;" />
+      <p style="font-size: 12px; color: #aaa; text-align: center;">Se você não solicitou esse código, ignore este e-mail.</p>
+    </div>
+  `,
+};
 
   await transporter.sendMail(mailOptions);
 };
@@ -198,21 +229,21 @@ export const resetPassword = async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: '🔐 Redefinição de Senha - PulseFlow',
+      subject: '🔑 Redefinição de Senha - PulseFlow',
       html: `
-        <div style="max-width: 600px; margin: auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; padding: 30px; border-radius: 10px; border: 1px solid #e0e0e0;">
+        <div style="max-width: 600px; margin: auto; padding: 40px; background-color: #ffffff; border-radius: 10px; border: 1px solid #ccc; font-family: 'Segoe UI', sans-serif;">
           <div style="text-align: center;">
-            <h1 style="color: #007bff; font-size: 28px;">PulseFlow</h1>
-            <h2 style="color: #333; font-size: 22px;">Olá, ${user.nome || 'usuário'} 👋</h2>
+          <img src="https://imgur.com/8WWX04s" alt="Logo Pulse Flow" style="max-width: 200px;" />
+            <h2 style="color: #333;">Olá, ${user.nome || 'usuário'} 👋</h2>
           </div>
-          <p style="font-size: 16px; color: #555;">Recebemos uma solicitação para redefinir sua senha. Para prosseguir, clique no botão abaixo:</p>
+          <p style="font-size: 16px; color: #555;">Recebemos uma solicitação para redefinir sua senha.</p>
+          <p style="font-size: 16px; color: #555;">Clique no botão abaixo para criar uma nova senha:</p>
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetLink}" style="background-color: #007bff; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-size: 16px; display: inline-block;">🔁 Redefinir minha senha</a>
+            <a href="${resetLink}" style="background-color: #0D6EFD; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-size: 16px;">🔁 Redefinir Senha</a>
           </div>
-          <p style="font-size: 14px; color: #888;">Se você não solicitou esta redefinição, pode ignorar este e-mail. O link é válido por 1 hora.</p>
-          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;" />
-          <p style="font-size: 14px; color: #aaa;">Esta mensagem foi enviada automaticamente. Por favor, não responda.</p>
-          <p style="font-size: 14px; color: #aaa;">Atenciosamente, Equipe PulseFlow 🚀</p>
+          <p style="font-size: 14px; color: #888;">Se você não fez essa solicitação, ignore este e-mail. O link expira em 1 hora.</p>
+          <hr style="margin-top: 30px; border: none; border-top: 1px solid #ddd;" />
+          <p style="font-size: 12px; color: #aaa; text-align: center;">Esta é uma mensagem automática. Não é necessário responder.</p>
         </div>
       `,
     };
@@ -244,5 +275,152 @@ export const confirmResetPassword = async (req, res) => {
     res.status(200).json({ message: 'Senha redefinida com sucesso.' });
   } catch (err) {
     res.status(500).json({ message: 'Erro ao redefinir a senha.', error: err.message });
+  }
+};
+
+// Obter dados do usuário logado
+export const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-senha -otp -otpExpires');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+
+    res.json({
+      _id: user._id,
+      nome: user.nome,
+      email: user.email,
+      cpf: user.cpf,
+      genero: user.genero,
+      crm: user.crm,
+      rqe: user.rqe,
+      areaAtuacao: user.areaAtuacao,
+      telefonePessoal: user.telefonePessoal,
+      telefoneConsultorio: user.telefoneConsultorio,
+      cep: user.cep,
+      enderecoConsultorio: user.enderecoConsultorio,
+      numeroConsultorio: user.numeroConsultorio,
+      complemento: user.complemento,
+      bairro: user.bairro,
+      cidade: user.cidade,
+      estado: user.estado,
+      foto: user.foto
+    });
+  } catch (err) {
+    console.error('Erro ao buscar dados do usuário:', err);
+    res.status(500).json({ message: 'Erro ao buscar dados do usuário.', error: err.message });
+  }
+};
+
+// Atualizar perfil do usuário
+export const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+
+    const { nome, email, areaAtuacao } = req.body;
+
+    // Verificar se o email já existe em outro usuário
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email, _id: { $ne: user._id } });
+      if (emailExists) {
+        return res.status(400).json({ error: 'Este email já está em uso por outro usuário' });
+      }
+      user.email = email;
+    }
+
+    if (nome !== undefined) {
+      user.nome = nome;
+    }
+
+    if (areaAtuacao !== undefined) {
+      user.areaAtuacao = areaAtuacao;
+    }
+
+    await user.save();
+
+    res.json({
+      message: 'Perfil atualizado com sucesso',
+      user: {
+        nome: user.nome,
+        email: user.email,
+        areaAtuacao: user.areaAtuacao
+      }
+    });
+  } catch (err) {
+    console.error('Erro ao atualizar perfil:', err);
+    if (err.code === 11000) {
+      return res.status(400).json({ error: 'Este email já está em uso' });
+    }
+    res.status(500).json({ message: 'Erro ao atualizar perfil.', error: err.message });
+  }
+};
+
+// Alterar senha do usuário
+export const changePassword = async (req, res) => {
+  try {
+    const { senhaAtual, senha } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+
+    if (!senhaAtual) {
+      return res.status(400).json({ error: 'A senha atual é obrigatória' });
+    }
+
+    const isMatch = await bcrypt.compare(senhaAtual, user.senha);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'A senha atual está incorreta' });
+    }
+
+    if (!senha || senha.length < 6) {
+      return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres' });
+    }
+
+    const isSamePassword = await bcrypt.compare(senha, user.senha);
+    if (isSamePassword) {
+      return res.status(400).json({ error: 'A nova senha deve ser diferente da senha atual' });
+    }
+
+    const hashedPassword = await bcrypt.hash(senha, 10);
+    user.senha = hashedPassword;
+    await user.save();
+
+    res.json({ message: 'Senha alterada com sucesso' });
+  } catch (err) {
+    console.error('Erro ao alterar senha:', err);
+    res.status(500).json({ message: 'Erro ao alterar senha.', error: err.message });
+  }
+};
+
+// Excluir conta do usuário
+export const deleteAccount = async (req, res) => {
+  try {
+    const { senha } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+
+    // Verificar se a senha está correta
+    const isMatch = await bcrypt.compare(senha, user.senha);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Senha incorreta' });
+    }
+
+    // Excluir o usuário
+    await User.findByIdAndDelete(req.user._id);
+
+    res.json({ message: 'Conta excluída com sucesso' });
+  } catch (err) {
+    console.error('Erro ao excluir conta:', err);
+    res.status(500).json({ message: 'Erro ao excluir conta.', error: err.message });
   }
 };

@@ -1,81 +1,74 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes da Crise de Gastrite</title>
-    <link rel="stylesheet" href="../public/css/visualizacaoCriseGastrite.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+    <title>PulseFlow | Visualização de Crise de Gastrite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/client/public/css/visualizacaoCriseGastrite.css">
+    <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 </head>
 <body>
+    <div id="header-component"></div>
+    <div id="sidebar-component"></div>
+    
     <div class="container">
-        <button class="sidebar-toggle" id="sidebarToggle">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-        </button>
-        <aside class="sidebar">
-            <div class="profile">
-              <h3>Draª Eliane Young</h3>
-            </div>
-            <nav class="specialties">
-              <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
-              <details><summary><span><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
-              <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
-              <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
-              <detail open><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
-                <ul>
-                  <!-- Condições Crônicas -->
-                  <li><a href="diabetes.html">Diabetes</a></li>
-                  <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
-                  <li style="font-weight: bold;"><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
-                  
-                  <!-- Saúde Hormonal e Reprodutiva -->
-                  <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
-                  <li><a href="hormonal.html">Hormonal</a></li>
-                  
-                  <!-- Saúde Mental e Sono -->
-                  <li><a href="insonia.html">Insônia</a></li>
-                  <li><a href="enxaqueca.html">Enxaqueca</a></li>
-                </ul>
-              </details>
-            </nav>
-            <div class="change-patient">
-              <a href="selecao.html">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
-                Trocar de Paciente
-              </a>
-            </div>
-          </aside>
-
         <main class="content">
-            <header class="header">
-                <div class="header-left">
-                    <h1>Detalhes da Crise de Gastrite</h1>
-                    <p class="subtitle">Informações detalhadas da crise</p>
-                </div>
-                <div class="logo">
-                    <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
-                </div>
-            </header>
-
-            <section class="note-card">
-                <div class="card-header">
-                    <div class="titulo">
-                        <strong>Crise de Gastrite</strong>
-                        <span id="statusCrise"></span>
+            <section class="page-header">
+                <div class="header-content">
+                    <button class="back-btn" id="btnVoltar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 12H5"></path>
+                            <path d="M12 19l-7-7 7-7"></path>
+                        </svg>
+                        Voltar
+                    </button>
+                    <div class="header-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5"></path>
+                            <path d="M2 12l10 5 10-5"></path>
+                        </svg>
                     </div>
-                    <div class="status-badge">
-                        <span class="status-dot"></span>
-                        Crise Registrada
+                    <div class="header-text">
+                        <h1 id="tituloCrise">Crise de Gastrite</h1>
+                        <p>Detalhes completos da crise gástrica registrada</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn" id="btnSalvarPDF">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Salvar PDF
+                    </button>
+                    <button class="action-btn" id="btnImprimir">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <rect x="6" y="14" width="12" height="8"></rect>
+                        </svg>
+                        Imprimir
+                    </button>
+                </div>
+            </section>
+
+            <section class="crisis-card">
+                <div class="card-header">
+                    <div class="crisis-title-section">
+                        <div class="crisis-type-badge" id="tipoCrise">Crise de Gastrite</div>
+                        <div class="crisis-meta">
+                            <span class="crisis-date" id="dataCrise"></span>
+                            <span class="crisis-status" id="statusCrise">Crise Registrada</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="info-grid">
-                    <div class="info-item">
+                    <div class="info-card">
                         <div class="info-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -85,11 +78,12 @@
                             </svg>
                         </div>
                         <div class="info-content">
-                            <strong>Data da Crise</strong>
-                            <span id="dataCrise"></span>
+                            <h3>Data da Crise</h3>
+                            <p id="dataCriseValue"></p>
                         </div>
                     </div>
-                    <div class="info-item">
+
+                    <div class="info-card">
                         <div class="info-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
@@ -98,56 +92,104 @@
                             </svg>
                         </div>
                         <div class="info-content">
-                            <strong>Intensidade da Dor</strong>
-                            <span id="intensidadeDor"></span>
+                            <h3>Intensidade da Dor</h3>
+                            <div class="intensity-display" id="intensidadeDor"></div>
                         </div>
                     </div>
-                    <div class="info-item">
+
+                    <div class="info-card">
                         <div class="info-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                             </svg>
                         </div>
                         <div class="info-content">
-                            <strong>Alívio após Medicação</strong>
-                            <span id="alivioMedicacao"></span>
+                            <h3>Alívio após Medicação</h3>
+                            <p id="alivioMedicacao"></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="details-grid">
-                    <div class="detail-section">
-                        <h3>Sintomas Relatados</h3>
+                <div class="details-section">
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <div class="detail-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                                </svg>
+                            </div>
+                            <h3>Sintomas Relatados</h3>
+                        </div>
                         <div class="detail-content">
                             <p id="sintomas"></p>
                         </div>
                     </div>
 
-                    <div class="detail-section">
-                        <h3>Alimentos Ingeridos</h3>
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <div class="detail-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                            </div>
+                            <h3>Alimentos Ingeridos</h3>
+                        </div>
                         <div class="detail-content">
                             <p id="alimentos"></p>
                         </div>
                     </div>
 
-                    <div class="detail-section">
-                        <h3>Medicação Usada</h3>
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <div class="detail-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7z"></path>
+                                </svg>
+                            </div>
+                            <h3>Medicação Usada</h3>
+                        </div>
                         <div class="detail-content">
                             <p id="medicacao"></p>
                         </div>
                     </div>
 
-                    <div class="detail-section">
-                        <h3>Observações Adicionais</h3>
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <div class="detail-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14,2 14,8 20,8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10,9 9,9 8,9"></polyline>
+                                </svg>
+                            </div>
+                            <h3>Observações Adicionais</h3>
+                        </div>
                         <div class="detail-content">
                             <p id="observacoes"></p>
                         </div>
                     </div>
                 </div>
+            </section>
+        </main>
+    </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script ></script>
+    <script src="/client/public/js/visualizacaoCriseGastrite.js"></script>
+    <script ></script>
+</body>
+</html> 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script ></script>
+    <script src="/client/public/js/visualizacaoCriseGastrite.js"></script>
+    <script ></script>
+</body>
+</html> 
                 <div class="card-footer">
                     <button class="btn-secondary" onclick="window.history.back()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -155,7 +197,7 @@
                         </svg>
                         Voltar
                     </button>
-                    <button class="btn-secondary">
+                    <button class="btn-secondary" id="btnSalvarPDF">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -163,7 +205,7 @@
                         </svg>
                         Salvar PDF
                     </button>
-                    <button class="btn-primary" onclick="window.print()">
+                    <button class="btn-primary" id="btnImprimir">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 6 2 18 2 18 9"></polyline>
                             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -176,6 +218,7 @@
         </main>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="../public/js/visualizacaoCriseGastrite.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <script src="/client/public/js/visualizacaoCriseGastrite.js"></script>
 </body>
 </html> 

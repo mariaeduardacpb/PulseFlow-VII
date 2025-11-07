@@ -1,18 +1,342 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Novo Registro Clinico</title>
-  <link rel="stylesheet" href="../public/css/criarAnotações.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
-  <!-- Select2 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFlow | Novo Registro Clínico</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/client/public/css/criarAnotações.css">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 </head>
 <body>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
+  
   <div class="container">
+    <main class="content">
+      <!-- Cabeçalho da Página -->
+      <section class="page-header">
+        <div class="header-content">
+          <div class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14,2 14,8 20,8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10,9 9,9 8,9"></polyline>
+            </svg>
+          </div>
+          <div class="header-text">
+            <h1>Novo Registro Clínico</h1>
+            <p>Preencha as informações para criar um novo registro clínico</p>
+          </div>
+        </div>
+        <div class="progress-indicator">
+          <div class="progress-step active">
+            <div class="step-number">1</div>
+            <span>Informações</span>
+          </div>
+          <div class="progress-step">
+            <div class="step-number">2</div>
+            <span>Registro</span>
+          </div>
+          <div class="progress-step">
+            <div class="step-number">3</div>
+            <span>Finalizar</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mensagem de Erro -->
+      <div id="erroPerfil" class="error-message" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <span id="errorText">Erro ao carregar dados</span>
+      </div>
+
+      <!-- Formulário Principal -->
+      <form class="main-form" id="mainForm">
+        <!-- Seção 1: Informações do Atendimento -->
+        <section class="form-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <polyline points="17 11 19 13 23 9"></polyline>
+              </svg>
+            </div>
+            <div class="section-title">
+              <h2>Informações do Atendimento</h2>
+              <p>Dados básicos da consulta</p>
+            </div>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="titulo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                Motivo da Consulta
+              </label>
+              <input type="text" id="titulo" name="titulo" required minlength="5" 
+                     placeholder="Descreva o motivo da consulta (mínimo 5 caracteres)" />
+              <span class="error-message">O motivo da consulta é obrigatório e deve ter pelo menos 5 caracteres</span>
+            </div>
+
+            <div class="form-group">
+              <label for="data">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Data da Consulta
+              </label>
+              <input type="date" id="data" name="data" required />
+              <span class="error-message">A data da consulta é obrigatória</span>
+            </div>
+
+            <div class="form-group">
+              <label for="tipoConsulta">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
+                  <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
+                  <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"></path>
+                  <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"></path>
+                </svg>
+                Tipo da Consulta
+              </label>
+              <select id="tipoConsulta" name="tipoConsulta" required>
+                <option value="" disabled selected>Selecione o tipo da consulta</option>
+                <option value="primeira">Primeira consulta</option>
+                <option value="rotina">Consulta de rotina</option>
+                <option value="preventiva">Consulta preventiva</option>
+                <option value="urgencia">Consulta de urgência/emergência</option>
+                <option value="retorno">Consulta de retorno</option>
+                <option value="segundaOpniao">Consulta de segunda opinião</option>
+              </select>
+              <span class="error-message">O tipo da consulta é obrigatório</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção 2: Informações do Médico -->
+        <section class="form-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="section-title">
+              <h2>Informações do Médico</h2>
+              <p>Dados do profissional responsável</p>
+            </div>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="categoria">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                Especialidade
+              </label>
+              <input type="text" id="categoria" name="categoria" 
+                     placeholder="Digite a especialidade" readonly />
+            </div>
+
+            <div class="form-group">
+              <label for="medico">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Médico Responsável
+              </label>
+              <input type="text" id="medico" name="medico" readonly 
+                     placeholder="Carregando informações do médico..." />
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção 3: Registro Clínico -->
+        <section class="form-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14,2 14,8 20,8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10,9 9,9 8,9"></polyline>
+              </svg>
+            </div>
+            <div class="section-title">
+              <h2>Registro Clínico</h2>
+              <p>Descrição detalhada do atendimento</p>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="prontuario">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14,2 14,8 20,8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10,9 9,9 8,9"></polyline>
+              </svg>
+              Registro Clínico
+            </label>
+            <textarea id="prontuario" name="prontuario" rows="8" required minlength="20"
+                      placeholder="Descreva detalhadamente o registro clínico (mínimo 20 caracteres)"></textarea>
+            <div class="textarea-footer">
+              <span class="char-count">
+                <span id="charCount">0</span> / 1000 caracteres
+              </span>
+              <span class="error-message">O registro clínico é obrigatório e deve ter pelo menos 20 caracteres</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Botões de Ação -->
+        <section class="form-actions">
+          <button type="button" class="btn-secondary" onclick="window.history.back()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5"></path>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Voltar
+          </button>
+          <button type="submit" class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Salvar Registro
+          </button>
+        </section>
+      </form>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script type="module" src="/client/public/js/criarAnotacao.js"></script>
+  <script ></script>
+  <script ></script>
+</body>
+</html>
+            <div class="section-title">
+              <h2>Informações do Médico</h2>
+              <p>Dados do profissional responsável</p>
+            </div>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="categoria">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                Especialidade
+              </label>
+              <input type="text" id="categoria" name="categoria" 
+                     placeholder="Digite a especialidade" readonly />
+            </div>
+
+            <div class="form-group">
+              <label for="medico">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Médico Responsável
+              </label>
+              <input type="text" id="medico" name="medico" readonly 
+                     placeholder="Carregando informações do médico..." />
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção 3: Registro Clínico -->
+        <section class="form-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14,2 14,8 20,8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10,9 9,9 8,9"></polyline>
+              </svg>
+            </div>
+            <div class="section-title">
+              <h2>Registro Clínico</h2>
+              <p>Descrição detalhada do atendimento</p>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="prontuario">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14,2 14,8 20,8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10,9 9,9 8,9"></polyline>
+              </svg>
+              Registro Clínico
+            </label>
+            <textarea id="prontuario" name="prontuario" rows="8" required minlength="20"
+                      placeholder="Descreva detalhadamente o registro clínico (mínimo 20 caracteres)"></textarea>
+            <div class="textarea-footer">
+              <span class="char-count">
+                <span id="charCount">0</span> / 1000 caracteres
+              </span>
+              <span class="error-message">O registro clínico é obrigatório e deve ter pelo menos 20 caracteres</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Botões de Ação -->
+        <section class="form-actions">
+          <button type="button" class="btn-secondary" onclick="window.history.back()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5"></path>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Voltar
+          </button>
+          <button type="submit" class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Salvar Registro
+          </button>
+        </section>
+      </form>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script type="module" src="/client/public/js/criarAnotacao.js"></script>
+  <script ></script>
+  <script ></script>
+</body>
+</html>
     <button class="sidebar-toggle" id="sidebarToggle">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -58,7 +382,7 @@
       <header class="header">
         <h1>Novo Registro Clinico Do Atendimento</h1>
         <div class="logo">
-          <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+          <img src="/client/public/assets/pulseLogo.png" alt="Logo Pulse Flow">
         </div>
       </header>
 
@@ -136,6 +460,6 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- Select2 JS -->
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <script src="../public/js/criarAnotacao.js"></script>
+  <script type="module" src="/client/public/js/criarAnotacao.js"></script>
 </body>
 </html>

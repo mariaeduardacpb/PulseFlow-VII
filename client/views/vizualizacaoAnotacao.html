@@ -1,12 +1,13 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Visualizar Registro Clinico Do Atendimento</title>
-  <link rel="stylesheet" href="../public/css/vizualizarAnotacao.css">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+  <title>PulseFlow | Registro Clinico</title>
+  <link rel="stylesheet" href="/client/public/css/vizualizarAnotacao.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
 </head>
 <body>
   <div class="container">
@@ -19,7 +20,7 @@
     </button>
     <aside class="sidebar">
       <div class="profile">
-        <h3>Draª Eliane Young</h3>
+        <h3><span id="medicoNomeSidebar"></span></h3>
       </div>
       <nav class="specialties">
         <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
@@ -57,10 +58,9 @@
       <header class="header">
         <div class="header-left">
           <h1>Visualizar Registro Clínico</h1>
-          <p class="subtitle">Detalhes do atendimento médico</p>
         </div>
         <div class="logo">
-          <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+          <img src="/client/public/assets/pulseLogo.png" alt="Logo Pulse Flow">
         </div>
       </header>
 
@@ -104,7 +104,18 @@
               <span class="categoria"></span>
             </div>
           </div>
-          <div class="info-item medico">
+          <div class="info-item">
+            <div class="info-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+              </svg>
+            </div>
+            <div class="info-content">
+              <strong>Tipo da Consulta</strong>
+              <span class="tipo-consulta"></span>
+            </div>
+          </div>
+          <div class="info-item">
             <div class="info-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -137,11 +148,13 @@
         </div>
 
         <div class="card-footer">
-          <button class="btn-secondary" onclick="window.history.back()">
+          <button class="btn-secondary" onclick="deleteAnnotation()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
             </svg>
-            Voltar
+            Excluir Anotação
           </button>
           <button class="btn-secondary" >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -164,6 +177,6 @@
     </main>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="../public/js/vizualizarAnotacao.js"></script>
+  <script src="/client/public/js/vizualizarAnotacao.js"></script>
 </body>
 </html>

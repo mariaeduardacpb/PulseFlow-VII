@@ -1,37 +1,152 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Perfil do Médico</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../public/css/perfilMedico.css">
-  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Perfil do Médico</title>
+  <link rel="stylesheet" href="/client/public/css/perfilMedico.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
   <div class="container">
-    <main class="content">
-      <section class="patient-header">
-        <h1>👤 Perfil do Paciente</h1>
-        <div class="profile-box">
-          <img src="../public/assets/perfilPhotoCharles.webp" alt="Foto do Paciente">
-          <div class="separator"></div>
-          <div class="info">
-            <p><strong>Nome do Paciente:</strong> Charles Leclerc</p>
-            <p><strong>Gênero:</strong> Masculino</p>
-            <p><strong>Idade:</strong> 27 anos e 6 meses</p>
-            <p><strong>Nacionalidade:</strong> Mônaco</p>
-            <p><strong>Altura:</strong> 180cm</p>
-            <p><strong>Peso:</strong> 70.8kg</p>
-            <p><strong>Profissão:</strong> Piloto Profissional</p>
-            <p><strong>E-mail:</strong> charlesleclerc@gmail.com</p>
-            <p><strong>Telefone:</strong> +1 (407) 360-5106</p>
-            <p><strong>Observações:</strong> Utiliza Venvanse em uso contínuo.</p>
+    <h1>Meu Perfil</h1>
+    <form id="profileForm">
+      <div class="form-section">
+        <h2>Foto do Perfil</h2>
+        <div class="profile-photo-container">
+          <div class="profile-photo">
+            <img id="profileImage" src="/client/public/assets/user_logo.png" alt="Foto do Médico">
+            <button type="button" id="changePhotoBtn" class="change-photo-btn" disabled>
+              <i class="fas fa-camera"></i> Alterar Foto
+            </button>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+
+      <div class="form-section">
+        <h2>Informações Pessoais</h2>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="nome">Nome Completo</label>
+            <input type="text" id="nome" name="nome" readonly>
+          </div>
+          <div class="input-group">
+            <label for="cpf">CPF</label>
+            <input type="text" id="cpf" name="cpf" readonly>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="genero">Gênero</label>
+            <input type="text" id="genero" name="genero" readonly>
+          </div>
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" readonly>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="telefone">Telefone Pessoal</label>
+            <input type="tel" id="telefone" name="telefone" readonly>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Informações Profissionais</h3>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="crm">CRM</label>
+            <input type="text" id="crm" name="crm" readonly>
+          </div>
+        </div>
+        <div id="rqeContainer">
+          <!-- Os campos RQE serão adicionados dinamicamente aqui -->
+        </div>
+        <div class="input-row" id="addRqeRow" style="display: none;">
+          <button type="button" id="addRqeBtn" class="add-rqe-btn">
+            <i class="fas fa-plus"></i> Adicionar RQE
+          </button>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="especialidade">Especialidade</label>
+            <input type="text" id="especialidade" name="especialidade" readonly>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Endereço do Consultório</h3>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="cep">CEP</label>
+            <input type="text" id="cep" name="cep" readonly>
+          </div>
+          <div class="input-group">
+            <label for="endereco">Endereço</label>
+            <input type="text" id="endereco" name="endereco" readonly>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="numero">Número</label>
+            <input type="text" id="numero" name="numero" readonly>
+          </div>
+          <div class="input-group">
+            <label for="complemento">Complemento</label>
+            <input type="text" id="complemento" name="complemento" readonly>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="bairro">Bairro</label>
+            <input type="text" id="bairro" name="bairro" readonly>
+          </div>
+          <div class="input-group">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" name="cidade" readonly>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="estado">Estado</label>
+            <input type="text" id="estado" name="estado" readonly>
+          </div>
+          <div class="input-group">
+            <label for="telefoneConsultorio">Telefone do Consultório</label>
+            <input type="tel" id="telefoneConsultorio" name="telefoneConsultorio" readonly>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <button type="button" id="editBtn" class="edit-btn">
+          <i class="fas fa-edit"></i> Editar Perfil
+        </button>
+        <button type="submit" id="saveBtn" class="save-btn" style="display: none;">
+          <i class="fas fa-save"></i> Salvar Alterações
+        </button>
+        <button type="button" id="cancelBtn" class="cancel-btn" style="display: none;">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="button" id="logoutBtn" class="back-btn">
+          <i class="fas fa-arrow-left"></i> Voltar
+        </button>
+      </div>
+    </form>
   </div>
-  <script src="../public/js/perfilPaciente.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script src="https://unpkg.com/imask"></script>
+  <script ></script>
+  <script ></script>
+  <script src="/client/public/js/perfilMedico.js"></script>
 </body>
 </html>

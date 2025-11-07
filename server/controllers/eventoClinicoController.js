@@ -37,7 +37,6 @@ export const criarEvento = async (req, res) => {
     await evento.save();
     res.status(201).json(evento);
   } catch (error) {
-    console.error('Erro ao criar evento clínico:', error);
     res.status(400).json({ message: error.message });
   }
 };
@@ -47,17 +46,63 @@ export const buscarEventos = async (req, res) => {
   try {
     const { cpf } = req.query;
 
-    const paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    // Tentar buscar com CPF limpo primeiro
+    let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    
+    // Se não encontrar, tentar com CPF formatado
+    if (!paciente) {
+      const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+    
+    // Se ainda não encontrar, tentar com o CPF original
+    if (!paciente) {
+      paciente = await Paciente.findOne({ cpf: cpf });
+    }
+
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
 
     const eventos = await EventoClinico.find({ paciente: paciente._id })
+      .populate('paciente', 'name nome cpf email')
       .sort({ dataHora: -1 });
 
     res.json(eventos);
   } catch (error) {
-    console.error('Erro ao buscar eventos:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+// Médico busca eventos de um paciente pelo CPF
+export const buscarEventosMedico = async (req, res) => {
+  try {
+    const { cpf } = req.query;
+
+    // Tentar buscar com CPF limpo primeiro
+    let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    
+    // Se não encontrar, tentar com CPF formatado
+    if (!paciente) {
+      const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+    
+    // Se ainda não encontrar, tentar com o CPF original
+    if (!paciente) {
+      paciente = await Paciente.findOne({ cpf: cpf });
+    }
+
+    if (!paciente) {
+      return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
+
+    const eventos = await EventoClinico.find({ paciente: paciente._id })
+      .populate('paciente', 'name nome cpf email')
+      .sort({ dataHora: -1 });
+
+    res.json(eventos);
+  } catch (error) {
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
 };
@@ -74,7 +119,6 @@ export const buscarEventoPorId = async (req, res) => {
 
     res.json(evento);
   } catch (error) {
-    console.error('Erro ao buscar evento:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
 }; 

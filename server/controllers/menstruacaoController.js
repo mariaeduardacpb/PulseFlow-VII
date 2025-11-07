@@ -137,6 +137,55 @@ export const atualizarRegistro = async (req, res) => {
     }
 };
 
+// Médico busca registros de menstruação por CPF
+export const buscarMenstruacaoMedico = async (req, res) => {
+    try {
+        const { cpf } = req.query;
+        console.log(`[buscarMenstruacaoMedico] Recebido CPF: ${cpf}`);
+
+        if (!cpf) {
+            return res.status(400).json({ message: 'CPF não fornecido' });
+        }
+
+        // Tentar buscar com CPF limpo primeiro
+        let paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+        
+        // Se não encontrar, tentar com CPF formatado
+        if (!paciente) {
+            const cpfFormatado = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            paciente = await Paciente.findOne({ cpf: cpfFormatado });
+        }
+        
+        // Se ainda não encontrar, tentar com o CPF original
+        if (!paciente) {
+            paciente = await Paciente.findOne({ cpf: cpf });
+        }
+
+        if (!paciente) {
+            console.log(`[buscarMenstruacaoMedico] Paciente não encontrado para CPF: ${cpf}`);
+            return res.status(404).json({ message: 'Paciente não encontrado' });
+        }
+
+        console.log(`[buscarMenstruacaoMedico] Paciente encontrado: ${paciente._id}`);
+
+        // Buscar registros de menstruação
+        const pacienteObjectId = new mongoose.Types.ObjectId(paciente._id);
+        const query = { pacienteId: pacienteObjectId };
+        console.log(`[buscarMenstruacaoMedico] Executando consulta com ObjectId: ${JSON.stringify(query)}`);
+
+        const registros = await Menstruacao.find(query)
+            .sort({ dataInicio: -1 });
+        
+        console.log(`[buscarMenstruacaoMedico] Resultado da consulta (quantidade): ${registros.length}`);
+        console.log(`[buscarMenstruacaoMedico] Resultado da consulta (dados): ${JSON.stringify(registros)}`);
+
+        res.status(200).json(registros);
+    } catch (error) {
+        console.error('Erro ao buscar registros de menstruação:', error);
+        res.status(500).json({ message: 'Erro interno ao buscar registros de menstruação' });
+    }
+};
+
 // Excluir um registro
 export const excluirRegistro = async (req, res) => {
     try {

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Sobre Nós</title>
+  <link rel="stylesheet" href="/client/public/css/homePage.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <style>
+    .page-hero {
+      background: linear-gradient(135deg, #0d1117 0%, #052b3b 100%);
+      padding: 12rem 5rem 10rem;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    .page-hero h1 {
+      font-size: clamp(3rem, 7vw, 5rem);
+      font-weight: 200;
+      margin-bottom: 2rem;
+      letter-spacing: -0.04em;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .page-hero p {
+      font-size: 1.375rem;
+      line-height: 1.8;
+      color: #c9d1d9;
+      font-weight: 300;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .page-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 8rem 5rem;
+      animation: fadeIn 1s ease;
+    }
+    .stats-section {
+      background: #f8fafc;
+      padding: 6rem 5rem;
+      margin: 8rem 0;
+      animation: fadeIn 1.2s ease;
+    }
+    .stats-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 4rem;
+      text-align: center;
+    }
+    .stat-item {
+      padding: 2rem;
+    }
+    .stat-number {
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      font-weight: 200;
+      color: #052b3b;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+    .stat-label {
+      font-size: 1.125rem;
+      color: #4a5568;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+    .content-section {
+      margin-bottom: 7rem;
+    }
+    .content-section h2 {
+      font-size: clamp(2.25rem, 5vw, 3rem);
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+      letter-spacing: -0.025em;
+      color: #0d1117;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+    .content-section h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: #052b3b;
+    }
+    .content-section p {
+      font-size: 1.1875rem;
+      line-height: 2;
+      color: #2d3748;
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2.5rem;
+      margin-top: 4rem;
+    }
+    .value-card {
+      background: #ffffff;
+      padding: 3.5rem;
+      border: 1px solid #e5e7eb;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .value-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: #052b3b;
+      transform: scaleY(0);
+      transition: transform 0.4s ease;
+    }
+    .value-card:hover::before {
+      transform: scaleY(1);
+    }
+    .value-card:hover {
+      box-shadow: 0 8px 24px rgba(5, 43, 59, 0.1);
+      transform: translateY(-4px);
+    }
+    .value-card h3 {
+      font-size: 1.625rem;
+      font-weight: 400;
+      margin-bottom: 1.25rem;
+      color: #0d1117;
+      letter-spacing: -0.015em;
+    }
+    .value-card p {
+      font-size: 1.0625rem;
+      line-height: 1.8;
+      color: #4a5568;
+      font-weight: 300;
+    }
+    .commitment-section {
+      background: #0d1117;
+      padding: 8rem 5rem;
+      color: #ffffff;
+      margin-top: 8rem;
+      animation: fadeIn 1.2s ease;
+    }
+    .commitment-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .commitment-section h2 {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 300;
+      margin-bottom: 3rem;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      position: relative;
+      padding-bottom: 1.5rem;
+    }
+    .commitment-section h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 80px;
+      height: 3px;
+      background: #ffffff;
+    }
+    .commitment-section p {
+      font-size: 1.25rem;
+      line-height: 2;
+      color: #c9d1d9;
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 1024px) {
+      .page-hero {
+        padding: 10rem 3rem 8rem;
+      }
+      .page-content {
+        padding: 6rem 3rem;
+      }
+      .stats-section {
+        padding: 5rem 3rem;
+      }
+      .stats-grid {
+        gap: 3rem;
+      }
+    }
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+      .main-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        gap: 1rem;
+        z-index: 1000;
+      }
+      .main-nav.active {
+        display: flex;
+      }
+      .page-hero {
+        padding: 8rem 2rem 6rem;
+      }
+      .page-hero h1 {
+        font-size: 2.5rem;
+      }
+      .page-hero p {
+        font-size: 1.125rem;
+      }
+      .page-content {
+        padding: 4rem 2rem;
+      }
+      .content-section {
+        margin-bottom: 5rem;
+      }
+      .content-section h2 {
+        font-size: 2rem;
+      }
+      .content-section p {
+        font-size: 1rem;
+      }
+      .stats-section {
+        padding: 4rem 2rem;
+        margin: 4rem 0;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.5rem;
+      }
+      .stat-number {
+        font-size: 2.5rem;
+      }
+      .values-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .value-card {
+        padding: 2.5rem 2rem;
+      }
+      .commitment-section {
+        padding: 4rem 2rem;
+        margin-top: 4rem;
+      }
+      .commitment-section h2 {
+        font-size: 2rem;
+      }
+      .commitment-section p {
+        font-size: 1.125rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .page-hero {
+        padding: 6rem 1.5rem 4rem;
+      }
+      .page-hero h1 {
+        font-size: 2rem;
+      }
+      .page-hero p {
+        font-size: 1rem;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .stat-number {
+        font-size: 2.25rem;
+      }
+      .stat-label {
+        font-size: 1rem;
+      }
+      .content-section h2 {
+        font-size: 1.75rem;
+      }
+      .value-card {
+        padding: 2rem 1.5rem;
+      }
+      .commitment-section {
+        padding: 3rem 1.5rem;
+      }
+      .commitment-section h2 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">
+      <img src="/client/public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+    </div>
+    <nav class="main-nav" id="mainNav">
+      <a href="homePage.html" class="nav-link">HOME</a>
+      <a href="homePage.html#features" class="nav-link">ÁREAS DE ATUAÇÃO</a>
+      <a href="sobreNos.html" class="nav-link">SOBRE</a>
+      <a href="contato.html" class="nav-link">CONTATO</a>
+    </nav>
+    <div class="btn-container">
+      <a href="login.html" class="login-button">Entrar</a>
+    </div>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <section class="page-hero">
+    <h1>Transformando o Cuidado com a Saúde</h1>
+    <p>Somos uma plataforma inovadora que conecta pacientes e médicos de forma inteligente, promovendo um acompanhamento de saúde mais proativo e colaborativo com tecnologia de ponta.</p>
+  </section>
+
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">50K+</div>
+        <div class="stat-label">Usuários Ativos</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">5K+</div>
+        <div class="stat-label">Profissionais de Saúde</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">98%</div>
+        <div class="stat-label">Satisfação dos Usuários</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">Suporte Disponível</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="page-content">
+    <div class="content-section">
+      <h2>Nossa Missão</h2>
+      <p>Proporcionar cuidado médico conectado, eficiente e acessível para todos, utilizando tecnologia para transformar a maneira como profissionais de saúde e pacientes interagem.</p>
+      <p>Fundada com o propósito de democratizar o acesso a cuidados de saúde de qualidade, nossa plataforma facilita a gestão de informações médicas e promove melhorias contínuas no atendimento.</p>
+    </div>
+
+    <div class="content-section">
+      <h2>Nossos Valores</h2>
+      <div class="values-grid">
+        <div class="value-card">
+          <h3>Inovação</h3>
+          <p>Utilizamos tecnologia de ponta para criar soluções inovadoras em saúde digital, sempre à frente das tendências tecnológicas.</p>
+        </div>
+        <div class="value-card">
+          <h3>Confiabilidade</h3>
+          <p>Garantimos a segurança e privacidade dos dados dos pacientes, seguindo os mais rigorosos padrões de conformidade.</p>
+        </div>
+        <div class="value-card">
+          <h3>Acessibilidade</h3>
+          <p>Tornamos os cuidados de saúde mais acessíveis e convenientes para todos, sem barreiras geográficas ou temporais.</p>
+        </div>
+        <div class="value-card">
+          <h3>Excelência</h3>
+          <p>Comprometidos com a excelência no atendimento e na qualidade dos serviços, buscando sempre superar expectativas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="commitment-section">
+    <div class="commitment-content">
+      <h2>Nosso Compromisso</h2>
+      <p>Acreditamos que o cuidado com a saúde deve ser simples, eficaz e acessível. O PulseFlow conecta pacientes e médicos de forma inteligente, promovendo um acompanhamento mais proativo e colaborativo.</p>
+      <p>Tudo isso com total segurança e responsabilidade no tratamento dos dados dos pacientes, respeitando as diretrizes de privacidade e confidencialidade médica estabelecidas pelas normas regulatórias.</p>
+    </div>
+  </section>
+
+  <div id="footer-container"></div>
+  <script src="/client/public/js/homePage.js"></script>
+  <script src="/client/public/js/footer.js"></script>
+  <script>
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mainNav = document.getElementById('mainNav');
+    
+    if (mobileMenuToggle && mainNav) {
+      mobileMenuToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        mainNav.classList.toggle('active');
+      });
+      
+      document.addEventListener('click', function(event) {
+        const isClickInsideNav = mainNav.contains(event.target);
+        const isClickOnToggle = mobileMenuToggle.contains(event.target);
+        
+        if (!isClickInsideNav && !isClickOnToggle && mainNav.classList.contains('active')) {
+          mainNav.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+        }
+      });
+      
+      const navLinks = mainNav.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          mainNav.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+        });
+      });
+    }
+    
+    const header = document.querySelector('.main-header');
+    if (header) {
+      window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll > 100) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+

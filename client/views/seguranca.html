@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Segurança</title>
+  <link rel="stylesheet" href="/client/public/css/homePage.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <style>
+    .page-hero {
+      background: linear-gradient(135deg, #052b3b 0%, #0d1117 100%);
+      padding: 12rem 5rem 10rem;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    .page-hero h1 {
+      font-size: clamp(3rem, 7vw, 5rem);
+      font-weight: 200;
+      margin-bottom: 2rem;
+      letter-spacing: -0.04em;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .page-hero p {
+      font-size: 1.375rem;
+      line-height: 1.8;
+      color: #c9d1d9;
+      font-weight: 300;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .page-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 8rem 5rem;
+      animation: fadeIn 1s ease;
+    }
+    .update-date {
+      text-align: center;
+      font-size: 0.9375rem;
+      color: #718096;
+      font-weight: 300;
+      margin-bottom: 4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .content-section {
+      margin-bottom: 5rem;
+    }
+    .content-section h2 {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 300;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
+      color: #0d1117;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+    .content-section h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: #052b3b;
+    }
+    .content-section p {
+      font-size: 1.1875rem;
+      line-height: 2;
+      color: #2d3748;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+    }
+    .content-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 2rem 0;
+    }
+    .content-section ul li {
+      font-size: 1.125rem;
+      line-height: 2;
+      color: #4a5568;
+      font-weight: 300;
+      margin-bottom: 1rem;
+      padding-left: 2rem;
+      position: relative;
+    }
+    .content-section ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: #052b3b;
+      font-weight: 400;
+    }
+    .highlight-box {
+      background: #f8fafc;
+      border-left: 4px solid #052b3b;
+      padding: 2.5rem;
+      margin: 3rem 0;
+      border-radius: 4px;
+    }
+    .highlight-box p {
+      margin-bottom: 0;
+      font-size: 1.125rem;
+      color: #2d3748;
+    }
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+    .security-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+    .security-card:hover {
+      border-color: #052b3b;
+      box-shadow: 0 4px 12px rgba(5, 43, 59, 0.1);
+      transform: translateY(-2px);
+    }
+    .security-card h3 {
+      font-size: 1.375rem;
+      font-weight: 600;
+      color: #052b3b;
+      margin-bottom: 1rem;
+    }
+    .security-card p {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #4a5568;
+      margin-bottom: 0;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @media (max-width: 1024px) {
+      .page-hero {
+        padding: 10rem 3rem 8rem;
+      }
+      .page-content {
+        padding: 6rem 3rem;
+      }
+    }
+    @media (max-width: 768px) {
+      .page-hero {
+        padding: 8rem 2rem 6rem;
+      }
+      .page-hero h1 {
+        font-size: clamp(2.5rem, 8vw, 4rem);
+      }
+      .page-hero p {
+        font-size: 1.125rem;
+      }
+      .page-content {
+        padding: 5rem 2rem;
+      }
+      .content-section h2 {
+        font-size: 2rem;
+      }
+      .content-section p {
+        font-size: 1.0625rem;
+      }
+      .security-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .page-hero {
+        padding: 7rem 1.5rem 5rem;
+      }
+      .page-content {
+        padding: 4rem 1.5rem;
+      }
+      .content-section h2 {
+        font-size: 1.75rem;
+      }
+      .content-section p {
+        font-size: 1rem;
+      }
+      .content-section ul li {
+        font-size: 0.95rem;
+        padding-left: 1.5rem;
+      }
+      .highlight-box {
+        padding: 1.5rem 1rem;
+      }
+      .highlight-box p {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">
+      <img src="/client/public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+    </div>
+    <nav class="main-nav" id="mainNav">
+      <a href="homePage.html" class="nav-link">HOME</a>
+      <a href="homePage.html#features" class="nav-link">ÁREAS DE ATUAÇÃO</a>
+      <a href="sobreNos.html" class="nav-link">SOBRE</a>
+      <a href="contato.html" class="nav-link">CONTATO</a>
+    </nav>
+    <div class="btn-container">
+      <a href="login.html" class="login-button">Entrar</a>
+    </div>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <section class="page-hero">
+    <h1>Segurança e Proteção de Dados</h1>
+    <p>Garantimos a máxima proteção dos dados médicos e informações de saúde, seguindo rigorosamente as normas de segurança e privacidade.</p>
+  </section>
+
+  <div class="page-content">
+    <div class="update-date">
+      Última atualização: Janeiro de 2025
+    </div>
+
+    <div class="content-section">
+      <h2>Compromisso com a Segurança</h2>
+      <p>O PulseFlow é uma plataforma desenvolvida com foco na segurança e proteção dos dados médicos. Entendemos a sensibilidade e criticidade das informações de saúde e implementamos medidas robustas para garantir que seus dados estejam sempre protegidos.</p>
+      <p>Nossa plataforma está em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018) e segue as melhores práticas de segurança da informação para sistemas de saúde.</p>
+    </div>
+
+    <div class="security-grid">
+      <div class="security-card">
+        <h3>Criptografia End-to-End</h3>
+        <p>Todos os dados médicos são criptografados durante o transporte e armazenamento, utilizando algoritmos de criptografia de nível empresarial.</p>
+      </div>
+      <div class="security-card">
+        <h3>Autenticação em Dois Fatores</h3>
+        <p>Sistema de autenticação 2FA obrigatório para profissionais de saúde, garantindo que apenas usuários autorizados acessem os dados.</p>
+      </div>
+      <div class="security-card">
+        <h3>Controle de Acesso</h3>
+        <p>Políticas rigorosas de controle de acesso baseadas em roles, garantindo que cada profissional visualize apenas os dados necessários.</p>
+      </div>
+      <div class="security-card">
+        <h3>Backup Automatizado</h3>
+        <p>Realizamos backups regulares e automatizados de todos os dados, com múltiplas cópias de segurança em locais diferentes.</p>
+      </div>
+      <div class="security-card">
+        <h3>Monitoramento Contínuo</h3>
+        <p>Sistema de monitoramento 24/7 para detectar e prevenir tentativas de acesso não autorizado ou atividades suspeitas.</p>
+      </div>
+      <div class="security-card">
+        <h3>Auditoria e Rastreabilidade</h3>
+        <p>Todas as ações realizadas na plataforma são registradas e auditadas, permitindo rastreabilidade completa de acessos e modificações.</p>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <h2>Medidas de Segurança Técnicas</h2>
+      <p>Implementamos múltiplas camadas de segurança para proteger os dados médicos:</p>
+      <ul>
+        <li>Criptografia SSL/TLS em todas as comunicações entre cliente e servidor</li>
+        <li>Armazenamento seguro em servidores com certificações de segurança (ISO 27001)</li>
+        <li>Firewalls e sistemas de detecção de intrusão (IDS/IPS)</li>
+        <li>Proteção contra ataques DDoS e outras ameaças cibernéticas</li>
+        <li>Atualizações regulares de segurança e patches de correção</li>
+        <li>Testes de penetração e auditorias de segurança periódicas</li>
+        <li>Isolamento de dados entre diferentes organizações médicas</li>
+        <li>Políticas de senha robustas e expiração periódica</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>Proteção de Dados Médicos</h2>
+      <p>Os dados médicos são tratados com o máximo cuidado e sigilo profissional:</p>
+      <ul>
+        <li>Acesso restrito apenas a profissionais de saúde autorizados e autenticados</li>
+        <li>Logs detalhados de todas as consultas e acessos aos dados dos pacientes</li>
+        <li>Conformidade com o Código de Ética Médica e regulamentações do Conselho Federal de Medicina (CFM)</li>
+        <li>Respeito ao sigilo médico e à confidencialidade das informações clínicas</li>
+        <li>Proteção contra compartilhamento não autorizado de dados</li>
+        <li>Direito do paciente de solicitar acesso, correção ou exclusão de seus dados</li>
+      </ul>
+    </div>
+
+    <div class="highlight-box">
+      <p><strong>Importante:</strong> Todos os profissionais de saúde que utilizam a plataforma são responsáveis por manter suas credenciais de acesso em sigilo e não compartilhar suas contas com terceiros. O uso inadequado dos dados pode gerar responsabilidades cíveis, éticas e criminais.</p>
+    </div>
+
+    <div class="content-section">
+      <h2>Notificação de Incidentes</h2>
+      <p>Em caso de qualquer incidente de segurança que possa afetar os dados dos pacientes, notificaremos imediatamente os profissionais afetados e as autoridades competentes, conforme exigido pela LGPD e outras regulamentações aplicáveis.</p>
+      <p>Caso identifique alguma vulnerabilidade de segurança ou atividade suspeita, entre em contato conosco imediatamente através do e-mail: <a href="mailto:pulseflowsaude@gmail.com" style="color: #052b3b; font-weight: 500;">pulseflowsaude@gmail.com</a></p>
+    </div>
+
+    <div class="content-section">
+      <h2>Seus Direitos</h2>
+      <p>Conforme a LGPD, você tem direito a:</p>
+      <ul>
+        <li>Confirmar a existência de tratamento de seus dados</li>
+        <li>Acessar seus dados pessoais e médicos</li>
+        <li>Corrigir dados incompletos, inexatos ou desatualizados</li>
+        <li>Solicitar a anonimização, bloqueio ou eliminação de dados</li>
+        <li>Solicitar a portabilidade dos dados</li>
+        <li>Revogar o consentimento para tratamento de dados</li>
+        <li>Ser informado sobre compartilhamento de dados com terceiros</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>Atualizações de Segurança</h2>
+      <p>Esta política de segurança pode ser atualizada periodicamente para refletir melhorias em nossas práticas de segurança ou mudanças nas regulamentações. Recomendamos que você revise esta página regularmente para se manter informado sobre como protegemos seus dados.</p>
+      <p>Para mais informações sobre privacidade e tratamento de dados, consulte nossa <a href="privacidade.html" style="color: #052b3b; font-weight: 500;">Política de Privacidade</a>.</p>
+    </div>
+  </div>
+
+  <div id="footer-container"></div>
+  <script src="/client/public/js/homePage.js"></script>
+  <script src="/client/public/js/footer.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mainNav = document.getElementById('mainNav');
+
+      if (mobileMenuToggle && mainNav) {
+        mobileMenuToggle.addEventListener('click', function() {
+          this.classList.toggle('active');
+          mainNav.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+          link.addEventListener('click', function() {
+            mobileMenuToggle.classList.remove('active');
+            mainNav.classList.remove('active');
+          });
+        });
+      }
+
+      const header = document.querySelector('.main-header');
+      if (header) {
+        window.addEventListener('scroll', function() {
+          const currentScroll = window.pageYOffset;
+          if (currentScroll > 100) {
+            header.classList.add('scrolled');
+          } else {
+            header.classList.remove('scrolled');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Privacidade</title>
+  <link rel="stylesheet" href="/client/public/css/homePage.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <style>
+    .page-hero {
+      background: linear-gradient(135deg, #052b3b 0%, #0d1117 100%);
+      padding: 12rem 5rem 10rem;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    .page-hero h1 {
+      font-size: clamp(3rem, 7vw, 5rem);
+      font-weight: 200;
+      margin-bottom: 2rem;
+      letter-spacing: -0.04em;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .page-hero p {
+      font-size: 1.375rem;
+      line-height: 1.8;
+      color: #c9d1d9;
+      font-weight: 300;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .page-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 8rem 5rem;
+      animation: fadeIn 1s ease;
+    }
+    .update-date {
+      text-align: center;
+      font-size: 0.9375rem;
+      color: #718096;
+      font-weight: 300;
+      margin-bottom: 4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .content-section {
+      margin-bottom: 5rem;
+    }
+    .content-section h2 {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 300;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
+      color: #0d1117;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+    .content-section h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: #052b3b;
+    }
+    .content-section p {
+      font-size: 1.1875rem;
+      line-height: 2;
+      color: #2d3748;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+    }
+    .content-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 2rem 0;
+    }
+    .content-section ul li {
+      font-size: 1.125rem;
+      line-height: 2;
+      color: #4a5568;
+      font-weight: 300;
+      margin-bottom: 1rem;
+      padding-left: 2rem;
+      position: relative;
+    }
+    .content-section ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: #052b3b;
+      font-weight: 400;
+    }
+    .highlight-box {
+      background: #f8fafc;
+      border-left: 4px solid #052b3b;
+      padding: 2.5rem;
+      margin: 3rem 0;
+      border-radius: 4px;
+    }
+    .highlight-box p {
+      margin-bottom: 0;
+      font-size: 1.0625rem;
+      color: #1a202c;
+      font-weight: 400;
+    }
+    @media (max-width: 1024px) {
+      .page-hero {
+        padding: 10rem 3rem 8rem;
+      }
+      .page-content {
+        padding: 6rem 3rem;
+      }
+    }
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+      .main-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        gap: 1rem;
+        z-index: 1000;
+      }
+      .main-nav.active {
+        display: flex;
+      }
+      .page-hero {
+        padding: 8rem 2rem 6rem;
+      }
+      .page-hero h1 {
+        font-size: 2.5rem;
+      }
+      .page-hero p {
+        font-size: 1.125rem;
+      }
+      .page-content {
+        padding: 4rem 2rem;
+      }
+      .content-section {
+        margin-bottom: 4rem;
+      }
+      .content-section h2 {
+        font-size: 2rem;
+      }
+      .content-section p {
+        font-size: 1rem;
+      }
+      .content-section ul li {
+        font-size: 0.95rem;
+      }
+      .highlight-box {
+        padding: 2rem 1.5rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .page-hero {
+        padding: 6rem 1.5rem 4rem;
+      }
+      .page-hero h1 {
+        font-size: 2rem;
+      }
+      .page-hero p {
+        font-size: 1rem;
+      }
+      .page-content {
+        padding: 3rem 1.5rem;
+      }
+      .content-section h2 {
+        font-size: 1.75rem;
+      }
+      .content-section p {
+        font-size: 0.95rem;
+      }
+      .content-section ul li {
+        font-size: 0.9rem;
+        padding-left: 1.5rem;
+      }
+      .highlight-box {
+        padding: 1.5rem 1rem;
+      }
+      .highlight-box p {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">
+      <img src="/client/public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+    </div>
+    <nav class="main-nav" id="mainNav">
+      <a href="homePage.html" class="nav-link">HOME</a>
+      <a href="homePage.html#features" class="nav-link">ÁREAS DE ATUAÇÃO</a>
+      <a href="sobreNos.html" class="nav-link">SOBRE</a>
+      <a href="contato.html" class="nav-link">CONTATO</a>
+    </nav>
+    <div class="btn-container">
+      <a href="login.html" class="login-button">Entrar</a>
+    </div>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <section class="page-hero">
+    <h1>Política de Privacidade</h1>
+    <p>Nosso compromisso é proteger seus dados pessoais e médicos com total transparência e segurança.</p>
+  </section>
+
+  <div class="page-content">
+    <p class="update-date">Última atualização: Janeiro de 2025</p>
+
+    <div class="content-section">
+      <h2>Compromisso com a Privacidade</h2>
+      <p>O PulseFlow leva a privacidade e a segurança dos dados dos usuários muito a sério. Esta política descreve como coletamos, usamos, armazenamos e protegemos suas informações pessoais e médicas, sempre em conformidade com a legislação brasileira de proteção de dados.</p>
+    </div>
+
+    <div class="content-section">
+      <h2>Informações Coletadas</h2>
+      <p>Coletamos as seguintes informações para fornecer nossos serviços de saúde:</p>
+      <ul>
+        <li>Dados pessoais: nome, CPF, data de nascimento, endereço, telefone e e-mail</li>
+        <li>Informações médicas: histórico médico, diagnósticos, exames, medicamentos e tratamentos</li>
+        <li>Dados de saúde: sinais vitais, histórico de eventos clínicos e registros de consultas</li>
+        <li>Informações técnicas: endereço IP, tipo de navegador e cookies</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>Uso das Informações</h2>
+      <p>Utilizamos suas informações exclusivamente para:</p>
+      <ul>
+        <li>Fornecer serviços médicos e de saúde personalizados</li>
+        <li>Facilitar o acesso de profissionais de saúde autorizados aos seus dados</li>
+        <li>Melhorar nossos serviços e plataforma</li>
+        <li>Comunicar atualizações importantes sobre nossa plataforma</li>
+        <li>Cumprir obrigações legais e regulatórias</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>Segurança e Proteção</h2>
+      <p>Implementamos medidas de segurança robustas para proteger suas informações:</p>
+      <ul>
+        <li>Criptografia de dados em repouso e em trânsito (SSL/TLS)</li>
+        <li>Controle de acesso baseado em permissões e autenticação multifator</li>
+        <li>Monitoramento contínuo de atividades e auditoria de acesso</li>
+        <li>Backups regulares e procedimentos de recuperação de desastres</li>
+        <li>Conformidade com normas de segurança da informação e LGPD</li>
+      </ul>
+      <div class="highlight-box">
+        <p>Todos os seus dados médicos são armazenados com o mais alto nível de segurança e confidencialidade.</p>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <h2>Seus Direitos</h2>
+      <p>Conforme a LGPD, você tem direito de:</p>
+      <ul>
+        <li>Acessar suas informações pessoais</li>
+        <li>Corrigir dados incompletos, inexatos ou desatualizados</li>
+        <li>Solicitar anonimização, bloqueio ou eliminação de dados desnecessários</li>
+        <li>Revogar seu consentimento a qualquer momento</li>
+        <li>Obter cópia dos seus dados em formato estruturado</li>
+        <li>Ser informado sobre compartilhamento de dados com terceiros</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>Compartilhamento de Dados</h2>
+      <p>Não vendemos seus dados pessoais ou médicos. Podemos compartilhar informações apenas com:</p>
+      <ul>
+        <li>Profissionais de saúde autorizados e vinculados ao seu atendimento</li>
+        <li>Instituições de saúde parceiras quando necessário para seu tratamento</li>
+        <li>Autoridades competentes quando exigido por lei</li>
+        <li>Prestadores de serviços que nos auxiliam na operação da plataforma</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>Contato</h2>
+      <p>Para exercer seus direitos ou esclarecer dúvidas sobre esta política, entre em contato conosco através do e-mail pulseflowsaude@gmail.com.</p>
+    </div>
+  </div>
+
+  <div id="footer-container"></div>
+  <script src="/client/public/js/homePage.js"></script>
+  <script src="/client/public/js/footer.js"></script>
+  <script>
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mainNav = document.getElementById('mainNav');
+    
+    if (mobileMenuToggle && mainNav) {
+      mobileMenuToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        mainNav.classList.toggle('active');
+      });
+      
+      document.addEventListener('click', function(event) {
+        const isClickInsideNav = mainNav.contains(event.target);
+        const isClickOnToggle = mobileMenuToggle.contains(event.target);
+        
+        if (!isClickInsideNav && !isClickOnToggle && mainNav.classList.contains('active')) {
+          mainNav.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+        }
+      });
+      
+      const navLinks = mainNav.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          mainNav.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+        });
+      });
+    }
+    
+    const header = document.querySelector('.main-header');
+    if (header) {
+      window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll > 100) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+

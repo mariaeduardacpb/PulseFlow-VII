@@ -1,246 +1,304 @@
+const API_URL = window.API_URL || 'http://localhost:65432';
+
 document.addEventListener("DOMContentLoaded", function () {
-  const ctx1 = document.getElementById('chartHorasSono').getContext('2d');
-  const ctx2 = document.getElementById('chartQualidadeSono').getContext('2d');
-  const noDataLabelHoras = document.getElementById('no-data-msg-horas');
-  const noDataLabelQualidade = document.getElementById('no-data-msg-qualidade');
+  const canvasHoras = document.getElementById("chartHorasSono");
+  const canvasQualidade = document.getElementById("chartQualidadeSono");
+  
+  if (!canvasHoras || !canvasQualidade) {
+    return;
+  }
+  
+  const ctxHoras = canvasHoras.getContext("2d");
+  const ctxQualidade = canvasQualidade.getContext("2d");
 
   const months = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
   ];
-
-  const today = new Date();
-  let currentMonthIndex = today.getMonth();
-  const currentYear = today.getFullYear();
+  // Elementos de menu foram movidos para componentes de header/sidebar
+  // Não precisamos mais gerenciar o toggle aqui
   
-const toggleButton = document.querySelector(".menu-toggle");
-  const sidebar = document.querySelector(".sidebar");
+  const today = new Date();
+  let currentMonthIndex = 8; // Setembro (0-indexed)
+  const currentYear = 2025;
 
-  toggleButton.addEventListener("click", () => {
-    sidebar.classList.toggle("active");
-    toggleButton.classList.toggle("shifted");
-  });
+  function mostrarErro(mensagem) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = mensagem;
+    errorDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #f44336;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 5px;
+      z-index: 1000;
+      font-family: 'Montserrat', sans-serif;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    `;
+    document.body.appendChild(errorDiv);
+    setTimeout(() => errorDiv.remove(), 5000);
+  }
 
   async function carregarDadosMedico() {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token não encontrado. Por favor, faça login novamente.');
-      }
-
-      const res = await fetch('http://localhost:65432/api/usuarios/perfil', {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Erro ao carregar dados do médico');
-      }
-
-      const medico = await res.json();
-      const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
-      const nomeFormatado = `${prefixo} ${medico.nome}`;
-      
-      const tituloSidebar = document.querySelector('.sidebar .profile h3');
-      if (tituloSidebar) {
-        tituloSidebar.textContent = nomeFormatado;
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Erro ao carregar dados do médico:", error);
-      const fallback = document.querySelector('.sidebar .profile h3');
-      if (fallback) fallback.textContent = 'Dr(a). Nome não encontrado';
-      mostrarErro("Erro ao carregar dados do médico. Por favor, faça login novamente.");
-      return false;
-    }
-  }
-
-  async function fetchInsoniaData(month, year) {
-    try {
-      const tokenMedico = localStorage.getItem("token");
-      const tokenPaciente = localStorage.getItem("tokenPaciente");
+      const tokenMedico = localStorage.getItem('token');
+      const tokenPaciente = localStorage.getItem('tokenPaciente');
 
       if (!tokenMedico || !tokenPaciente) {
-        console.error("Token não encontrado.");
-        return { dias: [], horasSono: [], qualidadeSono: [] };
+        mostrarErro("Sessão expirada. Faça login novamente!");
+        return;
       }
 
-      const [, payloadBase64] = tokenPaciente.split('.');
-      const decodedPayload = JSON.parse(atob(payloadBase64));
+      const decodedPayload = JSON.parse(atob(tokenPaciente));
       const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
 
       if (!cpf) {
-        console.error("CPF não encontrado no token.");
-        return { dias: [], horasSono: [], qualidadeSono: [] };
+        mostrarErro("CPF não encontrado no token do paciente.");
+        return;
       }
 
-      const response = await fetch(`http://127.0.0.1:65432/api/insonia/medico?cpf=${cpf}&month=${month + 1}&year=${year}`, {
-        method: "GET",
+      const response = await fetch(`${API_URL}/api/insonia/medico?cpf=${cpf}&month=${currentMonthIndex + 1}&year=${currentYear}`, {
+        method: 'GET',
         headers: {
-          "Authorization": `Bearer ${tokenMedico}`,
+          Authorization: `Bearer ${tokenMedico}`,
           "Content-Type": "application/json"
         }
       });
 
-      const result = await response.json();
       if (!response.ok) {
-        console.error("Erro ao buscar dados:", result.message || result);
-        return { dias: [], horasSono: [], qualidadeSono: [] };
+        mostrarErro("Erro ao buscar dados de sono!");
+        return;
       }
 
-      const dias = result.data.map(item => item.dia);
-      const horasSono = result.data.map(item => item.horasSono);
-      const qualidadeSono = result.data.map(item => item.qualidadeSono);
-      return { dias, horasSono, qualidadeSono };
+      const data = await response.json();
+      updateCharts(data);
     } catch (error) {
-      console.error("Erro ao buscar dados de insônia:", error);
-      return { dias: [], horasSono: [], qualidadeSono: [] };
+      console.error('Erro ao buscar dados de sono:', error);
+      mostrarErro("Erro interno ao buscar dados de sono.");
     }
   }
 
-  const chartHorasSono = new Chart(ctx1, {
+  // Gráfico de Horas de Sono
+  const chartHorasSono = new Chart(ctxHoras, {
     type: 'line',
     data: {
       labels: [],
       datasets: [{
-        label: 'Horas de Sono',
+        label: "Horas de Sono",
         data: [],
-        fill: true,
-        borderColor: '#0a4466',
-        backgroundColor: 'rgba(10, 68, 102, 0.1)',
+        borderColor: "#4CAF50",
+        backgroundColor: "rgba(76, 175, 80, 0.1)",
         tension: 0.3,
-        pointRadius: 4,
-        pointHoverRadius: 6
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        spanGaps: true
       }]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1200,
+        easing: 'easeOutQuart',
+        animations: {
+          y: {
+            type: 'number',
+            easing: 'easeOutBounce',
+            from: 0
+          }
+        }
+      },
       plugins: {
         legend: { display: false },
         tooltip: {
+          displayColors: false,
           callbacks: {
-            // Título customizado → "Dia X"
-            title: function (context) {
-              return `Dia ${context[0].label}`;
-            },
-            // Conteúdo → "Horas de Sono: 10h 45min"
-            label: function (context) {
-              const horasDecimais = context.raw;
-              const horas = Math.floor(horasDecimais);
-              const minutos = Math.round((horasDecimais - horas) * 60);
-              return `Horas de Sono: ${horas}h${minutos > 0 ? ` ${minutos}min` : ''}`;
+            title: context => `Dia ${context[0].parsed.x}`,
+            label: () => '',
+            afterBody: context => {
+              const valor = context[0].parsed.y;
+              return [
+                `Horas de sono: ${valor}h`,
+                `Classificação: ${classificarSono(valor)}`
+              ];
             }
-          },
-          displayColors: false 
+          }
         }
       },
       scales: {
+        x: {
+          type: 'linear',
+          title: { display: true, text: 'Dia do Mês' },
+          ticks: { precision: 0 }
+        },
         y: {
           min: 0,
-          max: 16,
-          ticks: {
-            stepSize: 2,
-            callback: val => `${val}h`
+          max: 12,
+          title: { display: true, text: 'Horas de Sono' },
+          ticks: { 
+            stepSize: 1,
+            callback: function(value) {
+              return `${value}h`;
+            }
           }
         }
       }
     }
-  });  
+  });
 
-  const chartQualidadeSono = new Chart(ctx2, {
+  // Gráfico de Qualidade do Sono (placeholder - não temos dados de qualidade)
+  const chartQualidadeSono = new Chart(ctxQualidade, {
     type: 'line',
     data: {
       labels: [],
       datasets: [{
-        label: 'Qualidade do Sono',
+        label: "Qualidade do Sono",
         data: [],
-        fill: true,
-        borderColor: '#0a4466',
-        backgroundColor: 'rgba(10, 68, 102, 0.1)',
+        borderColor: "#FF9800",
+        backgroundColor: "rgba(255, 152, 0, 0.1)",
         tension: 0.3,
-        pointRadius: 4,
-        pointHoverRadius: 6
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        spanGaps: true
       }]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1200,
+        easing: 'easeOutQuart'
+      },
       plugins: {
         legend: { display: false },
         tooltip: {
+          displayColors: false,
           callbacks: {
-            title: function (context) {
-              return `Dia ${context[0].label}`;
-            },
-            label: function (context) {
-              const nota = context.raw;
-              let categoria = '';
-              if (nota <= 60) categoria = 'Ruim';
-              else if (nota <= 79) categoria = 'Médio';
-              else if (nota <= 89) categoria = 'Bom';
-              else categoria = 'Excelente';
-              return [`Nota: ${nota}`, `Qualidade: ${categoria}`];
-            }
-          },
-          displayColors: false
-        }
-      },
-      scales: {
-        y: {
-          min: 0,
-          max: 100,
-          ticks: {
-            stepSize: 10,
-            callback: function (val) {
-              if (val === 100) return 'Excelente';
-              if (val === 90) return 'Bom';
-              if (val === 80) return 'Médio';
-              if (val === 60) return 'Ruim';
-              return '';
+            title: context => `Dia ${context[0].parsed.x}`,
+            label: () => '',
+            afterBody: context => {
+              return ['Dados de qualidade não disponíveis'];
             }
           }
         }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          title: { display: true, text: 'Dia do Mês' },
+          ticks: { precision: 0 }
+        },
+        y: {
+          min: 0,
+          max: 10,
+          title: { display: true, text: 'Qualidade (1-10)' },
+          ticks: { stepSize: 1 }
+        }
       }
-      
     }
-  });  
-  
+  });
+
+  // Buscar dados da API
+  async function fetchInsoniaData(month, year) {
+    try {
+      const tokenMedico = localStorage.getItem('token');
+      const tokenPaciente = localStorage.getItem('tokenPaciente');
+
+      if (!tokenMedico || !tokenPaciente) {
+        mostrarErro("Sessão expirada. Faça login novamente!");
+        return null;
+      }
+
+      const decodedPayload = JSON.parse(atob(tokenPaciente));
+      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+
+      if (!cpf) {
+        mostrarErro("CPF não encontrado no token do paciente.");
+        return null;
+      }
+
+      const response = await fetch(`${API_URL}/api/insonia/medico?cpf=${cpf}&month=${month}&year=${year}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${tokenMedico}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        mostrarErro("Erro ao buscar dados de sono!");
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao buscar dados de sono:', error);
+      mostrarErro("Erro interno ao buscar dados de sono.");
+      return null;
+    }
+  }
+
+  // Carregar e exibir no gráfico
   async function loadChartData() {
-    const { dias, horasSono, qualidadeSono } = await fetchInsoniaData(currentMonthIndex, currentYear);
-  
-    // Converte para número (caso venha como string)
-    const horasNumericas = horasSono.map(h => Number(h));
-    const qualidadeNumerica = qualidadeSono.map(q => Number(q));
-  
-    const temHoras = horasNumericas.length > 0;
-    const temQualidade = qualidadeNumerica.length > 0;
-  
-    // Horas de sono
-    if (!temHoras) {
+    const month = currentMonthIndex + 1; // Converter para 1-indexed
+    const data = await fetchInsoniaData(month, currentYear);
+    if (!data) return;
+
+    // Atualizar o gráfico com os dados
+    updateCharts(data);
+  }
+
+  function updateCharts(data) {
+    if (!data || !data.data || data.data.length === 0) {
+      document.getElementById('no-data-msg-horas').style.display = 'block';
+      document.getElementById('no-data-msg-qualidade').style.display = 'block';
       chartHorasSono.data.labels = [];
       chartHorasSono.data.datasets[0].data = [];
-      noDataLabelHoras.style.display = 'block';
-    } else {
-      chartHorasSono.data.labels = dias;
-      chartHorasSono.data.datasets[0].data = horasNumericas;
-      noDataLabelHoras.style.display = 'none';
-    }
-    chartHorasSono.update();
-  
-    // Qualidade do sono
-    if (!temQualidade) {
       chartQualidadeSono.data.labels = [];
       chartQualidadeSono.data.datasets[0].data = [];
-      noDataLabelQualidade.style.display = 'block';
-    } else {
-      chartQualidadeSono.data.labels = dias;
-      chartQualidadeSono.data.datasets[0].data = qualidadeNumerica;
-      noDataLabelQualidade.style.display = 'none';
+      chartHorasSono.update();
+      chartQualidadeSono.update();
+      return;
     }
+
+    document.getElementById('no-data-msg-horas').style.display = 'none';
+    document.getElementById('no-data-msg-qualidade').style.display = 'none';
+
+    // Extrair dias e valores de sono
+    const dias = data.data.map(d => d.dia);
+    const valoresHoras = data.data.map(d => ({
+      x: d.dia,
+      y: d.valor
+    }));
+
+    // Atualizar dados do gráfico de horas
+    chartHorasSono.data.labels = dias;
+    chartHorasSono.data.datasets[0].data = valoresHoras;
+
+    // Atualizar o gráfico
+    chartHorasSono.update();
+    
+    // Gráfico de qualidade permanece vazio (sem dados)
+    chartQualidadeSono.data.labels = [];
+    chartQualidadeSono.data.datasets[0].data = [];
     chartQualidadeSono.update();
+  }
+
+  function classificarSono(horas) {
+    if (horas >= 7 && horas <= 9) {
+      return 'Ideal';
+    } else if (horas >= 6 && horas < 7) {
+      return 'Adequado';
+    } else if (horas > 9) {
+      return 'Excessivo';
+    } else {
+      return 'Insuficiente';
+    }
   }
 
   function updateMonth(change) {
@@ -267,5 +325,61 @@ const toggleButton = document.querySelector(".menu-toggle");
   });
 
   loadChartData();
-  carregarDadosMedico();
+  atualizarEstatisticas();
 });
+
+// Função para atualizar estatísticas
+async function atualizarEstatisticas() {
+  try {
+    const tokenMedico = localStorage.getItem('token');
+    const tokenPaciente = localStorage.getItem('tokenPaciente');
+
+    if (!tokenMedico || !tokenPaciente) {
+      return;
+    }
+
+    const decodedPayload = JSON.parse(atob(tokenPaciente));
+    const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+
+    if (!cpf) {
+      return;
+    }
+
+    // Buscar dados do mês atual
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    
+    const response = await fetch(`${API_URL}/api/insonia/medico?cpf=${cpf}&month=${currentMonth}&year=${currentYear}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${tokenMedico}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+    
+    if (data && data.data && data.data.length > 0) {
+      // Atualizar estatísticas
+      document.getElementById('totalRecordsCount').textContent = data.data.length;
+      
+      const horasSono = data.data.map(d => parseFloat(d.horasSono || 0)).filter(h => h > 0);
+      const mediaHoras = horasSono.length > 0 ? horasSono.reduce((sum, val) => sum + val, 0) / horasSono.length : 0;
+      document.getElementById('avgSleepHours').textContent = mediaHoras.toFixed(1);
+      
+      const qualidades = data.data.map(d => parseFloat(d.qualidadeSono || 0)).filter(q => q > 0);
+      const mediaQualidade = qualidades.length > 0 ? qualidades.reduce((sum, val) => sum + val, 0) / qualidades.length : 0;
+      document.getElementById('avgSleepQuality').textContent = mediaQualidade.toFixed(1);
+      
+      // Contar noites com qualidade boa (>= 4)
+      const boasNoites = qualidades.filter(q => q >= 4).length;
+      document.getElementById('goodSleepCount').textContent = boasNoites;
+    }
+  } catch (error) {
+    console.error('Erro ao atualizar estatísticas:', error);
+  }
+}

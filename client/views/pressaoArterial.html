@@ -1,90 +1,186 @@
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pressão Arterial</title>
-  <link rel="stylesheet" href="../public/css/pressaoArterial.css" />
-  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFlow | Monitoramento de Pressão Arterial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/client/public/css/pressaoArterial.css">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 </head>
 <body>
-  <button class="menu-toggle" aria-label="Abrir menu">☰</button>
-  <div class="container">
-    <aside class="sidebar">
-      <div class="profile">
-        <h3></h3>
-      </div>
-      <nav class="specialties">
-        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
-        <details><summary><span><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
-        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
-        <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
-        <detail open><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
-          <ul>
-            <!-- Condições Crônicas -->
-            <li><a href="diabetes.html">Diabetes</a></li>
-            <li style="font-weight: bold;"><a href="pressaoArterial.html">Pressão Arterial</a></li>
-            <li><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
-            
-            <!-- Saúde Hormonal e Reprodutiva -->
-            <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
-            <li><a href="hormonal.html">Hormonal</a></li>
-            
-            <!-- Saúde Mental e Sono -->
-            <li><a href="insonia.html">Insônia</a></li>
-            <li><a href="enxaqueca.html">Enxaqueca</a></li>
-          </ul>
-        </details>
-      </nav>
-      <div class="change-patient">
-        <a href="selecao.html">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
-          Trocar de Paciente
-        </a>
-      </div>
-    </aside>
-
-    <main class="content">
-        <header class="header">
-          <h1>Pressão Arterial</h1>
-          <div class="logo">
-            <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
-          </div>
-        </header>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
   
-        <section class="chart-section">
-          <div class="chart">
-            <div class="chart-header">
-              <h4>Dados de Pressão Arterial</h4>
-              <div class="month-selector">
-                <button class="arrow-btn" data-direction="prev">&#8249;</button>
-                <span class="month-label">Abril • 2025</span>
-                <button class="arrow-btn" data-direction="next">&#8250;</button>
+  <div class="container">
+    <main class="content">
+      <!-- Card Principal da Pressão Arterial -->
+      <section class="pressao-card">
+        <div class="card-header">
+          <div class="title-section">
+            <h1 class="page-title">Monitoramento de Pressão Arterial</h1>
+            <p class="page-subtitle">Acompanhamento dos níveis pressóricos do paciente</p>
+          </div>
+          <div class="stats-section">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="totalReadingsCount">0</span>
+                <span class="stat-label">Total de Leituras</span>
               </div>
             </div>
-            <div id="no-data-msg-pressao" class="no-data-msg">
-              ⚠️ <span>Nenhum dado encontrado para este mês.</span>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="avgSystolic">0</span>
+                <span class="stat-label">Média Sistólica</span>
+              </div>
             </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
+                  <path d="M16 2l4 4-4 4"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="avgDiastolic">0</span>
+                <span class="stat-label">Média Diastólica</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
+                  <path d="M16 2l4 4-4 4"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="normalReadingsCount">0</span>
+                <span class="stat-label">Leituras Normais</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico de Pressão Arterial -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <div class="chart-title">
+              <div class="title-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                </svg>
+              </div>
+              <div class="title-text">
+                <h2>Gráfico de Pressão Arterial</h2>
+                <p>Níveis sistólicos e diastólicos ao longo do tempo</p>
+              </div>
+            </div>
+            <div class="month-selector">
+              <button class="arrow-btn" data-direction="prev">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+              </button>
+              <span class="month-label">Abril • 2025</span>
+              <button class="arrow-btn" data-direction="next">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 18l6-6-6-6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <div id="no-data-msg-pressao" class="no-data-message">
+            <div class="no-data-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"></path>
+                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+              </svg>
+            </div>
+            <h3>Nenhum dado encontrado</h3>
+            <p>Não há registros de pressão arterial para este mês.</p>
+          </div>
+          
+          <div class="chart-container">
             <canvas id="chartPressao"></canvas>
           </div>
-        </section>
-      
-      
-      <footer class="referencia-dor">
-        <p>
-          🔎 Artigo sobre os níveis da pressão arterial:
-          <a href="https://brasilescola.uol.com.br/saude/pressao-arterial.htm" target="_blank" rel="noopener noreferrer">
-            Artigo
-          </a>
-        </p>
-      </footer>
+        </div>
 
-    
-
-      
-   
- 
+        <!-- Classificação da Pressão Arterial -->
+        <div class="info-section">
+          <div class="info-header">
+            <div class="info-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <h3>Classificação da Pressão Arterial</h3>
+          </div>
+          <div class="info-content">
+            <div class="reference-item">
+              <div class="reference-label">Normal:</div>
+              <div class="reference-value normal">Sistólica < 130 mmHg e Diastólica < 85 mmHg</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Normal limítrofe:</div>
+              <div class="reference-value borderline">Sistólica 130-139 mmHg e Diastólica 85-89 mmHg</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Hipertensão leve (estágio 1):</div>
+              <div class="reference-value stage1">Sistólica 140-159 mmHg e Diastólica 90-99 mmHg</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Hipertensão moderada (estágio 2):</div>
+              <div class="reference-value stage2">Sistólica 160-179 mmHg e Diastólica 100-109 mmHg</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Hipertensão grave (estágio 3):</div>
+              <div class="reference-value stage3">Sistólica ≥ 180 mmHg e Diastólica ≥ 110 mmHg</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Hipertensão sistólica isolada:</div>
+              <div class="reference-value isolated">Sistólica ≥ 140 mmHg e Diastólica < 90 mmHg</div>
+            </div>
+          </div>
+          <div class="info-footer">
+            <a href="https://brasilescola.uol.com.br/saude/pressao-arterial.htm" 
+               target="_blank" rel="noopener noreferrer" class="reference-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15,3 21,3 21,9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              Saiba mais sobre pressão arterial
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="../public/js/pressaoArterial.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script ></script>
+  <script ></script>
+  <script src="/client/public/js/pressaoArterial.js"></script>
 </body>
 </html>

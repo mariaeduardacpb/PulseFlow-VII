@@ -3,192 +3,187 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Histórico de Registro Clinico</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../public/css/historicoProntuario.css">
-  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+  <title>PulseFlow | Registro Clínico</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/client/public/css/historicoProntuario.css">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 </head>
 <body>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
+  
   <div class="container">
-    <button class="sidebar-toggle" id="sidebarToggle">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
-      </svg>
-    </button>
-    <aside class="sidebar">
-      <div class="profile">
-        <h3>Draª Eliane Young</h3>
-      </div>
-      <nav class="specialties">
-        <details><summary><span><a href="perfilPaciente.html">Perfil Paciente</a></span></summary></details>
-        <details><summary><span style="font-weight: bold;"><a href="historicoProntuario.html">Registro Clínico</a></span></summary></details>
-        <details><summary><span><a href="anexoExame.html">Anexo de Exames</a></span></summary></details>
-        <details><summary><span><a href="historicoEventoClinico.html">Eventos Clínicos</a></span></summary></details>
-        <details><summary><span>Relatórios e Dashboards</span><span class="chevron"></span></summary>
-          <ul>
-            <!-- Condições Crônicas -->
-            <li><a href="diabetes.html">Diabetes</a></li>
-            <li><a href="pressaoArterial.html">Pressão Arterial</a></li>
-            <li><a href="historicoCriseGastrite.html">Histórico de Crise de Gastrite</a></li>
-            
-            <!-- Saúde Hormonal e Reprodutiva -->
-            <li><a href="cicloMenstrual.html">Ciclo Menstrual</a></li>
-            <li><a href="hormonal.html">Hormonal</a></li>
-            
-            <!-- Saúde Mental e Sono -->
-            <li><a href="insonia.html">Insônia</a></li>
-            <li><a href="enxaqueca.html">Enxaqueca</a></li>
-          </ul>
-        </details>
-      </nav>
-      <div class="change-patient">
-        <a href="selecao.html">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" style="vertical-align: middle; margin-right: 6px;"><path fill="white" d="M11.03 8.53a.75.75 0 0 0-1.06-1.06L5.97 11.47a.75.75 0 0 0 0 1.06l4 4a.75.75 0 1 0 1.06-1.06L8.31 12.75H18a.75.75 0 0 0 0-1.5H8.31l2.72-2.72Z"/></svg>
-          Trocar de Paciente
-        </a>
-      </div>
-    </aside>
-      
     <main class="content">
-      <header class="header">
-        <h1>Histórico De Registro Clinico</h1>
-        <div class="logo">
-          <img src="../public/assets/pulseLogo.png" alt="Logo Pulse Flow">
-        </div>
-      </header>
+      <!-- Mensagem de Erro -->
+      <div id="erroProntuario" class="error-message" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <span id="errorText">Erro ao carregar dados do prontuário</span>
+      </div>
 
-    <div class="filters">
-      <div class="filter-group">
-        <div class="custom-select">
-          <input type="text" id="filterCategory" placeholder="Buscar por especialidade">
-          <div class="select-options" id="especialidadesList">
-            <div class="option" data-value="Todas as Especialidades">Todas as Especialidades</div>
-            <div class="option" data-value="Acupuntura">Acupuntura</div>
-            <div class="option" data-value="Alergia e imunologia">Alergia e imunologia</div>
-            <div class="option" data-value="Anestesiologia">Anestesiologia</div>
-            <div class="option" data-value="Angiologia">Angiologia</div>
-            <div class="option" data-value="Cardiologia">Cardiologia</div>
-            <div class="option" data-value="Cirurgia cardiovascular">Cirurgia cardiovascular</div>
-            <div class="option" data-value="Cirurgia da mão">Cirurgia da mão</div>
-            <div class="option" data-value="Cirurgia de cabeça e pescoço">Cirurgia de cabeça e pescoço</div>
-            <div class="option" data-value="Cirurgia do aparelho digestivo">Cirurgia do aparelho digestivo</div>
-            <div class="option" data-value="Cirurgia geral">Cirurgia geral</div>
-            <div class="option" data-value="Cirurgia oncológica">Cirurgia oncológica</div>
-            <div class="option" data-value="Cirurgia pediátrica">Cirurgia pediátrica</div>
-            <div class="option" data-value="Cirurgia plástica">Cirurgia plástica</div>
-            <div class="option" data-value="Cirurgia torácica">Cirurgia torácica</div>
-            <div class="option" data-value="Cirurgia vascular">Cirurgia vascular</div>
-            <div class="option" data-value="Clínica médica">Clínica médica</div>
-            <div class="option" data-value="Coloproctologia">Coloproctologia</div>
-            <div class="option" data-value="Dermatologia">Dermatologia</div>
-            <div class="option" data-value="Endocrinologia e metabologia">Endocrinologia e metabologia</div>
-            <div class="option" data-value="Endoscopia">Endoscopia</div>
-            <div class="option" data-value="Gastroenterologia">Gastroenterologia</div>
-            <div class="option" data-value="Genética médica">Genética médica</div>
-            <div class="option" data-value="Geriatria">Geriatria</div>
-            <div class="option" data-value="Ginecologia e obstetrícia">Ginecologia e obstetrícia</div>
-            <div class="option" data-value="Hematologia e hemoterapia">Hematologia e hemoterapia</div>
-            <div class="option" data-value="Homeopatia">Homeopatia</div>
-            <div class="option" data-value="Infectologia">Infectologia</div>
-            <div class="option" data-value="Mastologia">Mastologia</div>
-            <div class="option" data-value="Medicina de emergência">Medicina de emergência</div>
-            <div class="option" data-value="Medicina de família e comunidade">Medicina de família e comunidade</div>
-            <div class="option" data-value="Medicina do trabalho">Medicina do trabalho</div>
-            <div class="option" data-value="Medicina do tráfego">Medicina do tráfego</div>
-            <div class="option" data-value="Medicina esportiva">Medicina esportiva</div>
-            <div class="option" data-value="Medicina física e reabilitação">Medicina física e reabilitação</div>
-            <div class="option" data-value="Medicina intensiva">Medicina intensiva</div>
-            <div class="option" data-value="Medicina legal e perícia médica">Medicina legal e perícia médica</div>
-            <div class="option" data-value="Medicina nuclear">Medicina nuclear</div>
-            <div class="option" data-value="Medicina preventiva e social">Medicina preventiva e social</div>
-            <div class="option" data-value="Nefrologia">Nefrologia</div>
-            <div class="option" data-value="Neurocirurgia">Neurocirurgia</div>
-            <div class="option" data-value="Neurologia">Neurologia</div>
-            <div class="option" data-value="Nutrologia">Nutrologia</div>
-            <div class="option" data-value="Oftalmologia">Oftalmologia</div>
-            <div class="option" data-value="Oncologia clínica">Oncologia clínica</div>
-            <div class="option" data-value="Ortopedia e traumatologia">Ortopedia e traumatologia</div>
-            <div class="option" data-value="Otorrinolaringologia">Otorrinolaringologia</div>
-            <div class="option" data-value="Patologia">Patologia</div>
-            <div class="option" data-value="Patologia clínica/medicina laboratorial">Patologia clínica/medicina laboratorial</div>
-            <div class="option" data-value="Pediatria">Pediatria</div>
-            <div class="option" data-value="Pneumologia">Pneumologia</div>
-            <div class="option" data-value="Psiquiatria">Psiquiatria</div>
-            <div class="option" data-value="Radiologia e diagnóstico por imagem">Radiologia e diagnóstico por imagem</div>
-            <div class="option" data-value="Radioterapia">Radioterapia</div>
-            <div class="option" data-value="Reumatologia">Reumatologia</div>
-            <div class="option" data-value="Urologia">Urologia</div>
+      <!-- Header da Página -->
+      <section class="page-header">
+        <div class="header-content">
+          <div class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14,2 14,8 20,8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10,9 9,9 8,9"></polyline>
+            </svg>
+          </div>
+          <div class="header-text">
+            <h1>Registro Clínico</h1>
+            <p>Histórico completo de consultas e registros médicos</p>
           </div>
         </div>
-      </div>
-      <div class="filter-group">
-        <input type="text" id="filterDoctor" placeholder="Buscar por médico responsável">
-      </div>
-      <button id="filterButton">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        Filtrar
-      </button>
-      <button onclick="window.location.href='criarAnotações.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Novo Registro
-      </button>
-    </div>
+        <div class="header-actions">
+          <button class="action-btn" id="btnNovoRegistro">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Novo Registro
+          </button>
+        </div>
+      </section>
 
-    <div class="record-list">
-      <div class="record-item">
-        <div class="info">
-          <p class="titulo"><strong>Título:</strong> ${anotacao.titulo}</p>
-          <p class="data"><strong>Data:</strong> ${dataFormatada}</p>
-          <p class="especialidade"><strong>Especialidade:</strong> ${anotacao.categoria}</p>
-          <p class="medico"><strong>Médico Responsável:</strong> Draª ${anotacao.medico}</p>
+      <!-- Seção de Filtros -->
+      <section class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="filterCategory">Especialidade</label>
+            <div class="custom-select">
+              <input type="text" id="filterCategory" placeholder="Selecione uma especialidade">
+              <div class="select-options" id="especialidadesList">
+                <div class="option" data-value="Todas as Especialidades">Todas as Especialidades</div>
+                <div class="option" data-value="Acupuntura">Acupuntura</div>
+                <div class="option" data-value="Alergia e imunologia">Alergia e imunologia</div>
+                <div class="option" data-value="Anestesiologia">Anestesiologia</div>
+                <div class="option" data-value="Angiologia">Angiologia</div>
+                <div class="option" data-value="Cardiologia">Cardiologia</div>
+                <div class="option" data-value="Cirurgia cardiovascular">Cirurgia cardiovascular</div>
+                <div class="option" data-value="Cirurgia da mão">Cirurgia da mão</div>
+                <div class="option" data-value="Cirurgia de cabeça e pescoço">Cirurgia de cabeça e pescoço</div>
+                <div class="option" data-value="Cirurgia do aparelho digestivo">Cirurgia do aparelho digestivo</div>
+                <div class="option" data-value="Cirurgia geral">Cirurgia geral</div>
+                <div class="option" data-value="Cirurgia oncológica">Cirurgia oncológica</div>
+                <div class="option" data-value="Cirurgia pediátrica">Cirurgia pediátrica</div>
+                <div class="option" data-value="Cirurgia plástica">Cirurgia plástica</div>
+                <div class="option" data-value="Cirurgia torácica">Cirurgia torácica</div>
+                <div class="option" data-value="Cirurgia vascular">Cirurgia vascular</div>
+                <div class="option" data-value="Clínica médica">Clínica médica</div>
+                <div class="option" data-value="Coloproctologia">Coloproctologia</div>
+                <div class="option" data-value="Dermatologia">Dermatologia</div>
+                <div class="option" data-value="Endocrinologia e metabologia">Endocrinologia e metabologia</div>
+                <div class="option" data-value="Endoscopia">Endoscopia</div>
+                <div class="option" data-value="Gastroenterologia">Gastroenterologia</div>
+                <div class="option" data-value="Genética médica">Genética médica</div>
+                <div class="option" data-value="Geriatria">Geriatria</div>
+                <div class="option" data-value="Ginecologia e obstetrícia">Ginecologia e obstetrícia</div>
+                <div class="option" data-value="Hematologia e hemoterapia">Hematologia e hemoterapia</div>
+                <div class="option" data-value="Homeopatia">Homeopatia</div>
+                <div class="option" data-value="Infectologia">Infectologia</div>
+                <div class="option" data-value="Mastologia">Mastologia</div>
+                <div class="option" data-value="Medicina de emergência">Medicina de emergência</div>
+                <div class="option" data-value="Medicina de família e comunidade">Medicina de família e comunidade</div>
+                <div class="option" data-value="Medicina do trabalho">Medicina do trabalho</div>
+                <div class="option" data-value="Medicina do tráfego">Medicina do tráfego</div>
+                <div class="option" data-value="Medicina esportiva">Medicina esportiva</div>
+                <div class="option" data-value="Medicina física e reabilitação">Medicina física e reabilitação</div>
+                <div class="option" data-value="Medicina intensiva">Medicina intensiva</div>
+                <div class="option" data-value="Medicina legal e perícia médica">Medicina legal e perícia médica</div>
+                <div class="option" data-value="Medicina nuclear">Medicina nuclear</div>
+                <div class="option" data-value="Medicina preventiva e social">Medicina preventiva e social</div>
+                <div class="option" data-value="Nefrologia">Nefrologia</div>
+                <div class="option" data-value="Neurocirurgia">Neurocirurgia</div>
+                <div class="option" data-value="Neurologia">Neurologia</div>
+                <div class="option" data-value="Nutrologia">Nutrologia</div>
+                <div class="option" data-value="Oftalmologia">Oftalmologia</div>
+                <div class="option" data-value="Oncologia clínica">Oncologia clínica</div>
+                <div class="option" data-value="Ortopedia e traumatologia">Ortopedia e traumatologia</div>
+                <div class="option" data-value="Otorrinolaringologia">Otorrinolaringologia</div>
+                <div class="option" data-value="Patologia">Patologia</div>
+                <div class="option" data-value="Patologia clínica/medicina laboratorial">Patologia clínica/medicina laboratorial</div>
+                <div class="option" data-value="Pediatria">Pediatria</div>
+                <div class="option" data-value="Pneumologia">Pneumologia</div>
+                <div class="option" data-value="Psiquiatria">Psiquiatria</div>
+                <div class="option" data-value="Radiologia e diagnóstico por imagem">Radiologia e diagnóstico por imagem</div>
+                <div class="option" data-value="Radioterapia">Radioterapia</div>
+                <div class="option" data-value="Reumatologia">Reumatologia</div>
+                <div class="option" data-value="Urologia">Urologia</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="filter-group">
+            <label for="filterDoctor">Médico Responsável</label>
+            <input type="text" id="filterDoctor" placeholder="Digite o nome do médico">
+          </div>
+          
+          <div class="filter-group">
+            <label for="filterDate">Data</label>
+            <input type="date" id="filterDate">
+          </div>
+          
+          <div class="filter-group">
+            <button class="btn-clear" id="btnLimparFiltros">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3,6 5,6 21,6"></polyline>
+                <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"></path>
+              </svg>
+              Limpar Filtros
+            </button>
+          </div>
         </div>
-        <a href="/client/views/vizualizacaoAnotacao.html?id=${anotacao._id}">Visualizar Registro Clinico </a>
-      </div>
-      <div class="record-item">
-        <div>
-          <span>20/03/2025 Consulta de rotina</span>
-          <span>Draª Eliane Young</span>
+      </section>
+
+      <!-- Lista de Registros -->
+      <section class="records-section">
+        <div class="section-header">
+          <h2>Registros Clínicos</h2>
+          <div class="records-count">
+            <span id="totalRecords">0</span> registro(s) encontrado(s)
+          </div>
         </div>
-        <a href="#">Visualizar Registro Clinico</a>
-      </div>
-      <div class="record-item">
-        <div>
-          <span>20/03/2025 Consulta de rotina</span>
-          <span>Draª Eliane Young</span>
+        
+        <div class="records-grid" id="recordsGrid">
+          <!-- Os registros serão inseridos dinamicamente via JavaScript -->
         </div>
-        <a href="#">Visualizar Registro Clinico</a>
-      </div>
-      <div class="record-item">
-        <div>
-          <span>20/03/2025 Consulta de rotina</span>
-          <span>Draª Eliane Young</span>
+        
+        <!-- Mensagem quando não há registros -->
+        <div class="no-records" id="noRecords" style="display: none;">
+          <div class="no-records-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14,2 14,8 20,8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10,9 9,9 8,9"></polyline>
+            </svg>
+          </div>
+          <h3>Nenhum registro encontrado</h3>
+          <p>Não há registros clínicos para este paciente ainda.</p>
+          <button class="btn-primary" id="btnNovoRegistroEmpty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Criar Primeiro Registro
+          </button>
         </div>
-        <a href="#">Visualizar Registro Clinico</a>
-      </div>
-      <div class="record-item">
-        <div>
-          <span>20/03/2025 Consulta de rotina</span>
-          <span>Draª Eliane Young</span>
-        </div>
-        <a href="#">Visualizar Registro Clinico</a>
-      </div>
-      <div class="record-item">
-        <div>
-          <span>20/03/2025 Consulta de rotina</span>
-          <span>Draª Eliane Young</span>
-        </div>
-        <a href="#">Visualizar Registro Clinico </a>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
-  <script src="../public/js/historicoAnotacao.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script type="module" src="/client/public/js/historicoAnotacao.js"></script>
+  <script ></script>
+  <script ></script>
 </body>
 </html>

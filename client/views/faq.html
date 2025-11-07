@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | FAQ</title>
+  <link rel="stylesheet" href="/client/public/css/homePage.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <style>
+    .page-hero {
+      background: linear-gradient(135deg, #052b3b 0%, #0d1117 100%);
+      padding: 12rem 5rem 10rem;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    .page-hero h1 {
+      font-size: clamp(3rem, 7vw, 5rem);
+      font-weight: 200;
+      margin-bottom: 2rem;
+      letter-spacing: -0.04em;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .page-hero p {
+      font-size: 1.375rem;
+      line-height: 1.8;
+      color: #c9d1d9;
+      font-weight: 300;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .page-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 8rem 5rem;
+      animation: fadeIn 1s ease;
+    }
+    .faq-item {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      padding: 2.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .faq-item:hover {
+      border-color: #052b3b;
+      box-shadow: 0 4px 12px rgba(5, 43, 59, 0.08);
+    }
+    .faq-item h3 {
+      font-size: 1.375rem;
+      font-weight: 400;
+      margin-bottom: 1.25rem;
+      color: #052b3b;
+      letter-spacing: -0.01em;
+      position: relative;
+      padding-right: 3rem;
+    }
+    .faq-item h3::after {
+      content: '+';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      font-weight: 300;
+      color: #052b3b;
+      transition: transform 0.3s ease;
+    }
+    .faq-item.active h3::after {
+      transform: translateY(-50%) rotate(45deg);
+    }
+    .faq-item p {
+      font-size: 1.0625rem;
+      line-height: 1.9;
+      color: #4a5568;
+      font-weight: 300;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, margin 0.3s ease;
+      margin-top: 0;
+    }
+    .faq-item.active p {
+      max-height: 500px;
+      margin-top: 1.25rem;
+    }
+    .contact-section {
+      background: #f8fafc;
+      padding: 4rem 5rem;
+      margin-top: 4rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .contact-section h2 {
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+      color: #0d1117;
+      letter-spacing: -0.02em;
+    }
+    .contact-section p {
+      font-size: 1.1875rem;
+      color: #4a5568;
+      font-weight: 300;
+      margin-bottom: 0;
+    }
+    .contact-section a {
+      color: #052b3b;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .contact-section a:hover {
+      color: #0a4055;
+    }
+    @media (max-width: 968px) {
+      .page-hero {
+        padding: 10rem 3rem 8rem;
+      }
+      .page-content {
+        padding: 6rem 3rem;
+      }
+    }
+    @media (max-width: 768px) {
+      .page-hero {
+        padding: 8rem 2rem 6rem;
+      }
+      .page-hero h1 {
+        font-size: clamp(2.5rem, 8vw, 4rem);
+      }
+      .page-hero p {
+        font-size: 1.125rem;
+      }
+      .page-content {
+        padding: 5rem 2rem;
+      }
+      .faq-item {
+        padding: 2rem;
+      }
+      .faq-item h3 {
+        font-size: 1.25rem;
+        padding-right: 2.5rem;
+      }
+      .faq-item h3::after {
+        font-size: 1.75rem;
+      }
+      .contact-section {
+        padding: 3rem 2rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .page-hero {
+        padding: 7rem 1.5rem 5rem;
+      }
+      .page-content {
+        padding: 4rem 1.5rem;
+      }
+      .faq-item {
+        padding: 1.5rem;
+      }
+      .faq-item h3 {
+        font-size: 1.125rem;
+        padding-right: 2rem;
+      }
+      .faq-item p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">
+      <img src="/client/public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+    </div>
+    <nav class="main-nav" id="mainNav">
+      <a href="homePage.html" class="nav-link">HOME</a>
+      <a href="homePage.html#features" class="nav-link">ÁREAS DE ATUAÇÃO</a>
+      <a href="sobreNos.html" class="nav-link">SOBRE</a>
+      <a href="contato.html" class="nav-link">CONTATO</a>
+    </nav>
+    <div class="btn-container">
+      <a href="login.html" class="login-button">Entrar</a>
+    </div>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <section class="page-hero">
+    <h1>Perguntas Frequentes</h1>
+    <p>Encontre respostas para as dúvidas mais comuns sobre a plataforma PulseFlow para profissionais de saúde.</p>
+  </section>
+
+  <div class="page-content">
+    <div class="faq-item active">
+      <h3>Como faço login na plataforma como médico?</h3>
+      <p>Profissionais de saúde podem fazer login na plataforma web através da página de login usando suas credenciais cadastradas (CRM e senha). O sistema possui autenticação em dois fatores (2FA) para garantir máxima segurança dos dados. Após inserir suas credenciais, você receberá um código de verificação no e-mail ou aplicativo autenticador para completar o acesso.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Como pesquiso pacientes no sistema?</h3>
+      <p>Na sua área de trabalho médico, você pode pesquisar pacientes pelo CPF utilizando a barra de busca. Após localizar o paciente desejado, você terá acesso completo ao prontuário eletrônico dele, incluindo histórico médico, exames anexados, eventos clínicos registrados e gráficos de acompanhamento. Tudo isso facilita um diagnóstico mais preciso e abrangente.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Quais dados consigo visualizar do paciente?</h3>
+      <p>Como médico cadastrado, você tem acesso completo ao prontuário eletrônico do paciente. Isso inclui: todos os eventos clínicos registrados (pressão arterial, diabetes, enxaqueca, gastrite, menstruação), exames anexados, gráficos de evolução com dados históricos, histórico de consultas e informações médicas relevantes para o acompanhamento contínuo do paciente.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Como visualizo os exames dos pacientes?</h3>
+      <p>Os exames anexados pelos pacientes ficam disponíveis automaticamente no prontuário eletrônico. Você pode visualizar exames em PDF, imagens (laudos, resultados de exames de sangue, radiografias, etc.) e eles ficam organizados por data. Cada exame mantém as informações originais para consulta durante as consultas.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Como funcionam os gráficos de acompanhamento?</h3>
+      <p>O sistema gera automaticamente gráficos de evolução para cada tipo de evento clínico registrado pelo paciente. Você pode visualizar gráficos de pressão arterial ao longo do tempo, níveis de glicose para diabetes, frequência de crises de enxaqueca, etc. Esses gráficos ajudam a identificar tendências e padrões que facilitam o diagnóstico e ajustes de tratamento.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>O que é a autenticação em dois fatores (2FA)?</h3>
+      <p>A autenticação em dois fatores adiciona uma camada extra de segurança à sua conta médica. Além da senha, você precisa confirmar seu acesso com um código enviado para seu e-mail ou aplicativo autenticador. Isso protege os dados dos pacientes mesmo que suas credenciais sejam comprometidas, seguindo as normas de segurança médica.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Como os dados dos pacientes são atualizados?</h3>
+      <p>Os pacientes registram eventos clínicos e fazem upload de exames através do aplicativo PulseFlow. Esses dados são sincronizados automaticamente com a plataforma web, ficando disponíveis em tempo real para os médicos autorizados. Você sempre terá acesso aos dados mais recentes do paciente durante as consultas.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Qual a diferença entre a plataforma web e o aplicativo?</h3>
+      <p>A plataforma web é exclusiva para médicos e profissionais de saúde, permitindo acesso completo ao prontuário eletrônico, pesquisa de pacientes, visualização de exames e gráficos. O aplicativo móvel é para os pacientes registrarem seus eventos clínicos, anexarem exames e acompanharem sua própria saúde. Ambos trabalham em conjunto para facilitar o cuidado médico.</p>
+    </div>
+
+    <div class="contact-section">
+      <h2>Ainda tem dúvidas?</h2>
+      <p>Entre em contato conosco pelo e-mail <a href="mailto:pulseflowsaude@gmail.com">pulseflowsaude@gmail.com</a> ou ligue para +55 11 99999-9999. Estamos sempre prontos para ajudar!</p>
+    </div>
+  </div>
+
+  <div id="footer-container"></div>
+  <script src="/client/public/js/homePage.js"></script>
+  <script src="/client/public/js/footer.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const faqItems = document.querySelectorAll('.faq-item');
+      
+      faqItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const isActive = this.classList.contains('active');
+          
+          faqItems.forEach(faqItem => {
+            faqItem.classList.remove('active');
+          });
+          
+          if (!isActive) {
+            this.classList.add('active');
+          }
+        });
+      });
+
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mainNav = document.getElementById('mainNav');
+
+      if (mobileMenuToggle && mainNav) {
+        mobileMenuToggle.addEventListener('click', function() {
+          this.classList.toggle('active');
+          mainNav.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+          link.addEventListener('click', function() {
+            mobileMenuToggle.classList.remove('active');
+            mainNav.classList.remove('active');
+          });
+        });
+      }
+
+      const header = document.querySelector('.main-header');
+      if (header) {
+        let lastScroll = 0;
+        window.addEventListener('scroll', function() {
+          const currentScroll = window.pageYOffset;
+          if (currentScroll > 100) {
+            header.classList.add('scrolled');
+          } else {
+            header.classList.remove('scrolled');
+          }
+          lastScroll = currentScroll;
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -12,9 +12,13 @@ const DiabetesSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  nivelGlicemia: {
+  glicemia: {
     type: Number,
     required: true
+  },
+  unidade: {
+    type: String,
+    default: 'mg/dL'
   }
 });
 

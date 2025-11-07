@@ -2,23 +2,32 @@
 import mongoose from 'mongoose';
 
 const InsoniaSchema = new mongoose.Schema({
-  paciente: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Paciente',
+  pacienteId: {
+    type: String,
+    required: true
+  },
+  valor: {
+    type: Number,
     required: true
   },
   data: {
     type: Date,
     required: true
   },
-  horasSono: {
-    type: Number, // agora é número decimal
-    required: true
+  fonte: {
+    type: String,
+    default: 'Manual'
   },
-  qualidadeSono: {
-    type: Number, // assume que a nota também é numérica
-    required: true
+  unidade: {
+    type: String,
+    default: 'horas'
+  },
+  descricao: {
+    type: String,
+    default: 'Horas de sono'
   }
+}, {
+  timestamps: true
 });
 
 export default mongoose.model('Insonia', InsoniaSchema);

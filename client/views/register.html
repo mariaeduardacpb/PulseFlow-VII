@@ -3,110 +3,244 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Registro - Médico</title>
-  <link rel="stylesheet" href="../public/css/register.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="icon" type="image/png" href="../public/assets/logoMiniatura.png">
+  <title>PulseFlow | Registro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="/client/public/css/register.css" />
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
 </head>
 <body>
   <div class="container">
-    <h2>Preencha as Informações</h2>
-    <form id="registerForm" novalidate>
-      <div class="form-wrapper">
-        <!-- Seção de Informações Pessoais -->
-        <div class="form-section">
-          <h3>Informações Pessoais</h3>
-
-          <div class="input-group">
-            <i class="fas fa-user"></i>
-            <input type="text" name="nome" id="nome" placeholder="Nome completo" required aria-describedby="nomeError" />
-          </div>
-          <span class="error-message" id="nomeError"></span>
-
-          <div class="input-group">
-            <i class="fas fa-id-card"></i>
-            <input type="text" name="cpf" id="cpf" placeholder="CPF" required aria-describedby="cpfError" />
-          </div>
-          <span class="error-message" id="cpfError"></span>
-
-          <div class="input-group">
-            <i class="fas fa-phone"></i>
-            <input type="tel" name="telefonePessoal" id="telefonePessoal" placeholder="Telefone pessoal" required aria-describedby="telefonePessoalError" />
-          </div>
-          <span class="error-message" id="telefonePessoalError"></span>
-
-          <div class="input-group">
-            <i class="fas fa-envelope"></i>
-            <input type="email" name="email" id="email" placeholder="Email" required aria-describedby="emailError" />
-          </div>
-          <span class="error-message" id="emailError"></span>
-
-          <div class="input-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" name="senha" id="senha" placeholder="Senha" required aria-describedby="senhaError" />
-            <i class="fas fa-eye password-toggle"></i> <!-- Ícone de visibilidade da senha -->
-          </div>          
-          <span class="error-message" id="senhaError"></span>
-
-          <!-- Barra de Força da Senha -->
-          <div class="password-strength">
-            <div class="password-strength-bar" id="passwordStrengthBar"></div>
-          </div>
-        </div>
-
-        <!-- Seção de Informações Profissionais -->
-        <div class="form-section">
-          <h3>Informações Profissionais</h3>
-
-          <div class="input-group">
-            <i class="fas fa-id-badge"></i>
-            <input type="text" name="crm" id="crm" placeholder="CRM" required aria-describedby="crmError" />
-          </div>
-          <span class="error-message" id="crmError"></span>
-
-          <div class="input-group">
-            <i class="fas fa-stethoscope"></i>
-            <input type="text" name="areaAtuacao" id="areaAtuacao" placeholder="Área de atuação" required aria-describedby="areaAtuacaoError" />
-          </div>
-          <span class="error-message" id="areaAtuacaoError"></span>
-
-          <div class="input-group">
-            <i class="fas fa-venus-mars"></i>
-            <select name="genero" id="genero" required aria-describedby="generoError">
-              <option value="" disabled selected>Gênero</option>
-              <option value="Masculino">Masculino</option>
-              <option value="Feminino">Feminino</option>
-              <option value="Outro">Outro</option>
-            </select>
-          </div>
-          <span class="error-message" id="generoError"></span>
-
-          <div class="input-group">
-            <i class="fas fa-map-marker-alt"></i>
-            <input type="text" name="enderecoConsultorio" id="enderecoConsultorio" placeholder="Endereço do consultório" required aria-describedby="enderecoConsultorioError" />
-          </div>
-          <span class="error-message" id="enderecoConsultorioError"></span>
-
-          <div class="input-group">
-            <i class="fas fa-phone-square-alt"></i>
-            <input type="tel" name="telefoneConsultorio" id="telefoneConsultorio" placeholder="Telefone consultório" required aria-describedby="telefoneConsultorioError" />
-          </div>
-          <span class="error-message" id="telefoneConsultorioError"></span>
-        </div>
+    <!-- Lado Esquerdo -->
+    <div class="left-box">
+      <header class="logo-header">
+        <img src="/client/public/assets/PulseNegativo.png" alt="PulseFlow Logo" class="logo-img">
+      </header>
+      <div class="security-content">
+        <h2>Cadastre-se no PulseFlow</h2>
+        <p>Crie sua conta de profissional de saúde em poucos passos. Preencha suas informações pessoais, profissionais e do consultório para começar a utilizar a plataforma que conecta médicos e pacientes de forma segura e eficiente.</p>
       </div>
-
-      <div class="button-container">
-        <button type="submit">Criar Conta</button>
-      </div>
-    </form>
-
-    <div class="login-prompt">
-      <p>Já tem uma conta? <a href="/client/views/login.html">Faça login</a></p>
     </div>
 
-    <footer>Pulse<span>Flow</span></footer>
+    <!-- Lado Direito -->
+    <div class="right-box">
+      <div class="form-box">
+        <div class="form-header">
+          <h1>Criar Conta</h1>
+          <p class="form-subtitle">Preencha os dados abaixo para começar</p>
+        </div>
+        <div class="form-progress">
+          <div class="progress-step active">1</div>
+          <div class="progress-step">2</div>
+          <div class="progress-step">3</div>
+        </div>
+        <form id="registerForm">
+          <div class="form-step step-1 active">
+            <div class="form-section">
+              <div class="section-header">
+                <i class="fas fa-user"></i>
+                <h2>Informações Pessoais</h2>
+              </div>
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="nome">Nome Completo*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo" required />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="cpf">CPF*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-id-card input-icon"></i>
+                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required />
+                  </div>
+                </div>
+              </div>
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="telefonePessoal">Telefone Pessoal*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-phone input-icon"></i>
+                    <input type="tel" id="telefonePessoal" name="telefonePessoal" placeholder="(00) 00000-0000" required />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="email">Email*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="email" name="email" placeholder="seu@email.com" required />
+                  </div>
+                </div>
+              </div>
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="senha">Senha*</label>
+                  <div class="input-wrapper password-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+                    <i class="fas fa-eye password-toggle"></i>
+                  </div>
+                  <div class="password-strength-container">
+                    <div class="password-strength-bar">
+                      <div id="passwordStrengthBar" class="password-strength-bar-fill"></div>
+                    </div>
+                    <div id="passwordStrengthText" class="password-strength-text"></div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="genero">Gênero*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-venus-mars input-icon"></i>
+                    <select id="genero" name="genero" required>
+                      <option value="">Selecione seu gênero</option>
+                      <option value="masculino">Masculino</option>
+                      <option value="feminino">Feminino</option>
+                      <option value="outro">Outro</option>
+                      <option value="prefiro_nao_dizer">Prefiro não dizer</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="button-container">
+                <button type="button" class="next-btn" data-step="1">
+                  <i class="fas fa-arrow-right"></i> Próximo
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-step step-2">
+            <div class="form-section">
+              <div class="section-header">
+                <i class="fas fa-stethoscope"></i>
+                <h2>Informações Profissionais</h2>
+              </div>
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="crm">CRM*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-id-badge input-icon"></i>
+                    <input type="text" id="crm" name="crm" placeholder="Digite seu CRM" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-row">
+                <div class="input-group rqe-container">
+                  <label for="rqe1">RQE*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-certificate input-icon"></i>
+                    <input type="text" id="rqe1" name="rqe[]" placeholder="000000" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="areaAtuacao">Especialidade*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-user-md input-icon"></i>
+                    <select id="areaAtuacao" name="areaAtuacao" required>
+                      <option value="">Selecione sua especialidade</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-row" id="outraEspecialidadeRow" style="display: none;">
+                <div class="input-group">
+                  <label for="outraEspecialidade">Informe sua especialidade*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-user-md input-icon"></i>
+                    <input type="text" id="outraEspecialidade" name="outraEspecialidade" placeholder="Digite sua especialidade">
+                  </div>
+                </div>
+              </div>
+              <div class="button-container">
+                <button type="button" class="prev-btn" data-step="2">
+                  <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+                <button type="button" class="next-btn" data-step="2">
+                  <i class="fas fa-arrow-right"></i> Próximo
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-step step-3">
+            <div class="form-section">
+              <div class="section-header">
+                <i class="fas fa-building"></i>
+                <h2>Informações do Consultório</h2>
+              </div>
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="cep">CEP*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-map-marker-alt input-icon"></i>
+                    <input type="text" id="cep" name="cep" placeholder="00000-000" required>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="enderecoConsultorio">Endereço do Consultório*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-map input-icon"></i>
+                    <input type="text" id="enderecoConsultorio" name="enderecoConsultorio" placeholder="Endereço completo" required readonly>
+                  </div>
+                </div>
+              </div>
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="numeroConsultorio">Número*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-hashtag input-icon"></i>
+                    <input type="text" id="numeroConsultorio" name="numeroConsultorio" placeholder="Número" required>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="telefoneConsultorio">Telefone do Consultório*</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-phone-alt input-icon"></i>
+                    <input type="tel" id="telefoneConsultorio" name="telefoneConsultorio" placeholder="(00) 0000-0000" required>
+                  </div>
+                </div>
+              </div>
+              <div class="terms-section">
+                <div class="terms-group">
+                  <input type="checkbox" id="termsAccept" name="termsAccept" required>
+                  <label for="termsAccept">
+                    Li e aceito os <a href="/client/views/termos.html" target="_blank">Termos de Uso e Política de Privacidade</a>
+                  </label>
+                </div>
+              </div>
+              <div class="button-container">
+                <button type="button" class="prev-btn" data-step="3">
+                  <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+                <button type="submit" class="submit-btn">
+                  <i class="fas fa-user-plus"></i> Criar Conta
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-footer">
+            <p class="login-link">Já tem uma conta? <a href="login.html">Faça login</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
-  <script src="../public/js/register.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script src="https://unpkg.com/imask"></script>
+  <script>
+    // Script de teste para verificar se o JavaScript está funcionando
+    console.log('Teste de JavaScript');
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      console.error('Erro:', msg, 'URL:', url, 'Linha:', lineNo, 'Coluna:', columnNo, 'Erro:', error);
+      return false;
+    };
+  </script>
+  <script src="/client/public/js/register.js"></script>
 </body>
 </html>

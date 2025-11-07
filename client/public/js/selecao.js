@@ -1,6 +1,45 @@
-const inputCPF = document.querySelector('.input-cpf');
-const btnAcesso = document.querySelector('.btn-acesso');
+import { API_URL } from './config.js';
+
+const inputCPF = document.getElementById('input-cpf');
+const inputCodigo = document.getElementById('input-codigo');
+const btnAcesso = document.querySelector('#btn-acesso');
 const msgErro = document.getElementById('mensagem-erro');
+const codigoGroup = document.getElementById('codigo-group');
+const logoutBtn = document.getElementById('logoutBtn');
+
+let cpfValido = false;
+
+// Função de logout
+logoutBtn.addEventListener('click', () => {
+  Swal.fire({
+    title: 'Sair da conta?',
+    text: 'Tem certeza que deseja fazer logout?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Sim, Sair',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#00324A',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('pacienteSelecionado');
+      localStorage.removeItem('tokenPaciente');
+      
+      Swal.fire({
+        title: 'Logout realizado!',
+        text: 'Você foi desconectado com sucesso.',
+        icon: 'success',
+        confirmButtonColor: '#00324A',
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        window.location.href = 'login.html';
+      });
+    }
+  });
+});
 
 // Máscara de CPF (formata conforme digita)
 inputCPF.addEventListener('input', () => {
@@ -9,6 +48,12 @@ inputCPF.addEventListener('input', () => {
   value = value.replace(/(\d{3})(\d)/, '$1.$2');
   value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
   inputCPF.value = value;
+});
+
+// Máscara para código de acesso (apenas números, máximo 6 dígitos)
+inputCodigo.addEventListener('input', () => {
+  let value = inputCodigo.value.replace(/\D/g, '').slice(0, 6);
+  inputCodigo.value = value;
 });
 
 // Clique no botão "Solicitar Acesso"
@@ -25,29 +70,138 @@ btnAcesso.addEventListener('click', async () => {
     return;
   }
 
-  try {
-    const token = localStorage.getItem('token');
+  // Se ainda não validou o CPF, faz a primeira verificação
+  if (!cpfValido) {
+    await verificarCPF(cpfLimpo);
+  } else {
+    // Se CPF já foi validado, agora busca com código
+    await buscarComCodigo(cpfLimpo);
+  }
+});
 
-    const res = await fetch(`http://localhost:65432/api/pacientes/buscar?cpf=${cpfLimpo}`, {
+// Função para enviar notificação ao paciente
+async function enviarNotificacaoPaciente(cpfLimpo) {
+  try {
+    // Buscar dados do médico logado
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const resMedico = await fetch(`${API_URL}/api/usuarios/perfil`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (resMedico.ok) {
+      const medico = await resMedico.json();
+      
+      // Enviar notificação
+      await fetch(`${API_URL}/api/access-code/notificar-solicitacao`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          cpf: cpfLimpo,
+          medicoNome: medico.nome,
+          especialidade: medico.areaAtuacao || medico.especialidade
+        })
+      });
+      
+      console.log('✅ Notificação enviada ao paciente');
+    }
+  } catch (error) {
+    console.log('⚠️ Não foi possível enviar notificação:', error);
+  }
+}
+
+// Função para verificar se o CPF existe
+async function verificarCPF(cpfLimpo) {
+  try {
+    const res = await fetch(`${API_URL}/api/pacientes/buscar?cpf=${cpfLimpo}`, {
+      method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       }
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      msgErro.textContent = `⚠️ ${data.message || 'Erro ao buscar paciente.'}`;
+      msgErro.textContent = `⚠️ ${data.message || 'CPF não encontrado.'}`;
       msgErro.classList.add('ativo');
       return;
     }
 
-    // Armazena os dados e redireciona
-    localStorage.setItem('pacienteSelecionado', JSON.stringify(data));
-    window.location.href = 'perfilPaciente.html'; //mudando aquii
+    cpfValido = true;
+    codigoGroup.style.display = 'block';
+    btnAcesso.textContent = 'Acessar com Código';
+    inputCodigo.focus();
+    
+    msgErro.textContent = '✅ CPF encontrado! Digite o código de acesso do paciente.';
+    msgErro.classList.add('ativo');
+    msgErro.style.color = '#4CAF50';
+
+    // Enviar notificação ao paciente
+    await enviarNotificacaoPaciente(cpfLimpo);
+
   } catch (err) {
     console.error(err);
     msgErro.textContent = '⚠️ Erro de conexão com o servidor.';
     msgErro.classList.add('ativo');
   }
-});
+}
+
+// Função para buscar paciente com CPF + código
+async function buscarComCodigo(cpfLimpo) {
+  const codigoAcesso = inputCodigo.value.replace(/\D/g, '');
+
+  if (!codigoAcesso || codigoAcesso.length !== 6) {
+    msgErro.textContent = '⚠️ Código de acesso inválido. Digite os 6 dígitos.';
+    msgErro.classList.add('ativo');
+    return;
+  }
+
+  try {
+    const requestBody = {
+      cpf: cpfLimpo,
+      codigoAcesso: codigoAcesso
+    };
+
+    const token = localStorage.getItem('token');
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${API_URL}/api/pacientes/buscar-com-codigo`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(requestBody)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      msgErro.textContent = `⚠️ ${data.message || 'Código de acesso inválido ou expirado.'}`;
+      msgErro.classList.add('ativo');
+      return;
+    }
+
+    localStorage.setItem('pacienteSelecionado', JSON.stringify(data));
+
+    const cpfCodificado = cpfLimpo.replace(/[^\d]/g, '');
+    const tokenPaciente = btoa(JSON.stringify({ cpf: cpfCodificado }));
+    localStorage.setItem('tokenPaciente', tokenPaciente);
+
+    window.location.href = 'perfilPaciente.html';
+  } catch (err) {
+    console.error(err);
+    msgErro.textContent = '⚠️ Erro de conexão com o servidor.';
+    msgErro.classList.add('ativo');
+  }
+}

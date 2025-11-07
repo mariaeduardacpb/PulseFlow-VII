@@ -6,7 +6,20 @@ export const salvarCiclo = async (req, res) => {
   try {
     const { cpf, dataInicio, dataFim } = req.body;
 
-    const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+    // Tentar buscar com CPF limpo primeiro
+    let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    
+    // Se não encontrar, tentar com CPF formatado
+    if (!paciente) {
+      const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+    
+    // Se ainda não encontrar, tentar com o CPF original
+    if (!paciente) {
+      paciente = await Paciente.findOne({ cpf: cpf });
+    }
+
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
@@ -20,7 +33,6 @@ export const salvarCiclo = async (req, res) => {
     await novoCiclo.save();
     res.status(201).json({ message: 'Ciclo salvo com sucesso!' });
   } catch (err) {
-    console.error('Erro ao salvar ciclo:', err);
     res.status(500).json({ message: 'Erro interno ao salvar ciclo' });
   }
 };
@@ -28,101 +40,74 @@ export const salvarCiclo = async (req, res) => {
 export const listarCiclos = async (req, res) => {
   try {
     const { cpf } = req.params;
-    console.log(`[listarCiclos] Recebido CPF: ${cpf}`);
 
-    const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
-    console.log(`[listarCiclos] Paciente encontrado: ${paciente ? paciente._id : 'Nenhum'}`);
+    // Tentar buscar com CPF limpo primeiro
+    let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    
+    // Se não encontrar, tentar com CPF formatado
+    if (!paciente) {
+      const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+    
+    // Se ainda não encontrar, tentar com o CPF original
+    if (!paciente) {
+      paciente = await Paciente.findOne({ cpf: cpf });
+    }
 
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
 
-    const pacienteObjectId = paciente._id;
-    const query = { pacienteId: pacienteObjectId };
-    console.log(`[listarCiclos] Executando consulta: ${JSON.stringify(query)}`);
-
-    const ciclos = await CicloMenstrual.find({ pacienteId: new mongoose.Types.ObjectId(paciente._id) });
-    console.log(`[listarCiclos] Resultado da consulta (quantidade): ${ciclos.length}`);
-    console.log(`[listarCiclos] Resultado da consulta (dados): ${JSON.stringify(ciclos, null, 2)}`);
-
-    ciclos.forEach((ciclo, index) => {
-      console.log(`[listarCiclos] Ciclo ${index + 1}:`, {
-        id: ciclo._id,
-        dataInicio: ciclo.dataInicio,
-        dataFim: ciclo.dataFim,
-        pacienteId: ciclo.pacienteId,
-        rawData: ciclo.toObject()
-      });
-    });
-
-    const ciclosJSON = JSON.stringify(ciclos);
-    console.log(`[listarCiclos] Ciclos serializados: ${ciclosJSON}`);
+    const ciclos = await CicloMenstrual.find({ pacienteId: paciente._id })
+      .populate('pacienteId', 'name nome cpf email')
+      .sort({ dataInicio: -1 });
 
     res.status(200).json(ciclos);
   } catch (err) {
-    console.error('Erro ao buscar ciclos:', err);
     res.status(500).json({ message: 'Erro interno ao buscar ciclos' });
   }
 };
 
-export const debugCiclos = async (req, res) => {
+// Médico busca ciclos de um paciente pelo CPF
+export const buscarCiclosMedico = async (req, res) => {
   try {
-    const { cpf } = req.params;
-    console.log(`[debugCiclos] Recebido CPF: ${cpf}`);
+    const { cpf } = req.query;
 
-    // Buscar todos os ciclos no banco
-    const todosCiclos = await CicloMenstrual.find({});
-    console.log(`[debugCiclos] Total de ciclos no banco: ${todosCiclos.length}`);
-
-    // Buscar ciclos do paciente específico
-    const paciente = await Paciente.findOne({ cpf: cpf.replace(/[^\d]/g, '') });
+    // Tentar buscar com CPF limpo primeiro
+    let paciente = await Paciente.findOne({ cpf: cpf?.replace(/[^\d]/g, '') });
+    
+    // Se não encontrar, tentar com CPF formatado
     if (!paciente) {
-      return res.status(404).json({ 
-        message: 'Paciente não encontrado',
-        debug: {
-          totalCiclos: todosCiclos.length,
-          ciclosEncontrados: todosCiclos.map(c => ({
-            id: c._id,
-            pacienteId: c.pacienteId,
-            dataInicio: c.dataInicio,
-            dataFim: c.dataFim
-          }))
-        }
-      });
+      const cpfFormatado = cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      paciente = await Paciente.findOne({ cpf: cpfFormatado });
+    }
+    
+    // Se ainda não encontrar, tentar com o CPF original
+    if (!paciente) {
+      paciente = await Paciente.findOne({ cpf: cpf });
     }
 
-    const ciclosPaciente = await CicloMenstrual.find({ 
-      pacienteId: new mongoose.Types.ObjectId(paciente._id) 
-    });
+    if (!paciente) {
+      return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
 
-    console.log(`[debugCiclos] Ciclos do paciente:`, {
-      pacienteId: paciente._id,
-      cpf: cpf,
-      totalCiclos: ciclosPaciente.length,
-      ciclos: ciclosPaciente.map(c => ({
-        id: c._id,
-        dataInicio: c.dataInicio,
-        dataFim: c.dataFim
-      }))
-    });
+    console.log('Paciente encontrado:', paciente._id);
+    console.log('Buscando ciclos para pacienteId:', paciente._id);
+    
+    // Debug: buscar todos os ciclos
+    const todosCiclos = await CicloMenstrual.find({});
+    console.log('Total de ciclos no banco:', todosCiclos.length);
+    console.log('Primeiro ciclo:', todosCiclos[0]);
+    
+    const ciclos = await CicloMenstrual.find({ pacienteId: paciente._id })
+      .populate('pacienteId', 'name nome cpf email')
+      .sort({ dataInicio: -1 });
 
-    res.status(200).json({
-      message: 'Debug de ciclos',
-      debug: {
-        totalCiclosNoBanco: todosCiclos.length,
-        ciclosDoPaciente: ciclosPaciente.length,
-        ciclos: ciclosPaciente.map(c => ({
-          id: c._id,
-          dataInicio: c.dataInicio,
-          dataFim: c.dataFim
-        }))
-      }
-    });
-  } catch (err) {
-    console.error('Erro ao debugar ciclos:', err);
-    res.status(500).json({ 
-      message: 'Erro interno ao debugar ciclos',
-      error: err.message
-    });
+    console.log('Ciclos encontrados:', ciclos.length);
+    res.json(ciclos);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro interno do servidor' });
   }
 };
+

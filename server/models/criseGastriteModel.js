@@ -40,4 +40,4 @@ const criseGastriteSchema = new mongoose.Schema({
     timestamps: true
 });
 
-export const CriseGastrite = mongoose.model('CriseGastrite', criseGastriteSchema); 
+export const CriseGastrite = mongoose.model('CriseGastrite', criseGastriteSchema, 'crisegastrites'); 

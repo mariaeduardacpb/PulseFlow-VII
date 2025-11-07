@@ -5,7 +5,8 @@ import {
     obterRegistros,
     obterRegistro,
     atualizarRegistro,
-    excluirRegistro
+    excluirRegistro,
+    buscarMenstruacaoMedico
 } from '../controllers/menstruacaoController.js';
 
 const router = express.Router();
@@ -15,6 +16,7 @@ router.use(authMiddleware);
 
 // Rotas para registros de menstruação
 router.post('/', criarRegistro);
+router.get('/medico', buscarMenstruacaoMedico);
 router.get('/:cpf', obterRegistros);
 router.get('/:cpf/:id', obterRegistro);
 router.put('/:cpf/:id', atualizarRegistro);

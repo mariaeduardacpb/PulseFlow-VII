@@ -10,5 +10,5 @@ const anotacaoSchema = new mongoose.Schema({
   anotacao: { type: String, required: true }
 }, { timestamps: true });
 
-const AnotacaoMedica = mongoose.model('AnotacaoMedica', anotacaoSchema);
+const AnotacaoMedica = mongoose.model('AnotacaoMedica', anotacaoSchema, 'anotacaomedicas');
 export default AnotacaoMedica;
