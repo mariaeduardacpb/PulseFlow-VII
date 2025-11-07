@@ -896,6 +896,7 @@ body {
   animation: fadeIn 1.5s ease;
   position: relative;
   overflow: hidden;
+  margin-top: 4rem;
 }
 
 .main-footer::before {
@@ -952,6 +953,25 @@ body {
   display: block;
 }
 
+.social-icons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.social-icons a:hover {
+  transform: translateY(-3px);
+  color: white;
+}
+
+.social-icons a svg {
+  width: 38px;
+  height: 38px;
+  transition: all 0.3s ease;
+}
+
 .footer-section {
   display: flex;
   flex-direction: column;
@@ -996,6 +1016,11 @@ body {
   display: inline-block;
   position: relative;
   padding-left: 0;
+}
+
+.footer-links a:hover {
+  color: white;
+  padding-left: 8px;
 }
 
 .footer-bottom {
