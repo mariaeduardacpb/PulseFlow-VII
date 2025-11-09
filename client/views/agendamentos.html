@@ -15,203 +15,147 @@
   <div id="sidebar-component"></div>
   
   <div class="container">
-    <div class="page-header">
-      <div class="header-title">
-        <h1><i class="fas fa-calendar-alt"></i> Agendamentos</h1>
-        <p class="header-subtitle">Gerencie suas consultas de forma eficiente</p>
-      </div>
-      <button id="novoAgendamentoBtn" class="btn-primary">
-        <i class="fas fa-plus"></i> Novo Agendamento
-      </button>
-    </div>
-
-    <!-- Filtros -->
-    <div class="filters-section">
-      <div class="filter-group">
-        <label for="filtroStatus">Status</label>
-        <select id="filtroStatus" class="filter-select">
-          <option value="">Todos</option>
-          <option value="agendada">Agendada</option>
-          <option value="confirmada">Confirmada</option>
-          <option value="realizada">Realizada</option>
-          <option value="cancelada">Cancelada</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label for="filtroDataInicio">Data Início</label>
-        <input type="date" id="filtroDataInicio" class="filter-input">
-      </div>
-      <div class="filter-group">
-        <label for="filtroDataFim">Data Fim</label>
-        <input type="date" id="filtroDataFim" class="filter-input">
-      </div>
-      <div class="filter-group">
-        <button id="aplicarFiltrosBtn" class="btn-secondary">
-          <i class="fas fa-filter"></i> Aplicar
-        </button>
-        <button id="limparFiltrosBtn" class="btn-secondary">
-          <i class="fas fa-times"></i> Limpar
+    <div class="content-wrapper">
+      <div class="page-header">
+        <div class="header-title">
+          <h1><i class="fas fa-calendar-alt"></i> Agendamentos</h1>
+          <p class="header-subtitle">Gerencie suas consultas de forma eficiente</p>
+          <div class="header-badges">
+            <span class="badge"><i class="fas fa-rotate"></i> Atualizado em tempo real</span>
+            <span class="badge"><i class="fas fa-shield-check"></i> Dados protegidos</span>
+          </div>
+        </div>
+        <button id="novoAgendamentoBtn" class="btn-primary">
+          <i class="fas fa-plus"></i> Novo Agendamento
         </button>
       </div>
-    </div>
 
-    <!-- Estatísticas -->
-    <div class="stats-section">
-      <div class="stat-card">
-        <div class="stat-icon stat-agendada">
-          <i class="fas fa-clock"></i>
+      <!-- Filtros -->
+      <div class="filters-section">
+        <div class="filters-header">
+          <div class="filters-title">
+            <h2><i class="fas fa-sliders-h"></i> Filtros avançados</h2>
+            <p>Combine filtros para localizar rapidamente um agendamento específico</p>
+          </div>
+          <div class="filters-meta">
+            <span><i class="fas fa-bullseye"></i> Resultados sob medida</span>
+            <span><i class="fas fa-magnifying-glass-chart"></i> Insights precisos</span>
+          </div>
         </div>
-        <div class="stat-info">
-          <div class="stat-value" id="statAgendadas">0</div>
-          <div class="stat-label">Agendadas</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon stat-confirmada">
-          <i class="fas fa-check-circle"></i>
-        </div>
-        <div class="stat-info">
-          <div class="stat-value" id="statConfirmadas">0</div>
-          <div class="stat-label">Confirmadas</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon stat-realizada">
-          <i class="fas fa-check-double"></i>
-        </div>
-        <div class="stat-info">
-          <div class="stat-value" id="statRealizadas">0</div>
-          <div class="stat-label">Realizadas</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon stat-cancelada">
-          <i class="fas fa-times-circle"></i>
-        </div>
-        <div class="stat-info">
-          <div class="stat-value" id="statCanceladas">0</div>
-          <div class="stat-label">Canceladas</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Lista de Agendamentos -->
-    <div class="agendamentos-section">
-      <div id="loadingAgendamentos" class="loading" style="display: none;">
-        <i class="fas fa-spinner fa-spin"></i> Carregando agendamentos...
-      </div>
-      <div id="listaAgendamentos" class="agendamentos-list">
-        <!-- Agendamentos serão inseridos aqui via JavaScript -->
-      </div>
-      <div id="semAgendamentos" class="empty-state" style="display: none;">
-        <i class="fas fa-calendar-times"></i>
-        <p>Nenhum agendamento encontrado</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Novo/Editar Agendamento -->
-  <div id="modalAgendamento" class="modal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitulo">Novo Agendamento</h2>
-        <button class="modal-close" id="fecharModal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <form id="formAgendamento">
-        <input type="hidden" id="agendamentoId">
-        
-        <div class="form-group">
-          <label for="pacienteId">Paciente *</label>
-          <select id="pacienteId" class="form-input" required>
-            <option value="">Selecione um paciente</option>
-            <!-- Pacientes serão carregados via JavaScript -->
+        <div class="filter-group">
+          <label for="filtroStatus">Status</label>
+          <select id="filtroStatus" class="filter-select">
+            <option value="">Todos</option>
+            <option value="agendada">Agendada</option>
+            <option value="confirmada">Confirmada</option>
+            <option value="realizada">Realizada</option>
+            <option value="cancelada">Cancelada</option>
           </select>
         </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="dataHora">Data e Hora *</label>
-            <input type="datetime-local" id="dataHora" class="form-input" required>
-          </div>
-          <div class="form-group">
-            <label for="duracao">Duração (minutos) *</label>
-            <input type="number" id="duracao" class="form-input" value="30" min="15" step="15" required>
-          </div>
+        <div class="filter-group">
+          <label for="filtroDataInicio">Data Início</label>
+          <input type="date" id="filtroDataInicio" class="filter-input">
         </div>
-
-        <div class="form-group">
-          <label for="tipoConsulta">Tipo de Consulta *</label>
-          <select id="tipoConsulta" class="form-input" required>
-            <option value="presencial">Presencial</option>
-            <option value="online">Online</option>
-            <option value="domiciliar">Domiciliar</option>
-          </select>
+        <div class="filter-group">
+          <label for="filtroDataFim">Data Fim</label>
+          <input type="date" id="filtroDataFim" class="filter-input">
         </div>
-
-        <div class="form-group">
-          <label for="motivoConsulta">Motivo da Consulta *</label>
-          <textarea id="motivoConsulta" class="form-input" rows="3" required></textarea>
+        <div class="filter-group">
+          <button id="limparFiltrosBtn" class="btn-secondary">
+            <i class="fas fa-times"></i> Limpar
+          </button>
         </div>
+      </div>
 
-        <div class="form-group">
-          <label for="observacoes">Observações</label>
-          <textarea id="observacoes" class="form-input" rows="3"></textarea>
+      <div class="section-heading">
+        <div class="section-heading-text">
+          <h2>Resumo geral</h2>
+          <p>Indicadores atualizados dos atendimentos em cada etapa</p>
         </div>
+      </div>
 
-        <!-- Campos condicionais para endereço (presencial/domiciliar) -->
-        <div id="enderecoFields" style="display: none;">
-          <h3>Endereço</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="enderecoCep">CEP</label>
-              <input type="text" id="enderecoCep" class="form-input">
-            </div>
-            <div class="form-group">
-              <label for="enderecoLogradouro">Logradouro</label>
-              <input type="text" id="enderecoLogradouro" class="form-input">
-            </div>
+      <!-- Estatísticas -->
+      <div class="stats-section">
+        <div class="stat-card">
+          <div class="stat-icon stat-agendada">
+            <i class="fas fa-clock"></i>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="enderecoNumero">Número</label>
-              <input type="text" id="enderecoNumero" class="form-input">
-            </div>
-            <div class="form-group">
-              <label for="enderecoComplemento">Complemento</label>
-              <input type="text" id="enderecoComplemento" class="form-input">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="enderecoBairro">Bairro</label>
-              <input type="text" id="enderecoBairro" class="form-input">
-            </div>
-            <div class="form-group">
-              <label for="enderecoCidade">Cidade</label>
-              <input type="text" id="enderecoCidade" class="form-input">
-            </div>
-            <div class="form-group">
-              <label for="enderecoEstado">Estado</label>
-              <input type="text" id="enderecoEstado" class="form-input" maxlength="2">
-            </div>
+          <div class="stat-info">
+            <div class="stat-value" id="statAgendadas">0</div>
+            <div class="stat-label">Agendadas</div>
           </div>
         </div>
-
-        <!-- Campo condicional para link de videochamada (online) -->
-        <div id="linkVideoFields" style="display: none;">
-          <div class="form-group">
-            <label for="linkVideochamada">Link da Videochamada</label>
-            <input type="url" id="linkVideochamada" class="form-input" placeholder="https://...">
+        <div class="stat-card">
+          <div class="stat-icon stat-confirmada">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="statConfirmadas">0</div>
+            <div class="stat-label">Confirmadas</div>
           </div>
         </div>
-
-        <div class="modal-actions">
-          <button type="button" id="cancelarFormBtn" class="btn-secondary">Cancelar</button>
-          <button type="submit" class="btn-primary">Salvar</button>
+        <div class="stat-card">
+          <div class="stat-icon stat-realizada">
+            <i class="fas fa-check-double"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="statRealizadas">0</div>
+            <div class="stat-label">Realizadas</div>
+          </div>
         </div>
-      </form>
+        <div class="stat-card">
+          <div class="stat-icon stat-cancelada">
+            <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="statCanceladas">0</div>
+            <div class="stat-label">Canceladas</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-legend">
+        <span class="legend-pill">
+          <i class="fas fa-dot-circle status-agendada"></i> Agendada
+        </span>
+        <span class="legend-pill">
+          <i class="fas fa-dot-circle status-confirmada"></i> Confirmada
+        </span>
+        <span class="legend-pill">
+          <i class="fas fa-dot-circle status-realizada"></i> Realizada
+        </span>
+        <span class="legend-pill">
+          <i class="fas fa-dot-circle status-cancelada"></i> Cancelada
+        </span>
+      </div>
+
+      <!-- Lista de Agendamentos -->
+      <div class="agendamentos-section">
+        <div class="agendamentos-header">
+          <div class="agendamentos-title">
+            <h2>Próximos agendamentos</h2>
+            <p>Visualize, confirme e acompanhe cada etapa do atendimento com clareza</p>
+          </div>
+          <div class="agendamentos-toolbar">
+            <button class="view-toggle active" type="button">
+              <i class="fas fa-list-ul"></i>
+            </button>
+            <button class="view-toggle" type="button" disabled title="Em breve">
+              <i class="fas fa-table-cells-large"></i>
+            </button>
+          </div>
+        </div>
+        <div id="loadingAgendamentos" class="loading" style="display: none;">
+          <i class="fas fa-spinner fa-spin"></i> Carregando agendamentos...
+        </div>
+        <div id="listaAgendamentos" class="agendamentos-list">
+          <!-- Agendamentos serão inseridos aqui via JavaScript -->
+        </div>
+        <div id="semAgendamentos" class="empty-state" style="display: none;">
+          <i class="fas fa-calendar-times"></i>
+          <p>Nenhum agendamento encontrado</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -225,17 +169,26 @@
         </button>
       </div>
       <div id="detalhesConteudo" class="detalhes-content">
-        <!-- Conteúdo será preenchido via JavaScript -->
+        <!-- Conteúdo preenchido via JavaScript -->
       </div>
       <div class="modal-actions">
         <button type="button" id="fecharDetalhesBtn" class="btn-secondary">Fechar</button>
-        <button type="button" id="editarDetalhesBtn" class="btn-primary">Editar</button>
+        <div class="modal-actions-right">
+          <button type="button" id="reagendarAgendamentoBtn" class="btn-primary" style="display: none;">
+            <i class="fas fa-undo"></i>
+            Reagendar
+          </button>
+          <button type="button" id="cancelarAgendamentoBtn" class="btn-danger">
+            <i class="fas fa-ban"></i>
+            Cancelar agendamento
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
-  <script type="module" src="/client/public/js/agendamentos.js"></script>
+  <script src="/client/public/js/agendamentos.js"></script>
 </body>
 </html>
 

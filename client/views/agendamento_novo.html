@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Novo Agendamento</title>
+  <link rel="stylesheet" href="/client/public/css/agendamento_novo.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
+
+  <div class="container">
+    <div class="content-wrapper">
+      <header class="page-hero">
+        <div class="hero-content">
+          <button class="hero-back" id="voltarLista">
+            <i class="fas fa-arrow-left"></i>
+            Voltar para agendamentos
+          </button>
+          <div class="hero-text">
+            <span class="hero-kicker">Agenda inteligente</span>
+            <h1>Configure a próxima consulta do seu paciente</h1>
+            <p>Defina data, horário, formato do atendimento e capture os detalhes clínicos essenciais com a experiência PulseFlow.</p>
+          </div>
+        </div>
+        <div class="hero-illustration">
+          <div class="hero-card">
+            <span class="hero-card-icon"><i class="fas fa-calendar-check"></i></span>
+            <strong>Agenda integrada</strong>
+            <p>Sincronize horários da equipe e evite conflitos de consultas.</p>
+          </div>
+          <div class="hero-card secondary">
+            <span class="hero-card-icon"><i class="fas fa-bell"></i></span>
+            <strong>Notificações inteligentes</strong>
+            <p>Lembretes automáticos para pacientes e profissionais.</p>
+          </div>
+        </div>
+      </header>
+
+      <form id="formNovoAgendamento" class="appointment-form">
+        <div class="summary-panel">
+          <div class="summary-header">
+            <h2>Resumo rápido</h2>
+            <p>Revise os principais pontos antes de confirmar o agendamento.</p>
+          </div>
+          <div class="summary-grid" id="resumoAgendamento">
+            <div class="summary-item">
+              <span class="summary-label">Paciente</span>
+              <span class="summary-value">Informe os dados ao lado</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Data & horário</span>
+              <span class="summary-value">Selecione a agenda disponível</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Formato</span>
+              <span class="summary-value">Presencial / Teleconsulta</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Status</span>
+              <span class="summary-status badge badge-agendada">Pré-visualização</span>
+            </div>
+          </div>
+        </div>
+
+        <section class="form-section">
+          <header class="section-header">
+            <span class="section-icon"><i class="fas fa-user"></i></span>
+            <div class="section-text">
+              <h2>Dados do paciente</h2>
+              <p>Identifique rapidamente quem será atendido.</p>
+            </div>
+            <button type="button" class="section-action">
+              <i class="fas fa-address-book"></i>
+              Buscar cadastro
+            </button>
+          </header>
+          <div class="form-grid two-columns">
+            <div class="input-group">
+              <label for="nomePaciente">Nome do paciente *</label>
+              <input type="text" id="nomePaciente" name="nomePaciente" placeholder="Digite o nome completo" required>
+            </div>
+            <div class="input-group">
+              <label for="contatoPaciente">Contato (opcional)</label>
+              <input type="tel" id="contatoPaciente" name="contatoPaciente" placeholder="(00) 00000-0000">
+            </div>
+            <div class="input-group span-two">
+              <label for="observacoesPaciente">Informações relevantes do prontuário</label>
+              <textarea id="observacoesPaciente" rows="3" placeholder="Alergias, preferências de contato, instruções especiais"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <header class="section-header">
+            <span class="section-icon"><i class="fas fa-calendar-check"></i></span>
+            <div class="section-text">
+              <h2>Informações do agendamento</h2>
+              <p>Escolha data, horário e duração da consulta.</p>
+            </div>
+            <button type="button" class="section-action secondary">
+              <i class="fas fa-clock"></i>
+              Ver agenda da semana
+            </button>
+          </header>
+          <div class="form-grid three-columns">
+            <div class="input-group">
+              <label for="dataConsulta">Data *</label>
+              <input type="date" id="dataConsulta" name="dataConsulta" required>
+            </div>
+            <div class="input-group">
+              <label for="horaConsulta">Horário *</label>
+              <input type="time" id="horaConsulta" name="horaConsulta" required>
+            </div>
+            <div class="input-group">
+              <label for="duracaoConsulta">Duração (minutos)</label>
+              <input type="number" id="duracaoConsulta" name="duracaoConsulta" min="15" step="15" value="30">
+            </div>
+          </div>
+          <div class="form-grid two-columns">
+            <div class="input-group select-group">
+              <label for="tipoAtendimento">Tipo de atendimento</label>
+              <div class="select-wrapper">
+                <select id="tipoAtendimento" name="tipoAtendimento">
+                  <option value="presencial" selected>Presencial</option>
+                  <option value="online">Teleconsulta</option>
+                  <option value="domiciliar">Visita domiciliar</option>
+                </select>
+                <span class="select-icon"><i class="fas fa-chevron-down"></i></span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="localAtendimento">Local (se presencial/domiciliar)</label>
+              <input type="text" id="localAtendimento" name="localAtendimento" placeholder="Informe endereço ou sala">
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <header class="section-header">
+            <span class="section-icon"><i class="fas fa-notes-medical"></i></span>
+            <div class="section-text">
+              <h2>Detalhes clínicos</h2>
+              <p>Inclua o motivo da consulta e orientações adicionais.</p>
+            </div>
+          </header>
+          <div class="form-grid">
+            <div class="input-group">
+              <label for="motivoConsulta">Motivo da consulta *</label>
+              <textarea id="motivoConsulta" name="motivoConsulta" rows="4" placeholder="Descreva o motivo principal do atendimento" required></textarea>
+            </div>
+            <div class="input-group">
+              <label for="observacoesConsulta">Observações (opcional)</label>
+              <textarea id="observacoesConsulta" name="observacoesConsulta" rows="3" placeholder="Instruções, preparo ou observações adicionais"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <div class="actions-left">
+            <button type="button" class="btn-ghost" id="cancelarCadastro">
+              <i class="fas fa-arrow-left"></i>
+              Descartar e voltar
+            </button>
+          </div>
+          <div class="actions-right">
+            <button type="button" class="btn-secondary" id="enviarConfirmacao">
+              <i class="fas fa-paper-plane"></i>
+              Enviar confirmação
+            </button>
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-save"></i>
+              Salvar agendamento
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script src="/client/public/js/agendamento_novo.js"></script>
+</body>
+</html>
+
