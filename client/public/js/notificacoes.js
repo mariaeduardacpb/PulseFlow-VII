@@ -1,5 +1,5 @@
 import { API_URL } from '/client/public/js/config.js';
-import { db, collection, getDocs, orderBy, query, limit } from '/client/public/js/firebaseClient.js';
+import { getDb, collection, getDocs, orderBy, query, limit } from '/client/public/js/firebaseClient.js';
 
 const STORAGE_KEY = 'pf_notifications';
 let currentFilter = 'all';
@@ -219,38 +219,44 @@ async function fetchNotificationsFromApi() {
 }
 
 async function fetchNotificationsFromFirestore() {
-  if (!db) {
+  try {
+    const db = await getDb();
+    if (!db) {
+      return [];
+    }
+
+    const collectionsToTry = ['notificacoes', 'notifications'];
+
+    for (const collectionName of collectionsToTry) {
+      try {
+        const snapshot = await getDocs(
+          query(
+            collection(db, collectionName),
+            orderBy('criadoEm', 'desc'),
+            limit(50)
+          )
+        );
+
+        if (!snapshot.empty) {
+          return snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              ...data,
+              id: doc.id,
+              createdAt: data.criadoEm || data.createdAt || data.created_at
+            };
+          });
+        }
+      } catch (error) {
+        console.warn(`Não foi possível ler notificações na coleção ${collectionName}:`, error);
+      }
+    }
+
+    return [];
+  } catch (error) {
+    console.warn('Erro ao inicializar Firebase:', error);
     return [];
   }
-
-  const collectionsToTry = ['notificacoes', 'notifications'];
-
-  for (const collectionName of collectionsToTry) {
-    try {
-      const snapshot = await getDocs(
-        query(
-          collection(db, collectionName),
-          orderBy('criadoEm', 'desc'),
-          limit(50)
-        )
-      );
-
-      if (!snapshot.empty) {
-        return snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            ...data,
-            id: doc.id,
-            createdAt: data.criadoEm || data.createdAt || data.created_at
-          };
-        });
-      }
-    } catch (error) {
-      console.warn(`Não foi possível ler notificações na coleção ${collectionName}:`, error);
-    }
-  }
-
-  return [];
 }
 
 async function synchronizeNotifications() {
