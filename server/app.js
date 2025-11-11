@@ -27,7 +27,6 @@ import geminiRoutes from './routes/geminiRoutes.js';
 import agendamentoRoutes from './routes/agendamentoRoutes.js';
 
 
-
 // Carregar variáveis de ambiente
 // dotenv.config() será chamado depois de definir __dirname
 const app = express();

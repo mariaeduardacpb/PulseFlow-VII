@@ -110,8 +110,7 @@ export const buscarEventosMedico = async (req, res) => {
 // Buscar um evento específico por ID
 export const buscarEventoPorId = async (req, res) => {
   try {
-    const { id } = req.params;
-    const evento = await EventoClinico.findById(id).populate('paciente', 'nome cpf dataNascimento');
+    const evento = req.evento || await EventoClinico.findById(req.params.id).populate('paciente', 'nome cpf dataNascimento');
     
     if (!evento) {
       return res.status(404).json({ message: 'Evento não encontrado' });

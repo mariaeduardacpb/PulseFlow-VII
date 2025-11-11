@@ -283,22 +283,37 @@ router.post('/:patientId/desconectar-medico', async (req, res) => {
   }
 });
 
-// Buscar paciente por CPF completo (usado no perfil)
-router.get('/perfil/:cpf', async (req, res) => {
-  const { cpf } = req.params;
-
+// Buscar paciente por CPF completo (usado no perfil) - verifica conexão ativa
+router.get('/perfil/:cpf', authMiddleware, async (req, res) => {
   try {
-    // Tentar buscar com CPF limpo primeiro
-    let paciente = await Paciente.findOne({ cpf: cpf.replace(/\D/g, '') });
+    const { cpf } = req.params;
+    const medicoId = req.user._id;
+
+    const cpfLimpo = cpf.replace(/\D/g, '');
     
-    // Se não encontrar, tentar com CPF formatado
+    let paciente = await Paciente.findOne({ cpf: cpfLimpo });
+    
     if (!paciente) {
-      const cpfFormatado = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      const cpfFormatado = cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
       paciente = await Paciente.findOne({ cpf: cpfFormatado });
     }
 
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
+
+    // Verificar conexão ativa
+    const conexaoAtiva = await ConexaoMedicoPaciente.findOne({
+      pacienteId: paciente._id,
+      medicoId: medicoId,
+      isActive: true
+    });
+
+    if (!conexaoAtiva) {
+      return res.status(403).json({ 
+        message: 'Acesso negado. Você não tem uma conexão ativa com este paciente. Por favor, solicite acesso novamente.',
+        codigo: 'CONEXAO_INATIVA'
+      });
     }
 
     res.json({
@@ -379,6 +394,20 @@ router.put('/perfil/:cpf', authMiddleware, async (req, res) => {
 
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
+
+    // Verificar conexão ativa
+    const conexaoAtiva = await ConexaoMedicoPaciente.findOne({
+      pacienteId: paciente._id,
+      medicoId: req.user._id,
+      isActive: true
+    });
+
+    if (!conexaoAtiva) {
+      return res.status(403).json({ 
+        message: 'Acesso negado. Você não tem uma conexão ativa com este paciente. Por favor, solicite acesso novamente.',
+        codigo: 'CONEXAO_INATIVA'
+      });
     }
 
     // Atualizar campos permitidos

@@ -84,18 +84,14 @@ export const buscarExamesPaciente = async (req, res) => {
 
 export const downloadExame = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const exame = await Exame.findById(id);
+    const exame = req.exame || await Exame.findById(req.params.id);
     if (!exame) {
       return res.status(404).json({ message: 'Exame não encontrado' });
     }
 
-    // Corrigir o caminho do arquivo
     const fileName = path.basename(exame.filePath);
-    const pacienteId = exame.paciente._id ? exame.paciente._id.toString() : exame.paciente.toString();
+    const pacienteId = req.pacienteId || (exame.paciente._id ? exame.paciente._id.toString() : exame.paciente.toString());
     
-    // Construir o caminho correto no servidor
     const filePath = path.join(process.cwd(), 'uploads', `paciente_${pacienteId}`, fileName);
 
     if (!fs.existsSync(filePath)) {

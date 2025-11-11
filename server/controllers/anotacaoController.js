@@ -84,8 +84,7 @@ export const buscarCategorias = async (req, res) => {
 
 export const buscarAnotacaoPorId = async (req, res) => {
   try {
-    const { id } = req.params;
-    const anotacao = await AnotacaoMedica.findById(id);
+    const anotacao = req.anotacao || await AnotacaoMedica.findById(req.params.id);
 
     if (!anotacao) {
       return res.status(404).json({ message: 'Anotação não encontrada' });
@@ -99,13 +98,13 @@ export const buscarAnotacaoPorId = async (req, res) => {
 
 export const deleteAnotacao = async (req, res) => {
   try {
-    const { id } = req.params;
-    const anotacao = await AnotacaoMedica.findByIdAndDelete(id);
-
+    const anotacao = req.anotacao || await AnotacaoMedica.findById(req.params.id);
+    
     if (!anotacao) {
       return res.status(404).json({ message: 'Anotação não encontrada' });
     }
 
+    await AnotacaoMedica.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Anotação excluída com sucesso' });
   } catch (error) {
     res.status(500).json({ message: 'Erro interno ao excluir anotação' });
