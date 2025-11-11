@@ -17,7 +17,7 @@ export function initHeaderComponent({ title = '' } = {}) {
           <span></span>
         </button>
         <div class="header-title-group">
-          <img class="header-logo" src="/client/public/assets/pulseLogo.png" alt="PulseFlow">
+          <img class="header-logo" src="/client/public/assets/PulseNegativo.png" alt="PulseFlow">
           <h1 class="header-title">${heading}</h1>
         </div>
       </div>

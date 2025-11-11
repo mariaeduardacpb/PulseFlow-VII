@@ -25,7 +25,6 @@ import perfilMedicoRoutes from './routes/perfilMedicoRoutes.js';
 import accessCodeRoutes from './routes/accessCodeRoutes.js';
 import geminiRoutes from './routes/geminiRoutes.js';
 import agendamentoRoutes from './routes/agendamentoRoutes.js';
-import firebaseRoutes from './routes/firebaseRoutes.js';
 
 
 // Carregar variáveis de ambiente
@@ -146,7 +145,6 @@ app.use('/api/eventos-clinicos', eventoClinicoRoutes);
 app.use('/api/access-code', accessCodeRoutes);
 app.use('/api/gemini', geminiRoutes);
 app.use('/api/agendamentos', agendamentoRoutes);
-app.use('/api/firebase', firebaseRoutes);
 
 
 // Middleware de erro
