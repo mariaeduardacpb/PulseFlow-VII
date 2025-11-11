@@ -1,83 +1,186 @@
 import { API_URL } from './config.js';
+import { initHeaderComponent } from '/client/public/js/components/header.js';
+import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
 
-const inputCPF = document.getElementById('input-cpf');
-const inputCodigo = document.getElementById('input-codigo');
-const btnAcesso = document.querySelector('#btn-acesso');
-const msgErro = document.getElementById('mensagem-erro');
-const codigoGroup = document.getElementById('codigo-group');
-const logoutBtn = document.getElementById('logoutBtn');
-
+let inputCPF;
+let inputCodigo;
+let btnAcesso;
+let msgErro;
+let codigoGroup;
 let cpfValido = false;
 
-// Função de logout
-logoutBtn.addEventListener('click', () => {
-  Swal.fire({
-    title: 'Sair da conta?',
-    text: 'Tem certeza que deseja fazer logout?',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: 'Sim, Sair',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#dc3545',
-    cancelButtonColor: '#00324A',
-    reverseButtons: true
-  }).then((result) => {
-    if (result.isConfirmed) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('pacienteSelecionado');
-      localStorage.removeItem('tokenPaciente');
-      
-      Swal.fire({
-        title: 'Logout realizado!',
-        text: 'Você foi desconectado com sucesso.',
-        icon: 'success',
-        confirmButtonColor: '#00324A',
-        timer: 1500,
-        showConfirmButton: false
-      }).then(() => {
-        window.location.href = 'login.html';
-      });
-    }
+async function init() {
+  initHeaderComponent({ title: 'Buscar Paciente' });
+  initDoctorSidebar('selecao');
+
+  const toggleButton = document.querySelector('.menu-toggle');
+  const sidebar = document.querySelector('.sidebar');
+
+  toggleButton?.addEventListener('click', () => {
+    sidebar?.classList.toggle('active');
+    toggleButton.classList.toggle('shifted');
   });
-});
 
-// Máscara de CPF (formata conforme digita)
-inputCPF.addEventListener('input', () => {
-  let value = inputCPF.value.replace(/\D/g, '').slice(0, 11);
-  value = value.replace(/(\d{3})(\d)/, '$1.$2');
-  value = value.replace(/(\d{3})(\d)/, '$1.$2');
-  value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-  inputCPF.value = value;
-});
+  await ensureProfile();
 
-// Máscara para código de acesso (apenas números, máximo 6 dígitos)
-inputCodigo.addEventListener('input', () => {
-  let value = inputCodigo.value.replace(/\D/g, '').slice(0, 6);
-  inputCodigo.value = value;
-});
+  inputCPF = document.getElementById('input-cpf');
+  inputCodigo = document.getElementById('input-codigo');
+  btnAcesso = document.querySelector('#btn-acesso');
+  msgErro = document.getElementById('mensagem-erro');
+  codigoGroup = document.getElementById('codigo-group');
 
-// Clique no botão "Solicitar Acesso"
-btnAcesso.addEventListener('click', async () => {
-  const cpfLimpo = inputCPF.value.replace(/\D/g, '');
+  bindLogout();
+  bindFormEvents();
+  bindInfoPanel();
 
-  // Limpa mensagens anteriores
-  msgErro.textContent = '';
-  msgErro.classList.remove('ativo');
+  const cpfSalvo = localStorage.getItem('cpfSelecionado');
+  if (cpfSalvo) {
+    inputCPF.value = formatarCPF(cpfSalvo);
+    cpfValido = true;
+    codigoGroup.style.display = 'block';
+    btnAcesso.textContent = 'Acessar com Código';
+  }
+}
 
-  if (!cpfLimpo || cpfLimpo.length !== 11) {
-    msgErro.textContent = '⚠️ CPF inválido. Verifique os 11 dígitos.';
-    msgErro.classList.add('ativo');
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+async function ensureProfile() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    await Swal.fire({
+      title: 'Erro',
+      text: 'Você precisa estar logado para acessar esta página',
+      icon: 'error',
+      confirmButtonText: 'Ir para Login',
+      confirmButtonColor: '#002A42'
+    });
+    window.location.href = '/client/views/login.html';
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Falha ao carregar dados do usuário.');
+    }
+
+    const data = await response.json();
+
+    if (window.updateDoctorSidebarInfo) {
+      window.updateDoctorSidebarInfo(data.nome, data.areaAtuacao, data.genero);
+    }
+
+    return data;
+  } catch (error) {
+    await Swal.fire({
+      title: 'Erro',
+      text: 'Não foi possível carregar suas informações. Faça login novamente.',
+      icon: 'error',
+      confirmButtonText: 'Ir para Login',
+      confirmButtonColor: '#002A42'
+    });
+    localStorage.removeItem('token');
+    window.location.href = '/client/views/login.html';
+    return null;
+  }
+}
+
+function bindLogout() {
+  const logoutBtn = document.getElementById('headerLogoutButton');
+  if (!logoutBtn) {
     return;
   }
 
-  // Se ainda não validou o CPF, faz a primeira verificação
-  if (!cpfValido) {
-    await verificarCPF(cpfLimpo);
-  } else {
-    // Se CPF já foi validado, agora busca com código
-    await buscarComCodigo(cpfLimpo);
-  }
-});
+  logoutBtn.addEventListener('click', () => {
+    Swal.fire({
+      title: 'Sair da conta?',
+      text: 'Tem certeza que deseja fazer logout?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, Sair',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#00324A',
+      reverseButtons: true
+    }).then(result => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('pacienteSelecionado');
+        localStorage.removeItem('tokenPaciente');
+
+        Swal.fire({
+          title: 'Logout realizado!',
+          text: 'Você foi desconectado com sucesso.',
+          icon: 'success',
+          confirmButtonColor: '#00324A',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = 'login.html';
+        });
+      }
+    });
+  });
+}
+
+function bindFormEvents() {
+  inputCPF.addEventListener('input', () => {
+    let value = inputCPF.value.replace(/\D/g, '').slice(0, 11);
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    inputCPF.value = value;
+  });
+
+  inputCodigo.addEventListener('input', () => {
+    let value = inputCodigo.value.replace(/\D/g, '').slice(0, 6);
+    inputCodigo.value = value;
+  });
+
+  btnAcesso.addEventListener('click', async () => {
+    const cpfLimpo = inputCPF.value.replace(/\D/g, '');
+
+    msgErro.textContent = '';
+    msgErro.classList.remove('ativo');
+
+    if (!cpfLimpo || cpfLimpo.length !== 11) {
+      msgErro.textContent = '⚠️ CPF inválido. Verifique os 11 dígitos.';
+      msgErro.classList.add('ativo');
+      return;
+    }
+
+    if (!cpfValido) {
+      await verificarCPF(cpfLimpo);
+    } else {
+      await buscarComCodigo(cpfLimpo);
+    }
+  });
+}
+
+function bindInfoPanel() {
+  document.querySelectorAll('.info-trigger').forEach(button => {
+    const panelId = button.getAttribute('aria-controls');
+    const panel = document.getElementById(panelId);
+    if (!panel) {
+      return;
+    }
+
+    button.addEventListener('click', () => {
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!expanded));
+      panel.classList.toggle('open', !expanded);
+    });
+  });
+}
 
 // Função para enviar notificação ao paciente
 async function enviarNotificacaoPaciente(cpfLimpo) {

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PulseFlow | Monitoramento de Insônia</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/client/public/css/perfilPaciente.css">
   <link rel="stylesheet" href="/client/public/css/insonia.css">
   <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
@@ -222,8 +223,52 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0/dist/chartjs-plugin-annotation.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
-  <script ></script>
-  <script ></script>
+  <script type="module">
+    import { initHeaderComponent } from '/client/public/js/components/header.js';
+    import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
+    import { API_URL } from '/client/public/js/config.js';
+
+    initHeaderComponent({ title: 'Monitoramento de Insônia' });
+    initDoctorSidebar('insonia');
+
+    const toggleButton = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+
+    if (toggleButton && sidebar) {
+      toggleButton.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        toggleButton.classList.toggle('shifted');
+      });
+    }
+
+    // Carregar dados do médico para atualizar o sidebar
+    async function loadDoctorInfo() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) return;
+
+        const medico = await response.json();
+        
+        // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
+        if (window.updateDoctorSidebarInfo) {
+          window.updateDoctorSidebarInfo(medico.nome, medico.areaAtuacao || 'Acompanhamento Integrado', medico.genero);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados do médico:', error);
+      }
+    }
+
+    loadDoctorInfo();
+  </script>
   <script src="/client/public/js/insonia.js"></script>
 </body>
 </html>

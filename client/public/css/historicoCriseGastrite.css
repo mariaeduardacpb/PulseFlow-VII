@@ -21,12 +21,12 @@ body {
 }
 
 .content {
-  width: calc(100vw - 300px);
-  max-width: calc(100vw - 300px);
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  min-height: 100vh;
   box-sizing: border-box;
   overflow-x: hidden;
   padding: 24px;
-  margin-left: 300px;
   padding-top: 100px;
 }
 
@@ -541,9 +541,8 @@ body {
 /* Responsividade */
 @media (max-width: 1200px) {
   .content {
-    width: calc(100vw - 250px);
-    max-width: calc(100vw - 250px);
-    margin-left: 250px;
+    margin-left: 260px;
+    width: calc(100% - 260px);
   }
   
   .stats-section {

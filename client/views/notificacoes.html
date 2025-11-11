@@ -7,58 +7,135 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/client/public/css/perfilPaciente.css">
   <link rel="stylesheet" href="/client/public/css/notificacoes.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
 </head>
 <body>
   <div id="header-component"></div>
   <div id="sidebar-component"></div>
-  
-  <div class="container">
-    <main class="content">
-      <section class="notifications-header">
-        <div class="header-top">
-          <h1><i class="fas fa-bell"></i> Notificações</h1>
-          <div class="header-actions">
-            <button id="markAllReadBtn" class="btn-mark-all">
-              <i class="fas fa-check-double"></i> Marcar todas como lidas
-            </button>
-            <button id="clearAllBtn" class="btn-clear-all">
-              <i class="fas fa-trash"></i> Limpar todas
-            </button>
-          </div>
+
+  <main class="notifications-shell">
+    <div class="notifications-container">
+      <header class="notifications-hero">
+        <div class="hero-text">
+          <span class="hero-eyebrow">Central</span>
+          <h1>Notificações</h1>
+          <p>Visualize e gerencie os avisos da plataforma em um só lugar.</p>
+        </div>
+        <div class="hero-actions">
+          <button type="button" class="hero-btn" data-action="mark-all">Marcar todas como lidas</button>
+          <button type="button" class="hero-btn ghost" data-action="clear-all">Limpar notificações</button>
+        </div>
+      </header>
+
+      <section class="notifications-summary">
+        <article class="summary-card">
+          <span class="summary-label">Pendentes</span>
+          <strong class="summary-value" id="summaryPending">0</strong>
+        </article>
+        <article class="summary-card">
+          <span class="summary-label">Respondidas</span>
+          <strong class="summary-value" id="summaryHandled">0</strong>
+        </article>
+        <article class="summary-card critical">
+          <span class="summary-label">Críticas</span>
+          <strong class="summary-value" id="summaryCritical">0</strong>
+        </article>
+      </section>
+
+      <section class="notifications-toolbar">
+        <div class="toolbar-title">
+          <h2>Filtros rápidos</h2>
+          <p>Selecione uma categoria para organizar as notificações</p>
+        </div>
+        <div class="notifications-filters">
+          <button type="button" class="filter-chip active" data-filter="all">Todas</button>
+          <button type="button" class="filter-chip" data-filter="critical">Críticas</button>
+          <button type="button" class="filter-chip" data-filter="appointments">Consultas</button>
+          <button type="button" class="filter-chip" data-filter="updates">Atualizações</button>
+          <button type="button" class="filter-chip" data-filter="today">Hoje</button>
         </div>
       </section>
 
-      <div class="notifications-filters">
-        <button class="filter-btn active" data-filter="all">
-          <i class="fas fa-list"></i> Todas
-        </button>
-        <button class="filter-btn" data-filter="unread">
-          <i class="fas fa-circle"></i> Não lidas
-        </button>
-        <button class="filter-btn" data-filter="read">
-          <i class="fas fa-check-circle"></i> Lidas
-        </button>
-        <button class="filter-btn" data-filter="archived">
-          <i class="fas fa-archive"></i> Arquivadas
-        </button>
-      </div>
-
-      <section class="notifications-container">
-        <div id="notificationsList" class="notifications-list">
-          <div class="loading-spinner" id="loadingSpinner">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Carregando notificações...</p>
-          </div>
+      <section class="notifications-content">
+        <div class="feed-header">
+          <h2>Linha do tempo</h2>
+          <p>As notificações mais recentes aparecem no topo.</p>
+        </div>
+        <div class="notifications-feed" id="notificationsFeed"></div>
+        <div class="empty-state" id="notificationsEmpty" hidden>
+          <h2>Sem notificações para este filtro</h2>
+          <p>Quando surgirem novos avisos, eles aparecerão automaticamente aqui.</p>
         </div>
       </section>
-    </main>
-  </div>
+    </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
-  <script ></script>
-  <script ></script>
-  <script src="/client/public/js/notificacoes.js"></script>
+  <script type="module">
+    import { initHeaderComponent } from '/client/public/js/components/header.js';
+    import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
+    import { API_URL } from '/client/public/js/config.js';
+
+    initHeaderComponent({ title: 'Notificações' });
+    initDoctorSidebar('notificacoes');
+
+    const toggleButton = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+
+    if (toggleButton && sidebar) {
+      toggleButton.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        toggleButton.classList.toggle('shifted');
+      });
+    }
+
+    async function ensureProfile() {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        await Swal.fire({
+          title: 'Erro',
+          text: 'Você precisa estar logado para acessar esta página',
+          icon: 'error',
+          confirmButtonText: 'Ir para Login',
+          confirmButtonColor: '#002A42'
+        });
+        window.location.href = '../views/login.html';
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Falha ao carregar dados do médico');
+        }
+
+        const data = await response.json();
+
+        // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
+        if (window.updateDoctorSidebarInfo) {
+          window.updateDoctorSidebarInfo(data.nome, data.areaAtuacao, data.genero);
+        }
+      } catch (error) {
+        await Swal.fire({
+          title: 'Erro',
+          text: 'Não foi possível carregar suas informações. Faça login novamente.',
+          icon: 'error',
+          confirmButtonText: 'Ir para Login',
+          confirmButtonColor: '#002A42'
+        });
+        localStorage.removeItem('token');
+        window.location.href = '../views/login.html';
+      }
+    }
+
+    ensureProfile();
+  </script>
+  <script type="module" src="/client/public/js/notificacoes.js"></script>
 </body>
 </html>

@@ -1,6 +1,14 @@
+import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
+
 const API_URL = window.API_URL || 'http://localhost:65432';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const validation = validateActivePatient();
+  if (!validation.valid) {
+    redirectToPatientSelection(validation.error);
+    return;
+  }
+  
   await carregarDadosMedico();
   inicializarComponentes();
   await carregarEventosClinicos();
@@ -473,8 +481,13 @@ async function carregarEventosClinicos() {
       headers: { Authorization: `Bearer ${token}` }
     });
 
+    const handled = await handleApiError(response);
+    if (handled) {
+      return;
+    }
+
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || 'Erro ao buscar eventos clínicos');
     }
 
@@ -486,11 +499,12 @@ async function carregarEventosClinicos() {
     atualizarEstatisticas(allEventos);
     atualizarControlesPagina();
 
-    if (allEventos.length === 0) {
-      mostrarAviso('Nenhum evento clínico encontrado para este paciente.', 'info');
-    } else {
-      mostrarAviso(`${allEventos.length} evento${allEventos.length !== 1 ? 's' : ''} clínico${allEventos.length !== 1 ? 's' : ''} carregado${allEventos.length !== 1 ? 's' : ''} com sucesso.`, 'success');
-    }
+    // Removido snackbar de sucesso/info ao carregar eventos
+    // if (allEventos.length === 0) {
+    //   mostrarAviso('Nenhum evento clínico encontrado para este paciente.', 'info');
+    // } else {
+    //   mostrarAviso(`${allEventos.length} evento${allEventos.length !== 1 ? 's' : ''} clínico${allEventos.length !== 1 ? 's' : ''} carregado${allEventos.length !== 1 ? 's' : ''} com sucesso.`, 'success');
+    // }
 
   } catch (error) {
     console.error('Erro ao carregar eventos clínicos:', error);

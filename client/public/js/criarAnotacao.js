@@ -1,6 +1,13 @@
 import { API_URL } from './config.js';
+import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const validation = validateActivePatient();
+  if (!validation.valid) {
+    redirectToPatientSelection(validation.error);
+    return;
+  }
+  
   await carregarDadosMedico();
   inicializarFormulario();
 });
@@ -212,17 +219,16 @@ async function handleSubmit(e) {
     return;
   }
 
-  const paciente = JSON.parse(localStorage.getItem("pacienteSelecionado"));
-  if (!paciente?.cpf) {
-    mostrarAviso("Paciente não selecionado. Volte à tela de seleção.", 'error');
-    setTimeout(() => {
-      window.location.href = 'selecao.html';
-    }, 2000);
+  const validation = validateActivePatient();
+  if (!validation.valid) {
+    redirectToPatientSelection(validation.error);
     return;
   }
+  
+  const paciente = validation.paciente;
 
   const body = {
-    cpf: paciente.cpf,
+    cpf: validation.cpf,
     titulo: document.getElementById("titulo").value.trim(),
     data: document.getElementById("data").value,
     categoria: document.getElementById("categoria").value,
@@ -253,8 +259,13 @@ async function handleSubmit(e) {
       body: JSON.stringify(body)
     });
 
+    const handled = await handleApiError(res);
+    if (handled) {
+      return;
+    }
+
     if (!res.ok) {
-      const errorData = await res.json();
+      const errorData = await res.json().catch(() => ({}));
       throw new Error(errorData.message || 'Erro ao criar anotação');
     }
 

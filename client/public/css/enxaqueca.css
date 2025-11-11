@@ -28,12 +28,12 @@ body {
 }
 
 .content {
-  width: calc(100vw - 300px);
-  max-width: calc(100vw - 300px);
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  min-height: 100vh;
   box-sizing: border-box;
   overflow-x: hidden;
   padding: 24px;
-  margin-left: 300px;
   padding-top: 100px;
 }
 
@@ -454,11 +454,19 @@ body {
 }
 
 /* Responsividade */
+@media (max-width: 1200px) {
+  .content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    padding: 20px;
+    padding-top: 100px;
+  }
+}
+
 @media (max-width: 1024px) {
   .content {
-    width: calc(100vw - 280px);
-    max-width: calc(100vw - 280px);
-    margin-left: 280px;
+    margin-left: 0;
+    width: 100%;
     padding: 20px;
     padding-top: 100px;
   }

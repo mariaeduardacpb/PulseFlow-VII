@@ -1,4 +1,6 @@
 import { API_URL } from './config.js';
+import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
+import { startConnectionMonitoring, stopConnectionMonitoring } from './utils/connectionMonitor.js';
 
 // Variáveis globais
 let allAnotacoes = [];
@@ -14,6 +16,14 @@ let recordsGrid, noRecords, totalRecords, filterCategory, filterDoctor, filterDa
 
 document.addEventListener('DOMContentLoaded', async () => {
   
+  const validation = validateActivePatient();
+  if (!validation.valid) {
+    redirectToPatientSelection(validation.error);
+    return;
+  }
+
+  startConnectionMonitoring(5);
+  
   // Aguardar carregamento dos componentes
   setTimeout(async () => {
     await carregarDadosMedico();
@@ -23,26 +33,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function inicializarPagina() {
   try {
+    // Validação já feita no DOMContentLoaded, mas garantir novamente
+    const validation = validateActivePatient();
+    if (!validation.valid) {
+      return;
+    }
     
     // Obter elementos DOM
     obterElementosDOM();
     
-    // Verificar paciente selecionado
-    const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
-    if (!paciente?.cpf) {
-      mostrarErro('Nenhum paciente selecionado. Por favor, selecione um paciente primeiro.');
-      return;
-    }
-    
-    
     // Configurar event listeners
     configurarEventListeners();
     
-    // Mostrar loading
-    mostrarAviso('Carregando registros clínicos...', 'info');
-    
     // Carregar dados
-    await carregarRegistros(paciente.cpf);
+    await carregarRegistros(validation.cpf);
     
     
   } catch (error) {
@@ -144,13 +148,16 @@ async function carregarRegistros(cpf) {
       }
     });
     
+    const handled = await handleApiError(response);
+    if (handled) {
+      return;
+    }
     
     if (!response.ok) {
       if (response.status === 404) {
         allAnotacoes = [];
         filteredAnotacoes = [];
         renderizarRegistros([]);
-        mostrarAviso('Este paciente ainda não possui registros clínicos.', 'info');
         return;
       }
       
@@ -189,12 +196,13 @@ async function carregarRegistros(cpf) {
     
     renderizarRegistros(filteredAnotacoes);
     
-    const total = allAnotacoes.length;
-    if (total > 0) {
-      mostrarAviso(`${total} registro(s) clínico(s) carregado(s) com sucesso!`, 'success');
-    } else {
-      mostrarAviso('Nenhum registro clínico encontrado para este paciente.', 'info');
-    }
+    // Removido snackbar de sucesso ao carregar registros
+    // const total = allAnotacoes.length;
+    // if (total > 0) {
+    //   mostrarAviso(`${total} registro(s) clínico(s) carregado(s) com sucesso!`, 'success');
+    // } else {
+    //   mostrarAviso('Nenhum registro clínico encontrado para este paciente.', 'info');
+    // }
     
     
   } catch (error) {
@@ -362,7 +370,8 @@ function limparFiltros() {
   filteredAnotacoes = [...allAnotacoes];
   renderizarRegistros(filteredAnotacoes);
   
-  mostrarAviso('Filtros limpos', 'info');
+  // Removido snackbar ao limpar filtros
+  // mostrarAviso('Filtros limpos', 'info');
 }
 
 function criarNovoRegistro() {
@@ -773,3 +782,6 @@ window.forcarAtualizacaoMedico = function() {
   });
 };
                           
+window.addEventListener('beforeunload', () => {
+  stopConnectionMonitoring();
+});

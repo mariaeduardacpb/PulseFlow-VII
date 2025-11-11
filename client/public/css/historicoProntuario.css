@@ -30,9 +30,8 @@ body {
 }
 
 .content {
-  margin-left: 300px;
-  width: calc(100vw - 300px);
-  max-width: calc(100vw - 300px);
+  margin-left: 260px;
+  width: calc(100% - 260px);
   min-height: 100vh;
   padding: 100px 30px 30px 30px;
   display: flex;

@@ -68,6 +68,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
 
+      try {
+        const { handleApiError } = await import('./utils/patientValidation.js');
+        const handled = await handleApiError(response);
+        if (handled) {
+          return;
+        }
+      } catch (importError) {
+        console.error('Erro ao importar handleApiError:', importError);
+      }
+
       if (!response.ok) {
         mostrarErro("Erro ao buscar dados de sono!");
         return;

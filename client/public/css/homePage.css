@@ -914,7 +914,7 @@ body {
   margin: 0 auto;
   padding: 2.5rem 2rem 1.5rem;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 2rem;
   align-items: start;
 }
@@ -1195,12 +1195,40 @@ body {
     padding: 2rem 1.5rem 1.5rem;
   }
 
+  .footer-logo-section {
+    align-items: center;
+  }
+
+  .footer-section {
+    align-items: center;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
+
   .footer-logo {
-    width: 120px;
+    width: 100px;
   }
 
   .footer-bottom {
     padding: 1rem;
+  }
+
+  .footer-tagline {
+    font-size: 0.8rem;
+  }
+
+  .footer-title {
+    font-size: 0.9rem;
+  }
+
+  .footer-links a {
+    font-size: 0.8rem;
+  }
+
+  .footer-bottom-content p {
+    font-size: 0.78rem;
   }
 }
 

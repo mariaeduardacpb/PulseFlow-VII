@@ -1,4 +1,21 @@
+import { API_URL } from './config.js';
+import { initHeaderComponent } from './components/header.js';
+import { initDoctorSidebar } from './components/sidebarDoctor.js';
+
 document.addEventListener('DOMContentLoaded', function() {
+    initHeaderComponent({ title: 'Perfil do Médico' });
+    initDoctorSidebar('perfilmedico');
+
+    const toggleButton = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+
+    if (toggleButton && sidebar) {
+        toggleButton.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            toggleButton.classList.toggle('shifted');
+        });
+    }
+
     // Verificar se o usuário está autenticado
     const token = localStorage.getItem('token');
     if (!token) {
@@ -89,7 +106,6 @@ async function refreshToken() {
 
 async function carregarDadosMedico() {
     try {
-        const API_URL = window.API_URL || 'http://localhost:65432';
         const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
             method: 'GET',
             headers: {
@@ -103,6 +119,11 @@ async function carregarDadosMedico() {
 
         const medico = await response.json();
         console.log('Dados recebidos da API:', medico);
+
+        // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
+        if (window.updateDoctorSidebarInfo) {
+          window.updateDoctorSidebarInfo(medico.nome, medico.areaAtuacao, medico.genero);
+        }
         
         // Formatar telefones em um objeto
         const telefones = {
@@ -538,7 +559,6 @@ async function salvarAlteracoes(event) {
         console.log('Dados a serem enviados:', dadosPerfil);
 
         // Fazer a requisição com JSON
-        const API_URL = window.API_URL || 'http://localhost:65432';
         const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
             method: 'PUT',
             headers: {
@@ -554,46 +574,6 @@ async function salvarAlteracoes(event) {
             // Se a resposta não for ok, lançar erro com a mensagem do servidor
             const errorMessage = responseData.message || responseData.error || 'Erro ao salvar alterações';
             throw new Error(errorMessage);
-        }
-
-        // Atualizar Firestore se disponível (para monitoramento em tempo real)
-        // Fazer de forma não-bloqueante (não esperar, apenas tentar)
-        if (window.firebaseDb && typeof firebase !== 'undefined') {
-            // Executar em background, não bloquear o fluxo
-            (async () => {
-                try {
-                    const token = localStorage.getItem('token');
-                    if (token) {
-                        const payload = JSON.parse(atob(token.split('.')[1]));
-                        const userId = payload._id || payload.id || payload.userId;
-                        
-                        if (userId) {
-                            // Usar os dados retornados ou montar objeto com os dados salvos
-                            const firestoreData = responseData.usuario || responseData || dadosPerfil;
-                            
-                            // Criar objeto de atualização
-                            const updateData = {
-                                ...firestoreData,
-                                updatedAt: typeof firebase !== 'undefined' && firebase.firestore 
-                                    ? firebase.firestore.FieldValue.serverTimestamp() 
-                                    : new Date()
-                            };
-                            
-                            // Tentar atualizar com timeout
-                            const updatePromise = window.firebaseDb.collection('medicos').doc(userId).set(updateData, { merge: true });
-                            const timeoutPromise = new Promise((_, reject) => 
-                                setTimeout(() => reject(new Error('Timeout')), 3000)
-                            );
-                            
-                            await Promise.race([updatePromise, timeoutPromise]);
-                            console.log('✅ Dados atualizados no Firestore');
-                        }
-                    }
-                } catch (firestoreError) {
-                    // Silenciar erros do Firestore - não é crítico, o polling vai detectar mudanças
-                    console.log('ℹ️ Firestore não disponível para atualização (usando polling)');
-                }
-            })();
         }
 
         // Fechar popup de salvamento e mostrar sucesso

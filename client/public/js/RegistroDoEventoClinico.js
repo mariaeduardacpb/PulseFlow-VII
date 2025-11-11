@@ -1,4 +1,12 @@
+import { validateActivePatient, redirectToPatientSelection } from './utils/patientValidation.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
+  const validation = validateActivePatient();
+  if (!validation.valid) {
+    redirectToPatientSelection(validation.error);
+    return;
+  }
+  
   const form = document.querySelector('form');
   const token = localStorage.getItem('token');
 
@@ -13,15 +21,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
-    if (!paciente || !paciente.cpf) {
-      alert('Paciente não selecionado. Por favor, selecione um paciente primeiro.');
-      window.location.href = '/selecao.html';
+    const validation = validateActivePatient();
+    if (!validation.valid) {
+      redirectToPatientSelection(validation.error);
       return;
     }
+    
+    const paciente = validation.paciente;
 
     const formData = {
-      cpfPaciente: paciente.cpf,
+      cpfPaciente: validation.cpf,
       titulo: document.getElementById('titulo').value,
       dataHora: document.getElementById('dataHora').value,
       tipoEvento: document.getElementById('tipoEvento').value,

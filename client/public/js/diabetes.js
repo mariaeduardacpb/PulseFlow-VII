@@ -1,8 +1,16 @@
+import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
+
 // Configuração da API
 const API_URL = window.API_URL || 'http://localhost:65432';
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log('Página de diabetes carregada, iniciando...');
+  
+  const validation = validateActivePatient();
+  if (!validation.valid) {
+    redirectToPatientSelection(validation.error);
+    return;
+  }
   
   await carregarDadosMedico();
   await inicializarPagina();
@@ -123,6 +131,11 @@ async function fetchGlicemiaData(month, year) {
         "Content-Type": "application/json"
       }
     });
+
+    const handled = await handleApiError(response);
+    if (handled) {
+      return null;
+    }
 
     if (!response.ok) {
       if (response.status === 404) {

@@ -1,4 +1,6 @@
 import { API_URL } from './config.js';
+import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
+import { startConnectionMonitoring, stopConnectionMonitoring } from './utils/connectionMonitor.js';
 
 // Elementos DOM
 let examsGrid, emptyState, loadingState, examsCount, totalExames, examesMes, categorias;
@@ -13,6 +15,14 @@ let currentExamId = null;
 let selectedPatient = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const validation = validateActivePatient();
+  if (!validation.valid) {
+    redirectToPatientSelection(validation.error);
+    return;
+  }
+
+  startConnectionMonitoring(5);
+  
   // Aguardar carregamento dos componentes
   setTimeout(async () => {
     await inicializarPagina();
@@ -109,39 +119,22 @@ async function carregarExames() {
   try {
     mostrarLoading(true);
     
-    const token = localStorage.getItem('token');
-    
-    // Tentar diferentes chaves possíveis para o paciente
-    let paciente = null;
-    const chavesPaciente = ['selectedPatient', 'pacienteSelecionado', 'selectedPatientData'];
-    
-    for (const chave of chavesPaciente) {
-      const dados = localStorage.getItem(chave);
-      if (dados) {
-        try {
-          paciente = JSON.parse(dados);
-          if (paciente && (paciente.cpf || paciente.id)) {
-            break;
-          }
-        } catch (e) {
-          continue;
-        }
-      }
+    const validation = validateActivePatient();
+    if (!validation.valid) {
+      redirectToPatientSelection(validation.error);
+      return;
     }
     
+    const token = localStorage.getItem('token');
     if (!token) {
       throw new Error('Token não encontrado');
     }
     
-    if (!paciente || (!paciente.cpf && !paciente.id)) {
-      throw new Error('Paciente não selecionado. Redirecionando para seleção de paciente.');
-    }
-    
     // Definir paciente selecionado globalmente
-    selectedPatient = paciente;
+    selectedPatient = validation.paciente;
     
     // Buscar exames da API usando CPF do paciente
-    const cpfPaciente = paciente.cpf || paciente.id;
+    const cpfPaciente = validation.cpf;
     const response = await fetch(`${API_URL}/api/anexoExame/medico?cpf=${cpfPaciente}`, {
       method: 'GET',
       headers: {
@@ -149,6 +142,12 @@ async function carregarExames() {
         'Content-Type': 'application/json'
       }
     });
+    
+    const handled = await handleApiError(response);
+    if (handled) {
+      mostrarLoading(false);
+      return;
+    }
     
     if (!response.ok) {
       if (response.status === 404) {
@@ -922,3 +921,7 @@ window.testarRenderizacao = function() {
     console.log('Nenhum exame para renderizar');
   }
 };
+
+window.addEventListener('beforeunload', () => {
+  stopConnectionMonitoring();
+});

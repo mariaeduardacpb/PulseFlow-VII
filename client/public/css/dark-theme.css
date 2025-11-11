@@ -1,0 +1,86 @@
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-base: rgba(15, 23, 42, 0.96);
+  --surface-soft: rgba(15, 23, 42, 0.9);
+  --border-soft: rgba(148, 163, 184, 0.28);
+  --shadow-soft: 0 28px 60px -32px rgba(2, 6, 23, 0.85);
+  --brand-dark: #e2e8f0;
+  --brand-accent: #38bdf8;
+  --text-muted: #cbd5f5;
+  --text-light: #94a3b8;
+  --danger: #f87171;
+}
+
+:root[data-theme="dark"] body {
+  background: radial-gradient(circle at 20% 20%, rgba(23, 37, 84, 0.6), rgba(2, 6, 23, 0.95));
+  color: var(--brand-dark);
+}
+
+:root[data-theme="dark"] .settings-hero,
+:root[data-theme="dark"] .settings-section,
+:root[data-theme="dark"] .modal-content,
+:root[data-theme="dark"] .btn-link,
+:root[data-theme="dark"] .btn-edit,
+:root[data-theme="dark"] .btn-light,
+:root[data-theme="dark"] .btn-cancel {
+  background: var(--surface-base);
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+:root[data-theme="dark"] .settings-hero p,
+:root[data-theme="dark"] .hero-eyebrow,
+:root[data-theme="dark"] .field-value,
+:root[data-theme="dark"] label,
+:root[data-theme="dark"] .modal-header h3,
+:root[data-theme="dark"] .form-group label,
+:root[data-theme="dark"] .form-input,
+:root[data-theme="dark"] .form-error {
+  color: var(--brand-dark);
+}
+
+:root[data-theme="dark"] .toggle-switch .slider {
+  background: rgba(148, 163, 184, 0.45);
+}
+
+:root[data-theme="dark"] .btn-edit-profile,
+:root[data-theme="dark"] .btn-save {
+  background: linear-gradient(135deg, #38bdf8 0%, #0f172a 100%);
+  color: #0f172a;
+}
+
+:root[data-theme="dark"] .btn-edit-profile:hover,
+:root[data-theme="dark"] .btn-save:hover {
+  background: linear-gradient(135deg, #0ea5e9 0%, #020617 100%);
+  color: #e2e8f0;
+}
+
+:root[data-theme="dark"] .btn-link:hover,
+:root[data-theme="dark"] .btn-edit:hover,
+:root[data-theme="dark"] .btn-light:hover,
+:root[data-theme="dark"] .btn-cancel:hover {
+  background: rgba(59, 130, 246, 0.16);
+}
+
+:root[data-theme="dark"] .settings-section.danger {
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+:root[data-theme="dark"] .btn-danger {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fecaca;
+}
+
+:root[data-theme="dark"] .btn-danger:hover {
+  background: rgba(239, 68, 68, 0.26);
+}
+
+:root[data-theme="dark"] .form-input {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+:root[data-theme="dark"] .form-input:focus {
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+}
+

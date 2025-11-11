@@ -16,55 +16,62 @@
   <div id="header-component"></div>
   <div id="sidebar-component"></div>
   
-  <div class="container">
-    <main class="content">
-      <section class="settings-header">
-        <div class="header-top">
-          <h1><i class="fas fa-cog"></i> Configurações</h1>
-          <p class="subtitle">Gerencie suas preferências e configurações da conta</p>
+  <main class="settings-shell">
+    <div class="settings-container">
+      <header class="settings-hero">
+        <div class="hero-text">
+          <span class="hero-eyebrow">Preferências</span>
+          <h1>Configurações</h1>
+          <p>Personalize a experiência PulseFlow ajustando conta, segurança e notificações conforme sua rotina.</p>
         </div>
-      </section>
+      </header>
 
-      <div class="settings-container">
-        <div class="settings-section">
+      <section class="settings-grid">
+        <article class="settings-section">
           <div class="section-header">
             <h2><i class="fas fa-user"></i> Perfil</h2>
           </div>
-          <div class="settings-card">
-            <div class="profile-info-item">
-              <label>Nome Completo</label>
-              <span id="userNameDisplay" class="setting-value">Carregando...</span>
+          <div class="section-body">
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Nome completo</label>
+                <span id="userNameDisplay" class="field-value">Carregando...</span>
+              </div>
             </div>
-            <div class="profile-info-item">
-              <label>Email</label>
-              <span id="userEmailDisplay" class="setting-value">Carregando...</span>
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Email</label>
+                <span id="userEmailDisplay" class="field-value">Carregando...</span>
+              </div>
             </div>
-            <div class="setting-item-action">
+            <div class="settings-actions">
               <button class="btn-edit-profile" id="editProfileBtn">
-                <i class="fas fa-edit"></i> Editar Dados
+                <i class="fas fa-edit"></i> Editar dados
               </button>
             </div>
           </div>
-        </div>
+        </article>
 
-        <div class="settings-section">
+        <article class="settings-section">
           <div class="section-header">
             <h2><i class="fas fa-lock"></i> Segurança</h2>
           </div>
-          <div class="settings-card">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Alterar Senha</label>
-                <span class="setting-value">••••••••</span>
+          <div class="section-body">
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Alterar senha</label>
+                <span class="field-value">••••••••</span>
               </div>
-              <button class="btn-edit" id="changePasswordBtn">
-                <i class="fas fa-edit"></i>
-              </button>
+              <div class="settings-actions">
+                <button class="btn-edit" id="changePasswordBtn">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </div>
             </div>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Autenticação de Dois Fatores</label>
-                <span class="setting-value">Desativado</span>
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Autenticação de dois fatores</label>
+                <span class="field-value" id="twoFactorLabel">Desativado</span>
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" id="twoFactorToggle">
@@ -72,27 +79,27 @@
               </label>
             </div>
           </div>
-        </div>
+        </article>
 
-        <div class="settings-section">
+        <article class="settings-section">
           <div class="section-header">
             <h2><i class="fas fa-bell"></i> Notificações</h2>
           </div>
-          <div class="settings-card">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Notificações por Email</label>
-                <span class="setting-value">Receber notificações importantes</span>
+          <div class="section-body">
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Notificações por email</label>
+                <span class="field-value" id="emailNotificationsLabel">Receber notificações importantes</span>
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" id="emailNotificationsToggle" checked>
                 <span class="slider"></span>
               </label>
             </div>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Notificações Push</label>
-                <span class="setting-value">Receber notificações em tempo real</span>
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Notificações push</label>
+                <span class="field-value" id="pushNotificationsLabel">Receber notificações em tempo real</span>
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" id="pushNotificationsToggle" checked>
@@ -100,102 +107,84 @@
               </label>
             </div>
           </div>
-        </div>
+        </article>
 
-        <div class="settings-section">
+        <article class="settings-section">
           <div class="section-header">
             <h2><i class="fas fa-palette"></i> Aparência</h2>
           </div>
-          <div class="settings-card">
-            <div class="setting-item">
-              <div class="setting-info">
+          <div class="section-body">
+            <div class="settings-field">
+              <div class="field-info">
                 <label>Tema</label>
-                <span class="setting-value" id="themeDisplay">Claro</span>
+                <span class="field-value" id="themeDisplay">Claro</span>
               </div>
-              <select class="theme-select" id="themeSelect">
+              <select class="form-input" id="themeSelect">
                 <option value="light">Claro</option>
                 <option value="dark">Escuro</option>
                 <option value="auto">Automático</option>
               </select>
             </div>
           </div>
-        </div>
+        </article>
 
-        <div class="settings-section">
+        <article class="settings-section">
           <div class="section-header">
             <h2><i class="fas fa-info-circle"></i> Sobre</h2>
           </div>
-          <div class="settings-card">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Versão do Aplicativo</label>
-                <span class="setting-value">1.0.0</span>
+          <div class="section-body">
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Versão do aplicativo</label>
+                <span class="field-value">1.0.0</span>
               </div>
             </div>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Termos de Uso</label>
-                <span class="setting-value">Ver termos e condições</span>
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Termos de uso</label>
+                <span class="field-value">Ver termos e condições</span>
               </div>
-              <a href="termos.html" class="btn-link">
-                <i class="fas fa-external-link-alt"></i>
-              </a>
+              <div class="settings-actions">
+                <a href="termos.html" class="btn-link" aria-label="Abrir termos de uso">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+              </div>
             </div>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Política de Privacidade</label>
-                <span class="setting-value">Ler política de privacidade</span>
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Política de privacidade</label>
+                <span class="field-value">Ler política de privacidade</span>
               </div>
-              <a href="privacidade.html" class="btn-link">
-                <i class="fas fa-external-link-alt"></i>
-              </a>
+              <div class="settings-actions">
+                <a href="privacidade.html" class="btn-link" aria-label="Abrir política de privacidade">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+              </div>
             </div>
           </div>
-        </div>
+        </article>
 
-        <div class="settings-section danger-zone">
+        <article class="settings-section danger">
           <div class="section-header">
-            <h2><i class="fas fa-exclamation-triangle"></i> Zona Perigosa</h2>
+            <h2><i class="fas fa-exclamation-triangle"></i> Zona perigosa</h2>
           </div>
-          <div class="settings-card">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Excluir Conta</label>
-                <span class="setting-value danger-text">Esta ação não pode ser desfeita</span>
+          <div class="section-body">
+            <div class="settings-field">
+              <div class="field-info">
+                <label>Excluir conta</label>
+                <span class="field-value">Esta ação não pode ser desfeita</span>
               </div>
-              <button class="btn-danger" id="deleteAccountBtn">
-                <i class="fas fa-trash"></i> Excluir
-              </button>
+              <div class="settings-actions">
+                <button class="btn-danger" id="deleteAccountBtn">
+                  <i class="fas fa-trash"></i> Excluir
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <div id="editModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modalTitle">Editar</h3>
-        <button class="modal-close" id="closeModal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="editForm">
-          <div class="form-group">
-            <label id="editLabel">Campo</label>
-            <input type="text" id="editInput" class="form-input">
-            <span class="form-error" id="editError"></span>
-          </div>
-          <div class="form-actions">
-            <button type="button" class="btn-cancel" id="cancelEdit">Cancelar</button>
-            <button type="submit" class="btn-save">Salvar</button>
-          </div>
-        </form>
-      </div>
+        </article>
+      </section>
     </div>
-  </div>
+  </main>
 
   <div id="changePasswordModal" class="modal">
     <div class="modal-content">
@@ -248,9 +237,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
   <script src="/client/public/js/theme.js"></script>
-  <script ></script>
-  <script ></script>
-  <script src="/client/public/js/configuracoes.js"></script>
+  <script type="module" src="/client/public/js/configuracoes.js"></script>
 </body>
 </html>
 

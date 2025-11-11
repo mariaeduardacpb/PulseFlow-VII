@@ -21,14 +21,13 @@ body {
 }
 
 .content {
-  width: calc(100vw - 300px);
-  max-width: calc(100vw - 300px);
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  min-height: 100vh;
   box-sizing: border-box;
   overflow-x: hidden;
   padding: 24px;
-  margin-left: 300px;
   padding-top: 100px;
-  min-height: calc(100vh - 100px);
 }
 
 /* Card Principal do Ciclo Menstrual */

@@ -1,5 +1,13 @@
+import { validateActivePatient, redirectToPatientSelection } from './utils/patientValidation.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Página de ciclo menstrual carregada, iniciando...');
+    
+    const validation = validateActivePatient();
+    if (!validation.valid) {
+        redirectToPatientSelection(validation.error);
+        return;
+    }
     
     // Aguardar carregamento dos componentes
     setTimeout(async () => {

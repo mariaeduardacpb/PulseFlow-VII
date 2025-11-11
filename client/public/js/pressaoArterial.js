@@ -1,5 +1,13 @@
+import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
+
 document.addEventListener("DOMContentLoaded", async () => {
     console.log('Página de pressão arterial carregada, iniciando...');
+    
+    const validation = validateActivePatient();
+    if (!validation.valid) {
+        redirectToPatientSelection(validation.error);
+        return;
+    }
     
     // Aguardar carregamento dos componentes
     setTimeout(async () => {
@@ -105,6 +113,11 @@ async function buscarDadosPressao(mes, ano) {
                 "Content-Type": "application/json"
             }
         });
+
+        const handled = await handleApiError(response);
+        if (handled) {
+            return null;
+        }
 
         if (!response.ok) {
             if (response.status === 404) {

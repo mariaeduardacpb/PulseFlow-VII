@@ -1,0 +1,504 @@
+:root {
+  color-scheme: light;
+  --surface-base: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.9);
+  --border-soft: rgba(148, 163, 184, 0.2);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --brand-dark: #002a42;
+  --brand-accent: #0ea5e9;
+  --text-muted: #475569;
+  --text-light: #64748b;
+  --danger: #ef4444;
+}
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  color: var(--brand-dark);
+}
+
+.settings-shell {
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  padding: 136px 72px 56px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease, padding 0.3s ease;
+}
+
+@media (max-width: 1200px) {
+  .settings-shell {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    padding: 124px 48px 48px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .settings-shell {
+    margin-left: 0;
+    width: 100%;
+    padding: 124px 48px 48px;
+  }
+}
+
+@media (max-width: 960px) {
+  .settings-shell {
+    padding: 116px 36px 40px;
+  }
+
+  .settings-container {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .settings-shell {
+    padding: 108px 24px 36px;
+  }
+}
+
+.settings-container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-right: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.settings-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  text-align: left;
+  margin: 0;
+  background: var(--surface-base);
+  border-radius: 12px;
+  padding: 28px;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.hero-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-light);
+}
+
+.settings-hero h1 {
+  margin: 0;
+  width: 100%;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  text-align: left;
+}
+
+.settings-hero p {
+  margin: 0;
+  width: 100%;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 560px;
+  text-align: left;
+}
+
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-section {
+  background: var(--surface-base);
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-soft);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.settings-section.danger {
+  border-color: rgba(239, 68, 68, 0.28);
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.settings-field {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+}
+
+.settings-field .field-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-field label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.field-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand-dark);
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-edit-profile,
+.btn-edit,
+.btn-link,
+.btn-save,
+.btn-cancel,
+.btn-danger,
+.btn-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-edit-profile,
+.btn-save {
+  background: var(--brand-dark);
+  color: #f8fafc;
+  padding: 10px 18px;
+}
+
+.btn-edit-profile:hover,
+.btn-save:hover {
+  background: #001e30;
+}
+
+.btn-light,
+.btn-cancel {
+  background: rgba(226, 232, 240, 0.6);
+  color: var(--brand-dark);
+  padding: 10px 18px;
+}
+
+.btn-light:hover,
+.btn-cancel:hover {
+  background: rgba(203, 213, 225, 0.8);
+}
+
+.btn-edit {
+  background: rgba(226, 232, 240, 0.6);
+  color: var(--brand-dark);
+  padding: 8px 14px;
+}
+
+.btn-edit:hover {
+  background: rgba(203, 213, 225, 0.8);
+}
+
+.btn-link {
+  background: rgba(226, 232, 240, 0.6);
+  color: var(--brand-dark);
+  padding: 8px 12px;
+}
+
+.btn-link:hover {
+  background: rgba(203, 213, 225, 0.8);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #b91c1c;
+  padding: 10px 18px;
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.18);
+}
+
+.toggle-switch {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-switch .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(148, 163, 184, 0.3);
+  transition: background 0.2s ease;
+  border-radius: 13px;
+}
+
+.toggle-switch .slider::before {
+  position: absolute;
+  content: '';
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: transform 0.2s ease;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-switch input:checked + .slider {
+  background-color: var(--brand-accent);
+}
+
+.toggle-switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+.settings-section.danger .field-value {
+  color: var(--danger);
+}
+
+.section-header {
+  margin: 0 0 16px 0;
+  padding: 0;
+  border-bottom: 1px solid var(--border-soft);
+  padding-bottom: 12px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-header h2 i {
+  font-size: 16px;
+  color: var(--brand-accent);
+}
+
+.section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-input {
+  padding: 10px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--brand-dark);
+  background: #ffffff;
+  transition: border 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--brand-accent);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal.visible {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--surface-base);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 480px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--brand-dark);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--brand-dark);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  padding-right: 40px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: var(--brand-dark);
+}
+
+.form-error {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 4px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+@media (max-width: 520px) {
+  .settings-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .settings-section {
+    padding: 20px;
+  }
+
+  .settings-field {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .settings-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .btn-edit-profile,
+  .btn-save,
+  .btn-light,
+  .btn-danger,
+  .btn-cancel {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .modal-header,
+  .modal-body {
+    padding: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-save,
+  .btn-cancel {
+    width: 100%;
+  }
+}
+
