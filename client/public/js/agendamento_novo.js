@@ -1,19 +1,4 @@
-const STORAGE_KEY = 'pulseflow_agendamentos';
-
-const loadAppointments = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (_) {
-    return [];
-  }
-};
-
-const saveAppointments = (appointments) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
-};
+const API_URL = window.API_URL || 'http://localhost:65432';
 
 const escapeHTML = (str) =>
   str
@@ -26,10 +11,67 @@ const escapeHTML = (str) =>
 const formatDateLong = (dateString) => {
   if (!dateString) return '';
   try {
-    return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(dateString));
+    const normalized = dateString.length === 10 ? `${dateString}T00:00:00` : dateString;
+    return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(normalized));
   } catch (_) {
     return dateString;
   }
+};
+
+const formatTime = (timeString) => {
+  if (!timeString) return '';
+  const [hours, minutes] = timeString.split(':');
+  return `${hours}:${minutes || '00'}`;
+};
+
+const showToast = (message, icon = 'info') => {
+  if (typeof Swal !== 'undefined') {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon,
+      title: message,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+  } else {
+    alert(message);
+  }
+};
+
+const getToken = () => localStorage.getItem('token');
+
+const ensureAuthenticated = () => {
+  const token = getToken();
+  if (!token) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Sessão expirada',
+      text: 'Faça login novamente para agendar consultas.',
+      confirmButtonColor: '#002a42',
+    }).then(() => {
+      window.location.href = '/client/views/login.html';
+    });
+    return null;
+  }
+  return token;
+};
+
+const getAuthHeaders = () => {
+  const headers = { 'Content-Type': 'application/json' };
+  const token = getToken();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+};
+
+const buildIsoDateTime = (date, time) => {
+  if (!date || !time) return null;
+  const combined = new Date(`${date}T${time}`);
+  if (Number.isNaN(combined.getTime())) return null;
+  return combined.toISOString();
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,6 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const voltarBtn = document.getElementById('voltarLista');
   const enviarConfirmacaoBtn = document.getElementById('enviarConfirmacao');
   const resumo = document.getElementById('resumoAgendamento');
+  const buscarPacienteBtn = document.querySelector('[data-action="buscar-paciente"]');
+  const pacienteIdInput = document.getElementById('pacienteId');
+
+  let pacienteAtual = null;
 
   const voltarParaLista = () => {
     if (window.history.length > 1) {
@@ -47,36 +93,114 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  if (cancelarBtn) {
-    cancelarBtn.addEventListener('click', (event) => {
-      event.preventDefault();
-      Swal.fire({
-        title: 'Cancelar cadastro?',
-        text: 'As informações preenchidas serão descartadas.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#00324a',
-        cancelButtonColor: '#94a3b8',
-        confirmButtonText: 'Sim, descartar',
-        cancelButtonText: 'Manter preenchimento',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          voltarParaLista();
-        }
+  const preencherPaciente = (paciente) => {
+    pacienteAtual = paciente;
+    if (pacienteIdInput && paciente?.id) {
+      pacienteIdInput.value = paciente.id;
+    }
+    if (form?.nomePaciente && paciente?.nome) {
+      form.nomePaciente.value = paciente.nome;
+    }
+    if (form?.contatoPaciente && (paciente?.telefone || paciente?.phone)) {
+      form.contatoPaciente.value = paciente.telefone || paciente.phone;
+    }
+    atualizarResumo();
+  };
+
+  const carregarPacienteSalvo = () => {
+    try {
+      const salvo = localStorage.getItem('pacienteSelecionado');
+      if (!salvo) return;
+      const paciente = JSON.parse(salvo);
+      if (!paciente) return;
+      preencherPaciente({
+        id: paciente.id || paciente._id,
+        nome: paciente.nome || paciente.name,
+        telefone: paciente.telefone || paciente.phone,
       });
+    } catch (error) {
+      console.error('Erro ao carregar paciente salvo:', error);
+    }
+  };
+
+  const buscarPaciente = async () => {
+    const { value: cpfInput } = await Swal.fire({
+      title: 'Buscar paciente',
+      input: 'text',
+      inputLabel: 'Informe o CPF do paciente',
+      inputPlaceholder: '000.000.000-00',
+      inputAttributes: {
+        autocapitalize: 'off',
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Buscar',
+      confirmButtonColor: '#002a42',
+      cancelButtonText: 'Cancelar',
+      cancelButtonColor: '#94a3b8',
+      preConfirm: (value) => {
+        if (!value) {
+          Swal.showValidationMessage('Informe o CPF do paciente');
+          return false;
+        }
+        const somenteNumeros = value.replace(/\D/g, '');
+        if (somenteNumeros.length !== 11) {
+          Swal.showValidationMessage('CPF deve possuir 11 dígitos');
+          return false;
+        }
+        return somenteNumeros;
+      },
     });
-  }
+
+    if (!cpfInput) return;
+
+    const token = ensureAuthenticated();
+    if (!token) return;
+
+    try {
+      Swal.fire({
+        title: 'Buscando paciente...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      const response = await fetch(`${API_URL}/api/pacientes/buscar?cpf=${cpfInput}`, {
+        headers: getAuthHeaders(),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Paciente não encontrado.');
+      }
+
+      preencherPaciente({
+        id: data.id,
+        nome: data.nome,
+        telefone: data.telefone || data.phone,
+      });
+
+      showToast('Paciente vinculado ao agendamento.', 'success');
+    } catch (error) {
+      console.error(error);
+      showToast(error.message || 'Erro ao buscar paciente.', 'error');
+    } finally {
+      Swal.close();
+    }
+  };
 
   const atualizarResumo = () => {
     if (!resumo || !form) return;
+    const nomePaciente =
+      pacienteAtual?.nome || form.nomePaciente.value.trim() || 'Selecione um paciente';
+    const contatoPaciente =
+      form.contatoPaciente.value.trim() || pacienteAtual?.telefone || pacienteAtual?.phone || '';
+
     const valores = {
-      paciente: form.nomePaciente.value.trim() || 'Informe os dados ao lado',
-      contato: form.contatoPaciente.value.trim(),
+      paciente: nomePaciente,
+      contato: contatoPaciente,
       data: form.dataConsulta.value ? formatDateLong(form.dataConsulta.value) : 'Selecione a agenda disponível',
       hora: form.horaConsulta.value ? formatTime(form.horaConsulta.value) : '',
       tipo: form.tipoAtendimento.value,
       local: form.localAtendimento.value.trim(),
-      status: 'agendada',
     };
 
     const formatoLabel =
@@ -125,15 +249,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  carregarPacienteSalvo();
   atualizarResumo();
 
-  if (enviarConfirmacaoBtn) {
-    enviarConfirmacaoBtn.addEventListener('click', () => {
+  if (cancelarBtn) {
+    cancelarBtn.addEventListener('click', (event) => {
+      event.preventDefault();
       Swal.fire({
-        title: 'Envio de confirmação',
-        text: 'Uma confirmação será enviada ao paciente após salvar o agendamento.',
-        icon: 'info',
-        confirmButtonColor: '#00324a',
+        title: 'Cancelar cadastro?',
+        text: 'As informações preenchidas serão descartadas.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#002a42',
+        cancelButtonColor: '#94a3b8',
+        confirmButtonText: 'Sim, descartar',
+        cancelButtonText: 'Manter preenchimento',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          voltarParaLista();
+        }
       });
     });
   }
@@ -145,8 +279,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (enviarConfirmacaoBtn) {
+    enviarConfirmacaoBtn.addEventListener('click', () => {
+      Swal.fire({
+        title: 'Envio de confirmação',
+        text: 'Uma confirmação será enviada ao paciente após salvar o agendamento.',
+        icon: 'info',
+        confirmButtonColor: '#002a42',
+      });
+    });
+  }
+
+  if (buscarPacienteBtn) {
+    buscarPacienteBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      buscarPaciente();
+    });
+  }
+
   if (form) {
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
       if (!form.checkValidity()) {
@@ -154,43 +306,76 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const agendamentos = loadAppointments();
-      const nomePaciente = form.nomePaciente.value.trim();
+      if (!pacienteIdInput.value) {
+        showToast('Busque e selecione um paciente antes de salvar.', 'warning');
+        return;
+      }
+
       const dataConsulta = form.dataConsulta.value;
       const horaConsulta = form.horaConsulta.value;
-      const novoAgendamento = {
-        id: `${Date.now()}`,
-        paciente: nomePaciente,
-        contato: form.contatoPaciente.value.trim(),
-        observacoesPaciente: form.observacoesPaciente?.value.trim() ?? '',
-        data: dataConsulta,
-        hora: horaConsulta,
-        duracao: form.duracaoConsulta.value ? Number(form.duracaoConsulta.value) : null,
-        tipo: form.tipoAtendimento.value,
-        local: form.localAtendimento.value.trim(),
-        motivo: form.motivoConsulta.value.trim(),
+      const dataHoraISO = buildIsoDateTime(dataConsulta, horaConsulta);
+
+      if (!dataHoraISO) {
+        showToast('Data e horário inválidos.', 'error');
+        return;
+      }
+
+      const token = ensureAuthenticated();
+      if (!token) return;
+
+      const payload = {
+        pacienteId: pacienteIdInput.value,
+        dataHora: dataHoraISO,
+        tipoConsulta: form.tipoAtendimento.value,
+        motivoConsulta: form.motivoConsulta.value.trim(),
         observacoes: form.observacoesConsulta.value.trim(),
-        status: 'agendada',
-        createdAt: new Date().toISOString(),
+        duracao: form.duracaoConsulta.value ? Number(form.duracaoConsulta.value) : 30,
       };
 
-      agendamentos.push(novoAgendamento);
-      saveAppointments(agendamentos);
+      if (payload.tipoConsulta !== 'online' && form.localAtendimento.value.trim()) {
+        payload.endereco = {
+          logradouro: form.localAtendimento.value.trim(),
+        };
+      }
 
-      Swal.fire({
-        title: 'Agendamento criado!',
-        html: `
-          <p>O paciente <strong>${nomePaciente}</strong> foi agendado para
-          <strong>${formatDateLong(dataConsulta)}</strong>
-          às <strong>${horaConsulta}</strong>.</p>
-          <p class="swal-subtext">Os dados foram salvos localmente para uso de demonstração.</p>
-        `,
-        icon: 'success',
-        confirmButtonColor: '#00324a',
-        confirmButtonText: 'Voltar para agendamentos',
-      }).then(() => {
-        voltarParaLista();
-      });
+      const observacoesPaciente = form.observacoesPaciente.value.trim();
+      if (observacoesPaciente) {
+        payload.observacoes = payload.observacoes
+          ? `${observacoesPaciente}\n\n${payload.observacoes}`
+          : observacoesPaciente;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/agendamentos`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Não foi possível criar o agendamento.');
+        }
+
+        Swal.fire({
+          title: 'Agendamento criado!',
+          html: `
+            <p>O paciente <strong>${escapeHTML(form.nomePaciente.value.trim())}</strong> foi agendado para
+            <strong>${formatDateLong(dataConsulta)}</strong>
+            às <strong>${escapeHTML(formatTime(horaConsulta))}</strong>.</p>
+            <p class="swal-subtext">O paciente será notificado com os detalhes.</p>
+          `,
+          icon: 'success',
+          confirmButtonColor: '#002a42',
+          confirmButtonText: 'Voltar para agendamentos',
+        }).then(() => {
+          voltarParaLista();
+        });
+      } catch (error) {
+        console.error(error);
+        showToast(error.message || 'Erro ao criar o agendamento.', 'error');
+      }
     });
   }
 });

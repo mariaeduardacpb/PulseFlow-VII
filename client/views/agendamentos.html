@@ -4,18 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PulseFlow | Agendamentos</title>
+  <link rel="stylesheet" href="/client/public/css/perfilPaciente.css"/>
   <link rel="stylesheet" href="/client/public/css/agendamentos.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
   <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="header-component"></div>
   <div id="sidebar-component"></div>
   
   <div class="container">
-    <div class="content-wrapper">
+    <main class="content agendamentos-content">
       <div class="page-header">
         <div class="header-title">
           <h1><i class="fas fa-calendar-alt"></i> Agendamentos</h1>
@@ -36,6 +37,7 @@
           <div class="filters-title">
             <h2><i class="fas fa-sliders-h"></i> Filtros avançados</h2>
             <p>Combine filtros para localizar rapidamente um agendamento específico</p>
+            <span class="filters-hint">Datas representam o período de busca (início e fim)</span>
           </div>
           <div class="filters-meta">
             <span><i class="fas fa-bullseye"></i> Resultados sob medida</span>
@@ -67,67 +69,69 @@
         </div>
       </div>
 
-      <div class="section-heading">
-        <div class="section-heading-text">
-          <h2>Resumo geral</h2>
-          <p>Indicadores atualizados dos atendimentos em cada etapa</p>
+      <section class="stats-card">
+        <div class="section-heading">
+          <div class="section-heading-text">
+            <h2>Resumo geral</h2>
+            <p>Indicadores atualizados dos atendimentos em cada etapa</p>
+          </div>
         </div>
-      </div>
 
-      <!-- Estatísticas -->
-      <div class="stats-section">
-        <div class="stat-card">
-          <div class="stat-icon stat-agendada">
-            <i class="fas fa-clock"></i>
+        <!-- Estatísticas -->
+        <div class="stats-section">
+          <div class="stat-card">
+            <div class="stat-icon stat-agendada">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="statAgendadas">0</div>
+              <div class="stat-label">Agendadas</div>
+            </div>
           </div>
-          <div class="stat-info">
-            <div class="stat-value" id="statAgendadas">0</div>
-            <div class="stat-label">Agendadas</div>
+          <div class="stat-card">
+            <div class="stat-icon stat-confirmada">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="statConfirmadas">0</div>
+              <div class="stat-label">Confirmadas</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-realizada">
+              <i class="fas fa-check-double"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="statRealizadas">0</div>
+              <div class="stat-label">Realizadas</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-cancelada">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="statCanceladas">0</div>
+              <div class="stat-label">Canceladas</div>
+            </div>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon stat-confirmada">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value" id="statConfirmadas">0</div>
-            <div class="stat-label">Confirmadas</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon stat-realizada">
-            <i class="fas fa-check-double"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value" id="statRealizadas">0</div>
-            <div class="stat-label">Realizadas</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon stat-cancelada">
-            <i class="fas fa-times-circle"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value" id="statCanceladas">0</div>
-            <div class="stat-label">Canceladas</div>
-          </div>
-        </div>
-      </div>
 
-      <div class="status-legend">
-        <span class="legend-pill">
-          <i class="fas fa-dot-circle status-agendada"></i> Agendada
-        </span>
-        <span class="legend-pill">
-          <i class="fas fa-dot-circle status-confirmada"></i> Confirmada
-        </span>
-        <span class="legend-pill">
-          <i class="fas fa-dot-circle status-realizada"></i> Realizada
-        </span>
-        <span class="legend-pill">
-          <i class="fas fa-dot-circle status-cancelada"></i> Cancelada
-        </span>
-      </div>
+        <div class="status-legend">
+          <span class="legend-pill">
+            <i class="fas fa-dot-circle status-agendada"></i> Agendada
+          </span>
+          <span class="legend-pill">
+            <i class="fas fa-dot-circle status-confirmada"></i> Confirmada
+          </span>
+          <span class="legend-pill">
+            <i class="fas fa-dot-circle status-realizada"></i> Realizada
+          </span>
+          <span class="legend-pill">
+            <i class="fas fa-dot-circle status-cancelada"></i> Cancelada
+          </span>
+        </div>
+      </section>
 
       <!-- Lista de Agendamentos -->
       <div class="agendamentos-section">
@@ -156,7 +160,7 @@
           <p>Nenhum agendamento encontrado</p>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 
   <!-- Modal Detalhes do Agendamento -->
@@ -188,6 +192,13 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script type="module">
+    import { initHeaderComponent } from '/client/public/js/components/header.js';
+    import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
+
+    initHeaderComponent({ title: 'Agendamentos' });
+    initDoctorSidebar('agendamentos');
+  </script>
   <script src="/client/public/js/agendamentos.js"></script>
 </body>
 </html>

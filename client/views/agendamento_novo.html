@@ -4,18 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PulseFlow | Novo Agendamento</title>
+  <link rel="stylesheet" href="/client/public/css/perfilPaciente.css"/>
   <link rel="stylesheet" href="/client/public/css/agendamento_novo.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
   <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="header-component"></div>
   <div id="sidebar-component"></div>
 
   <div class="container">
-    <div class="content-wrapper">
+    <main class="content agendamento-novo-content">
       <header class="page-hero">
         <div class="hero-content">
           <button class="hero-back" id="voltarLista">
@@ -43,6 +44,7 @@
       </header>
 
       <form id="formNovoAgendamento" class="appointment-form">
+        <input type="hidden" id="pacienteId" name="pacienteId">
         <div class="summary-panel">
           <div class="summary-header">
             <h2>Resumo rápido</h2>
@@ -75,7 +77,7 @@
               <h2>Dados do paciente</h2>
               <p>Identifique rapidamente quem será atendido.</p>
             </div>
-            <button type="button" class="section-action">
+            <button type="button" class="section-action" data-action="buscar-paciente">
               <i class="fas fa-address-book"></i>
               Buscar cadastro
             </button>
@@ -180,10 +182,17 @@
           </div>
         </div>
       </form>
-    </div>
+    </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script type="module">
+    import { initHeaderComponent } from '/client/public/js/components/header.js';
+    import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
+
+    initHeaderComponent({ title: 'Novo Agendamento' });
+    initDoctorSidebar('agendamentos');
+  </script>
   <script src="/client/public/js/agendamento_novo.js"></script>
 </body>
 </html>
