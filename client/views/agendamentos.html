@@ -20,16 +20,32 @@
       <div class="page-header">
         <div class="header-title">
           <h1><i class="fas fa-calendar-alt"></i> Agendamentos</h1>
-          <p class="header-subtitle">Gerencie suas consultas de forma eficiente</p>
+          <p class="header-subtitle">Gerencie suas consultas e horários de disponibilidade</p>
           <div class="header-badges">
             <span class="badge"><i class="fas fa-rotate"></i> Atualizado em tempo real</span>
             <span class="badge"><i class="fas fa-shield-check"></i> Dados protegidos</span>
           </div>
         </div>
-        <button id="novoAgendamentoBtn" class="btn-primary">
+        <button id="novoAgendamentoBtn" class="btn-primary" style="display: none;">
           <i class="fas fa-plus"></i> Novo Agendamento
         </button>
+        <button id="addHorarioBtn" class="btn-primary" style="display: none;">
+          <i class="fas fa-plus"></i> Adicionar Horário
+        </button>
       </div>
+
+      <!-- Abas de navegação -->
+      <div class="tabs-container">
+        <button class="tab-button active" data-tab="agendamentos">
+          <i class="fas fa-calendar-check"></i> Agendamentos
+        </button>
+        <button class="tab-button" data-tab="horarios">
+          <i class="fas fa-clock"></i> Meus Horários
+        </button>
+      </div>
+
+      <!-- Conteúdo da aba Agendamentos -->
+      <div id="tabAgendamentos" class="tab-content active">
 
       <!-- Filtros -->
       <div class="filters-section">
@@ -160,7 +176,322 @@
           <p>Nenhum agendamento encontrado</p>
         </div>
       </div>
+      </div>
+
+      <!-- Conteúdo da aba Meus Horários -->
+      <div id="tabHorarios" class="tab-content">
+        <div class="horarios-section">
+          <div class="actions-bar">
+            <div class="actions-left">
+              <button id="configurarHorariosBtn" class="btn-primary">
+                <i class="fas fa-cog"></i> Configurar Horários
+              </button>
+              <button class="btn-secondary" id="toggleSelecaoMultipla" style="display: none;">
+                <i class="fas fa-check-square"></i> Selecionar Horário
+              </button>
+              <button class="btn-danger" id="excluirSelecionados" style="display: none;">
+                <i class="fas fa-trash"></i> Excluir Selecionados (<span id="contadorSelecionados">0</span>)
+              </button>
+            </div>
+            <div class="actions-right">
+              <button class="btn-link" id="cancelarSelecao" style="display: none;">
+                Cancelar Seleção
+              </button>
+              <div class="filter-group">
+                <label>
+                  <input type="checkbox" id="showInactiveHorarios" />
+                  Mostrar horários inativos
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visualização Semanal -->
+          <div class="semana-view">
+            <div class="semana-header">
+              <div class="semana-header-content">
+                <div>
+                  <h3>Minha Agenda</h3>
+                  <p>Visualize e gerencie seus horários de atendimento</p>
+                </div>
+                <div class="semana-navigation">
+                  <button class="btn-nav-semana" id="prevWeek">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <span class="semana-periodo" id="semanaPeriodo">Semana atual</span>
+                  <button class="btn-nav-semana" id="nextWeek">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                  <button class="btn-nav-semana" id="todayWeek" title="Hoje">
+                    <i class="fas fa-calendar-day"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div id="semanaGrid" class="semana-grid">
+              <!-- Será preenchido via JavaScript -->
+            </div>
+          </div>
+
+          <div id="horariosList" class="horarios-list" style="display: none;">
+            <div class="loading" id="loadingHorarios">
+              <i class="fas fa-spinner fa-spin"></i> Carregando horários...
+            </div>
+          </div>
+
+          <div id="emptyStateHorarios" class="empty-state" style="display: none;">
+            <i class="fas fa-calendar-times"></i>
+            <h3>Nenhum horário cadastrado</h3>
+            <p>Configure seus horários de disponibilidade para começar a receber agendamentos</p>
+            <button class="btn-primary" onclick="document.getElementById('configurarHorariosBtn').click()">
+              <i class="fas fa-cog"></i> Configurar Horários
+            </button>
+          </div>
+        </div>
+      </div>
     </main>
+  </div>
+
+  <!-- Modal para configurar horários -->
+  <div id="horarioModal" class="modal" style="display: none;">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2 id="modalHorarioTitle">Configurar Horários de Atendimento</h2>
+        <button class="modal-close" id="closeHorarioModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="horarioForm">
+        <!-- Passo 1: Período e Dias -->
+        <div class="form-step">
+          <div class="step-header">
+            <div class="step-number">1</div>
+            <div class="step-title">
+              <h3>Defina o Período</h3>
+              <p>Escolha por quantas semanas você quer configurar os horários</p>
+            </div>
+          </div>
+          
+          <div class="config-item">
+            <label for="periodoSemanas" class="config-label-simple">
+              Período de Configuração *
+            </label>
+            <select id="periodoSemanas" required class="config-input-simple">
+              <option value="1">1 semana</option>
+              <option value="2" selected>2 semanas</option>
+              <option value="4">4 semanas (1 mês)</option>
+              <option value="8">8 semanas (2 meses)</option>
+              <option value="12">12 semanas (3 meses)</option>
+              <option value="indefinido">Indefinido (horário recorrente)</option>
+            </select>
+            <small class="config-hint-modern" style="margin-top: 8px;">
+              <i class="fas fa-info-circle"></i>
+              <span id="periodoInfo">Os horários serão criados para as próximas 2 semanas</span>
+            </small>
+          </div>
+
+          <div class="config-item" style="margin-top: 20px;">
+            <label class="config-label-simple">
+              Selecione os Dias da Semana *
+            </label>
+            <div class="dias-selecao">
+              <label class="dia-checkbox">
+                <input type="checkbox" class="dia-select" value="1" />
+                <span>Segunda</span>
+              </label>
+              <label class="dia-checkbox">
+                <input type="checkbox" class="dia-select" value="2" />
+                <span>Terça</span>
+              </label>
+              <label class="dia-checkbox">
+                <input type="checkbox" class="dia-select" value="3" />
+                <span>Quarta</span>
+              </label>
+              <label class="dia-checkbox">
+                <input type="checkbox" class="dia-select" value="4" />
+                <span>Quinta</span>
+              </label>
+              <label class="dia-checkbox">
+                <input type="checkbox" class="dia-select" value="5" />
+                <span>Sexta</span>
+              </label>
+              <label class="dia-checkbox">
+                <input type="checkbox" class="dia-select" value="6" />
+                <span>Sábado</span>
+              </label>
+              <label class="dia-checkbox">
+                <input type="checkbox" class="dia-select" value="0" />
+                <span>Domingo</span>
+              </label>
+            </div>
+            <div class="step-actions">
+              <button type="button" class="btn-link" id="selectAllDays">Selecionar Todos</button>
+              <button type="button" class="btn-link" id="deselectAllDays">Desselecionar Todos</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passo 2: Configuração de Horários -->
+        <div class="form-step">
+          <div class="step-header">
+            <div class="step-number">2</div>
+            <div class="step-title">
+              <h3>Configure os Horários</h3>
+              <p>Defina seu período de atendimento e o sistema gerará todos os horários automaticamente</p>
+            </div>
+          </div>
+          
+          <div class="config-simple-grid">
+            <div class="config-item">
+              <label for="horaInicio" class="config-label-simple">
+                Horário de Início *
+              </label>
+              <input type="time" id="horaInicio" required value="08:00" class="config-input-simple" />
+            </div>
+
+            <div class="config-item">
+              <label for="horaFim" class="config-label-simple">
+                Horário de Fim *
+              </label>
+              <input type="time" id="horaFim" required value="18:00" class="config-input-simple" />
+            </div>
+
+            <div class="config-item">
+              <label for="duracaoConsulta" class="config-label-simple">
+                Duração da Consulta *
+              </label>
+              <select id="duracaoConsulta" required class="config-input-simple">
+                <option value="15">15 minutos</option>
+                <option value="30" selected>30 minutos</option>
+                <option value="45">45 minutos</option>
+                <option value="60">60 minutos</option>
+              </select>
+            </div>
+
+            <div class="config-item">
+              <label class="config-label-simple">
+                Intervalo de Almoço <span class="optional-text">(opcional)</span>
+              </label>
+              <div class="intervalo-simple">
+                <input type="time" id="almocoInicio" value="12:00" class="config-input-simple" />
+                <span class="intervalo-text">até</span>
+                <input type="time" id="almocoFim" value="13:30" class="config-input-simple" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Templates Rápidos -->
+          <div class="templates-quick">
+            <p class="templates-label">Ou use um template rápido:</p>
+            <div class="template-buttons">
+              <button type="button" class="template-btn" data-template="manha">
+                <i class="fas fa-sun"></i> Manhã
+              </button>
+              <button type="button" class="template-btn" data-template="tarde">
+                <i class="fas fa-sun"></i> Tarde
+              </button>
+              <button type="button" class="template-btn" data-template="dia-completo">
+                <i class="fas fa-calendar-day"></i> Dia Completo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview dos horários -->
+        <div class="form-step preview-step">
+          <div class="step-header">
+            <div class="step-number">3</div>
+            <div class="step-title">
+              <h3>Preview dos Horários</h3>
+              <p>Visualize quantos horários serão criados antes de salvar</p>
+            </div>
+          </div>
+          <div id="previewHorarios" class="preview-container">
+            <p class="preview-placeholder">Selecione os dias e configure os horários para ver o preview</p>
+          </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="form-step">
+          <div class="form-group">
+            <label for="observacoesHorario" class="form-label-with-icon">
+              <i class="fas fa-sticky-note"></i>
+              Observações (opcional)
+            </label>
+            <textarea id="observacoesHorario" rows="3" placeholder="Ex: Horário comercial, exceto feriados"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelHorarioForm">Cancelar</button>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-save"></i> Salvar Configuração
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para editar dia específico -->
+  <div id="editarDiaModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="editarDiaTitle">Editar Horário</h2>
+        <button class="modal-close" id="closeEditarDiaModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="editarDiaForm">
+        <input type="hidden" id="editarDiaId" />
+        <input type="hidden" id="editarDiaSemana" />
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editarHoraInicio">Hora de Início *</label>
+            <input type="time" id="editarHoraInicio" required />
+          </div>
+          <div class="form-group">
+            <label for="editarHoraFim">Hora de Fim *</label>
+            <input type="time" id="editarHoraFim" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editarDuracao">Duração (minutos) *</label>
+          <select id="editarDuracao" required>
+            <option value="15">15 minutos</option>
+            <option value="30" selected>30 minutos</option>
+            <option value="45">45 minutos</option>
+            <option value="60">60 minutos</option>
+            <option value="90">90 minutos</option>
+            <option value="120">120 minutos</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editarObservacoes">Observações</label>
+          <textarea id="editarObservacoes" rows="2"></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="editarAtivo" checked />
+            Horário ativo
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-danger" id="excluirDiaBtn" style="display: none;">
+            <i class="fas fa-trash"></i> Excluir
+          </button>
+          <div style="flex: 1;"></div>
+          <button type="button" class="btn-secondary" id="cancelEditarDia">Cancelar</button>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-save"></i> Salvar
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Modal Detalhes do Agendamento -->

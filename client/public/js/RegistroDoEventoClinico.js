@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   
-  const form = document.querySelector('form');
+  const form = document.querySelector('#registroForm');
   const token = localStorage.getItem('token');
 
   // Chamada da função que exibe Dr(a). Nome na sidebar

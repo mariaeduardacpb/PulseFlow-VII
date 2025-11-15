@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PulseFlow | Meus Horários de Trabalho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/client/public/css/perfilPaciente.css"/>
+  <link rel="stylesheet" href="/client/public/css/horariosDisponibilidade.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+</head>
+<body>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
+  <div class="container">
+    <main class="content horarios-content">
+      <div class="page-header">
+      <h1><i class="fas fa-clock"></i> Meus Horários de Trabalho</h1>
+      <p>Configure os horários em que você está disponível para atender pacientes</p>
+    </div>
+
+    <div class="actions-bar">
+      <button id="addHorarioBtn" class="btn-primary">
+        <i class="fas fa-plus"></i> Adicionar Horário
+      </button>
+      <div class="filter-group">
+        <label>
+          <input type="checkbox" id="showInactive" />
+          Mostrar horários inativos
+        </label>
+      </div>
+    </div>
+
+    <div id="horariosList" class="horarios-list">
+      <div class="loading" id="loading">
+        <i class="fas fa-spinner fa-spin"></i> Carregando horários...
+      </div>
+    </div>
+
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <i class="fas fa-calendar-times"></i>
+      <h3>Nenhum horário cadastrado</h3>
+      <p>Comece adicionando seus horários de disponibilidade</p>
+      <button class="btn-primary" onclick="document.getElementById('addHorarioBtn').click()">
+        <i class="fas fa-plus"></i> Adicionar Primeiro Horário
+      </button>
+    </div>
+    </main>
+  </div>
+
+  <!-- Modal para adicionar/editar horário -->
+  <div id="horarioModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Adicionar Horário</h2>
+        <button class="modal-close" id="closeModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="horarioForm">
+        <input type="hidden" id="horarioId" />
+        
+        <div class="form-group">
+          <label for="diaSemana">Dia da Semana *</label>
+          <select id="diaSemana" required>
+            <option value="">Selecione o dia</option>
+            <option value="0">Domingo</option>
+            <option value="1">Segunda-feira</option>
+            <option value="2">Terça-feira</option>
+            <option value="3">Quarta-feira</option>
+            <option value="4">Quinta-feira</option>
+            <option value="5">Sexta-feira</option>
+            <option value="6">Sábado</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="horaInicio">Hora de Início *</label>
+            <input type="time" id="horaInicio" required />
+          </div>
+          <div class="form-group">
+            <label for="horaFim">Hora de Fim *</label>
+            <input type="time" id="horaFim" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="duracaoConsulta">Duração da Consulta (minutos) *</label>
+          <select id="duracaoConsulta" required>
+            <option value="15">15 minutos</option>
+            <option value="30" selected>30 minutos</option>
+            <option value="45">45 minutos</option>
+            <option value="60">60 minutos</option>
+            <option value="90">90 minutos</option>
+            <option value="120">120 minutos</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="observacoes">Observações</label>
+          <textarea id="observacoes" rows="3" placeholder="Ex: Atendimento apenas pela manhã"></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="ativo" checked />
+            Horário ativo
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelForm">Cancelar</button>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-save"></i> Salvar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script type="module" src="/client/public/js/horariosDisponibilidade.js"></script>
+</body>
+</html>
+

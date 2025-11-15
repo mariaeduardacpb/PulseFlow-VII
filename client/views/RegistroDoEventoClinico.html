@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PulseFlow | Registro Clínico</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/client/public/css/RegistroDoEventoClinico.css">
   <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
 </head>
@@ -47,69 +48,100 @@
 
     <main class="form-section">
       <header class="form-header">
-        <span class="icon">📋</span>
-        <h1>Motivo do Registro</h1>
-        <div class="logo">
-          <img src="/client/public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+        <div class="header-content">
+          <div class="header-title">
+            <i class="fas fa-file-medical"></i>
+            <h1>Registro Clínico</h1>
+          </div>
+          <div class="logo">
+            <img src="/client/public/assets/pulseLogo.png" alt="Logo Pulse Flow">
+          </div>
         </div>
       </header>
 
-      <form>
-        <label for="titulo">Motivo do Registro</label>
-        <input type="text" id="titulo" name="titulo" placeholder="Ex: Dor no peito, Crise de ansiedade..." required />
+      <div class="form-container">
+        <form id="registroForm">
+          <div class="form-group">
+            <label for="titulo">Motivo do Registro</label>
+            <input type="text" id="titulo" name="titulo" placeholder="Ex: Dor no peito, Crise de ansiedade..." required />
+          </div>
 
-        <label for="dataHora">Data e Hora</label>
-        <input type="datetime-local" id="dataHora" name="dataHora" required />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dataHora">Data e Hora</label>
+              <input type="datetime-local" id="dataHora" name="dataHora" required />
+            </div>
 
-        <label for="tipoEvento">Tipo de Evento</label>
-        <select id="tipoEvento" name="tipoEvento">
-          <option value="" disabled selected>Selecione</option>
-          <option>Crise / Emergência</option>
-          <option>Acompanhamento de Condição Crônica</option>
-          <option>Episódio Psicológico ou Emocional</option>
-          <option>Evento Relacionado à Medicação</option>
-        </select>
+            <div class="form-group">
+              <label for="tipoEvento">Tipo de Evento</label>
+              <select id="tipoEvento" name="tipoEvento" required>
+                <option value="" disabled selected>Selecione</option>
+                <option>Crise / Emergência</option>
+                <option>Acompanhamento de Condição Crônica</option>
+                <option>Episódio Psicológico ou Emocional</option>
+                <option>Evento Relacionado à Medicação</option>
+              </select>
+            </div>
+          </div>
 
-        <label for="especialidade">Especialidade Relacionada</label>
-        <select id="especialidade" name="especialidade">
-          <option value="" disabled selected>Selecione</option>
-          <option>Cardiologia</option>
-          <option>Dermatologia</option>
-          <option>Endocrinologia</option>
-          <option>Gastroenterologia</option>
-          <option>Ginecologia</option>
-          <option>Neurologia</option>
-          <option>Psiquiatria</option>
-        </select>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="especialidade">Especialidade Relacionada</label>
+              <select id="especialidade" name="especialidade" required>
+                <option value="" disabled selected>Selecione</option>
+                <option>Cardiologia</option>
+                <option>Dermatologia</option>
+                <option>Endocrinologia</option>
+                <option>Gastroenterologia</option>
+                <option>Ginecologia</option>
+                <option>Neurologia</option>
+                <option>Psiquiatria</option>
+              </select>
+            </div>
 
-        <label for="gravidade">Intensidade da Dor</label>
-        <select id="gravidade" name="gravidade">
-          <option value="" disabled selected>Selecione</option>
-          <option value="na">Não se aplica</option>
-          <option value="0">Sem Dor (0)</option>
-          <option value="1-3">Dor Leve (1-3)</option>
-          <option value="4-6">Dor Moderada (4-6)</option>
-          <option value="7-9">Dor Intensa (7-9)</option>
-          <option value="10">Dor Insuportável (10)</option>
-        </select>
+            <div class="form-group">
+              <label for="gravidade">Intensidade da Dor</label>
+              <select id="gravidade" name="gravidade">
+                <option value="" disabled selected>Selecione</option>
+                <option value="na">Não se aplica</option>
+                <option value="0">Sem Dor (0)</option>
+                <option value="1-3">Dor Leve (1-3)</option>
+                <option value="4-6">Dor Moderada (4-6)</option>
+                <option value="7-9">Dor Intensa (7-9)</option>
+                <option value="10">Dor Insuportável (10)</option>
+              </select>
+            </div>
+          </div>
 
-        <label for="alivio">Alívio após Medicação ou Intervenção?</label>
-        <select id="alivio" name="alivio">
-          <option value="" disabled selected>Selecione</option>
-          <option>Sim</option>
-          <option>Parcial</option>
-          <option>Não</option>
-          <option>Não se Aplica</option>
-        </select>
+          <div class="form-group">
+            <label for="alivio">Alívio após Medicação ou Intervenção?</label>
+            <select id="alivio" name="alivio">
+              <option value="" disabled selected>Selecione</option>
+              <option>Sim</option>
+              <option>Parcial</option>
+              <option>Não</option>
+              <option>Não se Aplica</option>
+            </select>
+          </div>
 
-        <label for="descricao">Descrição do Evento</label>
-        <textarea id="descricao" name="descricao" rows="4" placeholder="Descreva com detalhes o que ocorreu..."></textarea>
+          <div class="form-group">
+            <label for="descricao">Descrição do Evento</label>
+            <textarea id="descricao" name="descricao" rows="5" placeholder="Descreva com detalhes o que ocorreu..."></textarea>
+          </div>
 
-        <label for="sintomas">Sintomas Apresentados</label>
-        <textarea id="sintomas" name="sintomas" rows="3" placeholder="Ex: Dor de cabeça, náusea, tontura..."></textarea>
+          <div class="form-group">
+            <label for="sintomas">Sintomas Apresentados</label>
+            <textarea id="sintomas" name="sintomas" rows="4" placeholder="Ex: Dor de cabeça, náusea, tontura..."></textarea>
+          </div>
 
-        <button type="submit">Registrar Evento</button>
-      </form>
+          <div class="form-actions">
+            <button type="submit" class="btn-submit">
+              <i class="fas fa-save"></i>
+              Registrar Evento
+            </button>
+          </div>
+        </form>
+      </div>
     </main>
   </div>
   <script type="module" src="/client/public/js/RegistroDoEventoClinico.js"></script>

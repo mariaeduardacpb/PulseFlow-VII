@@ -25,6 +25,7 @@ import perfilMedicoRoutes from './routes/perfilMedicoRoutes.js';
 import accessCodeRoutes from './routes/accessCodeRoutes.js';
 import geminiRoutes from './routes/geminiRoutes.js';
 import agendamentoRoutes from './routes/agendamentoRoutes.js';
+import horarioDisponibilidadeRoutes from './routes/horarioDisponibilidadeRoutes.js';
 
 
 // Carregar variáveis de ambiente
@@ -126,6 +127,11 @@ app.get('/client/views/agendamentos.html', (req, res) => {
   res.sendFile(path.join(clientPath, 'views', 'agendamentos.html'));
 });
 
+// Rota para horários de disponibilidade
+app.get('/client/views/horariosDisponibilidade.html', (req, res) => {
+  res.sendFile(path.join(clientPath, 'views', 'horariosDisponibilidade.html'));
+});
+
 // Rotas da aplicação
 app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', userRoutes); // ✅ NOVA ROTA ATIVADA
@@ -145,6 +151,7 @@ app.use('/api/eventos-clinicos', eventoClinicoRoutes);
 app.use('/api/access-code', accessCodeRoutes);
 app.use('/api/gemini', geminiRoutes);
 app.use('/api/agendamentos', agendamentoRoutes);
+app.use('/api/horarios-disponibilidade', horarioDisponibilidadeRoutes);
 
 
 // Middleware de erro
