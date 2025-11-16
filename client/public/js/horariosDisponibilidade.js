@@ -342,3 +342,4 @@ function initFilters() {
 window.createHorarioCard = createHorarioCard;
 
 
+

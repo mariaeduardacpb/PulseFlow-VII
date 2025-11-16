@@ -322,27 +322,32 @@ function renderizarCrises(crises) {
                     <div class="record-info-value">${dataFormatada}</div>
                 </div>
 
-                <div class="record-info-item">
-                    <div class="record-info-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 12l2 2 4-4"></path>
-                            <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
-                            <path d="M16 2l4 4-4 4"></path>
-                        </svg>
-                    </div>
-                    <div class="record-info-label">Tipo de Evento:</div>
-                    <div class="record-info-value">Crise de Gastrite</div>
-                </div>
+				<div class="record-info-item">
+					<div class="record-info-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M20 13V7a2 2 0 0 0-2-2h-3"></path>
+							<path d="M8 5H6a2 2 0 0 0-2 2v6"></path>
+							<rect x="6" y="13" width="12" height="8" rx="2"></rect>
+						</svg>
+					</div>
+					<div class="record-info-label">Sintomas:</div>
+					<div class="record-info-value">${(crise.sintomas && String(crise.sintomas).trim()) ? crise.sintomas : 'Não informado'}</div>
+				</div>
 
-                <div class="record-info-item">
-                    <div class="record-info-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                        </svg>
-                    </div>
-                    <div class="record-info-label">Intensidade:</div>
-                    <div class="record-info-value">${intensidadeTexto}</div>
-                </div>
+				<div class="record-info-item">
+					<div class="record-info-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M17 3H7a2 2 0 0 0-2 2v14"></path>
+							<path d="M7 7h10"></path>
+							<path d="M11 11h6"></path>
+							<path d="M11 15h6"></path>
+						</svg>
+					</div>
+					<div class="record-info-label">Medicação:</div>
+					<div class="record-info-value">${(crise.medicacao && String(crise.medicacao).trim()) ? crise.medicacao : 'Não informado'}</div>
+				</div>
+
+				
             </div>
 
             <div class="record-actions">
