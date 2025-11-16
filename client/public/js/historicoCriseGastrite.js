@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 const API_URL = window.API_URL || 'http://localhost:65432';
+let todasCrisesCache = [];
 
 function mostrarErro(mensagem) {
     const Toast = Swal.mixin({
@@ -220,28 +221,8 @@ async function buscarCrises(filtros = {}) {
 
         console.log(`Buscando crises de gastrite para CPF: ${cpf}`);
 
-        let url = `${API_URL}/api/gastrite/medico?cpf=${cpf}`;
-        const queryParams = new URLSearchParams();
-
-        if (filtros.month) {
-            queryParams.append('month', filtros.month);
-        }
-        
-        if (filtros.year) {
-            queryParams.append('year', filtros.year);
-        }
-
-        if (filtros.intensity) {
-            if (filtros.intensity === '10') {
-                queryParams.append('intensity', '10-10');
-            } else {
-                queryParams.append('intensity', filtros.intensity);
-            }
-        }
-
-        if (queryParams.toString()) {
-            url += `&${queryParams.toString()}`;
-        }
+		// Buscar SEM filtros no servidor (evitar 500). Filtramos no cliente.
+		let url = `${API_URL}/api/gastrite/medico?cpf=${cpf}`;
 
         const response = await fetch(url, {
             headers: {
@@ -261,11 +242,158 @@ async function buscarCrises(filtros = {}) {
 
         const data = await response.json();
         console.log('Crises de gastrite recebidas:', data);
-        return data;
+        // Cache completo para alimentar filtros dinâmicos (meses disponíveis)
+        todasCrisesCache = Array.isArray(data) ? data : [];
+
+		// Filtragem BURRA no cliente (mês/ano/intensidade)
+		const mes = filtros?.month ? parseInt(filtros.month, 10) : null;
+		const ano = filtros?.year ? parseInt(filtros.year, 10) : null;
+		const intensidadeFiltro = filtros?.intensity || '';
+        let resultado = Array.isArray(data) ? data : [];
+
+		if (mes || ano) {
+			resultado = resultado.filter((crise) => {
+				const d = new Date(crise.data);
+				if (isNaN(d.getTime())) return false;
+				// Usar UTC para evitar mudanças de mês por fuso horário
+				const dMes = d.getUTCMonth() + 1; // 1-12
+				const dAno = d.getUTCFullYear();
+				const mesOk = mes ? dMes === mes : true;
+				const anoOk = ano ? dAno === ano : true;
+				return mesOk && anoOk;
+			});
+		}
+
+		// Intensidade no cliente (aceita '0', '10', '1-3', '4-6', '7-9')
+		if (intensidadeFiltro) {
+			if (/^\d+$/.test(intensidadeFiltro)) {
+				const alvo = parseInt(intensidadeFiltro, 10);
+				resultado = resultado.filter((crise) => {
+					const val = Number(crise.intensidadeDor);
+					return !Number.isNaN(val) && val === alvo;
+				});
+			} else if (/^\d+\-\d+$/.test(intensidadeFiltro)) {
+				const [min, max] = intensidadeFiltro.split('-').map((n) => parseInt(n, 10));
+				resultado = resultado.filter((crise) => {
+					const val = Number(crise.intensidadeDor);
+					return !Number.isNaN(val) && val >= min && val <= max;
+				});
+			}
+		}
+
+		return resultado;
     } catch (error) {
         console.error('Erro ao buscar crises de gastrite:', error);
         mostrarErro("Erro interno ao buscar crises de gastrite.");
         return [];
+    }
+}
+
+function atualizarMesesDisponiveis(anoSelecionado) {
+    try {
+        const monthsList = document.getElementById('monthsList');
+        const monthInput = document.getElementById('filterMonth');
+        if (!monthsList || !monthInput) return;
+
+        const monthNames = {
+            1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+            5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+            9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+        };
+
+        const anoNum = anoSelecionado && /^\d+$/.test(anoSelecionado) ? parseInt(anoSelecionado, 10) : null;
+
+        // Descobrir meses com crises considerando o ano selecionado (se houver)
+        const mesesSet = new Set();
+        (todasCrisesCache || []).forEach((crise) => {
+            const d = new Date(crise.data);
+            if (isNaN(d.getTime())) return;
+            const y = d.getUTCFullYear();
+            const m = d.getUTCMonth() + 1;
+            if (!anoNum || y === anoNum) {
+                mesesSet.add(m);
+            }
+        });
+
+        // Reconstruir a lista de opções
+        let html = '';
+        html += `<div class="option" data-value="">Todos os meses</div>`;
+        for (let m = 1; m <= 12; m++) {
+            if (mesesSet.has(m)) {
+                html += `<div class="option" data-value="${m}">${monthNames[m]}</div>`;
+            }
+        }
+        monthsList.innerHTML = html;
+
+        // Se o mês selecionado atual não estiver mais disponível, resetar
+        const currentSelected = monthInput.dataset.value || '';
+        if (currentSelected && !mesesSet.has(parseInt(currentSelected, 10))) {
+            monthInput.value = 'Todos os meses';
+            monthInput.dataset.value = '';
+        }
+    } catch (e) {
+        console.warn('Falha ao atualizar meses disponíveis:', e);
+    }
+}
+
+function atualizarIntensidadesDisponiveis(mesSelecionado, anoSelecionado) {
+    try {
+        const intensityList = document.getElementById('intensidadesList');
+        const intensityInput = document.getElementById('filterIntensity');
+        if (!intensityList || !intensityInput) return;
+
+        const hasCategory = {
+            '0': false,
+            '1-3': false,
+            '4-6': false,
+            '7-9': false,
+            '10': false
+        };
+
+        const mesNum = mesSelecionado && /^\d+$/.test(mesSelecionado) ? parseInt(mesSelecionado, 10) : null;
+        const anoNum = anoSelecionado && /^\d+$/.test(anoSelecionado) ? parseInt(anoSelecionado, 10) : null;
+
+        (todasCrisesCache || []).forEach((crise) => {
+            const d = new Date(crise.data);
+            if (isNaN(d.getTime())) return;
+            const y = d.getUTCFullYear();
+            const m = d.getUTCMonth() + 1;
+            if ((mesNum && m !== mesNum) || (anoNum && y !== anoNum)) return;
+
+            const val = Number(crise.intensidadeDor);
+            if (Number.isNaN(val)) return;
+            if (val === 0) hasCategory['0'] = true;
+            else if (val === 10) hasCategory['10'] = true;
+            else if (val >= 1 && val <= 3) hasCategory['1-3'] = true;
+            else if (val >= 4 && val <= 6) hasCategory['4-6'] = true;
+            else if (val >= 7 && val <= 9) hasCategory['7-9'] = true;
+        });
+
+        const labels = {
+            '0': 'Sem dor (0)',
+            '1-3': 'Leve (1-3)',
+            '4-6': 'Moderada (4-6)',
+            '7-9': 'Intensa (7-9)',
+            '10': 'Dor insuportável (10)'
+        };
+
+        let html = '';
+        html += `<div class="option" data-value="">Todas as Intensidades</div>`;
+        ['0', '1-3', '4-6', '7-9', '10'].forEach((key) => {
+            if (hasCategory[key]) {
+                html += `<div class="option" data-value="${key}">${labels[key]}</div>`;
+            }
+        });
+        intensityList.innerHTML = html;
+
+        // Se a intensidade selecionada atual não estiver mais disponível, resetar
+        const currentSelected = intensityInput.dataset.value || '';
+        if (currentSelected && !hasCategory[currentSelected]) {
+            intensityInput.value = 'Todas as Intensidades';
+            intensityInput.dataset.value = '';
+        }
+    } catch (e) {
+        console.warn('Falha ao atualizar intensidades disponíveis:', e);
     }
 }
 
@@ -306,6 +434,7 @@ function renderizarCrises(crises) {
                 <div>
                     <div class="record-title">${titulo}</div>
                 </div>
+				<div class="record-badge ${obterClasseIntensidade(crise.intensidadeDor)}">${intensidadeTexto}</div>
             </div>
 
             <div class="record-info">
@@ -366,11 +495,20 @@ function renderizarCrises(crises) {
 }
 
 function aplicarFiltros() {
-    const filtros = {
-        month: document.getElementById('filterMonth')?.dataset.value || document.getElementById('filterMonth')?.value || '',
-        year: document.getElementById('filterYear')?.dataset.value || document.getElementById('filterYear')?.value || '',
-        intensity: document.getElementById('filterIntensity')?.dataset.value || document.getElementById('filterIntensity')?.value || ''
-    };
+	const monthEl = document.getElementById('filterMonth');
+	const yearEl = document.getElementById('filterYear');
+	const intensityEl = document.getElementById('filterIntensity');
+
+	const rawMonth = monthEl?.dataset.value || '';
+	const rawYear = yearEl?.dataset.value || '';
+	const rawIntensity = intensityEl?.dataset.value || '';
+
+	// Apenas valores válidos (numéricos/range), do contrário enviamos vazio
+	const filtros = {
+		month: /^\d+$/.test(rawMonth) ? rawMonth : '',
+		year: /^\d+$/.test(rawYear) ? rawYear : '',
+		intensity: /^(\d+|\d+\-\d+)$/.test(rawIntensity) ? rawIntensity : ''
+	};
     
     carregarCrises(filtros);
 }
@@ -389,6 +527,14 @@ function limparFiltros() {
 
 async function carregarCrises(filtros = {}) {
     const crises = await buscarCrises(filtros);
+    // Atualizar meses disponíveis após qualquer alteração de filtros (principalmente ano)
+    const yearEl = document.getElementById('filterYear');
+    const anoSelecionado = yearEl?.dataset.value || '';
+    atualizarMesesDisponiveis(anoSelecionado);
+    // Atualizar intensidades disponíveis com base em mês/ano atuais
+    const monthEl = document.getElementById('filterMonth');
+    const mesSelecionado = monthEl?.dataset.value || '';
+    atualizarIntensidadesDisponiveis(mesSelecionado, anoSelecionado);
     renderizarCrises(crises);
 }
 
@@ -400,6 +546,10 @@ function configurarEventListeners() {
 
     const clearFilters = document.getElementById('clearFilters');
     if (clearFilters) clearFilters.addEventListener('click', limparFiltros);
+
+	// Botão de limpar dentro do estado vazio
+	const noCrisesClear = document.getElementById('noCrisesClear');
+	if (noCrisesClear) noCrisesClear.addEventListener('click', limparFiltros);
 }
 
 async function inicializarPagina() {
