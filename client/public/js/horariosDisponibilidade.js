@@ -341,3 +341,4 @@ function initFilters() {
 // Exportar função para uso global se necessário
 window.createHorarioCard = createHorarioCard;
 
+

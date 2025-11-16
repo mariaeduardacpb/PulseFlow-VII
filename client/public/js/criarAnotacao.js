@@ -8,7 +8,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   
-  await carregarDadosMedico();
+  // Carrega os dados do médico primeiro (preenche campos automaticamente)
+  try {
+    await carregarDadosMedico();
+  } catch (error) {
+    console.error('Erro ao carregar dados do médico:', error);
+  }
+  
+  // Inicializa o formulário
   inicializarFormulario();
 });
 
@@ -17,107 +24,34 @@ let formSubmitted = false;
 
 // Função para mostrar mensagem de aviso
 function mostrarAviso(mensagem, tipo = 'success') {
-  const aviso = document.createElement('div');
-  aviso.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #ffffff;
-    color: #1e293b;
-    padding: 16px 20px;
-    border-radius: 12px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    z-index: 1000;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    border: 2px solid ${tipo === 'error' ? '#fecaca' : '#bbf7d0'}; 
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 300px;
-    max-width: 400px;
-    animation: slideIn 0.3s ease-out;
-  `;
-
-  const icon = document.createElement('div');
-  icon.innerHTML = tipo === 'error' ? `
-    <svg width="24" height="24" stroke="currentColor" fill="none" style="color: #dc2626;">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="15" y1="9" x2="9" y2="15"/>
-      <line x1="9" y1="9" x2="15" y2="15"/>
-    </svg>
-  ` : `
-    <svg width="24" height="24" stroke="currentColor" fill="none" style="color: #059669;">
-      <circle cx="12" cy="12" r="10"/>
-      <path d="M9 12l2 2 4-4"/>
-    </svg>
-  `;
-
-  const textContainer = document.createElement('div');
-  textContainer.style.cssText = `
-    flex: 1;
-    line-height: 1.4;
-  `;
-  textContainer.textContent = mensagem;
-
-  const closeButton = document.createElement('button');
-  closeButton.style.cssText = `
-    background: none;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    color: #94a3b8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-    border-radius: 4px;
-  `;
-  closeButton.innerHTML = `
-    <svg width="20" height="20" stroke="currentColor" fill="none">
-      <line x1="18" y1="6" x2="6" y2="18"/>
-      <line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
-  `;
-  closeButton.onclick = () => {
-    aviso.style.animation = 'slideOut 0.3s ease-out';
-    setTimeout(() => {
-      if (document.body.contains(aviso)) {
-        document.body.removeChild(aviso);
-      }
-    }, 300);
+  const icones = {
+    success: '✓',
+    error: '✕',
+    warning: '⚠',
+    info: 'ℹ'
   };
-
-  aviso.appendChild(icon);
-  aviso.appendChild(textContainer);
-  aviso.appendChild(closeButton);
-  document.body.appendChild(aviso);
-
-  // Adiciona estilo para a animação
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOut {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
-    }
-  `;
-  document.head.appendChild(style);
-
-  setTimeout(() => {
-    if (document.body.contains(aviso)) {
-      aviso.style.animation = 'slideOut 0.3s ease-out';
-      setTimeout(() => {
-        if (document.body.contains(aviso)) {
-          document.body.removeChild(aviso);
-          document.head.removeChild(style);
-        }
-      }, 300);
-    }
-  }, 5000);
+  
+  if (typeof Swal !== 'undefined') {
+    Swal.fire({
+      title: icones[tipo] || '',
+      text: mensagem,
+      icon: tipo,
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+      toast: true,
+      position: 'top-end',
+      background: '#ffffff',
+      color: '#1e293b',
+      customClass: {
+        popup: 'swal-popup-custom',
+        title: 'swal-title-custom',
+        content: 'swal-content-custom'
+      }
+    });
+  } else {
+    console.log(`${tipo.toUpperCase()}: ${mensagem}`);
+  }
 }
 
 // Função para mostrar erro
@@ -269,14 +203,18 @@ async function handleSubmit(e) {
       throw new Error(errorData.message || 'Erro ao criar anotação');
     }
 
-    mostrarAviso('Registro clínico criado com sucesso!', 'success');
-    
     // Atualizar progresso
     atualizarProgresso(3);
     
-    setTimeout(() => {
+    // Mostrar popup de sucesso igual ao de salvar PDF
+    Swal.fire({
+      icon: 'success',
+      title: 'Registro Criado!',
+      text: 'O registro clínico foi salvo com sucesso.',
+      confirmButtonColor: '#002A42'
+    }).then(() => {
       window.location.href = 'historicoProntuario.html';
-    }, 2000);
+    });
 
   } catch (error) {
     console.error('Erro ao criar anotação:', error);
@@ -328,13 +266,25 @@ async function carregarDadosMedico() {
       const nomeFormatado = `${prefixo} ${medico.nome}`;
       medicoInput.value = nomeFormatado;
       medicoInput.readOnly = true;
+      console.log('Campo médico preenchido:', nomeFormatado);
+    } else {
+      console.error('Campo médico não encontrado no DOM');
     }
 
     // Preenche o campo de especialidade
     const categoriaInput = document.getElementById("categoria");
-    if (medico.areaAtuacao) {
-      categoriaInput.value = medico.areaAtuacao;
-      categoriaInput.readOnly = true;
+    if (categoriaInput) {
+      if (medico.areaAtuacao) {
+        categoriaInput.value = medico.areaAtuacao;
+        categoriaInput.readOnly = true;
+        console.log('Campo categoria preenchido:', medico.areaAtuacao);
+      } else {
+        console.warn('Área de atuação não encontrada no perfil do médico');
+        categoriaInput.value = 'Especialidade não informada';
+        categoriaInput.readOnly = true;
+      }
+    } else {
+      console.error('Campo categoria não encontrado no DOM');
     }
 
     // Define a data atual como padrão
@@ -380,44 +330,3 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
-      const hoje = new Date();
-      const dataAjustada = new Date(hoje.getTime() - (hoje.getTimezoneOffset() * 60000));
-      const dataFormatada = dataAjustada.toISOString().split('T')[0];
-      dataInput.value = dataFormatada;
-      dataInput.max = dataFormatada;
-
-    // Remove a classe touched de todos os campos
-    document.querySelectorAll('input, select, textarea').forEach(field => {
-      field.classList.remove('touched');
-    });
-
-    // Atualizar progresso inicial
-    atualizarProgresso(1);
-
-// Adicionar estilos CSS para animações
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  .btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-  .btn-primary:disabled:hover {
-    transform: none;
-    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
-  }
-`;
-document.head.appendChild(style);
-// Inicialização
-document.addEventListener("DOMContentLoaded", async function () {
-  // Carrega os dados do médico primeiro
-  await carregarDadosMedico();
-  
-  // Resto do código de inicialização
-  // ... existing code ...
-});

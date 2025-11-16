@@ -375,7 +375,7 @@ function limparFiltros() {
 }
 
 function criarNovoRegistro() {
-  window.location.href = '/client/views/criarAnotacao.html';
+  window.location.href = '/client/views/criarAnotações.html';
 }
 
 function formatarData(data) {

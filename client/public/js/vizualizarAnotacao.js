@@ -1,20 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // Toggle da Sidebar
-  const sidebarToggle = document.getElementById('sidebarToggle');
-  const sidebar = document.querySelector('.sidebar');
-  const content = document.querySelector('.content');
-
-  sidebarToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-  });
-
-  // Fechar sidebar ao clicar fora
-  document.addEventListener('click', (e) => {
-    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && sidebar.classList.contains('active')) {
-      sidebar.classList.remove('active');
-    }
-  });
-
   // Carrega dados do médico logado primeiro
   let medicoLogado = null;
   try {
@@ -43,11 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       tituloSidebar.textContent = nomeFormatado;
     }
 
-    // Atualiza o nome no campo de médico responsável
-    const medicoNome = document.querySelector('.medico-nome');
-    if (medicoNome) {
-      medicoNome.textContent = nomeFormatado;
-    }
+    // Não atualiza o campo médico responsável aqui - será atualizado depois com os dados da API
 
   } catch (error) {
     console.error("Erro ao carregar dados do médico:", error);
@@ -87,26 +67,105 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const anotacao = await response.json();
     console.log('Dados da anotação:', anotacao);
+    console.log('Tipo de consulta recebido:', anotacao.tipoConsulta);
+    console.log('Médico recebido:', anotacao.medico);
 
     // Atualiza os elementos com os dados da anotação
-    document.querySelector('.titulo').innerHTML = `
-      <strong>Motivo da Consulta</strong>
-      <span>${anotacao.titulo || 'Sem título'}</span>
-    `;
+    // Atualiza o título no elemento oculto (para compatibilidade)
+    const tituloElement = document.querySelector('.titulo');
+    if (tituloElement) {
+      tituloElement.innerHTML = `
+        <strong>Motivo da Consulta</strong>
+        <span>${anotacao.titulo || 'Sem título'}</span>
+      `;
+    }
+    
+    // Atualiza o título no elemento visível
+    const tituloAnotacao = document.getElementById('tituloAnotacao');
+    if (tituloAnotacao) {
+      tituloAnotacao.textContent = anotacao.titulo || 'Registro Clínico';
+    }
     
     // Formatação correta da data usando UTC
     const data = new Date(anotacao.data);
     const dataFormatada = `${data.getUTCDate().toString().padStart(2, '0')}/${(data.getUTCMonth() + 1).toString().padStart(2, '0')}/${data.getUTCFullYear()}`;
-    document.querySelector('.data').textContent = anotacao.data ? dataFormatada : 'Data não informada';
+    const dataElement = document.querySelector('.data');
+    if (dataElement) {
+      dataElement.textContent = anotacao.data ? dataFormatada : 'Data não informada';
+    }
     
-    document.querySelector('.categoria').textContent = anotacao.categoria || 'Categoria não informada';
-    document.querySelector('.tipo-consulta').textContent = anotacao.tipo_consulta || 'Tipo não informado';
-    document.querySelector('.anotacao p').textContent = anotacao.anotacao || 'Sem anotação';
-
-    // Adiciona event listener para o botão Salvar PDF
-    const savePdfButton = document.querySelector('.card-footer .btn-secondary:nth-child(2)');
-    if (savePdfButton) {
-      savePdfButton.addEventListener('click', downloadClinicalRecordAsPdf);
+    const categoriaElement = document.querySelector('.categoria');
+    if (categoriaElement) {
+      categoriaElement.textContent = anotacao.categoria || 'Categoria não informada';
+    }
+    
+    // Função para formatar o tipo de consulta
+    const formatarTipoConsulta = (tipo) => {
+      if (!tipo) return 'Tipo não informado';
+      
+      const tipos = {
+        'primeira': 'Primeira consulta',
+        'rotina': 'Consulta de rotina',
+        'preventiva': 'Consulta preventiva',
+        'urgencia': 'Consulta de urgência/emergência',
+        'retorno': 'Consulta de retorno',
+        'segundaOpniao': 'Consulta de segunda opinião'
+      };
+      
+      // Normaliza o valor para minúsculas para busca
+      const tipoNormalizado = tipo.toLowerCase().trim();
+      
+      // Se encontrar no mapeamento, retorna o texto formatado
+      if (tipos[tipoNormalizado]) {
+        return tipos[tipoNormalizado];
+      }
+      
+      // Se não encontrar no mapeamento, retorna o valor original formatado
+      return tipo.charAt(0).toUpperCase() + tipo.slice(1).replace(/([A-Z])/g, ' $1').trim();
+    };
+    
+    // Usa tipoConsulta (camelCase) que é o nome correto do campo no modelo
+    const tipoConsulta = anotacao.tipoConsulta || anotacao.tipo_consulta;
+    const tipoConsultaElement = document.querySelector('.tipo-consulta');
+    if (tipoConsultaElement) {
+      const tipoFormatado = formatarTipoConsulta(tipoConsulta);
+      tipoConsultaElement.textContent = tipoFormatado;
+      console.log('Tipo de consulta formatado:', tipoFormatado);
+    } else {
+      console.error('Elemento .tipo-consulta não encontrado no DOM');
+    }
+    
+    // Atualiza o nome do médico responsável usando o valor da API
+    // Se a API retornar o nome do médico, usa ele, senão usa o médico logado como fallback
+    const medicoNome = document.querySelector('.medico-nome');
+    if (medicoNome) {
+      if (anotacao.medico) {
+        // Se a API já retornou o nome formatado do médico, usa ele
+        medicoNome.textContent = anotacao.medico;
+        console.log('Médico responsável definido da API:', anotacao.medico);
+      } else if (medicoLogado) {
+        // Fallback: usa o médico logado
+        const prefixo = medicoLogado.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
+        const nomeFormatado = `${prefixo} ${medicoLogado.nome}`;
+        medicoNome.textContent = nomeFormatado;
+        console.log('Médico responsável definido do médico logado:', nomeFormatado);
+      } else {
+        medicoNome.textContent = 'Médico não informado';
+      }
+    } else {
+      console.error('Elemento .medico-nome não encontrado no DOM');
+    }
+    
+    // Atualiza o conteúdo da anotação no elemento oculto (para compatibilidade)
+    const anotacaoPElement = document.querySelector('.anotacao p');
+    if (anotacaoPElement) {
+      anotacaoPElement.textContent = anotacao.anotacao || 'Sem anotação';
+    }
+    
+    // Atualiza o conteúdo da anotação no elemento visível
+    const conteudoAnotacao = document.getElementById('conteudoAnotacao');
+    if (conteudoAnotacao) {
+      conteudoAnotacao.textContent = anotacao.anotacao || 'Sem anotação';
     }
 
   } catch (error) {
@@ -335,9 +394,14 @@ async function deleteAnnotation() {
   }
 }
 
-// Adicionar event listeners para os botões
-document.getElementById('btnExcluir').addEventListener('click', () => {
-    Swal.fire({
+// Adicionar event listeners para os botões (aguarda o DOM estar pronto)
+document.addEventListener('DOMContentLoaded', () => {
+  const btnExcluir = document.getElementById('btnExcluir');
+  if (btnExcluir) {
+    // Remove o onclick inline se existir
+    btnExcluir.removeAttribute('onclick');
+    btnExcluir.addEventListener('click', () => {
+      Swal.fire({
         title: 'Excluir Anotação',
         text: 'Tem certeza que deseja excluir esta anotação?',
         icon: 'warning',
@@ -346,14 +410,17 @@ document.getElementById('btnExcluir').addEventListener('click', () => {
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d'
-    }).then((result) => {
+      }).then((result) => {
         if (result.isConfirmed) {
-            deleteAnnotation();
+          deleteAnnotation();
         }
+      });
     });
-});
+  }
 
-document.getElementById('btnSalvarPDF').addEventListener('click', async () => {
+  const btnSalvarPDF = document.getElementById('btnSalvarPDF');
+  if (btnSalvarPDF) {
+    btnSalvarPDF.addEventListener('click', async () => {
     try {
         // Mostrar popup de carregamento
         Swal.fire({
@@ -367,18 +434,189 @@ document.getElementById('btnSalvarPDF').addEventListener('click', async () => {
             }
         });
 
-        // Configurações do PDF
+        // Obter o elemento original
         const element = document.querySelector('.note-card');
+        if (!element) {
+          throw new Error('Elemento .note-card não encontrado');
+        }
+        
+        // Salvar estilos originais dos botões para restaurar depois
+        const cardActions = element.querySelector('.card-actions');
+        const originalActionsDisplay = cardActions ? cardActions.style.display : '';
+        
+        // Esconder botões temporariamente
+        if (cardActions) {
+          cardActions.style.display = 'none';
+        }
+        
+        // Criar container profissional para o PDF
+        const pdfContainer = document.createElement('div');
+        pdfContainer.id = 'pdf-professional-container';
+        pdfContainer.style.width = '210mm';
+        pdfContainer.style.minHeight = '297mm';
+        pdfContainer.style.backgroundColor = '#ffffff';
+        pdfContainer.style.padding = '20mm 25mm';
+        pdfContainer.style.fontFamily = 'Inter, sans-serif';
+        pdfContainer.style.color = '#0f172a';
+        pdfContainer.style.margin = '0 auto';
+        pdfContainer.style.boxSizing = 'border-box';
+        pdfContainer.style.lineHeight = '1.6';
+        
+        // Criar cabeçalho profissional
+        const header = document.createElement('div');
+        header.style.borderBottom = '2px solid #002A42';
+        header.style.paddingBottom = '12px';
+        header.style.marginBottom = '25px';
+        
+        const titleHeader = document.createElement('h1');
+        titleHeader.textContent = 'Registro Clínico';
+        titleHeader.style.fontSize = '24px';
+        titleHeader.style.fontWeight = '700';
+        titleHeader.style.color = '#002A42';
+        titleHeader.style.margin = '0 0 6px 0';
+        titleHeader.style.textAlign = 'center';
+        titleHeader.style.letterSpacing = '-0.5px';
+        
+        const docInfo = document.createElement('div');
+        const agora = new Date();
+        const dataFormatada = agora.toLocaleDateString('pt-BR', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric' 
+        });
+        const horaFormatada = agora.toLocaleTimeString('pt-BR', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        docInfo.textContent = `Documento gerado em ${dataFormatada} às ${horaFormatada}`;
+        docInfo.style.fontSize = '10px';
+        docInfo.style.color = '#64748b';
+        docInfo.style.textAlign = 'center';
+        docInfo.style.fontWeight = '500';
+        docInfo.style.letterSpacing = '0.3px';
+        
+        header.appendChild(titleHeader);
+        header.appendChild(docInfo);
+        
+        // Clonar o conteúdo do card para manter formatação
+        const contentClone = element.cloneNode(true);
+        
+        // Remover botões do clone também
+        const cloneActions = contentClone.querySelector('.card-actions');
+        if (cloneActions) {
+          cloneActions.remove();
+        }
+        
+        // Ajustar estilos do clone para PDF profissional
+        contentClone.style.boxShadow = 'none';
+        contentClone.style.border = 'none';
+        contentClone.style.borderRadius = '0';
+        contentClone.style.padding = '0';
+        contentClone.style.margin = '0';
+        contentClone.style.background = 'transparent';
+        contentClone.style.fontSize = '13px';
+        
+        // Remover a barra superior do clone e melhorar espaçamento
+        const styleElement = document.createElement('style');
+        styleElement.id = 'pdf-style-temp';
+        styleElement.textContent = `
+          #pdf-professional-container .note-card::before {
+            display: none !important;
+            content: none !important;
+          }
+          #pdf-professional-container .note-card {
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+          }
+          #pdf-professional-container .card-header {
+            margin-bottom: 20px !important;
+            padding-bottom: 15px !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+          }
+          #pdf-professional-container .card-title {
+            font-size: 20px !important;
+            color: #0f172a !important;
+            margin-bottom: 0 !important;
+          }
+          #pdf-professional-container .info-grid {
+            gap: 16px !important;
+            margin-bottom: 24px !important;
+          }
+          #pdf-professional-container .info-item {
+            padding: 16px 20px !important;
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+          }
+          #pdf-professional-container .detail-section {
+            margin-top: 24px !important;
+            padding-top: 20px !important;
+            border-top: 1px solid #e2e8f0 !important;
+          }
+          #pdf-professional-container .detail-section h3 {
+            font-size: 13px !important;
+            margin-bottom: 12px !important;
+          }
+        `;
+        document.head.appendChild(styleElement);
+        
+        // Montar container
+        pdfContainer.appendChild(header);
+        pdfContainer.appendChild(contentClone);
+        
+        // Adicionar ao body temporariamente (visível para html2canvas capturar)
+        pdfContainer.style.position = 'fixed';
+        pdfContainer.style.top = '0';
+        pdfContainer.style.left = '0';
+        pdfContainer.style.zIndex = '-9999';
+        pdfContainer.style.opacity = '0';
+        document.body.appendChild(pdfContainer);
+        
+        // Aguardar renderização
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // Configurações do PDF profissionais
         const opt = {
-            margin: 1,
-            filename: 'registro-clinico.pdf',
+            margin: 0,
+            filename: `registro-clinico-${new Date().toISOString().split('T')[0]}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            html2canvas: { 
+              scale: 2,
+              useCORS: true,
+              logging: false,
+              backgroundColor: '#ffffff',
+              windowWidth: 794,
+              windowHeight: 1123
+            },
+            jsPDF: { 
+              unit: 'mm', 
+              format: 'a4', 
+              orientation: 'portrait',
+              compress: true
+            }
         };
 
-        // Gerar PDF
-        await html2pdf().set(opt).from(element).save();
+        // Gerar PDF do container profissional
+        await html2pdf().set(opt).from(pdfContainer).save();
+
+        // Limpar: remover container temporário
+        if (document.body.contains(pdfContainer)) {
+          document.body.removeChild(pdfContainer);
+        }
+        
+        // Restaurar estilos originais dos botões
+        if (cardActions) {
+          cardActions.style.display = originalActionsDisplay || '';
+        }
+        
+        // Remover estilo temporário
+        setTimeout(() => {
+          const tempStyle = document.getElementById('pdf-style-temp');
+          if (tempStyle && document.head.contains(tempStyle)) {
+            document.head.removeChild(tempStyle);
+          }
+        }, 100);
 
         // Mostrar popup de sucesso
         Swal.fire({
@@ -397,253 +635,13 @@ document.getElementById('btnSalvarPDF').addEventListener('click', async () => {
             confirmButtonColor: '#002A42'
         });
     }
-});
-
-document.getElementById('btnImprimir').addEventListener('click', () => {
-    Swal.fire({
-        title: 'Imprimir Registro',
-        text: 'Deseja imprimir este registro clínico?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sim, Imprimir',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#002A42',
-        cancelButtonColor: '#dc3545'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Mostrar popup de carregamento
-            Swal.fire({
-                title: 'Preparando impressão...',
-                text: 'Por favor, aguarde enquanto preparamos o documento.',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                showConfirmButton: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Criar um elemento temporário para impressão
-            const printContent = document.createElement('div');
-            printContent.className = 'print-content';
-            
-            // Adicionar estilos base
-            const baseStyles = document.createElement('style');
-            baseStyles.textContent = `
-                @page {
-                    size: A4;
-                    margin: 1.5cm;
-                }
-                body {
-                    font-family: 'Montserrat', Arial, sans-serif;
-                    line-height: 1.5;
-                    color: #333;
-                    background: white;
-                }
-                .print-content {
-                    max-width: 21cm;
-                    margin: 0 auto;
-                    padding: 0;
-                }
-                .print-header {
-                    text-align: center;
-                    margin-bottom: 1cm;
-                    padding-bottom: 0.5cm;
-                    border-bottom: 1px solid #002A42;
-                }
-                .print-header img {
-                    height: 1.5cm;
-                    margin-bottom: 0.3cm;
-                }
-                .print-header h1 {
-                    color: #002A42;
-                    font-size: 0.7cm;
-                    margin: 0;
-                    font-weight: 600;
-                }
-                .print-card {
-                    background: white;
-                    padding: 0.6cm;
-                    margin-bottom: 0.6cm;
-                }
-                .print-card-header {
-                    margin-bottom: 0.6cm;
-                    padding-bottom: 0.3cm;
-                    border-bottom: 1px solid #eee;
-                }
-                .print-card-title {
-                    font-size: 0.6cm;
-                    color: #002A42;
-                    font-weight: 600;
-                    margin: 0;
-                }
-                .print-card-subtitle {
-                    color: #666;
-                    font-size: 0.35cm;
-                    margin-top: 0.1cm;
-                }
-                .print-status-badge {
-                    display: inline-block;
-                    padding: 0.15cm 0.3cm;
-                    border-radius: 0.15cm;
-                    font-size: 0.3cm;
-                    font-weight: 500;
-                    background: #f8f9fa;
-                    color: #002A42;
-                }
-                .print-info-grid {
-                    display: grid;
-                    grid-template-columns: repeat(2, 1fr);
-                    gap: 0.6cm;
-                    margin-bottom: 0.8cm;
-                }
-                .print-info-item {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 0.3cm;
-                }
-                .print-info-icon {
-                    color: #002A42;
-                    width: 0.4cm;
-                    height: 0.4cm;
-                }
-                .print-info-content {
-                    flex: 1;
-                }
-                .print-info-content strong {
-                    display: block;
-                    color: #002A42;
-                    margin-bottom: 0.1cm;
-                    font-size: 0.3cm;
-                }
-                .print-info-content span {
-                    color: #333;
-                    font-size: 0.35cm;
-                }
-                .print-anotacao {
-                    background: #f8f9fa;
-                    padding: 0.4cm;
-                    border-radius: 0.15cm;
-                    margin-top: 0.6cm;
-                }
-                .print-anotacao-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.3cm;
-                    margin-bottom: 0.3cm;
-                }
-                .print-anotacao-header strong {
-                    color: #002A42;
-                    font-size: 0.35cm;
-                    font-weight: 600;
-                }
-                .print-anotacao-content {
-                    color: #333;
-                    font-size: 0.3cm;
-                    line-height: 1.5;
-                }
-                @media print {
-                    body * {
-                        visibility: hidden;
-                    }
-                    .print-content, .print-content * {
-                        visibility: visible;
-                    }
-                    .print-content {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        width: 100%;
-                    }
-                    .print-card {
-                        box-shadow: none;
-                        border: 1px solid #ddd;
-                    }
-                }
-            `;
-            
-            // Criar o cabeçalho
-            const header = document.createElement('div');
-            header.className = 'print-header';
-            
-            const logo = document.querySelector('.logo img').cloneNode(true);
-            const title = document.createElement('h1');
-            title.textContent = 'Registro Clínico';
-            
-            header.appendChild(logo);
-            header.appendChild(title);
-            printContent.appendChild(header);
-
-            // Clonar e formatar o conteúdo do registro
-            const cardContent = document.querySelector('.note-card').cloneNode(true);
-            cardContent.className = 'print-card';
-            
-            // Remover os botões do footer
-            const footer = cardContent.querySelector('.card-footer');
-            if (footer) {
-                footer.remove();
-            }
-
-            // Aplicar classes de impressão
-            const cardHeader = cardContent.querySelector('.card-header');
-            cardHeader.className = 'print-card-header';
-            
-            const titleDiv = cardHeader.querySelector('.titulo');
-            if (titleDiv) {
-                const title = titleDiv.querySelector('strong');
-                const subtitle = titleDiv.querySelector('span');
-                if (title) title.className = 'print-card-title';
-                if (subtitle) subtitle.className = 'print-card-subtitle';
-            }
-
-            const statusBadge = cardHeader.querySelector('.status-badge');
-            if (statusBadge) {
-                statusBadge.className = 'print-status-badge';
-            }
-
-            // Formatar grid de informações
-            const infoGrid = cardContent.querySelector('.info-grid');
-            if (infoGrid) {
-                infoGrid.className = 'print-info-grid';
-                infoGrid.querySelectorAll('.info-item').forEach(item => {
-                    item.className = 'print-info-item';
-                    const icon = item.querySelector('.info-icon');
-                    const content = item.querySelector('.info-content');
-                    if (icon) icon.className = 'print-info-icon';
-                    if (content) content.className = 'print-info-content';
-                });
-            }
-
-            // Formatar anotação
-            const anotacao = cardContent.querySelector('.anotacao');
-            if (anotacao) {
-                anotacao.className = 'print-anotacao';
-                const header = anotacao.querySelector('.anotacao-header');
-                const content = anotacao.querySelector('.anotacao-content');
-                if (header) header.className = 'print-anotacao-header';
-                if (content) content.className = 'print-anotacao-content';
-            }
-
-            printContent.appendChild(cardContent);
-
-            // Criar um iframe para impressão
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-
-            // Adicionar estilos e conteúdo ao iframe
-            iframe.contentDocument.head.appendChild(baseStyles);
-            iframe.contentDocument.body.appendChild(printContent);
-
-            // Pequeno delay para garantir que o conteúdo seja carregado
-            setTimeout(() => {
-                iframe.contentWindow.print();
-                // Limpar após a impressão
-                setTimeout(() => {
-                    document.body.removeChild(iframe);
-                    Swal.close();
-                }, 1000);
-            }, 500);
-        }
     });
+  }
+
+  const btnImprimir = document.getElementById('btnImprimir');
+  if (btnImprimir) {
+    btnImprimir.addEventListener('click', () => {
+      window.print();
+    });
+  }
 });
