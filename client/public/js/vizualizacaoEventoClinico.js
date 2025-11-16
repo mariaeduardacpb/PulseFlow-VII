@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Verificar se os elementos existem
   console.log('Verificando elementos:');
-  console.log('btnVoltar:', document.getElementById('btnVoltar'));
   console.log('tituloEvento:', document.getElementById('tituloEvento'));
   console.log('dataHora:', document.getElementById('dataHora'));
   console.log('descricao:', document.getElementById('descricao'));
@@ -126,26 +125,22 @@ function preencherDadosEvento(evento) {
   }
   
   // Tipo do evento
-  const tipoEventoElement = document.getElementById('tipoEvento');
   const tipoEventoText = document.getElementById('tipoEventoText');
-  if (tipoEventoElement && tipoEventoText) {
-    tipoEventoText.textContent = evento.tipoEvento || 'Evento Clínico';
-    tipoEventoElement.className = `event-type ${getEventTypeClass(evento.tipoEvento)}`;
-    console.log('Tipo do evento definido:', evento.tipoEvento);
+  const tipoEventoTitulo = document.getElementById('tipoEventoTitulo');
+  const tipoValor = evento.tipoEvento || 'Evento Clínico';
+  if (tipoEventoText) {
+    tipoEventoText.textContent = tipoValor;
   }
+  if (tipoEventoTitulo) {
+    tipoEventoTitulo.textContent = tipoValor;
+  }
+  console.log('Tipo do evento definido:', tipoValor);
   
   // Data e hora
   const dataHoraElement = document.getElementById('dataHora');
   if (dataHoraElement) {
     dataHoraElement.textContent = formatarDataHora(evento.dataHora);
     console.log('Data/Hora definida:', evento.dataHora);
-  }
-  
-  // Especialidade
-  const especialidadeElement = document.getElementById('especialidade');
-  if (especialidadeElement) {
-    especialidadeElement.textContent = evento.especialidade || 'Não informado';
-    console.log('Especialidade definida:', evento.especialidade);
   }
   
   // Intensidade da dor
@@ -155,45 +150,39 @@ function preencherDadosEvento(evento) {
     console.log('Intensidade da dor definida:', evento.intensidadeDor);
   }
   
-  // Alívio
-  const alivioElement = document.getElementById('alivio');
-  if (alivioElement) {
-    alivioElement.textContent = evento.alivio || 'Não informado';
-    console.log('Alívio definido:', evento.alivio);
+  // Medicação e Alívio (no mesmo campo)
+  const medicacaoAlivioEl = document.getElementById('medicacaoAlivio');
+  if (medicacaoAlivioEl) {
+    const med = (evento.medicacao && String(evento.medicacao).trim() !== '') ? String(evento.medicacao).trim() : '';
+    const aliv = (() => {
+      const valor = evento.alivio;
+      if (typeof valor === 'boolean') return valor ? 'Sim' : 'Não';
+      if (typeof valor === 'string') {
+        const v = valor.trim();
+        if (v === '') return '';
+        const l = v.toLowerCase();
+        if (l === 'sim' || l === 'não' || l === 'nao') return l.charAt(0).toUpperCase() + l.slice(1);
+        return v;
+      }
+      return '';
+    })();
+
+    const partes = [];
+    if (med) partes.push(`Medicação: ${med}`);
+    if (aliv) partes.push(`${aliv}`);
+
+    if (partes.length === 0) {
+      const item = medicacaoAlivioEl.closest('.info-item');
+      if (item) item.style.display = 'none';
+    } else {
+      medicacaoAlivioEl.textContent = partes.join(' — ');
+      const item = medicacaoAlivioEl.closest('.info-item');
+      if (item) item.style.display = '';
+    }
+    console.log('Medicação/Alívio:', med || '(vazio)', aliv || '(vazio)');
   }
   
-  // Médico responsável - verificar diferentes campos possíveis
-  const medicoElement = document.getElementById('medicoResponsavel');
-  if (medicoElement) {
-    // Verificar se há informações do médico no objeto paciente
-    let medicoNome = 'Não informado';
-    
-    if (evento.medico) {
-      medicoNome = evento.medico;
-    } else if (evento.medicoNome) {
-      medicoNome = evento.medicoNome;
-    } else if (evento.medicoResponsavel) {
-      medicoNome = evento.medicoResponsavel;
-    } else if (evento.createdBy) {
-      medicoNome = evento.createdBy;
-    } else if (evento.paciente && evento.paciente.medico) {
-      medicoNome = evento.paciente.medico;
-    } else if (evento.paciente && evento.paciente.medicoNome) {
-      medicoNome = evento.paciente.medicoNome;
-    } else if (evento.paciente && evento.paciente.medicoResponsavel) {
-      medicoNome = evento.paciente.medicoResponsavel;
-    }
-    
-    medicoElement.textContent = medicoNome;
-    console.log('Médico definido:', medicoNome);
-    console.log('Campos de médico disponíveis:', {
-      medico: evento.medico,
-      medicoNome: evento.medicoNome,
-      medicoResponsavel: evento.medicoResponsavel,
-      createdBy: evento.createdBy,
-      paciente: evento.paciente
-    });
-  }
+  // Campo de médico responsável foi removido do layout
   
   // Descrição
   const descricaoElement = document.getElementById('descricao');
@@ -202,18 +191,30 @@ function preencherDadosEvento(evento) {
     console.log('Descrição definida:', evento.descricao);
   }
   
-  // Sintomas
+  // Sintomas - mostrar seção apenas se houver sintomas
   const sintomasElement = document.getElementById('sintomas');
-  if (sintomasElement) {
-    sintomasElement.textContent = evento.sintomas || 'Sintomas não informados.';
-    console.log('Sintomas definidos:', evento.sintomas);
+  const sintomasSection = document.getElementById('sintomasSection');
+  if (sintomasElement && sintomasSection) {
+    if (evento.sintomas && evento.sintomas.trim() !== '') {
+      sintomasElement.textContent = evento.sintomas;
+      sintomasSection.style.display = 'block';
+      console.log('Sintomas definidos:', evento.sintomas);
+    } else {
+      sintomasSection.style.display = 'none';
+    }
   }
   
-  // Observações
+  // Observações - mostrar seção apenas se houver observações
   const observacoesElement = document.getElementById('observacoes');
-  if (observacoesElement) {
-    observacoesElement.textContent = evento.observacoes || 'Nenhuma observação adicional registrada.';
-    console.log('Observações definidas:', evento.observacoes);
+  const observacoesSection = document.getElementById('observacoesSection');
+  if (observacoesElement && observacoesSection) {
+    if (evento.observacoes && evento.observacoes.trim() !== '') {
+      observacoesElement.textContent = evento.observacoes;
+      observacoesSection.style.display = 'block';
+      console.log('Observações definidas:', evento.observacoes);
+    } else {
+      observacoesSection.style.display = 'none';
+    }
   }
   
   console.log('Dados do evento preenchidos com sucesso');
@@ -265,19 +266,67 @@ function getEventTypeClass(tipo) {
   }
 }
 
-// Função para inicializar eventos
-function inicializarEventos() {
-  // Botão voltar
-  const btnVoltar = document.getElementById('btnVoltar');
-  if (btnVoltar) {
-    btnVoltar.addEventListener('click', () => {
-      // Tentar voltar para a página anterior, se não houver histórico, ir para histórico de eventos
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.href = '/client/views/historicoEventoClinico.html';
+// Função para excluir evento
+async function excluirEvento() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventoId = urlParams.get('id');
+    
+    if (!eventoId) {
+      mostrarAviso('ID do evento não encontrado', 'error');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      mostrarAviso('Token não encontrado. Faça login novamente.', 'error');
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: 'Excluir Evento',
+      text: 'Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, Excluir',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    const response = await fetch(`${API_URL}/api/eventos-clinicos/${eventoId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
     });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Erro ao excluir evento');
+    }
+
+    mostrarAviso('Evento excluído com sucesso!', 'success');
+    setTimeout(() => {
+      window.location.href = '/client/views/historicoEventoClinico.html';
+    }, 1500);
+
+  } catch (error) {
+    console.error('Erro:', error);
+    mostrarAviso(error.message || 'Erro ao excluir evento', 'error');
+  }
+}
+
+// Função para inicializar eventos
+function inicializarEventos() {
+  // Botão excluir
+  const btnExcluir = document.getElementById('btnExcluir');
+  if (btnExcluir) {
+    btnExcluir.addEventListener('click', excluirEvento);
   }
 
   // Botão salvar PDF
@@ -311,7 +360,7 @@ function gerarPDF() {
         });
 
   try {
-    const element = document.querySelector('.event-card');
+    const element = document.querySelector('.note-card');
     if (!element) {
       throw new Error('Elemento do evento não encontrado');
     }
@@ -368,7 +417,7 @@ function imprimirEvento() {
             });
 
   try {
-    const element = document.querySelector('.event-card');
+    const element = document.querySelector('.note-card');
     if (!element) {
       throw new Error('Elemento do evento não encontrado');
     }
@@ -388,7 +437,7 @@ function imprimirEvento() {
                     background: white;
             color: black;
           }
-          .event-card {
+          .note-card {
                     background: white;
             border: 1px solid #e2e8f0;
             border-radius: 12px;

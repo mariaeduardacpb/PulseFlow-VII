@@ -298,10 +298,10 @@ function renderizarRegistros(registros) {
     const noRecords = document.getElementById('noRecords');
     const recordsCount = document.getElementById('recordsCount');
 
-    if (!recordsGrid || !noRecords || !recordsCount) return;
+    if (!recordsGrid || !noRecords) return;
 
     // Atualizar contador
-    recordsCount.textContent = registros.length;
+    if (recordsCount) recordsCount.textContent = registros.length;
 
     // Limpar grid
     recordsGrid.innerHTML = '';
@@ -322,39 +322,68 @@ function renderizarRegistros(registros) {
 
         const dataInicio = formatarData(registro.dataInicio);
         const dataFim = formatarData(registro.dataFim);
+        const periodo = `${dataInicio} - ${dataFim}`;
+        const fluxo = registro.fluxo || 'Não informado';
+        const humor = registro.humor || 'Não informado';
+        const colica = registro.teveColica ? 'Sim' : 'Não';
+        const intensidade = registro.teveColica && registro.intensidadeColica ? `${registro.intensidadeColica}/10` : '-';
 
         recordCard.innerHTML = `
             <div class="record-header">
-                <div class="record-date">${dataInicio} - ${dataFim}</div>
-                <div class="record-status">Registrado</div>
+                <div>
+                    <div class="record-title">Menstruação</div>
+                    <div class="record-date">${dataInicio}</div>
+                </div>
+                <div class="record-badge">MENSTRUAÇÃO</div>
             </div>
-            
-            <div class="record-details">
-                <div class="detail-item">
-                    <span class="detail-label">Fluxo</span>
-                    <span class="detail-value">${registro.fluxo || 'Não informado'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Humor</span>
-                    <span class="detail-value">${registro.humor || 'Não informado'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Cólica</span>
-                    <span class="detail-value">${registro.teveColica ? 'Sim' : 'Não'}</span>
-                </div>
-                ${registro.teveColica && registro.intensidadeColica ? `
-                    <div class="detail-item">
-                        <span class="detail-label">Intensidade</span>
-                        <span class="detail-value">${registro.intensidadeColica}/10</span>
+
+            <div class="record-info">
+                <div class="record-info-item">
+                    <div class="record-info-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
                     </div>
-                ` : ''}
-            </div>
-            
-            ${registro.observacoes ? `
-                <div class="record-observations">
-                    <span class="detail-label">Observações</span>
-                    <span class="detail-value">${registro.observacoes}</span>
+                    <div class="record-info-label">Período:</div>
+                    <div class="record-info-value">${periodo}</div>
                 </div>
+
+                <div class="record-info-item">
+                    <div class="record-info-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 9a2 2 0 0 0-2-2V3a2 2 0 0 0-2 2v2a2 2 0 0 0-2 2"/>
+                        </svg>
+                    </div>
+                    <div class="record-info-label">Fluxo:</div>
+                    <div class="record-info-value">${fluxo}</div>
+                </div>
+
+                <div class="record-info-item">
+                    <div class="record-info-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20v-6"/>
+                        </svg>
+                    </div>
+                    <div class="record-info-label">Cólica:</div>
+                    <div class="record-info-value">${colica}${registro.teveColica ? ` — Intensidade ${intensidade}` : ''}</div>
+                </div>
+
+                <div class="record-info-item">
+                    <div class="record-info-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                    </div>
+                    <div class="record-info-label">Humor:</div>
+                    <div class="record-info-value">${humor}</div>
+                </div>
+            </div>
+
+            ${registro.observacoes ? `
+                <div class="record-description">${registro.observacoes}</div>
             ` : ''}
         `;
 
@@ -392,118 +421,6 @@ async function inicializarPagina() {
             mostrarAviso('Nenhum paciente selecionado', 'error');
             return;
         }
-
-        const paciente = JSON.parse(pacienteData);
-        const cpf = paciente?.cpf;
-        
-        console.log('Paciente selecionado:', paciente);
-        console.log('CPF:', cpf);
-
-        if (!cpf) {
-            mostrarAviso('CPF do paciente não encontrado', 'error');
-            return;
-        }
-
-        // Configurar event listeners
-        configurarEventListeners();
-
-        // Mostrar loading
-        mostrarAviso('Carregando dados do ciclo menstrual...', 'info');
-
-        // Buscar dados
-        const dados = await buscarDadosMenstruacao(cpf);
-        ciclos = dados.ciclos;
-        registrosMenstruacao = dados.registros;
-
-        console.log('Dados carregados - Ciclos:', ciclos.length, 'Registros:', registrosMenstruacao.length);
-
-        // Renderizar componentes
-        renderizarCalendario(currentDate, ciclos, registrosMenstruacao);
-        renderizarRegistros(registrosMenstruacao);
-        atualizarEstatisticas(registrosMenstruacao, ciclos);
-
-        if (ciclos.length === 0 && registrosMenstruacao.length === 0) {
-            mostrarAviso('Este paciente ainda não possui registros de ciclo menstrual. Os dados aparecerão aqui quando forem adicionados.', 'info');
-        } else {
-            const totalDados = ciclos.length + registrosMenstruacao.length;
-            mostrarAviso(`${totalDados} registro(s) de ciclo menstrual carregado(s) com sucesso!`, 'success');
-        }
-
-        console.log('Página de ciclo menstrual inicializada com sucesso');
-    } catch (error) {
-        console.error('Erro ao inicializar página:', error);
-        mostrarAviso(`Erro ao carregar dados do ciclo menstrual: ${error.message}`, 'error');
-    }
-}
-
-// Funções globais para debug
-window.debugCicloMenstrual = function() {
-    console.log('=== DEBUG CICLO MENSTRUAL ===');
-    console.log('Ciclos:', ciclos);
-    console.log('Registros:', registrosMenstruacao);
-    console.log('Data atual:', currentDate);
-    console.log('Token:', localStorage.getItem('token'));
-    console.log('Paciente:', localStorage.getItem('pacienteSelecionado'));
-    console.log('API URL:', API_URL);
-};
-
-window.forcarCarregamentoDados = async function() {
-    console.log('Forçando carregamento de dados...');
-    await inicializarPagina();
-};
-
-window.testarAPI = async function() {
-    try {
-        console.log('=== TESTE DE CONECTIVIDADE API ===');
-        const token = localStorage.getItem('token');
-        const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
-        
-        if (!token) {
-            console.error('Token não encontrado');
-            return;
-        }
-        
-        if (!paciente?.cpf) {
-            console.error('Paciente não encontrado');
-            return;
-        }
-        
-        console.log('Testando endpoint de ciclos...');
-        const resCiclos = await fetch(`${API_URL}/api/ciclo/medico?cpf=${paciente.cpf}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        console.log('Status ciclos:', resCiclos.status);
-        console.log('Headers ciclos:', resCiclos.headers);
-        
-        if (resCiclos.ok) {
-            const dados = await resCiclos.json();
-            console.log('Dados de ciclos:', dados);
-        } else {
-            const errorText = await resCiclos.text();
-            console.error('Erro ciclos:', errorText);
-        }
-        
-        console.log('Testando endpoint de menstruação...');
-        const resMenstruacao = await fetch(`${API_URL}/api/menstruacao/${paciente.cpf}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        console.log('Status menstruação:', resMenstruacao.status);
-        console.log('Headers menstruação:', resMenstruacao.headers);
-        
-        if (resMenstruacao.ok) {
-            const dados = await resMenstruacao.json();
-            console.log('Dados de menstruação:', dados);
-        } else {
-            const errorText = await resMenstruacao.text();
-            console.error('Erro menstruação:', errorText);
-        }
-        
-    } catch (error) {
-        console.error('Erro no teste da API:', error);
-    }
-};
 
         const paciente = JSON.parse(pacienteData);
         const cpf = paciente?.cpf;

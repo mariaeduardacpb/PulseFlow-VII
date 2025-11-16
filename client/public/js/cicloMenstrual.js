@@ -469,13 +469,14 @@ function renderizarRegistros(registros) {
     const noRecords = document.getElementById('noRecords');
     const recordsCount = document.getElementById('recordsCount');
 
-    if (!recordsGrid || !noRecords || !recordsCount) return;
-
-    // Atualizar estatísticas
+    // Atualizar estatísticas SEMPRE
     atualizarEstatisticas(registros);
 
-    // Atualizar contador
-    recordsCount.textContent = registros.length;
+    // Se não há área de lista no DOM, parar por aqui (apenas estatísticas no topo)
+    if (!recordsGrid || !noRecords) return;
+
+    // Atualizar contador (se existir)
+    if (recordsCount) recordsCount.textContent = registros.length;
 
     // Limpar grid
     recordsGrid.innerHTML = '';
