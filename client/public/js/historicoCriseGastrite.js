@@ -97,6 +97,16 @@ function formatarData(dataString) {
     return 'Data não disponível';
 }
 
+function formatarDataCurta(dataString) {
+    try {
+        const data = new Date(typeof dataString === 'string' ? dataString.split('.')[0] : dataString);
+        if (isNaN(data.getTime())) return 'Data não disponível';
+        return data.toLocaleDateString('pt-BR');
+    } catch {
+        return 'Data não disponível';
+    }
+}
+
 function obterClasseIntensidade(intensidade) {
     if (intensidade === 0) return 'low';
     if (intensidade >= 1 && intensidade <= 3) return 'low';
@@ -113,6 +123,18 @@ function obterTextoIntensidade(intensidade) {
     if (intensidade >= 7 && intensidade <= 9) return 'Dor Intensa';
     if (intensidade === 10) return 'Dor insuportável';
     return 'Intensidade não especificada';
+}
+
+function getIntensityText(valor) {
+    if (valor === undefined || valor === null || valor === '') return 'Não informado';
+    const n = parseInt(valor, 10);
+    if (isNaN(n)) return String(valor);
+    if (n === 0) return 'Sem dor (0/10)';
+    if (n <= 3) return `Leve (${n}/10)`;
+    if (n <= 6) return `Moderada (${n}/10)`;
+    if (n <= 9) return `Intensa (${n}/10)`;
+    if (n === 10) return 'Insuportável (10/10)';
+    return `${n}/10`;
 }
 
 function calcularEstatisticas(crises) {
@@ -271,72 +293,78 @@ function renderizarCrises(crises) {
     noCrises.style.display = 'none';
 
     crises.forEach(crise => {
-        const criseCard = document.createElement('div');
-        criseCard.className = 'crisis-card';
+        const card = document.createElement('div');
+        card.className = 'record-card';
+        card.setAttribute('data-id', crise._id || '');
 
-        const classeIntensidade = obterClasseIntensidade(crise.intensidadeDor);
-        const textoIntensidade = obterTextoIntensidade(crise.intensidadeDor);
+        const titulo = crise.titulo || 'Crise de Gastrite';
+        const dataFormatada = formatarDataCurta(crise.data);
+        const intensidadeTexto = getIntensityText(crise.intensidadeDor);
 
-        criseCard.innerHTML = `
-            <div class="crisis-header">
-                <div class="crisis-date">${formatarData(crise.data)}</div>
-                <div class="crisis-intensity ${classeIntensidade}">
-                    ${textoIntensidade} (${crise.intensidadeDor}/10)
+        card.innerHTML = `
+            <div class="record-header">
+                <div>
+                    <div class="record-title">${titulo}</div>
                 </div>
             </div>
-            
-            <div class="crisis-title">${crise.titulo || 'Crise de Gastrite'}</div>
-            
-            <div class="crisis-details">
-                <div class="crisis-detail">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                    </svg>
-                    <span>Medicação: ${crise.medicacao || 'Não especificada'}</span>
-                </div>
-                <div class="crisis-detail">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 12l2 2 4-4"></path>
-                        <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
-                        <path d="M16 2l4 4-4 4"></path>
-                    </svg>
-                    <span>Alívio: ${crise.alivioMedicacao ? 'Sim' : 'Não'}</span>
-                </div>
-            </div>
-            
-            <div class="crisis-description">
-                ${crise.descricao || 'Descrição não disponível'}
-            </div>
-            
-            <div class="crisis-footer">
-                <div class="crisis-relief ${crise.alivioMedicacao ? 'has-relief' : 'no-relief'}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 12l2 2 4-4"></path>
-                        <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
-                        <path d="M16 2l4 4-4 4"></path>
-                    </svg>
-                    ${crise.alivioMedicacao ? 'Com alívio' : 'Sem alívio'}
-                </div>
-                <div class="crisis-actions">
-                    <button class="action-btn" onclick="window.open('../views/visualizacaoCriseGastrite.html?id=${crise._id}', '_blank')" title="Visualizar detalhes">
+
+            <div class="record-info">
+                <div class="record-info-item">
+                    <div class="record-info-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
                         </svg>
-                    </button>
+                    </div>
+                    <div class="record-info-label">Data:</div>
+                    <div class="record-info-value">${dataFormatada}</div>
                 </div>
+
+                <div class="record-info-item">
+                    <div class="record-info-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 12l2 2 4-4"></path>
+                            <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
+                            <path d="M16 2l4 4-4 4"></path>
+                        </svg>
+                    </div>
+                    <div class="record-info-label">Tipo de Evento:</div>
+                    <div class="record-info-value">Crise de Gastrite</div>
+                </div>
+
+                <div class="record-info-item">
+                    <div class="record-info-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="record-info-label">Intensidade:</div>
+                    <div class="record-info-value">${intensidadeTexto}</div>
+                </div>
+            </div>
+
+            <div class="record-actions">
+                <a href="/client/views/visualizacaoCriseGastrite.html?id=${crise._id || ''}" class="btn-view" onclick="event.stopPropagation();">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    Visualizar Registro
+                </a>
             </div>
         `;
 
-        crisesGrid.appendChild(criseCard);
+        crisesGrid.appendChild(card);
     });
 }
 
 function aplicarFiltros() {
     const filtros = {
-        month: document.getElementById('filterMonth')?.value || '',
-        year: document.getElementById('filterYear')?.value || '',
-        intensity: document.getElementById('filterIntensity')?.value || ''
+        month: document.getElementById('filterMonth')?.dataset.value || document.getElementById('filterMonth')?.value || '',
+        year: document.getElementById('filterYear')?.dataset.value || document.getElementById('filterYear')?.value || '',
+        intensity: document.getElementById('filterIntensity')?.dataset.value || document.getElementById('filterIntensity')?.value || ''
     };
     
     carregarCrises(filtros);
@@ -347,9 +375,9 @@ function limparFiltros() {
     const filterYear = document.getElementById('filterYear');
     const filterIntensity = document.getElementById('filterIntensity');
 
-    if (filterMonth) filterMonth.value = '';
-    if (filterYear) filterYear.value = '';
-    if (filterIntensity) filterIntensity.value = '';
+    if (filterMonth) { filterMonth.value = 'Todos os meses'; filterMonth.dataset.value = ''; }
+    if (filterYear) { filterYear.value = 'Todos os anos'; filterYear.dataset.value = ''; }
+    if (filterIntensity) { filterIntensity.value = 'Todas as Intensidades'; filterIntensity.dataset.value = ''; }
 
     carregarCrises();
 }
@@ -360,14 +388,12 @@ async function carregarCrises(filtros = {}) {
 }
 
 function configurarEventListeners() {
-    const filterMonth = document.getElementById('filterMonth');
-    const filterYear = document.getElementById('filterYear');
-    const filterIntensity = document.getElementById('filterIntensity');
-    const clearFilters = document.getElementById('clearFilters');
+    // Configura custom selects (mesmo visual do histórico de eventos clínicos)
+    setupCustomSelectByIds('filterMonth', 'monthsList');
+    setupCustomSelectByIds('filterYear', 'yearsList');
+    setupCustomSelectByIds('filterIntensity', 'intensidadesList');
 
-    if (filterMonth) filterMonth.addEventListener('change', aplicarFiltros);
-    if (filterYear) filterYear.addEventListener('change', aplicarFiltros);
-    if (filterIntensity) filterIntensity.addEventListener('change', aplicarFiltros);
+    const clearFilters = document.getElementById('clearFilters');
     if (clearFilters) clearFilters.addEventListener('click', limparFiltros);
 }
 
@@ -381,6 +407,44 @@ async function inicializarPagina() {
         console.error('Erro ao inicializar página:', error);
         mostrarErro('Erro ao inicializar a página');
     }
+}
+
+// Select customizado (adaptado do histórico de eventos clínicos)
+function setupCustomSelectByIds(inputId, optionsId) {
+    const input = document.getElementById(inputId);
+    const options = document.getElementById(optionsId);
+    if (!input || !options) return;
+
+    const customSelect = input.closest('.custom-select');
+    if (!customSelect) return;
+
+    input.addEventListener('click', (e) => {
+        e.preventDefault();
+        customSelect.classList.toggle('active');
+        document.querySelectorAll('.custom-select').forEach(select => {
+            if (select !== customSelect) select.classList.remove('active');
+        });
+    });
+
+    options.addEventListener('click', (e) => {
+        if (e.target.classList.contains('option')) {
+            const value = e.target.dataset.value;
+            const text = e.target.textContent;
+            input.value = text;
+            input.dataset.value = value;
+
+            options.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            e.target.classList.add('selected');
+            customSelect.classList.remove('active');
+            aplicarFiltros();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!customSelect.contains(e.target)) {
+            customSelect.classList.remove('active');
+        }
+    });
 }
 
 // Funções globais para debug
