@@ -217,9 +217,18 @@ async function carregarDadosMedico() {
 // Função para inicializar componentes
 function inicializarComponentes() {
   // Configurar selects customizados - buscar pelo input e encontrar o parent .custom-select
-  setupCustomSelectByIds('filterCategory', 'especialidadesList');
   setupCustomSelectByIds('filterType', 'tiposList');
   setupCustomSelectByIds('filterIntensity', 'intensidadesList');
+  
+  // Inicializar valores padrão dos filtros
+  const filterType = document.getElementById('filterType');
+  const filterIntensity = document.getElementById('filterIntensity');
+  if (filterType) {
+    filterType.dataset.value = 'Todos os Tipos';
+  }
+  if (filterIntensity) {
+    filterIntensity.dataset.value = 'Todas as Intensidades';
+  }
   
   // Event listeners para filtros
   const btnLimparFiltros = document.getElementById('btnLimparFiltros');
@@ -257,16 +266,18 @@ function inicializarComponentes() {
       if (eventosPaginaAtual > 1) {
         eventosPaginaAtual--;
         renderizarEventos(eventosFiltrados);
+        atualizarControlesPagina();
       }
     });
   }
-  
+
   if (btnProximo) {
     btnProximo.addEventListener('click', () => {
       const totalPaginas = Math.ceil(eventosFiltrados.length / EVENTOS_POR_PAGINA);
       if (eventosPaginaAtual < totalPaginas) {
         eventosPaginaAtual++;
         renderizarEventos(eventosFiltrados);
+        atualizarControlesPagina();
       }
     });
   }
@@ -283,10 +294,16 @@ function setupCustomSelectByIds(inputId, optionsId) {
   const customSelect = input.closest('.custom-select');
   if (!customSelect) return;
 
-  // Toggle do dropdown
+  // Toggle do dropdown ao clicar no input
+  input.addEventListener('focus', () => {
+    customSelect.classList.add('active');
+    filtrarOpcoesSelect(inputId, optionsId);
+  });
+
   input.addEventListener('click', (e) => {
-    e.preventDefault();
-    customSelect.classList.toggle('active');
+    e.stopPropagation();
+    customSelect.classList.add('active');
+    filtrarOpcoesSelect(inputId, optionsId);
     // Fechar outros dropdowns
     document.querySelectorAll('.custom-select').forEach(select => {
       if (select !== customSelect) {
@@ -295,13 +312,40 @@ function setupCustomSelectByIds(inputId, optionsId) {
     });
   });
 
+  // Busca enquanto digita
+  input.addEventListener('input', (e) => {
+    customSelect.classList.add('active');
+    filtrarOpcoesSelect(inputId, optionsId);
+    
+    // Se o input foi limpo manualmente, resetar o dataset.value para a opção padrão
+    if (!input.value || input.value.trim() === '') {
+      if (inputId === 'filterType') {
+        input.dataset.value = 'Todos os Tipos';
+      } else if (inputId === 'filterIntensity') {
+        input.dataset.value = 'Todas as Intensidades';
+      }
+    } else {
+      // Se está digitando, limpar o dataset.value para permitir busca livre
+      input.dataset.value = '';
+    }
+    
+    aplicarFiltros();
+  });
+
   // Seleção de opção
   options.addEventListener('click', (e) => {
     if (e.target.classList.contains('option')) {
       const value = e.target.dataset.value;
       const text = e.target.textContent;
       
-      input.value = text;
+      if (inputId === 'filterType') {
+        input.value = value === 'Todos os Tipos' ? '' : value;
+        input.dataset.value = value;
+      } else if (inputId === 'filterIntensity') {
+        input.value = value === 'Todas as Intensidades' ? '' : value;
+      } else {
+        input.value = text;
+      }
       input.dataset.value = value;
       
       // Remover seleção anterior
@@ -328,24 +372,104 @@ function setupCustomSelectByIds(inputId, optionsId) {
   });
 }
 
+// Função para filtrar opções do select baseado no texto digitado
+function filtrarOpcoesSelect(inputId, optionsId) {
+  const input = document.getElementById(inputId);
+  const options = document.getElementById(optionsId);
+  
+  if (!input || !options) return;
+  
+  const searchTerm = input.value.toLowerCase().trim();
+  const allOptions = options.querySelectorAll('.option');
+  
+  allOptions.forEach(option => {
+    const optionText = option.textContent.toLowerCase();
+    const optionValue = option.getAttribute('data-value') || '';
+    
+    // Sempre mostrar a primeira opção (Todos os Tipos/Todas as Intensidades) e "Outros"
+    if (optionValue === 'Todos os Tipos' || optionValue === 'Todas as Intensidades' || optionValue === 'Outros') {
+      option.style.display = 'block';
+      return;
+    }
+    
+    // Filtrar outras opções baseado no texto digitado
+    if (searchTerm === '' || optionText.includes(searchTerm) || optionValue.toLowerCase().includes(searchTerm)) {
+      option.style.display = 'block';
+    } else {
+      option.style.display = 'none';
+    }
+  });
+}
+
 // Função para aplicar filtros
 function aplicarFiltros() {
-  const categoria = document.getElementById('filterCategory')?.dataset.value || '';
-  const tipo = document.getElementById('filterType')?.dataset.value || '';
-  const intensidade = document.getElementById('filterIntensity')?.dataset.value || '';
+  const tipoInput = document.getElementById('filterType');
+  const tipoValue = tipoInput?.value || '';
+  const tipoDataset = tipoInput?.dataset.value || '';
+  const tipo = tipoValue.toLowerCase().trim() || tipoDataset.toLowerCase();
+  
+  const intensidadeInput = document.getElementById('filterIntensity');
+  const intensidadeValue = intensidadeInput?.value || '';
+  const intensidadeDataset = intensidadeInput?.dataset.value || '';
+  const intensidade = intensidadeValue.toLowerCase().trim() || intensidadeDataset.toLowerCase();
+  
   const buscaTexto = document.getElementById('buscaEventos')?.value.toLowerCase() || '';
 
   eventosFiltrados = allEventos.filter(evento => {
-    const matchCategoria = !categoria || evento.especialidade === categoria;
-    const matchTipo = !tipo || evento.tipoEvento === tipo;
-    const matchIntensidade = !intensidade || verificarIntensidade(evento.intensidadeDor, intensidade);
-    const matchBusca = !buscaTexto || 
-      evento.titulo.toLowerCase().includes(buscaTexto) ||
-      evento.descricao.toLowerCase().includes(buscaTexto) ||
-      evento.especialidade.toLowerCase().includes(buscaTexto) ||
-      evento.tipoEvento.toLowerCase().includes(buscaTexto);
+    // Filtro de tipo - busca por texto digitado (permite busca parcial)
+    let matchTipo = true;
     
-    return matchCategoria && matchTipo && matchIntensidade && matchBusca;
+    // Verificar se "Todos os Tipos" está selecionado
+    // Pode estar no dataset.value ou no value (quando selecionado da lista)
+    const isTodosTipos = 
+      tipoDataset === 'Todos os Tipos' || 
+      tipoValue === 'Todos os Tipos' ||
+      (!tipoValue && tipoDataset === 'Todos os Tipos') ||
+      (tipoValue === '' && tipoDataset === 'Todos os Tipos') ||
+      (!tipoValue && !tipoDataset);
+    
+    if (!isTodosTipos) {
+      const tipoLower = tipo.toLowerCase();
+      if (tipoLower === 'outros' || tipoDataset === 'Outros') {
+        // Se selecionou "Outros", buscar eventos que não correspondem aos tipos padrão
+        const tiposPadrao = [
+          'crise / emergência',
+          'acompanhamento de condição crônica',
+          'episódio psicológico ou emocional',
+          'evento relacionado à medicação'
+        ];
+        const tipoEvento = (evento.tipoEvento || '').toLowerCase();
+        matchTipo = !tiposPadrao.includes(tipoEvento);
+      } else {
+        const tipoEvento = (evento.tipoEvento || '').toLowerCase();
+        matchTipo = tipoEvento.includes(tipoLower) || tipoEvento === tipoLower;
+      }
+    }
+    
+    // Filtro de intensidade - verificar se corresponde à faixa ou busca por texto
+    let matchIntensidade = true;
+    
+    // Verificar se "Todas as Intensidades" está selecionado
+    const isTodasIntensidades = !intensidade || intensidade === '' || intensidadeDataset === 'Todas as Intensidades' || intensidadeValue === 'Todas as Intensidades';
+    
+    if (!isTodasIntensidades) {
+      // Se for um valor numérico ou faixa (0, 1-3, 4-6, etc), usar verificação de faixa
+      if (intensidade.match(/^\d+$|^\d+-\d+$/)) {
+        matchIntensidade = verificarIntensidade(evento.intensidadeDor, intensidade);
+      } else {
+        // Busca parcial por texto (ex: "leve", "moderada")
+        const intensidadeTexto = getIntensityText(evento.intensidadeDor).toLowerCase();
+        matchIntensidade = intensidadeTexto.includes(intensidade);
+      }
+    }
+    
+    const matchBusca = !buscaTexto || 
+      (evento.titulo && evento.titulo.toLowerCase().includes(buscaTexto)) ||
+      (evento.descricao && evento.descricao.toLowerCase().includes(buscaTexto)) ||
+      (evento.especialidade && evento.especialidade.toLowerCase().includes(buscaTexto)) ||
+      (evento.tipoEvento && evento.tipoEvento.toLowerCase().includes(buscaTexto));
+    
+    return matchTipo && matchIntensidade && matchBusca;
   });
 
   // Aplicar ordenação
@@ -422,27 +546,167 @@ function verificarIntensidade(intensidadeEvento, filtroIntensidade) {
   }
 }
 
+// Função para atualizar opções de tipos de evento
+function atualizarOpcoesTiposEvento() {
+  const tiposList = document.getElementById('tiposList');
+  if (!tiposList) return;
+  
+  // Extrair tipos únicos dos eventos do paciente
+  const tiposUnicos = new Set();
+  
+  allEventos.forEach(evento => {
+    const tipo = evento.tipoEvento;
+    if (tipo && tipo.trim() !== '') {
+      tiposUnicos.add(tipo.trim());
+    }
+  });
+  
+  // Ordenar tipos alfabeticamente
+  const tiposOrdenados = Array.from(tiposUnicos).sort((a, b) => 
+    a.localeCompare(b, 'pt-BR')
+  );
+  
+  // Limpar lista atual (mantendo apenas a primeira opção "Todos os Tipos")
+  tiposList.innerHTML = '<div class="option" data-value="Todos os Tipos">Todos os Tipos</div>';
+  
+  // Adicionar tipos do paciente
+  tiposOrdenados.forEach(tipo => {
+    const option = document.createElement('div');
+    option.className = 'option';
+    option.setAttribute('data-value', tipo);
+    option.textContent = tipo;
+    tiposList.appendChild(option);
+  });
+  
+  // Sempre adicionar a opção "Outros" no final
+  const optionOutros = document.createElement('div');
+  optionOutros.className = 'option';
+  optionOutros.setAttribute('data-value', 'Outros');
+  optionOutros.textContent = 'Outros';
+  tiposList.appendChild(optionOutros);
+  
+  // Se não houver tipos além de "Outros", não mostrar mensagem
+}
+
+// Função para atualizar opções de intensidade
+function atualizarOpcoesIntensidade() {
+  const intensidadesList = document.getElementById('intensidadesList');
+  if (!intensidadesList) return;
+  
+  // Extrair intensidades únicas dos eventos do paciente
+  const intensidadesUnicas = new Set();
+  
+  allEventos.forEach(evento => {
+    const intensidade = evento.intensidadeDor;
+    if (intensidade !== undefined && intensidade !== null && intensidade !== '') {
+      const intensidadeNum = parseInt(intensidade);
+      if (!isNaN(intensidadeNum)) {
+        // Agrupar por faixas
+        if (intensidadeNum === 0) {
+          intensidadesUnicas.add('0');
+        } else if (intensidadeNum >= 1 && intensidadeNum <= 3) {
+          intensidadesUnicas.add('1-3');
+        } else if (intensidadeNum >= 4 && intensidadeNum <= 6) {
+          intensidadesUnicas.add('4-6');
+        } else if (intensidadeNum >= 7 && intensidadeNum <= 9) {
+          intensidadesUnicas.add('7-9');
+        } else if (intensidadeNum === 10) {
+          intensidadesUnicas.add('10');
+        }
+      }
+    }
+  });
+  
+  // Ordenar intensidades (0, 1-3, 4-6, 7-9, 10)
+  const ordemIntensidade = ['0', '1-3', '4-6', '7-9', '10'];
+  const intensidadesOrdenadas = Array.from(intensidadesUnicas).sort((a, b) => {
+    const indexA = ordemIntensidade.indexOf(a);
+    const indexB = ordemIntensidade.indexOf(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+  
+  // Limpar lista atual (mantendo apenas a primeira opção "Todas as Intensidades")
+  intensidadesList.innerHTML = '<div class="option" data-value="Todas as Intensidades">Todas as Intensidades</div>';
+  
+  // Mapear valores para textos
+  const textosIntensidade = {
+    '0': 'Sem dor (0)',
+    '1-3': 'Leve (1-3)',
+    '4-6': 'Moderada (4-6)',
+    '7-9': 'Intensa (7-9)',
+    '10': 'Dor insuportável (10)'
+  };
+  
+  // Adicionar intensidades do paciente
+  intensidadesOrdenadas.forEach(intensidade => {
+    const option = document.createElement('div');
+    option.className = 'option';
+    option.setAttribute('data-value', intensidade);
+    option.textContent = textosIntensidade[intensidade] || intensidade;
+    intensidadesList.appendChild(option);
+  });
+  
+  // Se não houver intensidades, mostrar mensagem
+  if (intensidadesOrdenadas.length === 0) {
+    const option = document.createElement('div');
+    option.className = 'option';
+    option.setAttribute('data-value', '');
+    option.textContent = 'Nenhuma intensidade encontrada';
+    option.style.color = '#94a3b8';
+    option.style.fontStyle = 'italic';
+    intensidadesList.appendChild(option);
+  }
+}
+
 // Função para limpar filtros
 function limparFiltros() {
-  const filterCategory = document.getElementById('filterCategory');
   const filterType = document.getElementById('filterType');
   const filterIntensity = document.getElementById('filterIntensity');
   const buscaInput = document.getElementById('buscaEventos');
   const ordenacaoSelect = document.getElementById('ordenacaoSelect');
   
-  if (filterCategory) {
-    filterCategory.value = 'Todas as Especialidades';
-    filterCategory.dataset.value = '';
-  }
-  
   if (filterType) {
-    filterType.value = 'Todos os Tipos';
-    filterType.dataset.value = '';
+    filterType.value = '';
+    filterType.dataset.value = 'Todos os Tipos';
+    filterType.placeholder = 'Selecione um tipo';
+    const customSelectType = filterType.closest('.custom-select');
+    if (customSelectType) {
+      customSelectType.classList.remove('active');
+    }
+    const tiposList = document.getElementById('tiposList');
+    if (tiposList) {
+      tiposList.querySelectorAll('.option').forEach(opt => {
+        opt.classList.remove('selected');
+        opt.style.display = 'block';
+      });
+      const primeiraOpcao = tiposList.querySelector('.option[data-value="Todos os Tipos"]');
+      if (primeiraOpcao) {
+        primeiraOpcao.classList.add('selected');
+      }
+    }
   }
   
   if (filterIntensity) {
-    filterIntensity.value = 'Todas as Intensidades';
-    filterIntensity.dataset.value = '';
+    filterIntensity.value = '';
+    filterIntensity.dataset.value = 'Todas as Intensidades';
+    filterIntensity.placeholder = 'Selecione uma intensidade';
+    const customSelectIntensity = filterIntensity.closest('.custom-select');
+    if (customSelectIntensity) {
+      customSelectIntensity.classList.remove('active');
+    }
+    const intensidadesList = document.getElementById('intensidadesList');
+    if (intensidadesList) {
+      intensidadesList.querySelectorAll('.option').forEach(opt => {
+        opt.classList.remove('selected');
+        opt.style.display = 'block';
+      });
+      const primeiraOpcao = intensidadesList.querySelector('.option[data-value="Todas as Intensidades"]');
+      if (primeiraOpcao) {
+        primeiraOpcao.classList.add('selected');
+      }
+    }
   }
   
   if (buscaInput) {
@@ -454,11 +718,6 @@ function limparFiltros() {
     ordenacaoAtual = 'dataDesc';
   }
   
-  // Remover seleções visuais
-  document.querySelectorAll('.option.selected').forEach(option => {
-    option.classList.remove('selected');
-  });
-  
   // Fechar dropdowns
   document.querySelectorAll('.custom-select').forEach(select => {
     select.classList.remove('active');
@@ -467,7 +726,8 @@ function limparFiltros() {
   // Resetar paginação
   eventosPaginaAtual = 1;
   
-  renderizarEventos(allEventos);
+  eventosFiltrados = [...allEventos];
+  renderizarEventos(eventosFiltrados);
   atualizarControlesPagina();
 }
 
@@ -506,6 +766,10 @@ async function carregarEventosClinicos() {
     eventosFiltrados = [...allEventos];
     eventosPaginaAtual = 1;
     
+    // Atualizar opções de filtros com base nos eventos do paciente
+    atualizarOpcoesTiposEvento();
+    atualizarOpcoesIntensidade();
+    
     renderizarEventos(eventosFiltrados);
     atualizarEstatisticas(allEventos);
     atualizarControlesPagina();
@@ -537,6 +801,7 @@ function renderizarEventos(eventos) {
   const eventGrid = document.getElementById('eventGrid');
   const noRecords = document.getElementById('noRecords');
   const totalEventosEl = document.getElementById('totalEventos');
+  const paginationControls = document.getElementById('paginationControls');
 
   if (!eventGrid || !noRecords) return;
 
@@ -550,6 +815,9 @@ function renderizarEventos(eventos) {
   if (eventos.length === 0) {
     noRecords.style.display = 'flex';
     eventGrid.style.display = 'none';
+    if (paginationControls) {
+      paginationControls.style.display = 'none';
+    }
     return;
   }
 
@@ -565,6 +833,19 @@ function renderizarEventos(eventos) {
     const card = criarCardEvento(evento);
     eventGrid.appendChild(card);
   });
+
+  // Mostrar/ocultar controles de paginação
+  const totalPaginas = Math.ceil(eventos.length / EVENTOS_POR_PAGINA);
+  if (paginationControls) {
+    if (totalPaginas > 1) {
+      paginationControls.style.display = 'flex';
+    } else {
+      paginationControls.style.display = 'none';
+    }
+  }
+
+  // Atualizar controles de paginação
+  atualizarControlesPagina();
 }
 
 // Função para obter nome do médico do evento

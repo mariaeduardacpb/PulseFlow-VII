@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 const API_URL = window.API_URL || 'http://localhost:65432';
 let todasCrisesCache = [];
+let crisesFiltradasAtuais = [];
+let crisesPaginaAtual = 1;
+const CRISES_POR_PAGINA = 12;
 
 function mostrarErro(mensagem) {
     const Toast = Swal.mixin({
@@ -401,6 +404,7 @@ function renderizarCrises(crises) {
     const crisesGrid = document.getElementById('crisesGrid');
     const noCrises = document.getElementById('noCrises');
     const crisesCount = document.getElementById('crisesCount');
+    const paginationControls = document.getElementById('paginationControls');
 
     if (!crisesGrid || !noCrises || !crisesCount) return;
 
@@ -415,12 +419,20 @@ function renderizarCrises(crises) {
 
     if (crises.length === 0) {
         noCrises.style.display = 'block';
+        if (paginationControls) {
+            paginationControls.style.display = 'none';
+        }
         return;
     }
 
     noCrises.style.display = 'none';
 
-    crises.forEach(crise => {
+    // Aplicar paginação
+    const inicio = (crisesPaginaAtual - 1) * CRISES_POR_PAGINA;
+    const fim = inicio + CRISES_POR_PAGINA;
+    const crisesPagina = crises.slice(inicio, fim);
+
+    crisesPagina.forEach(crise => {
         const card = document.createElement('div');
         card.className = 'record-card';
         card.setAttribute('data-id', crise._id || '');
@@ -492,9 +504,49 @@ function renderizarCrises(crises) {
 
         crisesGrid.appendChild(card);
     });
+
+    // Mostrar/ocultar controles de paginação
+    const totalPaginas = Math.ceil(crises.length / CRISES_POR_PAGINA);
+    if (paginationControls) {
+        if (totalPaginas > 1) {
+            paginationControls.style.display = 'flex';
+        } else {
+            paginationControls.style.display = 'none';
+        }
+    }
+
+    // Atualizar controles de paginação
+    atualizarControlesPagina(crises);
+}
+
+// Função para atualizar controles de paginação
+function atualizarControlesPagina(crises) {
+    const totalPaginas = Math.ceil(crises.length / CRISES_POR_PAGINA);
+    const btnAnterior = document.getElementById('btnAnterior');
+    const btnProximo = document.getElementById('btnProximo');
+    const infoPagina = document.getElementById('infoPagina');
+    
+    if (btnAnterior) {
+        btnAnterior.disabled = crisesPaginaAtual === 1;
+        btnAnterior.style.opacity = crisesPaginaAtual === 1 ? '0.5' : '1';
+    }
+    
+    if (btnProximo) {
+        btnProximo.disabled = crisesPaginaAtual === totalPaginas;
+        btnProximo.style.opacity = crisesPaginaAtual === totalPaginas ? '0.5' : '1';
+    }
+    
+    if (infoPagina) {
+        const inicio = (crisesPaginaAtual - 1) * CRISES_POR_PAGINA + 1;
+        const fim = Math.min(crisesPaginaAtual * CRISES_POR_PAGINA, crises.length);
+        infoPagina.textContent = `Mostrando ${inicio}-${fim} de ${crises.length} registros`;
+    }
 }
 
 function aplicarFiltros() {
+	// Resetar paginação ao aplicar filtros
+	crisesPaginaAtual = 1;
+	
 	const monthEl = document.getElementById('filterMonth');
 	const yearEl = document.getElementById('filterYear');
 	const intensityEl = document.getElementById('filterIntensity');
@@ -514,6 +566,9 @@ function aplicarFiltros() {
 }
 
 function limparFiltros() {
+    // Resetar paginação ao limpar filtros
+    crisesPaginaAtual = 1;
+    
     const filterMonth = document.getElementById('filterMonth');
     const filterYear = document.getElementById('filterYear');
     const filterIntensity = document.getElementById('filterIntensity');
@@ -526,7 +581,13 @@ function limparFiltros() {
 }
 
 async function carregarCrises(filtros = {}) {
+    // Resetar paginação ao carregar crises
+    crisesPaginaAtual = 1;
+    
     const crises = await buscarCrises(filtros);
+    // Armazenar crises filtradas para paginação
+    crisesFiltradasAtuais = crises;
+    
     // Atualizar meses disponíveis após qualquer alteração de filtros (principalmente ano)
     const yearEl = document.getElementById('filterYear');
     const anoSelecionado = yearEl?.dataset.value || '';
@@ -550,6 +611,29 @@ function configurarEventListeners() {
 	// Botão de limpar dentro do estado vazio
 	const noCrisesClear = document.getElementById('noCrisesClear');
 	if (noCrisesClear) noCrisesClear.addEventListener('click', limparFiltros);
+	
+	// Event listeners para paginação
+	const btnAnterior = document.getElementById('btnAnterior');
+	const btnProximo = document.getElementById('btnProximo');
+	
+	if (btnAnterior) {
+		btnAnterior.addEventListener('click', () => {
+			if (crisesPaginaAtual > 1) {
+				crisesPaginaAtual--;
+				renderizarCrises(crisesFiltradasAtuais);
+			}
+		});
+	}
+	
+	if (btnProximo) {
+		btnProximo.addEventListener('click', () => {
+			const totalPaginas = Math.ceil(crisesFiltradasAtuais.length / CRISES_POR_PAGINA);
+			if (crisesPaginaAtual < totalPaginas) {
+				crisesPaginaAtual++;
+				renderizarCrises(crisesFiltradasAtuais);
+			}
+		});
+	}
 }
 
 async function inicializarPagina() {

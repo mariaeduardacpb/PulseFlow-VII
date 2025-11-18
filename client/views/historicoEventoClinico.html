@@ -60,10 +60,7 @@
               <input type="text" id="filterType" placeholder="Selecione um tipo">
               <div class="select-options" id="tiposList">
                 <div class="option" data-value="Todos os Tipos">Todos os Tipos</div>
-                <div class="option" data-value="Crise / Emergência">Crise / Emergência</div>
-                <div class="option" data-value="Acompanhamento de Condição Crônica">Acompanhamento de Condição Crônica</div>
-                <div class="option" data-value="Episódio Psicológico ou Emocional">Episódio Psicológico ou Emocional</div>
-                <div class="option" data-value="Evento Relacionado à Medicação">Evento Relacionado à Medicação</div>
+                <!-- Os tipos serão carregados dinamicamente via JavaScript -->
               </div>
             </div>
           </div>
@@ -74,11 +71,7 @@
               <input type="text" id="filterIntensity" placeholder="Selecione uma intensidade">
               <div class="select-options" id="intensidadesList">
                 <div class="option" data-value="Todas as Intensidades">Todas as Intensidades</div>
-                <div class="option" data-value="0">Sem dor (0)</div>
-                <div class="option" data-value="1-3">Leve (1-3)</div>
-                <div class="option" data-value="4-6">Moderada (4-6)</div>
-                <div class="option" data-value="7-9">Intensa (7-9)</div>
-                <div class="option" data-value="10">Dor insuportável (10)</div>
+                <!-- As intensidades serão carregadas dinamicamente via JavaScript -->
               </div>
             </div>
           </div>
@@ -106,6 +99,25 @@
         
         <div class="records-grid" id="eventGrid">
           <!-- Os cards serão inseridos dinamicamente via JavaScript -->
+        </div>
+        
+        <!-- Controles de Paginação -->
+        <div class="pagination-controls" id="paginationControls" style="display: none;">
+          <div class="pagination-info" id="infoPagina"></div>
+          <div class="pagination-buttons">
+            <button class="pagination-btn" id="btnAnterior" disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              Anterior
+            </button>
+            <button class="pagination-btn" id="btnProximo" disabled>
+              Próximo
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
         </div>
         
         <!-- Mensagem quando não há eventos -->

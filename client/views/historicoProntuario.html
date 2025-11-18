@@ -63,68 +63,20 @@
               <input type="text" id="filterCategory" placeholder="Selecione uma especialidade">
               <div class="select-options" id="especialidadesList">
                 <div class="option" data-value="Todas as Especialidades">Todas as Especialidades</div>
-                <div class="option" data-value="Acupuntura">Acupuntura</div>
-                <div class="option" data-value="Alergia e imunologia">Alergia e imunologia</div>
-                <div class="option" data-value="Anestesiologia">Anestesiologia</div>
-                <div class="option" data-value="Angiologia">Angiologia</div>
-                <div class="option" data-value="Cardiologia">Cardiologia</div>
-                <div class="option" data-value="Cirurgia cardiovascular">Cirurgia cardiovascular</div>
-                <div class="option" data-value="Cirurgia da mão">Cirurgia da mão</div>
-                <div class="option" data-value="Cirurgia de cabeça e pescoço">Cirurgia de cabeça e pescoço</div>
-                <div class="option" data-value="Cirurgia do aparelho digestivo">Cirurgia do aparelho digestivo</div>
-                <div class="option" data-value="Cirurgia geral">Cirurgia geral</div>
-                <div class="option" data-value="Cirurgia oncológica">Cirurgia oncológica</div>
-                <div class="option" data-value="Cirurgia pediátrica">Cirurgia pediátrica</div>
-                <div class="option" data-value="Cirurgia plástica">Cirurgia plástica</div>
-                <div class="option" data-value="Cirurgia torácica">Cirurgia torácica</div>
-                <div class="option" data-value="Cirurgia vascular">Cirurgia vascular</div>
-                <div class="option" data-value="Clínica médica">Clínica médica</div>
-                <div class="option" data-value="Coloproctologia">Coloproctologia</div>
-                <div class="option" data-value="Dermatologia">Dermatologia</div>
-                <div class="option" data-value="Endocrinologia e metabologia">Endocrinologia e metabologia</div>
-                <div class="option" data-value="Endoscopia">Endoscopia</div>
-                <div class="option" data-value="Gastroenterologia">Gastroenterologia</div>
-                <div class="option" data-value="Genética médica">Genética médica</div>
-                <div class="option" data-value="Geriatria">Geriatria</div>
-                <div class="option" data-value="Ginecologia e obstetrícia">Ginecologia e obstetrícia</div>
-                <div class="option" data-value="Hematologia e hemoterapia">Hematologia e hemoterapia</div>
-                <div class="option" data-value="Homeopatia">Homeopatia</div>
-                <div class="option" data-value="Infectologia">Infectologia</div>
-                <div class="option" data-value="Mastologia">Mastologia</div>
-                <div class="option" data-value="Medicina de emergência">Medicina de emergência</div>
-                <div class="option" data-value="Medicina de família e comunidade">Medicina de família e comunidade</div>
-                <div class="option" data-value="Medicina do trabalho">Medicina do trabalho</div>
-                <div class="option" data-value="Medicina do tráfego">Medicina do tráfego</div>
-                <div class="option" data-value="Medicina esportiva">Medicina esportiva</div>
-                <div class="option" data-value="Medicina física e reabilitação">Medicina física e reabilitação</div>
-                <div class="option" data-value="Medicina intensiva">Medicina intensiva</div>
-                <div class="option" data-value="Medicina legal e perícia médica">Medicina legal e perícia médica</div>
-                <div class="option" data-value="Medicina nuclear">Medicina nuclear</div>
-                <div class="option" data-value="Medicina preventiva e social">Medicina preventiva e social</div>
-                <div class="option" data-value="Nefrologia">Nefrologia</div>
-                <div class="option" data-value="Neurocirurgia">Neurocirurgia</div>
-                <div class="option" data-value="Neurologia">Neurologia</div>
-                <div class="option" data-value="Nutrologia">Nutrologia</div>
-                <div class="option" data-value="Oftalmologia">Oftalmologia</div>
-                <div class="option" data-value="Oncologia clínica">Oncologia clínica</div>
-                <div class="option" data-value="Ortopedia e traumatologia">Ortopedia e traumatologia</div>
-                <div class="option" data-value="Otorrinolaringologia">Otorrinolaringologia</div>
-                <div class="option" data-value="Patologia">Patologia</div>
-                <div class="option" data-value="Patologia clínica/medicina laboratorial">Patologia clínica/medicina laboratorial</div>
-                <div class="option" data-value="Pediatria">Pediatria</div>
-                <div class="option" data-value="Pneumologia">Pneumologia</div>
-                <div class="option" data-value="Psiquiatria">Psiquiatria</div>
-                <div class="option" data-value="Radiologia e diagnóstico por imagem">Radiologia e diagnóstico por imagem</div>
-                <div class="option" data-value="Radioterapia">Radioterapia</div>
-                <div class="option" data-value="Reumatologia">Reumatologia</div>
-                <div class="option" data-value="Urologia">Urologia</div>
+                <!-- As especialidades serão carregadas dinamicamente via JavaScript -->
               </div>
             </div>
           </div>
           
           <div class="filter-group">
             <label for="filterDoctor">Médico Responsável</label>
-            <input type="text" id="filterDoctor" placeholder="Digite o nome do médico">
+            <div class="custom-select">
+              <input type="text" id="filterDoctor" placeholder="Selecione um médico">
+              <div class="select-options" id="medicosList">
+                <div class="option" data-value="Todos os Médicos">Todos os Médicos</div>
+                <!-- Os médicos serão carregados dinamicamente via JavaScript -->
+              </div>
+            </div>
           </div>
           
           <div class="filter-group">
@@ -155,6 +107,25 @@
         
         <div class="records-grid" id="recordsGrid">
           <!-- Os registros serão inseridos dinamicamente via JavaScript -->
+        </div>
+        
+        <!-- Controles de Paginação -->
+        <div class="pagination-controls" id="paginationControls" style="display: none;">
+          <div class="pagination-info" id="infoPagina"></div>
+          <div class="pagination-buttons">
+            <button class="pagination-btn" id="btnAnterior" disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              Anterior
+            </button>
+            <button class="pagination-btn" id="btnProximo" disabled>
+              Próximo
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
         </div>
         
         <!-- Mensagem quando não há registros -->

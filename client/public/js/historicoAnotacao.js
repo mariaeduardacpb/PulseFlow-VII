@@ -10,9 +10,12 @@ let currentFilters = {
   doctor: '',
   date: ''
 };
+let registrosPaginaAtual = 1;
+const REGISTROS_POR_PAGINA = 12;
 
 // Elementos DOM
 let recordsGrid, noRecords, totalRecords, filterCategory, filterDoctor, filterDate, btnLimparFiltros, btnNovoRegistro, btnNovoRegistroEmpty;
+let btnAnterior, btnProximo, infoPagina, paginationControls;
 
 document.addEventListener('DOMContentLoaded', async () => {
   
@@ -65,17 +68,20 @@ function obterElementosDOM() {
   btnLimparFiltros = document.getElementById('btnLimparFiltros');
   btnNovoRegistro = document.getElementById('btnNovoRegistro');
   btnNovoRegistroEmpty = document.getElementById('btnNovoRegistroEmpty');
+  btnAnterior = document.getElementById('btnAnterior');
+  btnProximo = document.getElementById('btnProximo');
+  infoPagina = document.getElementById('infoPagina');
+  paginationControls = document.getElementById('paginationControls');
 }
 
 function configurarEventListeners() {
   // Filtros
   if (filterCategory) {
-    filterCategory.addEventListener('input', aplicarFiltros);
-    configurarSelectCustomizado();
+    configurarSelectCustomizado('filterCategory', 'especialidadesList');
   }
   
   if (filterDoctor) {
-    filterDoctor.addEventListener('input', aplicarFiltros);
+    configurarSelectCustomizado('filterDoctor', 'medicosList');
   }
   
   if (filterDate) {
@@ -94,25 +100,68 @@ function configurarEventListeners() {
   if (btnNovoRegistroEmpty) {
     btnNovoRegistroEmpty.addEventListener('click', criarNovoRegistro);
   }
+  
+  // Event listeners para paginação
+  if (btnAnterior) {
+    btnAnterior.addEventListener('click', () => {
+      if (registrosPaginaAtual > 1) {
+        registrosPaginaAtual--;
+        renderizarRegistros(filteredAnotacoes);
+        atualizarControlesPagina();
+      }
+    });
+  }
+  
+  if (btnProximo) {
+    btnProximo.addEventListener('click', () => {
+      const totalPaginas = Math.ceil(filteredAnotacoes.length / REGISTROS_POR_PAGINA);
+      if (registrosPaginaAtual < totalPaginas) {
+        registrosPaginaAtual++;
+        renderizarRegistros(filteredAnotacoes);
+        atualizarControlesPagina();
+      }
+    });
+  }
 }
 
-function configurarSelectCustomizado() {
-  const customSelect = document.querySelector('.custom-select');
-  const selectOptions = document.getElementById('especialidadesList');
+function configurarSelectCustomizado(inputId, optionsListId) {
+  const filterInput = document.getElementById(inputId);
+  if (!filterInput) return;
+  
+  const customSelect = filterInput.closest('.custom-select');
+  const selectOptions = document.getElementById(optionsListId);
   
   if (!customSelect || !selectOptions) return;
   
-  // Toggle do select
-  customSelect.addEventListener('click', (e) => {
+  // Toggle do select ao clicar no input
+  filterInput.addEventListener('focus', () => {
+    customSelect.classList.add('active');
+    filtrarOpcoes(inputId, optionsListId);
+  });
+  
+  filterInput.addEventListener('click', (e) => {
     e.stopPropagation();
-    customSelect.classList.toggle('active');
+    customSelect.classList.add('active');
+    filtrarOpcoes(inputId, optionsListId);
+  });
+  
+  // Busca enquanto digita
+  filterInput.addEventListener('input', (e) => {
+    customSelect.classList.add('active');
+    filtrarOpcoes(inputId, optionsListId);
+    aplicarFiltros();
   });
   
   // Seleção de opção
   selectOptions.addEventListener('click', (e) => {
     if (e.target.classList.contains('option')) {
       const value = e.target.getAttribute('data-value');
-      filterCategory.value = value;
+      
+      if (inputId === 'filterCategory') {
+        filterInput.value = value === 'Todas as Especialidades' ? '' : value;
+      } else if (inputId === 'filterDoctor') {
+        filterInput.value = value === 'Todos os Médicos' ? '' : value;
+      }
       
       // Atualizar visual
       selectOptions.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
@@ -124,8 +173,38 @@ function configurarSelectCustomizado() {
   });
   
   // Fechar ao clicar fora
-  document.addEventListener('click', () => {
-    customSelect.classList.remove('active');
+  document.addEventListener('click', (e) => {
+    if (!customSelect.contains(e.target)) {
+      customSelect.classList.remove('active');
+    }
+  });
+}
+
+function filtrarOpcoes(inputId, optionsListId) {
+  const filterInput = document.getElementById(inputId);
+  const selectOptions = document.getElementById(optionsListId);
+  
+  if (!filterInput || !selectOptions) return;
+  
+  const searchTerm = filterInput.value.toLowerCase().trim();
+  const allOptions = selectOptions.querySelectorAll('.option');
+  
+  allOptions.forEach(option => {
+    const optionText = option.textContent.toLowerCase();
+    const optionValue = option.getAttribute('data-value') || '';
+    
+    // Sempre mostrar a primeira opção (Todas as Especialidades/Todos os Médicos)
+    if (optionValue === 'Todas as Especialidades' || optionValue === 'Todos os Médicos') {
+      option.style.display = 'block';
+      return;
+    }
+    
+    // Filtrar outras opções baseado no texto digitado
+    if (searchTerm === '' || optionText.includes(searchTerm) || optionValue.toLowerCase().includes(searchTerm)) {
+      option.style.display = 'block';
+    } else {
+      option.style.display = 'none';
+    }
   });
 }
 
@@ -186,7 +265,14 @@ async function carregarRegistros(cpf) {
       allAnotacoes = [];
     }
     
+    // Resetar paginação ao carregar registros
+    registrosPaginaAtual = 1;
+    
     filteredAnotacoes = [...allAnotacoes];
+    
+    // Atualizar opções de especialidade e médicos com base nos registros do paciente
+    atualizarOpcoesEspecialidade();
+    atualizarOpcoesMedicos();
     
     const dadosProcessados = {
       total: allAnotacoes.length,
@@ -236,18 +322,39 @@ function renderizarRegistros(registros) {
   if (registros.length === 0) {
     recordsGrid.style.display = 'none';
     noRecords.style.display = 'flex';
+    if (paginationControls) {
+      paginationControls.style.display = 'none';
+    }
     return;
   }
   
   recordsGrid.style.display = 'grid';
   noRecords.style.display = 'none';
   
+  // Aplicar paginação
+  const inicio = (registrosPaginaAtual - 1) * REGISTROS_POR_PAGINA;
+  const fim = inicio + REGISTROS_POR_PAGINA;
+  const registrosPagina = registros.slice(inicio, fim);
+  
   // Renderizar cards
-  const cardsHTML = registros.map((anotacao, index) => {
+  const cardsHTML = registrosPagina.map((anotacao, index) => {
     return criarCardRegistro(anotacao);
   }).join('');
   
   recordsGrid.innerHTML = cardsHTML;
+  
+  // Mostrar/ocultar controles de paginação
+  const totalPaginas = Math.ceil(registros.length / REGISTROS_POR_PAGINA);
+  if (paginationControls) {
+    if (totalPaginas > 1) {
+      paginationControls.style.display = 'flex';
+    } else {
+      paginationControls.style.display = 'none';
+    }
+  }
+  
+  // Atualizar controles de paginação
+  atualizarControlesPagina();
 }
 
 function criarCardRegistro(anotacao) {
@@ -328,17 +435,31 @@ function criarCardRegistro(anotacao) {
 }
 
 function aplicarFiltros() {
-  const categoria = filterCategory?.value.toLowerCase() || '';
-  const medico = filterDoctor?.value.toLowerCase() || '';
+  const categoria = filterCategory?.value.toLowerCase().trim() || '';
+  const medico = filterDoctor?.value.toLowerCase().trim() || '';
   const data = filterDate?.value || '';
   
   
+  // Resetar paginação ao aplicar filtros
+  registrosPaginaAtual = 1;
+  
   filteredAnotacoes = allAnotacoes.filter(anotacao => {
-    const matchCategoria = !categoria || categoria === 'todas as especialidades' || 
-      (anotacao.categoria && anotacao.categoria.toLowerCase().includes(categoria));
+    // Filtro de categoria - busca por texto digitado (permite busca parcial)
+    let matchCategoria = true;
+    if (categoria && categoria !== 'todas as especialidades') {
+      const categoriaAnotacao = (anotacao.categoria || anotacao.especialidade || '').toLowerCase();
+      // Busca parcial no nome da especialidade
+      matchCategoria = categoriaAnotacao.includes(categoria);
+    }
     
-    const matchMedico = !medico || 
-      (anotacao.medico && anotacao.medico.toLowerCase().includes(medico));
+    // Filtro de médico - busca por texto digitado (permite busca parcial)
+    let matchMedico = true;
+    if (medico && medico !== 'todos os médicos') {
+      const medicoAnotacao = (anotacao.medico || anotacao.medicoResponsavel || '').toLowerCase();
+      const medicoNormalizado = medicoAnotacao.replace(/^(dra\.|draª|dr\.)\s*/i, '').trim();
+      // Busca parcial no nome do médico
+      matchMedico = medicoAnotacao.includes(medico) || medicoNormalizado.includes(medico);
+    }
     
     const matchData = !data || 
       (anotacao.data && anotacao.data.startsWith(data));
@@ -349,29 +470,181 @@ function aplicarFiltros() {
   renderizarRegistros(filteredAnotacoes);
 }
 
+function atualizarOpcoesEspecialidade() {
+  const especialidadesList = document.getElementById('especialidadesList');
+  if (!especialidadesList) return;
+  
+  // Extrair especialidades únicas dos registros do paciente
+  const especialidadesUnicas = new Set();
+  
+  allAnotacoes.forEach(anotacao => {
+    const especialidade = anotacao.categoria || anotacao.especialidade;
+    if (especialidade && especialidade.trim() !== '') {
+      especialidadesUnicas.add(especialidade.trim());
+    }
+  });
+  
+  // Ordenar especialidades alfabeticamente
+  const especialidadesOrdenadas = Array.from(especialidadesUnicas).sort((a, b) => 
+    a.localeCompare(b, 'pt-BR')
+  );
+  
+  // Limpar lista atual (mantendo apenas a primeira opção "Todas as Especialidades")
+  especialidadesList.innerHTML = '<div class="option" data-value="Todas as Especialidades">Todas as Especialidades</div>';
+  
+  // Adicionar especialidades do paciente
+  especialidadesOrdenadas.forEach(especialidade => {
+    const option = document.createElement('div');
+    option.className = 'option';
+    option.setAttribute('data-value', especialidade);
+    option.textContent = especialidade;
+    especialidadesList.appendChild(option);
+  });
+  
+  // Se não houver especialidades, mostrar mensagem
+  if (especialidadesOrdenadas.length === 0) {
+    const option = document.createElement('div');
+    option.className = 'option';
+    option.setAttribute('data-value', '');
+    option.textContent = 'Nenhuma especialidade encontrada';
+    option.style.color = '#94a3b8';
+    option.style.fontStyle = 'italic';
+    especialidadesList.appendChild(option);
+  }
+}
+
+function atualizarOpcoesMedicos() {
+  const medicosList = document.getElementById('medicosList');
+  if (!medicosList) return;
+  
+  // Extrair médicos únicos dos registros do paciente
+  const medicosUnicos = new Set();
+  
+  allAnotacoes.forEach(anotacao => {
+    const medico = anotacao.medico || anotacao.medicoResponsavel;
+    if (medico && medico.trim() !== '') {
+      // Remover prefixos como "Dr.", "Dra.", "Draª" para normalizar
+      const medicoNormalizado = medico.trim().replace(/^(Dra\.|Draª|Dr\.)\s*/i, '').trim();
+      if (medicoNormalizado) {
+        medicosUnicos.add(medicoNormalizado);
+      }
+    }
+  });
+  
+  // Ordenar médicos alfabeticamente
+  const medicosOrdenados = Array.from(medicosUnicos).sort((a, b) => 
+    a.localeCompare(b, 'pt-BR')
+  );
+  
+  // Limpar lista atual (mantendo apenas a primeira opção "Todos os Médicos")
+  medicosList.innerHTML = '<div class="option" data-value="Todos os Médicos">Todos os Médicos</div>';
+  
+  // Adicionar médicos do paciente
+  medicosOrdenados.forEach(medico => {
+    const option = document.createElement('div');
+    option.className = 'option';
+    option.setAttribute('data-value', medico);
+    option.textContent = medico;
+    medicosList.appendChild(option);
+  });
+  
+  // Se não houver médicos, mostrar mensagem
+  if (medicosOrdenados.length === 0) {
+    const option = document.createElement('div');
+    option.className = 'option';
+    option.setAttribute('data-value', '');
+    option.textContent = 'Nenhum médico encontrado';
+    option.style.color = '#94a3b8';
+    option.style.fontStyle = 'italic';
+    medicosList.appendChild(option);
+  }
+}
+
 function limparFiltros() {
   
   if (filterCategory) {
     filterCategory.value = '';
-    const customSelect = document.querySelector('.custom-select');
-    if (customSelect) {
-      customSelect.classList.remove('active');
+    const customSelectCategory = filterCategory.closest('.custom-select');
+    if (customSelectCategory) {
+      customSelectCategory.classList.remove('active');
+    }
+    // Remover seleção visual das opções de especialidade
+    const especialidadesList = document.getElementById('especialidadesList');
+    if (especialidadesList) {
+      especialidadesList.querySelectorAll('.option').forEach(opt => {
+        opt.classList.remove('selected');
+        opt.style.display = 'block'; // Mostrar todas as opções novamente
+      });
+      // Marcar "Todas as Especialidades" como selecionada
+      const primeiraOpcao = especialidadesList.querySelector('.option[data-value="Todas as Especialidades"]');
+      if (primeiraOpcao) {
+        primeiraOpcao.classList.add('selected');
+      }
+    }
+    // Atualizar placeholder
+    if (filterCategory) {
+      filterCategory.placeholder = 'Selecione uma especialidade';
     }
   }
   
   if (filterDoctor) {
     filterDoctor.value = '';
+    const customSelectDoctor = filterDoctor.closest('.custom-select');
+    if (customSelectDoctor) {
+      customSelectDoctor.classList.remove('active');
+    }
+    // Remover seleção visual das opções de médicos
+    const medicosList = document.getElementById('medicosList');
+    if (medicosList) {
+      medicosList.querySelectorAll('.option').forEach(opt => {
+        opt.classList.remove('selected');
+        opt.style.display = 'block'; // Mostrar todas as opções novamente
+      });
+      // Marcar "Todos os Médicos" como selecionado
+      const primeiraOpcao = medicosList.querySelector('.option[data-value="Todos os Médicos"]');
+      if (primeiraOpcao) {
+        primeiraOpcao.classList.add('selected');
+      }
+    }
+    // Atualizar placeholder
+    if (filterDoctor) {
+      filterDoctor.placeholder = 'Selecione um médico';
+    }
   }
   
   if (filterDate) {
     filterDate.value = '';
   }
   
+  // Resetar paginação ao limpar filtros
+  registrosPaginaAtual = 1;
+  
   filteredAnotacoes = [...allAnotacoes];
   renderizarRegistros(filteredAnotacoes);
   
   // Removido snackbar ao limpar filtros
   // mostrarAviso('Filtros limpos', 'info');
+}
+
+// Função para atualizar controles de paginação
+function atualizarControlesPagina() {
+  const totalPaginas = Math.ceil(filteredAnotacoes.length / REGISTROS_POR_PAGINA);
+  
+  if (btnAnterior) {
+    btnAnterior.disabled = registrosPaginaAtual === 1;
+    btnAnterior.style.opacity = registrosPaginaAtual === 1 ? '0.5' : '1';
+  }
+  
+  if (btnProximo) {
+    btnProximo.disabled = registrosPaginaAtual === totalPaginas;
+    btnProximo.style.opacity = registrosPaginaAtual === totalPaginas ? '0.5' : '1';
+  }
+  
+  if (infoPagina) {
+    const inicio = (registrosPaginaAtual - 1) * REGISTROS_POR_PAGINA + 1;
+    const fim = Math.min(registrosPaginaAtual * REGISTROS_POR_PAGINA, filteredAnotacoes.length);
+    infoPagina.textContent = `Mostrando ${inicio}-${fim} de ${filteredAnotacoes.length} registros`;
+  }
 }
 
 function criarNovoRegistro() {
@@ -645,6 +918,9 @@ window.carregarDadosExemplo = function() {
     }
   ];
   
+  
+  // Resetar paginação ao carregar dados de exemplo
+  registrosPaginaAtual = 1;
   
   allAnotacoes = dadosExemplo;
   filteredAnotacoes = [...allAnotacoes];

@@ -118,6 +118,26 @@
                     <div class="records-count"><span id="crisesCount">0</span> registro(s) encontrado(s)</div>
                 </div>
                 <div class="records-grid" id="crisesGrid"></div>
+                
+                <!-- Controles de Paginação -->
+                <div class="pagination-controls" id="paginationControls" style="display: none;">
+                  <div class="pagination-info" id="infoPagina"></div>
+                  <div class="pagination-buttons">
+                    <button class="pagination-btn" id="btnAnterior" disabled>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                      </svg>
+                      Anterior
+                    </button>
+                    <button class="pagination-btn" id="btnProximo" disabled>
+                      Próximo
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                
                 <div class="no-records" id="noCrises" style="display: none;">
                     <h3>Nenhuma crise encontrada</h3>
                     <p>Não há registros para os filtros aplicados.</p>

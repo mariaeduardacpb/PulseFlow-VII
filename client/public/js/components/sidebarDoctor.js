@@ -19,8 +19,7 @@ const patientMainLinks = [
   { page: 'notificacoes', label: 'Notificações', href: 'notificacoes.html' },
   { page: 'historicoprontuario', label: 'Registro Clínico', href: 'historicoProntuario.html' },
   { page: 'anexoexame', label: 'Anexo de Exames', href: 'anexoExame.html' },
-  { page: 'historicoeventoclinico', label: 'Eventos Clínicos', href: 'historicoEventoClinico.html' },
-  { page: 'criaranotacoes', label: 'Anotações Clínicas', href: 'criarAnotações.html' }
+  { page: 'historicoeventoclinico', label: 'Eventos Clínicos', href: 'historicoEventoClinico.html' }
 ];
 
 const patientReportLinks = [
