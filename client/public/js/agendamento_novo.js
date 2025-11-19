@@ -249,6 +249,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  const tipoAtendimentoSelect = form?.elements.namedItem('tipoAtendimento');
+  const localAtendimentoInput = form?.elements.namedItem('localAtendimento');
+  const labelLocalAtendimento = document.getElementById('labelLocalAtendimento');
+  
+  if (tipoAtendimentoSelect && localAtendimentoInput && labelLocalAtendimento) {
+    const atualizarLabelLocal = () => {
+      const tipo = tipoAtendimentoSelect.value;
+      if (tipo === 'online') {
+        labelLocalAtendimento.textContent = 'Link da videochamada';
+        localAtendimentoInput.placeholder = 'Cole o link da reunião (Zoom, Meet, etc.)';
+      } else if (tipo === 'domiciliar') {
+        labelLocalAtendimento.textContent = 'Endereço da visita';
+        localAtendimentoInput.placeholder = 'Informe o endereço completo';
+      } else {
+        labelLocalAtendimento.textContent = 'Local (se presencial/domiciliar)';
+        localAtendimentoInput.placeholder = 'Informe endereço ou sala';
+      }
+    };
+    
+    tipoAtendimentoSelect.addEventListener('change', atualizarLabelLocal);
+    atualizarLabelLocal();
+  }
+
   carregarPacienteSalvo();
   atualizarResumo();
 
@@ -323,16 +346,30 @@ document.addEventListener('DOMContentLoaded', () => {
       const token = ensureAuthenticated();
       if (!token) return;
 
+      const dataHoraObj = new Date(dataHoraISO);
+      if (dataHoraObj <= new Date()) {
+        showToast('A data e horário da consulta deve ser futura.', 'error');
+        return;
+      }
+
       const payload = {
         pacienteId: pacienteIdInput.value,
         dataHora: dataHoraISO,
         tipoConsulta: form.tipoAtendimento.value,
         motivoConsulta: form.motivoConsulta.value.trim(),
-        observacoes: form.observacoesConsulta.value.trim(),
         duracao: form.duracaoConsulta.value ? Number(form.duracaoConsulta.value) : 30,
       };
 
-      if (payload.tipoConsulta !== 'online' && form.localAtendimento.value.trim()) {
+      const observacoesConsulta = form.observacoesConsulta.value.trim();
+      if (observacoesConsulta) {
+        payload.observacoes = observacoesConsulta;
+      }
+
+      if (payload.tipoConsulta === 'online') {
+        if (form.localAtendimento.value.trim()) {
+          payload.linkVideochamada = form.localAtendimento.value.trim();
+        }
+      } else if (form.localAtendimento.value.trim()) {
         payload.endereco = {
           logradouro: form.localAtendimento.value.trim(),
         };

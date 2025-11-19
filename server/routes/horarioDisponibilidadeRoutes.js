@@ -6,12 +6,14 @@ import {
   buscarHorario,
   atualizarHorario,
   deletarHorario,
-  obterHorariosDisponiveis
+  obterHorariosDisponiveis,
+  listarHorariosMedico
 } from '../controllers/horarioDisponibilidadeController.js';
 
 const router = express.Router();
 
-// Rota pública para obter horários disponíveis (sem autenticação)
+// Rotas públicas (sem autenticação)
+router.get('/medico/:medicoId', listarHorariosMedico);
 router.get('/disponiveis/:medicoId', obterHorariosDisponiveis);
 
 // Todas as outras rotas requerem autenticação de médico

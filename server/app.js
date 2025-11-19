@@ -25,7 +25,9 @@ import perfilMedicoRoutes from './routes/perfilMedicoRoutes.js';
 import accessCodeRoutes from './routes/accessCodeRoutes.js';
 import geminiRoutes from './routes/geminiRoutes.js';
 import agendamentoRoutes from './routes/agendamentoRoutes.js';
+import agendamentoPacienteRoutes from './routes/agendamentoPacienteRoutes.js';
 import horarioDisponibilidadeRoutes from './routes/horarioDisponibilidadeRoutes.js';
+import notificacaoPacienteRoutes from './routes/notificacaoPacienteRoutes.js';
 
 
 // Carregar variáveis de ambiente
@@ -151,7 +153,9 @@ app.use('/api/eventos-clinicos', eventoClinicoRoutes);
 app.use('/api/access-code', accessCodeRoutes);
 app.use('/api/gemini', geminiRoutes);
 app.use('/api/agendamentos', agendamentoRoutes);
+app.use('/api/agendamentos-paciente', agendamentoPacienteRoutes);
 app.use('/api/horarios-disponibilidade', horarioDisponibilidadeRoutes);
+app.use('/api/notificacoes-paciente', notificacaoPacienteRoutes);
 
 
 // Middleware de erro

@@ -50,3 +50,6 @@ export const verificarConexaoMedicoPaciente = async (req, res, next) => {
   }
 };
 
+
+
+

@@ -2,16 +2,24 @@ import jwt from 'jsonwebtoken';
 import Paciente from '../models/Paciente.js';
 
 export const authPacienteMiddleware = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const authHeader = req.header('Authorization');
+  const token = authHeader?.replace('Bearer ', '');
 
   if (!token) {
     return res.status(401).json({ message: 'Token não fornecido' });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const jwtSecret = process.env.JWT_SECRET || 'default_secret_key_for_development_2024';
+    
+    const decoded = jwt.verify(token, jwtSecret);
 
-    const paciente = await Paciente.findById(decoded.id);
+    const pacienteId = decoded.id || decoded.sub;
+    if (!pacienteId) {
+      return res.status(400).json({ message: 'Token inválido: ID do paciente não encontrado' });
+    }
+
+    const paciente = await Paciente.findById(pacienteId);
     if (!paciente) {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
@@ -20,6 +28,12 @@ export const authPacienteMiddleware = async (req, res, next) => {
     req.user.tipo = 'paciente';
     next();
   } catch (err) {
-    return res.status(400).json({ message: 'Token inválido' });
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expirado. Faça login novamente.' });
+    }
+    if (err.name === 'JsonWebTokenError') {
+      return res.status(400).json({ message: `Token inválido: ${err.message}. Faça login novamente.` });
+    }
+    return res.status(400).json({ message: `Token inválido: ${err.message}` });
   }
 };

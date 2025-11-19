@@ -450,6 +450,23 @@ router.put('/perfil/:cpf', authMiddleware, async (req, res) => {
 
     await paciente.save();
 
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      const mongoose = (await import('mongoose')).default;
+      
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(paciente._id) ? paciente._id : new mongoose.Types.ObjectId(paciente._id.toString()),
+        userModel: 'Paciente',
+        title: 'Dados do perfil alterados',
+        description: `Seus dados de perfil foram atualizados por ${req.user.nome || 'um médico'}. Verifique as alterações em seu perfil.`,
+        type: 'profile_update',
+        link: `/profile`,
+        unread: true
+      });
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError);
+    }
+
     res.json({
       message: 'Perfil atualizado com sucesso',
       paciente: {

@@ -184,6 +184,23 @@ export const notificarSolicitacaoAcesso = async (req, res) => {
 
     await solicitacao.save();
 
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      const mongoose = (await import('mongoose')).default;
+      
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(paciente._id) ? paciente._id : new mongoose.Types.ObjectId(paciente._id.toString()),
+        userModel: 'Paciente',
+        title: 'Nova solicitação de acesso',
+        description: `${medicoNome || 'Um médico'} (${especialidade || 'Especialidade não informada'}) está solicitando acesso aos seus dados de saúde através do Pulse Key`,
+        type: 'pulse_key',
+        link: `/pulse-key`,
+        unread: true
+      });
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError);
+    }
+
     console.log('✅ Solicitação de acesso registrada:', {
       paciente: paciente.name || paciente.nome,
       medico: medicoNome,

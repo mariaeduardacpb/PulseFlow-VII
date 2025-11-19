@@ -19,7 +19,7 @@ export const criarAgendamento = async (req, res) => {
     const medicoId = req.user._id;
 
     // Validar campos obrigatórios
-    if (!pacienteId || !dataHora || !motivoConsulta) {
+    if (!pacienteId || !dataHora || !motivoConsulta || !motivoConsulta.trim()) {
       return res.status(400).json({ 
         message: 'Campos obrigatórios: pacienteId, dataHora e motivoConsulta' 
       });
@@ -33,6 +33,11 @@ export const criarAgendamento = async (req, res) => {
 
     // Verificar se a data/hora é futura
     const dataHoraConsulta = new Date(dataHora);
+    if (isNaN(dataHoraConsulta.getTime())) {
+      return res.status(400).json({ 
+        message: 'Data e hora inválidas' 
+      });
+    }
     if (dataHoraConsulta <= new Date()) {
       return res.status(400).json({ 
         message: 'A data e hora da consulta deve ser futura' 
@@ -40,13 +45,23 @@ export const criarAgendamento = async (req, res) => {
     }
 
     // Verificar conflito de horário para o médico
-    const conflito = await Agendamento.findOne({
+    const duracaoConsulta = duracao || 30;
+    const inicioConsulta = dataHoraConsulta.getTime();
+    const fimConsulta = inicioConsulta + duracaoConsulta * 60000;
+    
+    const agendamentosExistentes = await Agendamento.find({
       medicoId,
+      status: { $in: ['agendada', 'confirmada'] },
       dataHora: {
-        $gte: new Date(dataHoraConsulta.getTime() - (duracao || 30) * 60000),
-        $lte: new Date(dataHoraConsulta.getTime() + (duracao || 30) * 60000)
-      },
-      status: { $in: ['agendada', 'confirmada'] }
+        $gte: new Date(inicioConsulta - duracaoConsulta * 60000),
+        $lte: new Date(fimConsulta)
+      }
+    });
+    
+    const conflito = agendamentosExistentes.find(ag => {
+      const inicioExistente = new Date(ag.dataHora).getTime();
+      const fimExistente = inicioExistente + (ag.duracao || 30) * 60000;
+      return (inicioConsulta < fimExistente && fimConsulta > inicioExistente);
     });
 
     if (conflito) {
@@ -59,9 +74,9 @@ export const criarAgendamento = async (req, res) => {
     const novoAgendamento = new Agendamento({
       medicoId,
       pacienteId,
-      pacienteNome: paciente.name,
-      pacienteEmail: paciente.email,
-      pacienteTelefone: paciente.phone,
+      pacienteNome: paciente.name || paciente.nome || 'Paciente',
+      pacienteEmail: paciente.email || '',
+      pacienteTelefone: paciente.phone || paciente.telefone || '',
       dataHora: dataHoraConsulta,
       tipoConsulta: tipoConsulta || 'presencial',
       motivoConsulta,
@@ -448,6 +463,298 @@ export const remarcarConsulta = async (req, res) => {
     });
   } catch (error) {
     console.error('Erro ao remarcar consulta:', error);
+    res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      error: error.message 
+    });
+  }
+};
+
+// Criar agendamento pelo paciente
+export const criarAgendamentoPaciente = async (req, res) => {
+  try {
+    const {
+      medicoId,
+      dataHora,
+      tipoConsulta,
+      motivoConsulta,
+      observacoes,
+      duracao,
+      endereco,
+      linkVideochamada
+    } = req.body;
+
+    const pacienteId = req.user._id;
+
+    if (!medicoId || !dataHora || !motivoConsulta || !motivoConsulta.trim()) {
+      return res.status(400).json({ 
+        message: 'Campos obrigatórios: medicoId, dataHora e motivoConsulta' 
+      });
+    }
+
+    const medico = await User.findById(medicoId);
+    if (!medico) {
+      return res.status(404).json({ message: 'Médico não encontrado' });
+    }
+
+    const paciente = await Paciente.findById(pacienteId);
+    if (!paciente) {
+      return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
+
+    const dataHoraConsulta = new Date(dataHora);
+    if (isNaN(dataHoraConsulta.getTime())) {
+      return res.status(400).json({ 
+        message: 'Data e hora inválidas' 
+      });
+    }
+    if (dataHoraConsulta <= new Date()) {
+      return res.status(400).json({ 
+        message: 'A data e hora da consulta deve ser futura' 
+      });
+    }
+
+    const duracaoConsulta = duracao || 30;
+    const inicioConsulta = dataHoraConsulta.getTime();
+    const fimConsulta = inicioConsulta + duracaoConsulta * 60000;
+    
+    const agendamentosExistentes = await Agendamento.find({
+      medicoId,
+      status: { $in: ['agendada', 'confirmada'] },
+      dataHora: {
+        $gte: new Date(inicioConsulta - duracaoConsulta * 60000),
+        $lte: new Date(fimConsulta)
+      }
+    });
+    
+    const conflito = agendamentosExistentes.find(ag => {
+      const inicioExistente = new Date(ag.dataHora).getTime();
+      const fimExistente = inicioExistente + (ag.duracao || 30) * 60000;
+      return (inicioConsulta < fimExistente && fimConsulta > inicioExistente);
+    });
+
+    if (conflito) {
+      return res.status(400).json({ 
+        message: 'Já existe uma consulta agendada neste horário' 
+      });
+    }
+
+    const novoAgendamento = new Agendamento({
+      medicoId,
+      pacienteId,
+      pacienteNome: paciente.name || paciente.nome || 'Paciente',
+      pacienteEmail: paciente.email || '',
+      pacienteTelefone: paciente.phone || paciente.telefone || '',
+      dataHora: dataHoraConsulta,
+      tipoConsulta: tipoConsulta || 'presencial',
+      motivoConsulta,
+      observacoes: observacoes || '',
+      duracao: duracao || 30,
+      endereco: endereco || {},
+      linkVideochamada: linkVideochamada || null,
+      status: 'agendada'
+    });
+
+    await novoAgendamento.save();
+
+    await novoAgendamento.populate('pacienteId', 'name email phone');
+    await novoAgendamento.populate('medicoId', 'nome areaAtuacao');
+
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      const mongoose = (await import('mongoose')).default;
+      const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(dataHoraConsulta);
+
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(pacienteId) ? pacienteId : new mongoose.Types.ObjectId(pacienteId.toString()),
+        userModel: 'Paciente',
+        title: 'Consulta agendada',
+        description: `Sua consulta com ${medico.nome} foi agendada para ${dataFormatada}`,
+        type: 'appointment',
+        link: `/appointments/${novoAgendamento._id}`,
+        unread: true
+      });
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError);
+    }
+
+    res.status(201).json({
+      message: 'Agendamento criado com sucesso',
+      agendamento: novoAgendamento
+    });
+  } catch (error) {
+    console.error('Erro ao criar agendamento:', error);
+    res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      error: error.message 
+    });
+  }
+};
+
+// Listar agendamentos do paciente
+export const listarAgendamentosPaciente = async (req, res) => {
+  try {
+    const pacienteId = req.user._id;
+    const { status, dataInicio, dataFim, medicoId } = req.query;
+
+    const filtro = { pacienteId };
+
+    if (status) {
+      filtro.status = status;
+    }
+
+    if (medicoId) {
+      filtro.medicoId = medicoId;
+    }
+
+    if (dataInicio || dataFim) {
+      filtro.dataHora = {};
+      if (dataInicio) {
+        filtro.dataHora.$gte = new Date(dataInicio);
+      }
+      if (dataFim) {
+        filtro.dataHora.$lte = new Date(dataFim);
+      }
+    }
+
+    const agendamentos = await Agendamento.find(filtro)
+      .populate('pacienteId', 'name email phone profilePhoto')
+      .populate('medicoId', 'nome areaAtuacao crm')
+      .sort({ dataHora: 1 })
+      .lean();
+
+    res.json({
+      total: agendamentos.length,
+      agendamentos
+    });
+  } catch (error) {
+    console.error('Erro ao listar agendamentos do paciente:', error);
+    res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      error: error.message 
+    });
+  }
+};
+
+// Buscar agendamentos de um médico específico (para verificar horários ocupados)
+export const buscarAgendamentosMedico = async (req, res) => {
+  try {
+    const { medicoId } = req.params;
+    const { dataInicio, dataFim } = req.query;
+
+    if (!medicoId) {
+      return res.status(400).json({ message: 'ID do médico é obrigatório' });
+    }
+
+    const filtro = { 
+      medicoId,
+      status: { $in: ['agendada', 'confirmada'] }
+    };
+
+    if (dataInicio || dataFim) {
+      filtro.dataHora = {};
+      if (dataInicio) {
+        filtro.dataHora.$gte = new Date(dataInicio);
+      }
+      if (dataFim) {
+        filtro.dataHora.$lte = new Date(dataFim);
+      }
+    } else {
+      filtro.dataHora = { $gte: new Date() };
+    }
+
+    const agendamentos = await Agendamento.find(filtro)
+      .select('dataHora duracao status')
+      .sort({ dataHora: 1 })
+      .lean();
+
+    res.json({
+      total: agendamentos.length,
+      agendamentos
+    });
+  } catch (error) {
+    console.error('Erro ao buscar agendamentos do médico:', error);
+    res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      error: error.message 
+    });
+  }
+};
+
+// Cancelar agendamento pelo paciente
+export const cancelarAgendamentoPaciente = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { motivoCancelamento } = req.body;
+    const pacienteId = req.user._id;
+
+    const agendamento = await Agendamento.findOne({ 
+      _id: id, 
+      pacienteId 
+    });
+
+    if (!agendamento) {
+      return res.status(404).json({ message: 'Agendamento não encontrado' });
+    }
+
+    if (agendamento.status === 'cancelada') {
+      return res.status(400).json({ 
+        message: 'Este agendamento já foi cancelado' 
+      });
+    }
+
+    if (agendamento.status === 'realizada') {
+      return res.status(400).json({ 
+        message: 'Não é possível cancelar um agendamento já realizado' 
+      });
+    }
+
+    agendamento.status = 'cancelada';
+    agendamento.canceladoPor = 'paciente';
+    agendamento.motivoCancelamento = motivoCancelamento || 'Cancelado pelo paciente';
+    agendamento.dataCancelamento = new Date();
+    agendamento.updatedAt = new Date();
+    await agendamento.save();
+
+    await agendamento.populate('pacienteId', 'name email phone');
+    await agendamento.populate('medicoId', 'nome areaAtuacao');
+
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(agendamento.dataHora);
+
+      const mongoose = (await import('mongoose')).default;
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(pacienteId) ? pacienteId : new mongoose.Types.ObjectId(pacienteId.toString()),
+        userModel: 'Paciente',
+        title: 'Consulta cancelada',
+        description: `Sua consulta com ${agendamento.medicoId.nome} agendada para ${dataFormatada} foi cancelada`,
+        type: 'appointment',
+        link: `/appointments/${agendamento._id}`,
+        unread: true
+      });
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError);
+    }
+
+    res.json({
+      message: 'Agendamento cancelado com sucesso',
+      agendamento
+    });
+  } catch (error) {
+    console.error('Erro ao cancelar agendamento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
       error: error.message 

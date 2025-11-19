@@ -4,8 +4,14 @@ const notificationSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      refPath: 'userModel',
       required: true
+    },
+    userModel: {
+      type: String,
+      required: true,
+      enum: ['User', 'Paciente'],
+      default: 'User'
     },
     title: {
       type: String,
@@ -29,6 +35,10 @@ const notificationSchema = new mongoose.Schema(
     unread: {
       type: Boolean,
       default: true
+    },
+    archived: {
+      type: Boolean,
+      default: false
     }
   },
   {

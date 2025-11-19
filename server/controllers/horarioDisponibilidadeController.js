@@ -275,6 +275,49 @@ export const deletarHorario = async (req, res) => {
   }
 };
 
+// Listar horários cadastrados do médico (rota pública para pacientes)
+export const listarHorariosMedico = async (req, res) => {
+  try {
+    const { medicoId } = req.params;
+    const { ativo } = req.query;
+
+    if (!medicoId) {
+      return res.status(400).json({ 
+        message: 'ID do médico é obrigatório' 
+      });
+    }
+
+    const filtro = { medicoId };
+    if (ativo !== undefined) {
+      filtro.ativo = ativo === 'true';
+    } else {
+      filtro.ativo = true;
+    }
+
+    const horarios = await HorarioDisponibilidade.find(filtro)
+      .sort({ diaSemana: 1, horaInicio: 1 })
+      .lean();
+
+    const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    
+    const horariosFormatados = horarios.map(horario => ({
+      ...horario,
+      diaSemanaNome: diasSemana[horario.diaSemana]
+    }));
+
+    res.json({
+      total: horariosFormatados.length,
+      horarios: horariosFormatados
+    });
+  } catch (error) {
+    console.error('Erro ao listar horários do médico:', error);
+    res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      error: error.message 
+    });
+  }
+};
+
 // Obter horários disponíveis para um médico em uma data específica
 // Esta rota é pública e não requer autenticação
 export const obterHorariosDisponiveis = async (req, res) => {
@@ -295,14 +338,31 @@ export const obterHorariosDisponiveis = async (req, res) => {
     }
 
     const dataConsulta = new Date(data);
+    dataConsulta.setHours(0, 0, 0, 0);
+    const fimDiaConsulta = new Date(dataConsulta);
+    fimDiaConsulta.setHours(23, 59, 59, 999);
     const diaSemana = dataConsulta.getDay(); // 0 = Domingo, 6 = Sábado
 
-    // Buscar horários cadastrados para esse dia da semana
-    const horariosCadastrados = await HorarioDisponibilidade.find({
+    // Buscar horários cadastrados para esse dia da semana (recorrentes)
+    const horariosRecorrentes = await HorarioDisponibilidade.find({
       medicoId,
       diaSemana,
-      ativo: true
+      ativo: true,
+      tipo: 'recorrente'
     }).sort({ horaInicio: 1 });
+
+    // Buscar horários específicos para essa data
+    const horariosEspecificos = await HorarioDisponibilidade.find({
+      medicoId,
+      dataEspecifica: {
+        $gte: dataConsulta,
+        $lte: fimDiaConsulta
+      },
+      ativo: true,
+      tipo: 'especifico'
+    }).sort({ horaInicio: 1 });
+
+    const horariosCadastrados = [...horariosRecorrentes, ...horariosEspecificos];
 
     if (horariosCadastrados.length === 0) {
       return res.json({
