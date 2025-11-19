@@ -2,8 +2,55 @@
 import express from 'express';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import User from '../models/User.js';
+import Notification from '../models/Notification.js';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 const router = express.Router();
+
+// Configuração do Multer para upload de arquivos
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'fotos');
+        console.log('Tentando criar diretório de upload:', uploadDir);
+        try {
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+                console.log('Diretório de upload criado com sucesso:', uploadDir);
+            } else {
+                console.log('Diretório de upload já existe:', uploadDir);
+            }
+            cb(null, uploadDir);
+        } catch (error) {
+            console.error('Erro ao criar diretório de upload:', error);
+            cb(error);
+        }
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname).toLowerCase();
+        const filename = 'foto-' + uniqueSuffix + ext;
+        console.log('Nome do arquivo gerado:', filename);
+        cb(null, filename);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // limite de 5MB
+    },
+    fileFilter: (req, file, cb) => {
+        // Verifica o tipo MIME do arquivo
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Tipo de arquivo não suportado. Use apenas JPG, JPEG ou PNG.'));
+        }
+    }
+}).single('foto');
 
 router.get('/perfil', authMiddleware, async (req, res) => {
   try {
@@ -162,6 +209,92 @@ router.put('/perfil', authMiddleware, async (req, res) => {
       error: error.message 
     });
   }
+});
+
+// Atualizar foto do perfil
+router.post('/perfil/foto', authMiddleware, async (req, res) => {
+  console.log('Recebendo requisição para atualizar foto');
+  upload(req, res, async function(err) {
+    if (err instanceof multer.MulterError) {
+      console.error('Erro do Multer:', err);
+      return res.status(400).json({ 
+        message: err.code === 'LIMIT_FILE_SIZE' 
+          ? 'O arquivo é muito grande. Tamanho máximo permitido: 5MB' 
+          : 'Erro ao fazer upload do arquivo'
+      });
+    } else if (err) {
+      console.error('Erro no upload:', err);
+      return res.status(400).json({ message: err.message });
+    }
+
+    try {
+      if (!req.file) {
+        console.log('Nenhum arquivo recebido');
+        return res.status(400).json({ message: 'Nenhuma foto foi enviada' });
+      }
+
+      console.log('Arquivo recebido:', req.file);
+
+      const medico = await User.findById(req.user._id);
+      if (!medico) {
+        console.log('Médico não encontrado');
+        if (req.file && req.file.path) {
+          try {
+            fs.unlinkSync(req.file.path);
+            console.log('Arquivo removido após erro');
+          } catch (error) {
+            console.error('Erro ao remover arquivo:', error);
+          }
+        }
+        return res.status(404).json({ message: 'Médico não encontrado' });
+      }
+
+      // Remove a foto antiga se existir
+      if (medico.foto) {
+        const oldPhotoPath = path.join(process.cwd(), 'public', medico.foto);
+        try {
+          if (fs.existsSync(oldPhotoPath)) {
+            fs.unlinkSync(oldPhotoPath);
+            console.log('Foto antiga removida:', oldPhotoPath);
+          }
+        } catch (error) {
+          console.error('Erro ao remover foto antiga:', error);
+        }
+      }
+
+      // Atualiza o caminho da foto no banco de dados
+      const fotoUrl = `/uploads/fotos/${req.file.filename}`;
+      console.log('Nova URL da foto:', fotoUrl);
+      medico.foto = fotoUrl;
+      await medico.save();
+      console.log('Foto atualizada com sucesso');
+
+      try {
+        await Notification.create({
+          user: req.user._id,
+          title: 'Foto de perfil atualizada',
+          description: 'Sua foto de perfil foi atualizada com sucesso.',
+          type: 'updates',
+          link: '/client/views/perfilMedico.html',
+          unread: true
+        });
+        console.log('Notificação de foto criada com sucesso');
+      } catch (notifError) {
+        console.error('Erro ao criar notificação de foto:', notifError);
+      }
+
+      // Retorna a URL completa da foto
+      const fotoUrlCompleta = `${req.protocol}://${req.get('host')}${fotoUrl}`;
+      
+      res.json({ 
+        message: 'Foto atualizada com sucesso',
+        fotoUrl: fotoUrlCompleta
+      });
+    } catch (error) {
+      console.error('Erro ao processar upload:', error);
+      res.status(500).json({ message: 'Erro ao processar upload da foto' });
+    }
+  });
 });
 
 export default router;

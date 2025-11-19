@@ -200,8 +200,8 @@ function bindThemeSelect() {
     return;
   }
 
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  const currentTheme = typeof window.getCurrentTheme === 'function' ? window.getCurrentTheme() : savedTheme;
+  // Usar a mesma chave que theme.js (pf_theme)
+  const currentTheme = typeof window.getCurrentTheme === 'function' ? window.getCurrentTheme() : 'light';
   select.value = currentTheme;
   display.textContent = currentTheme === 'dark' ? 'Escuro' : currentTheme === 'auto' ? 'Automático' : 'Claro';
 
@@ -209,7 +209,7 @@ function bindThemeSelect() {
     const value = event.target.value;
     const label = value === 'dark' ? 'Escuro' : value === 'auto' ? 'Automático' : 'Claro';
     display.textContent = label;
-    localStorage.setItem('theme', value);
+    // Usar window.applyTheme que já salva no localStorage com a chave correta
     if (typeof window.applyTheme === 'function') {
       window.applyTheme(value);
     }
