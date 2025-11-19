@@ -443,7 +443,23 @@ async function alterarFoto() {
                 body: formData
             });
 
-            const data = await response.json();
+            // Tentar fazer parse do JSON, se falhar, mostrar erro mais claro
+            let data;
+            try {
+                const text = await response.text();
+                if (!text) {
+                    throw new Error('Resposta vazia do servidor');
+                }
+                // Verificar se começa com < (HTML) ou { (JSON)
+                if (text.trim().startsWith('<')) {
+                    console.error('Servidor retornou HTML em vez de JSON:', text.substring(0, 200));
+                    throw new Error('Erro: O servidor retornou uma página HTML em vez de JSON. Verifique se a rota está configurada corretamente.');
+                }
+                data = JSON.parse(text);
+            } catch (parseError) {
+                console.error('Erro ao fazer parse da resposta:', parseError);
+                throw new Error('Erro ao processar resposta do servidor. Verifique se a rota está configurada corretamente.');
+            }
 
             if (response.status === 401) {
                 // Token expirado, tenta refresh
@@ -457,12 +473,27 @@ async function alterarFoto() {
                     body: formData
                 });
 
-                if (!newResponse.ok) {
-                    const errorData = await newResponse.json();
-                    throw new Error(errorData.message || 'Erro ao atualizar foto');
+                // Tentar fazer parse do JSON, se falhar, mostrar erro mais claro
+                let newData;
+                try {
+                    const text = await newResponse.text();
+                    if (!text) {
+                        throw new Error('Resposta vazia do servidor');
+                    }
+                    // Verificar se começa com < (HTML) ou { (JSON)
+                    if (text.trim().startsWith('<')) {
+                        console.error('Servidor retornou HTML em vez de JSON:', text.substring(0, 200));
+                        throw new Error('Erro: O servidor retornou uma página HTML em vez de JSON. Verifique se a rota está configurada corretamente.');
+                    }
+                    newData = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Erro ao fazer parse da resposta:', parseError);
+                    throw new Error('Erro ao processar resposta do servidor. Verifique se a rota está configurada corretamente.');
                 }
 
-                const newData = await newResponse.json();
+                if (!newResponse.ok) {
+                    throw new Error(newData.message || 'Erro ao atualizar foto');
+                }
                 document.getElementById('profileImage').src = newData.fotoUrl;
                 return;
             }

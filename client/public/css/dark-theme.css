@@ -1,89 +1,1454 @@
+/* ============================================
+   SISTEMA DE TEMA ESCURO - PULSEFLOW
+   ============================================ */
+
 :root[data-theme="dark"] {
   color-scheme: dark;
+  
+  /* Variáveis de cores principais */
   --surface-base: rgba(15, 23, 42, 0.96);
   --surface-soft: rgba(15, 23, 42, 0.9);
+  --surface-alt: rgba(30, 41, 59, 0.8);
   --border-soft: rgba(148, 163, 184, 0.28);
+  --border-strong: rgba(148, 163, 184, 0.4);
   --shadow-soft: 0 28px 60px -32px rgba(2, 6, 23, 0.85);
+  --shadow-md: 0 18px 40px -24px rgba(2, 6, 23, 0.6);
+  --shadow-sm: 0 12px 28px -18px rgba(2, 6, 23, 0.4);
+  
+  /* Cores de marca */
   --brand-dark: #e2e8f0;
   --brand-accent: #38bdf8;
-  --text-muted: #cbd5f5;
-  --text-light: #94a3b8;
+  --brand-primary: #0ea5e9;
+  --brand-primary-dark: #0284c7;
+  
+  /* Cores de texto */
+  --text-primary: #e2e8f0;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-light: #64748b;
+  
+  /* Cores de estado */
   --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.16);
+  --success: #34d399;
+  --warning: #fbbf24;
+  --info: #60a5fa;
 }
+
+/* ============================================
+   ELEMENTOS BASE
+   ============================================ */
 
 :root[data-theme="dark"] body {
   background: radial-gradient(circle at 20% 20%, rgba(23, 37, 84, 0.6), rgba(2, 6, 23, 0.95));
-  color: var(--brand-dark);
+  color: var(--text-primary);
 }
 
+/* Removido regra genérica * que quebrava layouts */
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+
+:root[data-theme="dark"] .sidebar {
+  background: #0f172a;
+  border-right-color: var(--border-soft);
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .sidebar-link {
+  color: rgba(226, 232, 240, 0.78);
+}
+
+:root[data-theme="dark"] .sidebar-link:hover {
+  background: rgba(148, 163, 184, 0.12);
+  color: #f8fafc;
+}
+
+:root[data-theme="dark"] .sidebar-link.active {
+  background: rgba(14, 165, 233, 0.18);
+  color: #f8fafc;
+  border-left-color: var(--brand-primary);
+}
+
+:root[data-theme="dark"] .profile-info h3 {
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .profile-role {
+  color: rgba(226, 232, 240, 0.7);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+:root[data-theme="dark"] .app-header {
+  background: #0f172a;
+  border-bottom-color: var(--border-soft);
+  box-shadow: var(--shadow-md);
+}
+
+:root[data-theme="dark"] .header-title {
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .brand-name {
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .brand-tagline {
+  color: rgba(148, 163, 184, 0.75);
+}
+
+:root[data-theme="dark"] .brand-icon {
+  background: rgba(30, 41, 59, 0.8);
+  color: var(--brand-accent);
+}
+
+:root[data-theme="dark"] .header-action {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .header-action:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+:root[data-theme="dark"] .header-logout {
+  background: #1d4ed8;
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .header-logout:hover {
+  background: #2563eb;
+}
+
+:root[data-theme="dark"] .menu-toggle {
+  background: #0f172a;
+  border-color: var(--border-soft);
+}
+
+:root[data-theme="dark"] .menu-toggle span {
+  background: var(--text-primary);
+}
+
+/* ============================================
+   CONTAINERS E CARDS
+   ============================================ */
+
+:root[data-theme="dark"] .container,
+:root[data-theme="dark"] .settings-shell,
 :root[data-theme="dark"] .settings-hero,
 :root[data-theme="dark"] .settings-section,
-:root[data-theme="dark"] .modal-content,
-:root[data-theme="dark"] .btn-link,
-:root[data-theme="dark"] .btn-edit,
-:root[data-theme="dark"] .btn-light,
-:root[data-theme="dark"] .btn-cancel {
+:root[data-theme="dark"] .form-section,
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .modal-content {
   background: var(--surface-base);
-  border-color: rgba(148, 163, 184, 0.24);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
 }
 
-:root[data-theme="dark"] .settings-hero p,
-:root[data-theme="dark"] .hero-eyebrow,
+:root[data-theme="dark"] .form-section {
+  background: var(--surface-base);
+  border-color: var(--border-soft);
+}
+
+/* ============================================
+   TIPOGRAFIA
+   ============================================ */
+
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] h4,
+:root[data-theme="dark"] h5,
+:root[data-theme="dark"] h6 {
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] p,
+:root[data-theme="dark"] span,
 :root[data-theme="dark"] .field-value,
+:root[data-theme="dark"] .hero-eyebrow {
+  color: var(--text-secondary);
+}
+
 :root[data-theme="dark"] label,
-:root[data-theme="dark"] .modal-header h3,
 :root[data-theme="dark"] .form-group label,
+:root[data-theme="dark"] .modal-header h3 {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   FORMULÁRIOS E INPUTS
+   ============================================ */
+
 :root[data-theme="dark"] .form-input,
+:root[data-theme="dark"] input[type="text"],
+:root[data-theme="dark"] input[type="email"],
+:root[data-theme="dark"] input[type="tel"],
+:root[data-theme="dark"] input[type="password"],
+:root[data-theme="dark"] input[type="number"],
+:root[data-theme="dark"] input[type="date"],
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .form-input:focus,
+:root[data-theme="dark"] input:focus,
+:root[data-theme="dark"] textarea:focus,
+:root[data-theme="dark"] select:focus {
+  border-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+  background: rgba(15, 23, 42, 0.8);
+}
+
+:root[data-theme="dark"] .form-input:read-only,
+:root[data-theme="dark"] input:read-only {
+  background: rgba(15, 23, 42, 0.4);
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .form-input::placeholder,
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: var(--text-light);
+  opacity: 0.7;
+}
+
+:root[data-theme="dark"] .input-group,
+:root[data-theme="dark"] .input-wrapper {
+  background: transparent;
+}
+
+:root[data-theme="dark"] .input-icon {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: var(--border-soft);
+  color: var(--text-secondary);
+}
+
+:root[data-theme="dark"] .input-icon:focus-within {
+  border-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+}
+
 :root[data-theme="dark"] .form-error {
-  color: var(--brand-dark);
+  color: var(--danger);
 }
 
-:root[data-theme="dark"] .toggle-switch .slider {
-  background: rgba(148, 163, 184, 0.45);
-}
+/* ============================================
+   BOTÕES
+   ============================================ */
 
+:root[data-theme="dark"] .btn-primary,
+:root[data-theme="dark"] .btn-save,
 :root[data-theme="dark"] .btn-edit-profile,
-:root[data-theme="dark"] .btn-save {
+:root[data-theme="dark"] .edit-btn,
+:root[data-theme="dark"] .save-btn {
   background: linear-gradient(135deg, #38bdf8 0%, #0f172a 100%);
   color: #0f172a;
+  border-color: var(--brand-accent);
 }
 
+:root[data-theme="dark"] .btn-primary:hover,
+:root[data-theme="dark"] .btn-save:hover,
 :root[data-theme="dark"] .btn-edit-profile:hover,
-:root[data-theme="dark"] .btn-save:hover {
+:root[data-theme="dark"] .edit-btn:hover,
+:root[data-theme="dark"] .save-btn:hover {
   background: linear-gradient(135deg, #0ea5e9 0%, #020617 100%);
   color: #e2e8f0;
 }
 
+:root[data-theme="dark"] .btn-secondary,
+:root[data-theme="dark"] .btn-cancel,
+:root[data-theme="dark"] .cancel-btn,
+:root[data-theme="dark"] .back-btn {
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--text-primary);
+  border-color: var(--border-soft);
+}
+
+:root[data-theme="dark"] .btn-secondary:hover,
+:root[data-theme="dark"] .btn-cancel:hover,
+:root[data-theme="dark"] .cancel-btn:hover,
+:root[data-theme="dark"] .back-btn:hover {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+:root[data-theme="dark"] .btn-link,
+:root[data-theme="dark"] .btn-edit,
+:root[data-theme="dark"] .btn-light {
+  background: var(--surface-base);
+  color: var(--text-primary);
+  border-color: var(--border-soft);
+}
+
 :root[data-theme="dark"] .btn-link:hover,
 :root[data-theme="dark"] .btn-edit:hover,
-:root[data-theme="dark"] .btn-light:hover,
-:root[data-theme="dark"] .btn-cancel:hover {
+:root[data-theme="dark"] .btn-light:hover {
   background: rgba(59, 130, 246, 0.16);
 }
 
-:root[data-theme="dark"] .settings-section.danger {
-  border-color: rgba(248, 113, 113, 0.45);
-}
-
 :root[data-theme="dark"] .btn-danger {
-  background: rgba(239, 68, 68, 0.16);
+  background: var(--danger-soft);
   color: #fecaca;
+  border-color: rgba(248, 113, 113, 0.3);
 }
 
 :root[data-theme="dark"] .btn-danger:hover {
   background: rgba(239, 68, 68, 0.26);
 }
 
-:root[data-theme="dark"] .form-input {
-  background: rgba(15, 23, 42, 0.6);
-  border-color: rgba(148, 163, 184, 0.3);
+:root[data-theme="dark"] .add-rqe-btn,
+:root[data-theme="dark"] .remove-rqe-btn {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--brand-accent);
+  border-color: rgba(56, 189, 248, 0.3);
 }
 
-:root[data-theme="dark"] .form-input:focus {
-  border-color: rgba(56, 189, 248, 0.6);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+:root[data-theme="dark"] .add-rqe-btn:hover,
+:root[data-theme="dark"] .remove-rqe-btn:hover {
+  background: rgba(56, 189, 248, 0.22);
 }
 
+:root[data-theme="dark"] .change-photo-btn {
+  background: rgba(14, 165, 233, 0.12);
+  color: var(--brand-primary);
+  border-color: rgba(14, 165, 233, 0.3);
+}
 
+:root[data-theme="dark"] .change-photo-btn:hover {
+  background: rgba(14, 165, 233, 0.22);
+}
 
+/* ============================================
+   TOGGLE SWITCHES
+   ============================================ */
 
+:root[data-theme="dark"] .toggle-switch .slider {
+  background: rgba(148, 163, 184, 0.45);
+}
+
+:root[data-theme="dark"] .toggle-switch input:checked + .slider {
+  background: var(--brand-accent);
+}
+
+/* ============================================
+   MODAIS
+   ============================================ */
+
+:root[data-theme="dark"] .modal {
+  background: rgba(2, 6, 23, 0.8);
+}
+
+:root[data-theme="dark"] .modal-content {
+  background: var(--surface-base);
+  border-color: var(--border-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+:root[data-theme="dark"] .modal-header {
+  border-bottom-color: var(--border-soft);
+}
+
+:root[data-theme="dark"] .modal-close {
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .modal-close:hover {
+  background: rgba(148, 163, 184, 0.12);
+}
+
+/* ============================================
+   TABELAS
+   ============================================ */
+
+:root[data-theme="dark"] table {
+  background: var(--surface-base);
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] thead {
+  background: rgba(30, 41, 59, 0.6);
+}
+
+:root[data-theme="dark"] th {
+  color: var(--text-primary);
+  border-color: var(--border-soft);
+}
+
+:root[data-theme="dark"] td {
+  color: var(--text-secondary);
+  border-color: var(--border-soft);
+}
+
+:root[data-theme="dark"] tr:hover {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+/* ============================================
+   SEÇÕES ESPECIAIS
+   ============================================ */
+
+:root[data-theme="dark"] .settings-section.danger {
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+:root[data-theme="dark"] .profile-photo-container {
+  background: var(--surface-alt);
+  border-color: var(--border-soft);
+}
+
+:root[data-theme="dark"] .profile-photo {
+  border-color: var(--border-soft);
+}
+
+:root[data-theme="dark"] .button-container {
+  border-top-color: var(--border-soft);
+}
+
+/* ============================================
+   ELEMENTOS DE NAVEGAÇÃO
+   ============================================ */
+
+:root[data-theme="dark"] .tabs-container {
+  background: var(--surface-base);
+  border-color: var(--border-soft);
+}
+
+:root[data-theme="dark"] .tab-button {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .tab-button:hover {
+  background: var(--surface-alt);
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .tab-button.active {
+  background: var(--brand-primary);
+  color: white;
+}
+
+/* ============================================
+   CARDS E LISTAS
+   ============================================ */
+
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .list-item {
+  background: var(--surface-base);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .card:hover,
+:root[data-theme="dark"] .list-item:hover {
+  background: var(--surface-alt);
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+:root[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+/* ============================================
+   SELECT E DROPDOWNS
+   ============================================ */
+
+:root[data-theme="dark"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e2e8f0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   ALERTAS E NOTIFICAÇÕES
+   ============================================ */
+
+:root[data-theme="dark"] .alert,
+:root[data-theme="dark"] .notification {
+  background: var(--surface-base);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .alert-success {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: #6ee7b7;
+}
+
+:root[data-theme="dark"] .alert-error {
+  background: var(--danger-soft);
+  border-color: rgba(248, 113, 113, 0.3);
+  color: #fecaca;
+}
+
+:root[data-theme="dark"] .alert-warning {
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fde68a;
+}
+
+/* ============================================
+   PÁGINAS ESPECÍFICAS
+   ============================================ */
+
+/* HomePage */
+:root[data-theme="dark"] .main-header {
+  background: #0f172a;
+  border-bottom-color: var(--border-soft);
+}
+
+:root[data-theme="dark"] .nav-link {
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .nav-link:hover {
+  color: var(--brand-accent);
+}
+
+:root[data-theme="dark"] .login-button {
+  background: var(--brand-primary);
+  color: white;
+}
+
+:root[data-theme="dark"] .login-button:hover {
+  background: var(--brand-primary-dark);
+}
+
+/* Login/Register */
+:root[data-theme="dark"] .left {
+  background-color: #002a42;
+}
+
+:root[data-theme="dark"] .form-container {
+  background: var(--surface-base);
+  border-color: var(--border-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Agendamentos */
+:root[data-theme="dark"] .actions-bar {
+  background: var(--surface-base);
+  border-color: var(--border-soft);
+}
+
+/* ============================================
+   PERFIL MÉDICO - SOBRESCRITA ESPECÍFICA
+   ============================================ */
+
+:root[data-theme="dark"] .container {
+  background: var(--surface-base) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+:root[data-theme="dark"] .container h1 {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .form-section {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .form-section h2,
+:root[data-theme="dark"] .form-section h3 {
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .form-section h2::before,
+:root[data-theme="dark"] .form-section h3::before {
+  background: linear-gradient(135deg, var(--brand-accent) 0%, var(--brand-primary) 100%) !important;
+}
+
+:root[data-theme="dark"] .input-group label {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .input-group input {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .input-group input:focus {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: var(--brand-accent) !important;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.22) !important;
+}
+
+:root[data-theme="dark"] .input-group input:disabled,
+:root[data-theme="dark"] .input-group input[readonly] {
+  background: rgba(15, 23, 42, 0.4) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .profile-photo {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+}
+
+/* Removido background transparent que quebrava layout */
+
+:root[data-theme="dark"] #rqeContainer {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .rqe-group .input-group input {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .rqe-group .input-group input:focus {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: var(--brand-accent) !important;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.22) !important;
+}
+
+:root[data-theme="dark"] .rqe-group .input-group input:not([readonly]) {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .rqe-group label {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .remove-rqe-btn {
+  background: var(--surface-base) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+:root[data-theme="dark"] .remove-rqe-btn:hover {
+  background: var(--danger-soft) !important;
+}
+
+:root[data-theme="dark"] .edit-btn {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .edit-btn:hover {
+  background: linear-gradient(135deg, var(--brand-primary-dark) 0%, #0369a1 100%) !important;
+}
+
+:root[data-theme="dark"] .save-btn {
+  background: linear-gradient(135deg, var(--success) 0%, #10b981 100%) !important;
+  color: white !important;
+}
+
+:root[data-theme="dark"] .save-btn:hover {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+:root[data-theme="dark"] .cancel-btn {
+  background: linear-gradient(135deg, var(--danger) 0%, #ef4444 100%) !important;
+  color: white !important;
+}
+
+:root[data-theme="dark"] .cancel-btn:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+}
+
+:root[data-theme="dark"] .back-btn {
+  background: linear-gradient(135deg, var(--text-muted) 0%, var(--text-light) 100%) !important;
+  color: white !important;
+}
+
+:root[data-theme="dark"] .back-btn:hover {
+  background: linear-gradient(135deg, var(--text-light) 0%, #475569 100%) !important;
+}
+
+:root[data-theme="dark"] .add-rqe-btn {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%) !important;
+  color: white !important;
+}
+
+:root[data-theme="dark"] .add-rqe-btn:hover {
+  background: linear-gradient(135deg, var(--brand-primary-dark) 0%, #0369a1 100%) !important;
+}
+
+:root[data-theme="dark"] .change-photo-btn {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.9) 0%, rgba(2, 132, 199, 0.9) 100%) !important;
+  color: white !important;
+}
+
+:root[data-theme="dark"] .change-photo-btn:hover {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 1) 0%, rgba(2, 132, 199, 1) 100%) !important;
+}
+
+:root[data-theme="dark"] .change-photo-btn:disabled {
+  background: rgba(14, 165, 233, 0.3) !important;
+  opacity: 0.6;
+}
+
+:root[data-theme="dark"] #header-component .main-header {
+  background: #0f172a !important;
+}
+
+:root[data-theme="dark"] .button-container {
+  border-top-color: var(--border-soft) !important;
+}
+
+/* Sobrescrever qualquer elemento com background branco */
+:root[data-theme="dark"] * {
+  /* Garantir que elementos com background branco sejam sobrescritos */
+}
+
+:root[data-theme="dark"] input[type="text"],
+:root[data-theme="dark"] input[type="email"],
+:root[data-theme="dark"] input[type="tel"],
+:root[data-theme="dark"] input[type="password"],
+:root[data-theme="dark"] input[type="number"],
+:root[data-theme="dark"] input[type="date"],
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] input[type="text"]:focus,
+:root[data-theme="dark"] input[type="email"]:focus,
+:root[data-theme="dark"] input[type="tel"]:focus,
+:root[data-theme="dark"] input[type="password"]:focus,
+:root[data-theme="dark"] input[type="number"]:focus,
+:root[data-theme="dark"] input[type="date"]:focus,
+:root[data-theme="dark"] textarea:focus,
+:root[data-theme="dark"] select:focus {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: var(--brand-accent) !important;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.22) !important;
+}
+
+:root[data-theme="dark"] input[readonly],
+:root[data-theme="dark"] textarea[readonly] {
+  background: rgba(15, 23, 42, 0.4) !important;
+  color: var(--text-muted) !important;
+}
+
+/* Selects customizados */
+:root[data-theme="dark"] .custom-select select,
+:root[data-theme="dark"] select.custom-select {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+}
+
+:root[data-theme="dark"] .custom-select select:focus,
+:root[data-theme="dark"] select.custom-select:focus {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: var(--brand-accent) !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22) !important;
+}
+
+/* Botões secundários */
+:root[data-theme="dark"] .btn-secondary {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .btn-secondary:hover {
+  background: var(--surface-base) !important;
+  border-color: var(--brand-accent) !important;
+}
+
+/* Sobrescrever estilos inline com background branco - apenas quando necessário */
+:root[data-theme="dark"] [style*="background: white"]:not(.profile-box):not(.sidebar):not(.app-header),
+:root[data-theme="dark"] [style*="background:#fff"]:not(.profile-box):not(.sidebar):not(.app-header),
+:root[data-theme="dark"] [style*="background: #fff"]:not(.profile-box):not(.sidebar):not(.app-header),
+:root[data-theme="dark"] [style*="background:#ffffff"]:not(.profile-box):not(.sidebar):not(.app-header),
+:root[data-theme="dark"] [style*="background: #ffffff"]:not(.profile-box):not(.sidebar):not(.app-header) {
+  background: var(--surface-base) !important;
+}
+
+:root[data-theme="dark"] [style*="color: #002A42"]:not(.profile-box *),
+:root[data-theme="dark"] [style*="color:#002A42"]:not(.profile-box *) {
+  color: var(--text-primary) !important;
+}
+
+/* ============================================
+   PERFIL DO PACIENTE - SOBRESCRITA ESPECÍFICA
+   ============================================ */
+
+:root[data-theme="dark"] .patient-header {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+:root[data-theme="dark"] .patient-header h1 {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .profile-box {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(2, 132, 199, 0.3) 100%) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .profile-box .info-item label {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+:root[data-theme="dark"] .profile-box .info-item .info-value {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .profile-box .info-item .info-input {
+  background: rgba(15, 23, 42, 0.8) !important;
+  color: var(--text-primary) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
+:root[data-theme="dark"] .profile-box .info-item .info-input:focus {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-color: var(--brand-accent) !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22) !important;
+}
+
+:root[data-theme="dark"] .shortcuts {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+:root[data-theme="dark"] .shortcuts h2 {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .shortcut-card {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+:root[data-theme="dark"] .shortcut-card:hover {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: var(--brand-accent) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+:root[data-theme="dark"] .shortcut-card::before {
+  background: linear-gradient(180deg, var(--brand-accent) 0%, var(--brand-primary) 100%) !important;
+}
+
+:root[data-theme="dark"] .shortcut-card p {
+  color: var(--text-secondary) !important;
+}
+
+:root[data-theme="dark"] .shortcut-card strong {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .shortcut-card button {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%) !important;
+  color: white !important;
+}
+
+:root[data-theme="dark"] .shortcut-card button:hover {
+  background: linear-gradient(135deg, var(--brand-primary-dark) 0%, #0369a1 100%) !important;
+}
+
+:root[data-theme="dark"] .btn-editar {
+  background: linear-gradient(135deg, var(--brand-accent) 0%, var(--brand-primary) 100%) !important;
+  color: white !important;
+}
+
+:root[data-theme="dark"] .btn-editar:hover {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%) !important;
+}
+
+:root[data-theme="dark"] .btn-salvar {
+  background: linear-gradient(135deg, var(--success) 0%, #10b981 100%) !important;
+  color: white !important;
+}
+
+:root[data-theme="dark"] .btn-salvar:hover {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+:root[data-theme="dark"] .btn-cancelar {
+  background: rgba(148, 163, 184, 0.2) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .btn-cancelar:hover {
+  background: rgba(148, 163, 184, 0.3) !important;
+}
+
+:root[data-theme="dark"] .profile-actions {
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+:root[data-theme="dark"] .insights-section {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+:root[data-theme="dark"] .insights-header h2 {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .insights-summary {
+  background: rgba(56, 189, 248, 0.12) !important;
+  border-left-color: var(--brand-accent) !important;
+}
+
+:root[data-theme="dark"] .insights-summary h3 {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .insights-summary p {
+  color: var(--text-secondary) !important;
+}
+
+:root[data-theme="dark"] .insights-text {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-secondary) !important;
+}
+
+:root[data-theme="dark"] .insights-text h3 {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .insights-loading p {
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme="dark"] .spinner {
+  border-color: var(--surface-alt) !important;
+  border-top-color: var(--brand-accent) !important;
+}
+
+:root[data-theme="dark"] .chat-section {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .chat-header h3 {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .chat-messages {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .chat-message {
+  background: var(--surface-base) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .chat-input {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .chat-input:focus {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: var(--brand-accent) !important;
+}
+
+:root[data-theme="dark"] .error-message {
+  background: var(--danger-soft) !important;
+  border-color: rgba(248, 113, 113, 0.3) !important;
+  color: #fecaca !important;
+}
+
+/* ============================================
+   REGRAS GERAIS PARA TODAS AS TELAS
+   ============================================ */
+
+/* Cards e containers genéricos - apenas quando têm background branco */
+:root[data-theme="dark"] .card:not(.profile-box):not(.sidebar):not(.app-header),
+:root[data-theme="dark"] .insonia-card,
+:root[data-theme="dark"] .diabetes-card,
+:root[data-theme="dark"] .enxaqueca-card,
+:root[data-theme="dark"] .hormonal-card,
+:root[data-theme="dark"] .pressao-card,
+:root[data-theme="dark"] .ciclo-card,
+:root[data-theme="dark"] .gastrite-card {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  box-shadow: var(--shadow-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Headers de página */
+:root[data-theme="dark"] .page-header,
+:root[data-theme="dark"] .card-header,
+:root[data-theme="dark"] .title-section {
+  border-bottom-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .page-title,
+:root[data-theme="dark"] .card-title,
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3 {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .page-subtitle {
+  color: var(--text-muted) !important;
+}
+
+/* Stat cards */
+:root[data-theme="dark"] .stat-card {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .stat-icon {
+  background: var(--surface-base) !important;
+  color: var(--brand-accent) !important;
+}
+
+:root[data-theme="dark"] .stat-content {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .stat-value {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .stat-label {
+  color: var(--text-muted) !important;
+}
+
+/* Chart sections */
+:root[data-theme="dark"] .chart-section {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .chart-header {
+  border-bottom-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .chart-title {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .chart-container {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .month-selector {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .arrow-btn {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .arrow-btn:hover {
+  background: var(--surface-alt) !important;
+  border-color: var(--brand-accent) !important;
+}
+
+:root[data-theme="dark"] .month-label {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .no-data-message {
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme="dark"] .no-data-message h3 {
+  color: var(--text-primary) !important;
+}
+
+/* Visualizar Anotação */
+:root[data-theme="dark"] .note-card {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .card-title {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .status-badge {
+  background: var(--surface-alt) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .info-grid {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .info-item {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .info-item:hover {
+  background: var(--surface-alt) !important;
+}
+
+:root[data-theme="dark"] .info-item strong {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .info-item span {
+  color: var(--text-secondary) !important;
+}
+
+:root[data-theme="dark"] .info-icon {
+  background: var(--surface-alt) !important;
+  color: var(--brand-accent) !important;
+}
+
+:root[data-theme="dark"] .detail-section {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .detail-section:hover {
+  background: var(--surface-alt) !important;
+}
+
+:root[data-theme="dark"] .medico {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .medico:hover {
+  color: var(--brand-accent) !important;
+}
+
+/* ============================================
+   TELAS ESPECÍFICAS
+   ============================================ */
+
+/* HISTÓRICO PRONTUÁRIO e ANEXO DE EXAMES */
+:root[data-theme="dark"] .page-header {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .anexo-card,
+:root[data-theme="dark"] .exame-card {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .header-text h1 {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+:root[data-theme="dark"] .header-text p {
+  color: var(--text-muted) !important;
+}
+
+/* AGENDAMENTOS */
+:root[data-theme="dark"] .agendamento-card {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+/* NOTIFICAÇÕES */
+:root[data-theme="dark"] .notificacao-card,
+:root[data-theme="dark"] .notification-item {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+/* VISUALIZAR ANOTAÇÃO */
+:root[data-theme="dark"] .anotacao-container,
+:root[data-theme="dark"] .anotacao-card,
+:root[data-theme="dark"] .note-card {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .anotacao-header,
+:root[data-theme="dark"] .card-header {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+  border-bottom-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .card-title-section h1,
+:root[data-theme="dark"] .card-title {
+  color: var(--text-primary) !important;
+}
+
+/* CRIAR ANOTAÇÕES */
+:root[data-theme="dark"] .form-card {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .evento-card {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+/* HISTÓRICO CRISE GASTRITE */
+:root[data-theme="dark"] .crise-card,
+:root[data-theme="dark"] .crisis-card,
+:root[data-theme="dark"] .historico-card,
+:root[data-theme="dark"] .historico-container .card {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .crisis-header {
+  border-bottom-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .crisis-date {
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme="dark"] .crisis-card:hover {
+  background: var(--surface-alt) !important;
+  border-color: var(--brand-accent) !important;
+}
+
+/* HORÁRIOS DISPONIBILIDADE */
+:root[data-theme="dark"] .horario-card,
+:root[data-theme="dark"] .disponibilidade-card {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+}
+
+/* HOME PAGE */
+:root[data-theme="dark"] .main-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+:root[data-theme="dark"] .nav-link {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .nav-link:hover {
+  color: var(--brand-accent) !important;
+}
+
+:root[data-theme="dark"] .login-button {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%) !important;
+}
+
+/* LOGIN/REGISTER/SELECAO */
+:root[data-theme="dark"] .right {
+  background: var(--surface-base) !important;
+}
+
+:root[data-theme="dark"] .form-container {
+  background: var(--surface-alt) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] .form-group label {
+  color: var(--text-primary) !important;
+}
+
+/* TABELAS EM GERAL */
+:root[data-theme="dark"] table {
+  background: var(--surface-base) !important;
+}
+
+:root[data-theme="dark"] thead {
+  background: var(--surface-alt) !important;
+}
+
+:root[data-theme="dark"] th {
+  color: var(--text-primary) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] td {
+  color: var(--text-secondary) !important;
+  border-color: var(--border-soft) !important;
+}
+
+:root[data-theme="dark"] tr:hover {
+  background: var(--surface-alt) !important;
+}
+
+/* MODAIS EM GERAL */
+:root[data-theme="dark"] .modal-overlay {
+  background: rgba(2, 6, 23, 0.8) !important;
+}
+
+/* BADGES E TAGS */
+:root[data-theme="dark"] .badge,
+:root[data-theme="dark"] .tag {
+  background: var(--surface-alt) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-soft) !important;
+}
+
+/* ELEMENTOS COMUNS ADICIONAIS */
+/* Removido background transparent que quebrava layout */
+
+:root[data-theme="dark"] .back-btn {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .back-btn:hover {
+  background: var(--surface-alt) !important;
+  border-color: var(--brand-accent) !important;
+}
+
+:root[data-theme="dark"] .title-icon {
+  color: var(--brand-accent) !important;
+}
+
+:root[data-theme="dark"] .title-text h2 {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .title-text p {
+  color: var(--text-muted) !important;
+}
+
+/* Listas e grids */
+:root[data-theme="dark"] .list-item,
+:root[data-theme="dark"] .grid-item {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .list-item:hover,
+:root[data-theme="dark"] .grid-item:hover {
+  background: var(--surface-alt) !important;
+}
+
+/* Dropdowns e selects customizados */
+:root[data-theme="dark"] .dropdown-menu {
+  background: var(--surface-base) !important;
+  border-color: var(--border-soft) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+:root[data-theme="dark"] .dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme="dark"] .dropdown-item:hover {
+  background: var(--surface-alt) !important;
+}
+
+/* Tooltips */
+:root[data-theme="dark"] .tooltip {
+  background: var(--surface-base) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-soft) !important;
+}
+
+/* Alerts e mensagens */
+:root[data-theme="dark"] .alert-info {
+  background: rgba(96, 165, 250, 0.12) !important;
+  border-color: rgba(96, 165, 250, 0.3) !important;
+  color: #93c5fd !important;
+}
+
+:root[data-theme="dark"] .alert-warning {
+  background: rgba(251, 191, 36, 0.12) !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+  color: #fde68a !important;
+}
+
+:root[data-theme="dark"] .alert-success {
+  background: rgba(52, 211, 153, 0.12) !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+  color: #6ee7b7 !important;
+}
+
+/* Progress bars */
+:root[data-theme="dark"] .progress-bar {
+  background: var(--surface-alt) !important;
+}
+
+:root[data-theme="dark"] .progress-fill {
+  background: var(--brand-accent) !important;
+}
+
+/* Dividers */
+:root[data-theme="dark"] .divider,
+:root[data-theme="dark"] hr {
+  border-color: var(--border-soft) !important;
+}
+
+/* Empty states */
+:root[data-theme="dark"] .empty-state {
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme="dark"] .empty-state h3 {
+  color: var(--text-primary) !important;
+}
+
+/* ============================================
+   UTILITÁRIOS
+   ============================================ */
+
+:root[data-theme="dark"] .text-muted {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .text-light {
+  color: var(--text-light);
+}
+
+:root[data-theme="dark"] .bg-surface {
+  background: var(--surface-base);
+}
+
+:root[data-theme="dark"] .bg-surface-alt {
+  background: var(--surface-alt);
+}
