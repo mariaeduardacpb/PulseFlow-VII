@@ -1,10 +1,10 @@
 import { API_URL } from './config.js';
 import { initHeaderComponent } from './components/header.js';
-import { initDoctorSidebar } from './components/sidebarDoctor.js';
+import { initSidebar } from './components/sidebar.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     initHeaderComponent({ title: 'Perfil do Médico' });
-    initDoctorSidebar('perfilmedico');
+    initSidebar('perfilmedico');
 
     const toggleButton = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
@@ -121,8 +121,8 @@ async function carregarDadosMedico() {
         console.log('Dados recebidos da API:', medico);
 
         // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
-        if (window.updateDoctorSidebarInfo) {
-          window.updateDoctorSidebarInfo(medico.nome, medico.areaAtuacao, medico.genero);
+        if (window.updateSidebarInfo) {
+          window.updateSidebarInfo(medico.nome, medico.areaAtuacao, medico.genero, medico.crm);
         }
         
         // Formatar telefones em um objeto

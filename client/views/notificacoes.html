@@ -6,6 +6,8 @@
   <title>PulseFlow | Notificações</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/client/public/css/perfilPaciente.css">
+  <link rel="stylesheet" href="/client/public/css/sidebar.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="/client/public/css/notificacoes.css">
   <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
   <link rel="stylesheet" href="/client/public/css/dark-theme.css"/>
@@ -75,11 +77,11 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
   <script type="module">
     import { initHeaderComponent } from '/client/public/js/components/header.js';
-    import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
+    import { initSidebar } from '/client/public/js/components/sidebar.js';
     import { API_URL } from '/client/public/js/config.js';
 
     initHeaderComponent({ title: 'Notificações' });
-    initDoctorSidebar('notificacoes');
+    initSidebar('notificacoes');
 
     const toggleButton = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
@@ -120,8 +122,8 @@
         const data = await response.json();
 
         // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
-        if (window.updateDoctorSidebarInfo) {
-          window.updateDoctorSidebarInfo(data.nome, data.areaAtuacao, data.genero);
+        if (window.updateSidebarInfo) {
+          window.updateSidebarInfo(data.nome, data.areaAtuacao, data.genero, data.crm);
         }
       } catch (error) {
         await Swal.fire({

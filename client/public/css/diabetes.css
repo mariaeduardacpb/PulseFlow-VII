@@ -10,24 +10,34 @@ body {
     color: #1e293b;
     line-height: 1.6;
     width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .container {
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
 }
 
 .content {
-  margin-left: 260px;
-  width: calc(100% - 260px);
-  min-height: 100vh;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  padding: 24px;
-  padding-top: 100px;
+  margin-left: 280px !important;
+  width: calc(100% - 280px) !important;
+  min-height: 100vh !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  padding: 100px 40px 40px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 24px !important;
+  transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease !important;
+  max-width: none !important;
 }
 
 /* Card Principal do Diabetes */
@@ -35,9 +45,10 @@ body {
   background: #ffffff;
   border-radius: 20px;
   padding: 32px;
-  margin-bottom: 32px;
+  margin-bottom: 0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #e2e8f0;
+  width: 100%;
 }
 
 .card-header {
@@ -401,8 +412,9 @@ body {
 /* Responsividade */
 @media (max-width: 1200px) {
   .content {
-    margin-left: 260px;
-    width: calc(100% - 260px);
+    margin-left: 280px !important;
+    width: calc(100% - 280px) !important;
+    padding: 100px 32px 32px !important;
   }
   
   .stats-section {
@@ -416,11 +428,10 @@ body {
 
 @media (max-width: 1024px) {
   .content {
-    width: 100%;
-    max-width: 100%;
-    margin-left: 0;
-    padding: 20px;
-    padding-top: 100px;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding: 100px 32px 32px !important;
   }
   
   .diabetes-card {
@@ -477,8 +488,7 @@ body {
 
 @media (max-width: 768px) {
   .content {
-    padding: 16px;
-    padding-top: 100px;
+    padding: 100px 24px 24px !important;
   }
   
   .diabetes-card {
@@ -619,10 +629,9 @@ body {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .content {
-    padding: 12px;
-    padding-top: 100px;
+    padding: 100px 16px 16px !important;
   }
   
   .diabetes-card {
@@ -767,8 +776,7 @@ body {
 
 @media (max-width: 480px) {
   .content {
-    padding: 8px;
-    padding-top: 100px;
+    padding: 100px 16px 16px !important;
   }
   
   .diabetes-card {
@@ -910,8 +918,7 @@ body {
 
 @media (max-width: 360px) {
   .content {
-    padding: 6px;
-    padding-top: 100px;
+    padding: 100px 12px 12px !important;
   }
   
   .diabetes-card {

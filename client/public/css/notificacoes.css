@@ -26,33 +26,34 @@ body {
 }
 
 .notifications-shell {
-  margin-left: 260px;
-  width: calc(100% - 260px);
-  padding: 136px 72px 64px;
+  margin-left: 280px;
+  width: calc(100% - 280px);
+  padding: 100px 40px 40px;
   min-height: 100vh;
   background: transparent;
   transition: margin-left 0.3s ease, padding 0.3s ease;
+  box-sizing: border-box;
 }
 
 @media (max-width: 1200px) {
   .notifications-shell {
-    margin-left: 260px;
-    width: calc(100% - 260px);
-    padding: 120px 48px 56px;
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 100px 32px 32px;
   }
 }
 
 @media (max-width: 1024px) {
   .notifications-shell {
-    margin-left: 0;
-    width: 100%;
-    padding: 120px 48px 56px;
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 100px 32px 32px;
   }
 }
 
 @media (max-width: 960px) {
   .notifications-shell {
-    padding: 108px 32px 48px;
+    padding: 100px 24px 24px;
   }
 
   .notifications-hero {
@@ -67,7 +68,7 @@ body {
 
 @media (max-width: 640px) {
   .notifications-shell {
-    padding: 112px 24px 40px;
+    padding: 100px 16px 16px;
   }
 
   .notifications-hero {
@@ -83,11 +84,12 @@ body {
 }
 
 .notifications-container {
-  max-width: 1120px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
 }
 
 .notifications-hero,
@@ -104,7 +106,7 @@ body {
   gap: 24px;
   background: var(--surface-base);
   border-radius: 12px;
-  padding: 28px;
+  padding: 24px 28px;
   border: 1px solid var(--border-soft);
   box-shadow: var(--shadow-soft);
 }
@@ -179,18 +181,20 @@ body {
 .notifications-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 @media (max-width: 900px) {
   .notifications-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
   }
 }
 
 @media (max-width: 600px) {
   .notifications-summary {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 
@@ -327,7 +331,7 @@ body {
 .notifications-feed {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .notification-card {

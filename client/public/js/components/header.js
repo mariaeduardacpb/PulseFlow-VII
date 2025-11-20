@@ -24,48 +24,83 @@ export function initHeaderComponent({ title = '' } = {}) {
       <div class="header-right">
         <div class="header-actions">
           <button type="button" class="header-action" aria-label="Notificações" data-action="notifications">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2a6 6 0 0 0-6 6v4l-1.29 1.29A1 1 0 0 0 5.41 15h13.18a1 1 0 0 0 .7-1.71L18 12V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 1-3-3h6a3 3 0 0 1-3 3z" fill="currentColor"/>
-            </svg>
+            <i class="far fa-bell"></i>
           </button>
           <button type="button" class="header-action" aria-label="Agendamentos" data-action="appointments">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1zm12 7H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z" fill="currentColor"/>
-              <path d="M9 12h6v2H9zm0 3h4v2H9z" fill="currentColor"/>
-            </svg>
+            <i class="far fa-calendar"></i>
           </button>
         </div>
         <button type="button" class="header-logout" id="headerLogoutButton" aria-label="Sair">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M10 3a1 1 0 0 0-1 1v3h2V5h8v14h-8v-2H9v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-.707 6.293-1.414 1.414L10.172 14H3v2h7.172l-2.293 2.293 1.414 1.414L15 14z" fill="currentColor"/>
-          </svg>
+          <i class="fas fa-power-off"></i>
           <span>Sair</span>
         </button>
       </div>
     </header>
   `;
 
+  let overlay = document.querySelector('.sidebar-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    document.body.appendChild(overlay);
+  }
+
   const menuToggle = container.querySelector('.menu-toggle');
   const sidebar = document.querySelector('.sidebar');
 
+  function toggleSidebar() {
+    const isActive = sidebar.classList.toggle('active');
+    menuToggle.classList.toggle('shifted', isActive);
+    menuToggle.setAttribute('aria-expanded', isActive);
+    
+    if (window.innerWidth <= 1024) {
+      if (isActive) {
+        overlay.classList.add('active');
+        document.body.classList.add('sidebar-open');
+      } else {
+        overlay.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+      }
+    }
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('active');
+    menuToggle.classList.remove('shifted');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    overlay.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
+  }
+
   if (menuToggle && sidebar) {
-    menuToggle.addEventListener('click', () => {
-      const isActive = sidebar.classList.toggle('active');
-      menuToggle.classList.toggle('shifted', isActive);
-      menuToggle.setAttribute('aria-expanded', isActive);
-    });
+    menuToggle.addEventListener('click', toggleSidebar);
+
+    overlay.addEventListener('click', closeSidebar);
 
     document.addEventListener('click', (event) => {
       const isClickInsideSidebar = sidebar.contains(event.target);
       const isClickOnToggle = menuToggle.contains(event.target);
       const isClickInsideHeader = container.contains(event.target);
 
-      if (!isClickInsideSidebar && !isClickOnToggle && !isClickInsideHeader && sidebar.classList.contains('active')) {
-        sidebar.classList.remove('active');
-        menuToggle.classList.remove('shifted');
-        menuToggle.setAttribute('aria-expanded', 'false');
+      if (!isClickInsideSidebar && !isClickOnToggle && !isClickInsideHeader && sidebar.classList.contains('active') && window.innerWidth <= 1024) {
+        closeSidebar();
       }
     });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 1024) {
+        sidebar.classList.add('active');
+        overlay.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+      } else if (window.innerWidth <= 1024 && !sidebar.classList.contains('active')) {
+        overlay.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+      }
+    });
+
+    if (window.innerWidth > 1024) {
+      sidebar.classList.add('active');
+    }
   }
 
   const actions = [

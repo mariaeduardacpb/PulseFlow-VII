@@ -1,6 +1,6 @@
 import { API_URL } from './config.js';
 import { initHeaderComponent } from './components/header.js';
-import { initDoctorSidebar } from './components/sidebarDoctor.js';
+import { initSidebar } from './components/sidebar.js';
 
 const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
@@ -9,7 +9,7 @@ let showInactive = false;
 
 document.addEventListener('DOMContentLoaded', function() {
     initHeaderComponent({ title: 'Meus Horários de Trabalho' });
-    initDoctorSidebar('horarios');
+    initSidebar('horarios');
 
     const toggleButton = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');

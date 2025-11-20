@@ -237,9 +237,9 @@ body {
   transform: translateY(-2px);
 }
 
-.header-action svg {
-  width: 20px;
-  height: 20px;
+.header-action i {
+  font-size: 18px;
+  line-height: 1;
 }
 
 .header-logout {
@@ -262,9 +262,9 @@ body {
   transform: translateY(-2px);
 }
 
-.header-logout svg {
-  width: 20px;
-  height: 20px;
+.header-logout i {
+  font-size: 16px;
+  line-height: 1;
 }
 
 .header-logout:active {
@@ -536,9 +536,8 @@ body {
     height: 36px;
   }
 
-  .header-action svg {
-    width: 18px;
-    height: 18px;
+  .header-action i {
+    font-size: 16px;
   }
 
   .header-logout {
@@ -552,9 +551,8 @@ body {
     display: none;
   }
 
-  .header-logout svg {
-    width: 18px;
-    height: 18px;
+  .header-logout i {
+    font-size: 14px;
   }
 
   .sidebar {
@@ -636,9 +634,8 @@ body {
     height: 30px;
   }
 
-  .header-action svg {
-    width: 14px;
-    height: 14px;
+  .header-action i {
+    font-size: 14px;
   }
 
   .header-logout {
@@ -647,9 +644,8 @@ body {
     font-size: 10px;
   }
 
-  .header-logout svg {
-    width: 14px;
-    height: 14px;
+  .header-logout i {
+    font-size: 12px;
   }
 
   .sidebar {

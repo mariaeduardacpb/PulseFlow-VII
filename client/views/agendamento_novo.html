@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PulseFlow | Novo Agendamento</title>
   <link rel="stylesheet" href="/client/public/css/perfilPaciente.css"/>
+  <link rel="stylesheet" href="/client/public/css/sidebar.css">
   <link rel="stylesheet" href="/client/public/css/agendamento_novo.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
@@ -190,10 +191,10 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
   <script type="module">
     import { initHeaderComponent } from '/client/public/js/components/header.js';
-    import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
+    import { initSidebar } from '/client/public/js/components/sidebar.js';
 
     initHeaderComponent({ title: 'Novo Agendamento' });
-    initDoctorSidebar('agendamentos');
+    initSidebar('agendamentos');
   </script>
   <script src="/client/public/js/agendamento_novo.js"></script>
 </body>

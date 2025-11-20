@@ -1,6 +1,6 @@
 import { API_URL } from './config.js';
 import { initHeaderComponent } from '/client/public/js/components/header.js';
-import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
+import { initSidebar } from '/client/public/js/components/sidebar.js';
 
 let inputCPF;
 let inputCodigo;
@@ -11,7 +11,7 @@ let cpfValido = false;
 
 async function init() {
   initHeaderComponent({ title: 'Buscar Paciente' });
-  initDoctorSidebar('selecao');
+  initSidebar('selecao');
 
   const toggleButton = document.querySelector('.menu-toggle');
   const sidebar = document.querySelector('.sidebar');
@@ -75,8 +75,8 @@ async function ensureProfile() {
 
     const data = await response.json();
 
-    if (window.updateDoctorSidebarInfo) {
-      window.updateDoctorSidebarInfo(data.nome, data.areaAtuacao, data.genero);
+    if (window.updateSidebarInfo) {
+      window.updateSidebarInfo(data.nome, data.areaAtuacao, data.genero, data.crm);
     }
 
     return data;

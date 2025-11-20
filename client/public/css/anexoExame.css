@@ -12,7 +12,8 @@ body {
   color: #1e293b;
   overflow-x: hidden;
   width: 100%;
-  max-width: 100vw;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 #header-component .main-header {
@@ -21,46 +22,66 @@ body {
 
 /* ===== CONTAINER PRINCIPAL ===== */
 .container {
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-  overflow-x: hidden;
-  max-width: 100vw;
+  display: flex !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .content {
-  margin-left: 260px;
-  width: calc(100% - 260px);
-  min-height: 100vh;
-  padding: 100px 30px 30px 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  transition: all 0.3s ease;
+  margin-left: 280px !important;
+  width: calc(100% - 280px) !important;
+  min-height: 100vh !important;
+  padding: 100px 40px 40px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 24px !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease !important;
+  max-width: none !important;
+}
+
+@media (max-width: 1200px) {
+  .content {
+    margin-left: 280px !important;
+    width: calc(100% - 280px) !important;
+    padding: 100px 32px 32px !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 100px 32px 32px !important;
+  }
 }
 
 @media (max-width: 768px) {
   .container {
     overflow-x: hidden !important;
-    max-width: 100vw !important;
+    max-width: 100% !important;
     width: 100% !important;
   }
 
   .content {
-    width: 100vw !important;
-    max-width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
     margin-left: 0 !important;
-    padding: 80px 15px 15px 15px !important;
+    padding: 100px 24px 24px !important;
     overflow-x: hidden !important;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .content {
-    padding: 70px 10px 10px 10px !important;
+    padding: 100px 16px 16px !important;
   }
 }
 
@@ -88,9 +109,10 @@ body {
 .page-header {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: 16px;
-  padding: 30px;
+  padding: 24px 28px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.8);
+  width: 100%;
 }
 
 .header-content {
@@ -182,6 +204,7 @@ body {
   gap: 20px;
   align-items: end;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .filter-group {
@@ -352,8 +375,8 @@ body {
 /* ===== GRID DE EXAMES ===== */
 .exams-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
   width: 100%;
 }
 
@@ -614,12 +637,6 @@ body {
 
 /* ===== RESPONSIVIDADE ===== */
 @media (max-width: 1200px) {
-  .content {
-    margin-left: 260px;
-    width: calc(100% - 260px);
-    padding: 100px 20px 20px 20px;
-  }
-  
   .header-stats {
     flex-wrap: wrap;
     gap: 15px;
@@ -637,13 +654,6 @@ body {
 }
 
 @media (max-width: 1024px) {
-  .content {
-    margin-left: 0;
-    width: 100%;
-    padding: 80px 20px 20px 20px;
-    gap: 25px;
-  }
-  
   .header-stats {
     flex-wrap: wrap;
     gap: 12px;
@@ -669,14 +679,14 @@ body {
   body {
     overflow-x: hidden !important;
     width: 100% !important;
-    max-width: 100vw !important;
+    max-width: 100% !important;
   }
 
   .content {
     margin-left: 0 !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    padding: 80px 15px 15px 15px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 100px 24px 24px !important;
     overflow-x: hidden !important;
     gap: 20px;
   }
@@ -922,23 +932,24 @@ body {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   body {
     overflow-x: hidden !important;
     width: 100% !important;
-    max-width: 100vw !important;
+    max-width: 100% !important;
   }
 
   .container {
     overflow-x: hidden !important;
-    max-width: 100vw !important;
+    max-width: 100% !important;
     width: 100% !important;
   }
 
   .content {
     margin-left: 0 !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 100px 16px 16px !important;
     padding: 70px 10px 10px 10px !important;
     overflow-x: hidden !important;
     gap: 15px;

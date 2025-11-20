@@ -1,5 +1,5 @@
 import { initHeaderComponent } from '/client/public/js/components/header.js';
-import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
+import { initSidebar } from '/client/public/js/components/sidebar.js';
 import { API_URL } from '/client/public/js/config.js';
 
 const selectors = {
@@ -28,8 +28,6 @@ function toggleModal(modalId, visible) {
 function bindModals() {
   const editProfileBtn = document.getElementById('editProfileBtn');
   const changePasswordBtn = document.getElementById('changePasswordBtn');
-  const closeEditBtn = document.getElementById('closeModal');
-  const cancelEditBtn = document.getElementById('cancelEdit');
   const closePasswordBtn = document.getElementById('closePasswordModal');
   const cancelPasswordBtn = document.getElementById('cancelPassword');
 
@@ -41,9 +39,20 @@ function bindModals() {
     toggleModal(selectors.changePasswordModal, true);
   });
 
-  [closePasswordBtn, cancelPasswordBtn].forEach(el =>
-    el?.addEventListener('click', () => toggleModal(selectors.changePasswordModal, false))
-  );
+  closePasswordBtn?.addEventListener('click', () => {
+    toggleModal(selectors.changePasswordModal, false);
+  });
+
+  cancelPasswordBtn?.addEventListener('click', () => {
+    toggleModal(selectors.changePasswordModal, false);
+  });
+
+  document.addEventListener('click', (event) => {
+    const modal = document.querySelector(selectors.changePasswordModal);
+    if (event.target === modal && modal?.classList.contains('visible')) {
+      toggleModal(selectors.changePasswordModal, false);
+    }
+  });
 
   document.querySelector(selectors.changePasswordForm)?.addEventListener('submit', async event => {
     event.preventDefault();
@@ -246,8 +255,8 @@ async function ensureProfile() {
     document.getElementById('userEmailDisplay').textContent = data.email ?? '—';
 
     // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
-    if (window.updateDoctorSidebarInfo) {
-      window.updateDoctorSidebarInfo(data.nome, data.areaAtuacao, data.genero);
+    if (window.updateSidebarInfo) {
+      window.updateSidebarInfo(data.nome, data.areaAtuacao, data.genero, data.crm);
     }
 
     return data;
@@ -352,7 +361,7 @@ function bindDeleteAccount() {
 
 async function init() {
   initHeaderComponent({ title: 'Configurações' });
-  initDoctorSidebar('configuracoes');
+  initSidebar('configuracoes');
 
   const toggleButton = document.querySelector('.menu-toggle');
   const sidebar = document.querySelector('.sidebar');

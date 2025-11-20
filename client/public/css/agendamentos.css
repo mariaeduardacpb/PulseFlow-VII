@@ -1046,11 +1046,48 @@
   }
 }
 
+.container {
+  margin-left: 280px;
+  width: calc(100% - 280px);
+  padding: 100px 40px 40px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1200px) {
+  .container {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 100px 32px 32px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 100px 32px 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 100px 24px 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 100px 16px 16px;
+  }
+}
+
 .agendamentos-content {
-  padding: 36px 40px 28px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
   background: transparent;
   box-sizing: border-box;
   width: 100%;
@@ -1831,11 +1868,6 @@
   gap: 12px;
 }
 
-@media (max-width: 1280px) {
-  .agendamentos-content {
-    padding: 28px 28px 24px;
-  }
-}
 
 @media (max-width: 1024px) {
   .page-header {
@@ -1862,10 +1894,6 @@
 }
 
 @media (max-width: 720px) {
-  .agendamentos-content {
-    padding: 20px 20px 18px;
-  }
-
   .page-header,
   .filters-section,
   .stats-card,

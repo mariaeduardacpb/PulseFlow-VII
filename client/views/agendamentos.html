@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PulseFlow | Agendamentos</title>
   <link rel="stylesheet" href="/client/public/css/perfilPaciente.css"/>
+  <link rel="stylesheet" href="/client/public/css/sidebar.css">
   <link rel="stylesheet" href="/client/public/css/agendamentos.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
@@ -527,10 +528,60 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
   <script type="module">
     import { initHeaderComponent } from '/client/public/js/components/header.js';
-    import { initDoctorSidebar } from '/client/public/js/components/sidebarDoctor.js';
+    import { initSidebar } from '/client/public/js/components/sidebar.js';
+    import { API_URL } from '/client/public/js/config.js';
 
     initHeaderComponent({ title: 'Agendamentos' });
-    initDoctorSidebar('agendamentos');
+    initSidebar('agendamentos');
+
+    async function ensureProfile() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        await Swal.fire({
+          title: 'Erro',
+          text: 'Você precisa estar logado para acessar esta página',
+          icon: 'error',
+          confirmButtonText: 'Ir para Login',
+          confirmButtonColor: '#002A42'
+        });
+        window.location.href = '/client/views/login.html';
+        return null;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Falha ao carregar dados do usuário.');
+        }
+
+        const data = await response.json();
+
+        // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
+        if (window.updateSidebarInfo) {
+          window.updateSidebarInfo(data.nome, data.areaAtuacao, data.genero, data.crm);
+        }
+
+        return data;
+      } catch (error) {
+        await Swal.fire({
+          title: 'Erro',
+          text: 'Não foi possível carregar suas informações. Faça login novamente.',
+          icon: 'error',
+          confirmButtonText: 'Ir para Login',
+          confirmButtonColor: '#002A42'
+        });
+        localStorage.removeItem('token');
+        window.location.href = '/client/views/login.html';
+        return null;
+      }
+    }
+
+    ensureProfile();
   </script>
   <script src="/client/public/js/agendamentos.js"></script>
 </body>

@@ -198,6 +198,7 @@ async function fetchNotificationsFromApi() {
   try {
     const token = localStorage.getItem('token');
     if (!token) {
+      console.log('Token não encontrado, retornando array vazio');
       return [];
     }
     const response = await fetch(`${API_URL}/api/notificacoes`, {
@@ -206,14 +207,20 @@ async function fetchNotificationsFromApi() {
       }
     });
     if (!response.ok) {
-      throw new Error('Falha ao carregar notificações do servidor.');
+      if (response.status === 401) {
+        console.warn('Token inválido ou expirado');
+        return [];
+      }
+      throw new Error(`Falha ao carregar notificações: ${response.status}`);
     }
     const data = await response.json();
-    if (Array.isArray(data) && data.length) {
+    if (Array.isArray(data)) {
+      console.log(`Notificações carregadas da API: ${data.length}`);
       return data;
     }
+    console.warn('Resposta da API não é um array:', data);
   } catch (error) {
-    console.warn('Não foi possível sincronizar notificações do servidor:', error);
+    console.warn('Não foi possível sincronizar notificações do servidor:', error.message);
   }
   return [];
 }

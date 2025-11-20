@@ -1,6 +1,10 @@
 import { validateActivePatient, redirectToPatientSelection } from './utils/patientValidation.js';
+import { initHeaderComponent } from './components/header.js';
+import { initSidebar } from './components/sidebar.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  initHeaderComponent({ title: 'Registro Clínico' });
+  initSidebar('historicoeventoclinico');
   const validation = validateActivePatient();
   if (!validation.valid) {
     redirectToPatientSelection(validation.error);

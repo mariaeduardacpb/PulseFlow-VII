@@ -1,12 +1,12 @@
 import { API_URL } from './config.js';
 import { initHeaderComponent } from './components/header.js';
-import { initDoctorSidebar } from './components/sidebarDoctor.js';
+import { initSidebar } from './components/sidebar.js';
 import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
 import { startConnectionMonitoring, stopConnectionMonitoring } from './utils/connectionMonitor.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
   initHeaderComponent({ title: 'Perfil do Paciente' });
-  initDoctorSidebar('perfilpaciente');
+  initSidebar('perfilpaciente');
   
   const validation = validateActivePatient();
   if (!validation.valid) {
@@ -157,16 +157,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const prefixo = medico.genero?.toLowerCase() === 'feminino' ? 'Dra.' : 'Dr.';
       const nomeFormatado = `${prefixo} ${medico.nome}`;
 
-      // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
-      if (window.updateDoctorSidebarInfo) {
-        window.updateDoctorSidebarInfo(medico.nome, medico.areaAtuacao || 'Acompanhamento Integrado', medico.genero);
-      } else if (window.updateSidebarDoctorName) {
-        window.updateSidebarDoctorName(nomeFormatado);
-      } else {
-        const tituloSidebar = document.querySelector('.sidebar .profile h3');
-        if (tituloSidebar) {
-          tituloSidebar.textContent = nomeFormatado;
-        }
+      if (window.updateSidebarInfo) {
+        window.updateSidebarInfo(medico.nome, medico.areaAtuacao || 'Acompanhamento Integrado', medico.genero, medico.crm);
       }
 
       if (window.updateHeaderDoctorInfo) {
@@ -771,7 +763,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   // ========== FUNCIONALIDADE DE EDIÇÃO ==========
   let modoEdicao = false;
 
+  function isDoctorView() {
+    const token = localStorage.getItem('token');
+    const tokenPaciente = localStorage.getItem('tokenPaciente');
+    return !!token && !!tokenPaciente;
+  }
+
+  function disableEditForDoctor() {
+    if (isDoctorView()) {
+      const editarPerfilBtn = document.getElementById('editarPerfilBtn');
+      if (editarPerfilBtn) {
+        editarPerfilBtn.style.display = 'none';
+      }
+      const profileActions = document.getElementById('profileActions');
+      if (profileActions) {
+        profileActions.style.display = 'none';
+      }
+      document.querySelectorAll('.info-input').forEach(el => {
+        el.style.display = 'none';
+      });
+    }
+  }
+
   function habilitarEdicao() {
+    if (isDoctorView()) {
+      return;
+    }
     modoEdicao = true;
     
     // Esconder valores e mostrar inputs
@@ -891,19 +908,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Event listeners
   const editarPerfilBtn = document.getElementById('editarPerfilBtn');
-  if (editarPerfilBtn) {
+  if (editarPerfilBtn && !isDoctorView()) {
     editarPerfilBtn.addEventListener('click', habilitarEdicao);
+  } else if (editarPerfilBtn && isDoctorView()) {
+    editarPerfilBtn.style.display = 'none';
   }
 
   const salvarPerfilBtn = document.getElementById('salvarPerfilBtn');
-  if (salvarPerfilBtn) {
+  if (salvarPerfilBtn && !isDoctorView()) {
     salvarPerfilBtn.addEventListener('click', salvarAlteracoes);
   }
 
   const cancelarEdicaoBtn = document.getElementById('cancelarEdicaoBtn');
-  if (cancelarEdicaoBtn) {
+  if (cancelarEdicaoBtn && !isDoctorView()) {
     cancelarEdicaoBtn.addEventListener('click', desabilitarEdicao);
   }
+
+  disableEditForDoctor();
 
   let pacienteAtual = null;
 
@@ -918,6 +939,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     await carregarUltimosRegistros();
     
     pacienteAtual = JSON.parse(localStorage.getItem('pacienteSelecionado'));
+    
+    disableEditForDoctor();
     
     if (localStorage.getItem('tokenPaciente')) {
       // iniciarVerificacaoConexao();
