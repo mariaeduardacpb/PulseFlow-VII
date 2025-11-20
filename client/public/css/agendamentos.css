@@ -1663,6 +1663,234 @@
   font-weight: 600;
 }
 
+/* Estilos customizados para o modal de reagendamento */
+.swal2-popup-reagendar {
+  max-width: 95vw !important;
+  padding: 0 !important;
+  border-radius: var(--ag-radius-lg) !important;
+  overflow: hidden !important;
+}
+
+.swal2-container-reagendar {
+  padding: 20px !important;
+}
+
+.swal2-title-reagendar {
+  padding: 24px 32px !important;
+  background: linear-gradient(135deg, var(--ag-primary-strong), #0f172a) !important;
+  color: #fff !important;
+  margin: 0 !important;
+  border-radius: var(--ag-radius-lg) var(--ag-radius-lg) 0 0 !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
+
+.swal2-html-container-reagendar {
+  padding: 32px !important;
+  margin: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.reagendar-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.reagendar-form-group {
+  width: 100%;
+}
+
+.reagendar-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--ag-text);
+  font-size: 0.95rem;
+}
+
+.reagendar-label i {
+  color: var(--ag-primary);
+  font-size: 1rem;
+}
+
+.reagendar-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--ag-border);
+  border-radius: var(--ag-radius-sm);
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  background: var(--ag-surface);
+  color: var(--ag-text);
+  font-family: inherit;
+}
+
+.reagendar-input:focus {
+  outline: none;
+  border-color: var(--ag-primary);
+  box-shadow: 0 0 0 3px var(--ag-primary-soft);
+}
+
+.reagendar-horarios-container {
+  width: 100%;
+  min-height: 200px;
+}
+
+.reagendar-empty-state,
+.reagendar-loading-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--ag-muted);
+}
+
+.reagendar-empty-state i,
+.reagendar-loading-state i {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+  color: var(--ag-primary);
+}
+
+.reagendar-empty-state p,
+.reagendar-loading-state p {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.reagendar-empty-state span {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--ag-soft-muted);
+}
+
+.reagendar-loading-state i {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.reagendar-horarios-wrapper {
+  width: 100%;
+}
+
+.reagendar-horarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  background: var(--ag-surface-alt);
+  border-radius: var(--ag-radius-sm);
+  border: 1px solid var(--ag-border);
+  width: 100%;
+  box-sizing: border-box;
+  max-height: none;
+  overflow: visible;
+}
+
+.horario-slot-btn {
+  padding: 14px 16px;
+  border: 2px solid var(--ag-border-strong);
+  background: var(--ag-surface);
+  color: var(--ag-text);
+  border-radius: var(--ag-radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--ag-shadow-sm);
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.horario-slot-btn:hover {
+  background: var(--ag-surface-alt);
+  border-color: var(--ag-muted);
+  transform: translateY(-2px);
+  box-shadow: var(--ag-shadow-md);
+}
+
+.horario-slot-btn-selected {
+  background: var(--ag-primary) !important;
+  color: #fff !important;
+  border-color: var(--ag-primary) !important;
+  box-shadow: 0 2px 8px rgba(0, 42, 66, 0.3) !important;
+}
+
+.horario-slot-btn-selected:hover {
+  background: var(--ag-primary-strong) !important;
+  border-color: var(--ag-primary-strong) !important;
+}
+
+@media (max-width: 1200px) {
+  .reagendar-horarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .swal2-popup-reagendar {
+    width: 95vw !important;
+    max-width: 95vw !important;
+  }
+  
+  .swal2-container-reagendar {
+    padding: 10px !important;
+  }
+
+  .swal2-title-reagendar {
+    padding: 20px 24px !important;
+    font-size: 1.1rem !important;
+  }
+
+  .swal2-html-container-reagendar {
+    padding: 24px !important;
+  }
+
+  .reagendar-modal-content {
+    gap: 20px;
+  }
+
+  .reagendar-horarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .horario-slot-btn {
+    padding: 12px 14px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .swal2-popup-reagendar {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 0 !important;
+  }
+
+  .swal2-title-reagendar {
+    border-radius: 0 !important;
+  }
+
+  .reagendar-horarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+  }
+}
+
 .empty-state i,
 .loading i {
   font-size: 2rem;

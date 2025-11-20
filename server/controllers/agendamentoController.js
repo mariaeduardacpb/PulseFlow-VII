@@ -93,6 +93,30 @@ export const criarAgendamento = async (req, res) => {
     await novoAgendamento.populate('pacienteId', 'name email phone');
     await novoAgendamento.populate('medicoId', 'nome areaAtuacao');
 
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      const mongoose = (await import('mongoose')).default;
+      const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(dataHoraConsulta);
+
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(pacienteId) ? pacienteId : new mongoose.Types.ObjectId(pacienteId.toString()),
+        userModel: 'Paciente',
+        title: 'Nova consulta agendada',
+        description: `Uma consulta foi agendada para você com ${novoAgendamento.medicoId?.nome || 'seu médico'} em ${dataFormatada}`,
+        type: 'appointment',
+        link: `/appointments/${novoAgendamento._id}`,
+        unread: true
+      });
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError);
+    }
+
     res.status(201).json({
       message: 'Agendamento criado com sucesso',
       agendamento: novoAgendamento
@@ -140,6 +164,31 @@ export const listarAgendamentos = async (req, res) => {
       .sort({ dataHora: 1 })
       .lean();
 
+    const agora = new Date();
+    const idsParaAtualizar = [];
+
+    for (const agendamento of agendamentos) {
+      const dataHoraConsulta = new Date(agendamento.dataHora);
+      const fimConsulta = new Date(dataHoraConsulta.getTime() + (agendamento.duracao || 30) * 60000);
+
+      if (fimConsulta < agora && agendamento.status !== 'cancelada' && agendamento.status !== 'realizada') {
+        idsParaAtualizar.push(agendamento._id);
+        agendamento.status = 'realizada';
+      }
+    }
+
+    if (idsParaAtualizar.length > 0) {
+      await Agendamento.updateMany(
+        { _id: { $in: idsParaAtualizar } },
+        { 
+          $set: { 
+            status: 'realizada',
+            updatedAt: new Date()
+          }
+        }
+      );
+    }
+
     res.json({
       total: agendamentos.length,
       agendamentos
@@ -169,6 +218,23 @@ export const buscarAgendamento = async (req, res) => {
 
     if (!agendamento) {
       return res.status(404).json({ message: 'Agendamento não encontrado' });
+    }
+
+    const agora = new Date();
+    const dataHoraConsulta = new Date(agendamento.dataHora);
+    const fimConsulta = new Date(dataHoraConsulta.getTime() + (agendamento.duracao || 30) * 60000);
+
+    if (fimConsulta < agora && agendamento.status !== 'cancelada' && agendamento.status !== 'realizada') {
+      await Agendamento.updateOne(
+        { _id: agendamento._id },
+        { 
+          $set: { 
+            status: 'realizada',
+            updatedAt: new Date()
+          }
+        }
+      );
+      agendamento.status = 'realizada';
     }
 
     res.json(agendamento);
@@ -292,6 +358,33 @@ export const confirmarAgendamento = async (req, res) => {
     agendamento.updatedAt = new Date();
     await agendamento.save();
 
+    await agendamento.populate('pacienteId', 'name email phone');
+    await agendamento.populate('medicoId', 'nome areaAtuacao');
+
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      const mongoose = (await import('mongoose')).default;
+      const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(agendamento.dataHora);
+
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(agendamento.pacienteId._id) ? agendamento.pacienteId._id : new mongoose.Types.ObjectId(agendamento.pacienteId._id.toString()),
+        userModel: 'Paciente',
+        title: 'Consulta confirmada',
+        description: `Sua consulta com ${agendamento.medicoId?.nome || 'seu médico'} em ${dataFormatada} foi confirmada`,
+        type: 'appointment',
+        link: `/appointments/${agendamento._id}`,
+        unread: true
+      });
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError);
+    }
+
     res.json({
       message: 'Agendamento confirmado com sucesso',
       agendamento
@@ -339,6 +432,33 @@ export const cancelarAgendamento = async (req, res) => {
     agendamento.dataCancelamento = new Date();
     agendamento.updatedAt = new Date();
     await agendamento.save();
+
+    await agendamento.populate('pacienteId', 'name email phone');
+    await agendamento.populate('medicoId', 'nome areaAtuacao');
+
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      const mongoose = (await import('mongoose')).default;
+      const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(agendamento.dataHora);
+
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(agendamento.pacienteId._id) ? agendamento.pacienteId._id : new mongoose.Types.ObjectId(agendamento.pacienteId._id.toString()),
+        userModel: 'Paciente',
+        title: 'Consulta cancelada',
+        description: `Sua consulta com ${agendamento.medicoId?.nome || 'seu médico'} agendada para ${dataFormatada} foi cancelada${motivoCancelamento ? `. Motivo: ${motivoCancelamento}` : ''}`,
+        type: 'appointment',
+        link: `/appointments/${agendamento._id}`,
+        unread: true
+      });
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError);
+    }
 
     res.json({
       message: 'Agendamento cancelado com sucesso',
@@ -440,7 +560,7 @@ export const remarcarConsulta = async (req, res) => {
         $gte: new Date(novaData.getTime() - agendamento.duracao * 60000),
         $lte: new Date(novaData.getTime() + agendamento.duracao * 60000)
       },
-      status: { $in: ['agendada', 'confirmada'] }
+      status: { $in: ['agendada', 'confirmada', 'remarcada'] }
     });
 
     if (conflito) {
@@ -456,6 +576,30 @@ export const remarcarConsulta = async (req, res) => {
 
     await agendamento.populate('pacienteId', 'name email phone');
     await agendamento.populate('medicoId', 'nome areaAtuacao');
+
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      const mongoose = (await import('mongoose')).default;
+      const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(novaData);
+
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(agendamento.pacienteId._id) ? agendamento.pacienteId._id : new mongoose.Types.ObjectId(agendamento.pacienteId._id.toString()),
+        userModel: 'Paciente',
+        title: 'Consulta remarcada',
+        description: `Sua consulta com ${agendamento.medicoId?.nome || 'seu médico'} foi remarcada para ${dataFormatada}`,
+        type: 'appointment',
+        link: `/appointments/${agendamento._id}`,
+        unread: true
+      });
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError);
+    }
 
     res.json({
       message: 'Consulta remarcada com sucesso',
@@ -580,6 +724,16 @@ export const criarAgendamentoPaciente = async (req, res) => {
         link: `/appointments/${novoAgendamento._id}`,
         unread: true
       });
+
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(medicoId) ? medicoId : new mongoose.Types.ObjectId(medicoId.toString()),
+        userModel: 'User',
+        title: 'Novo agendamento',
+        description: `${paciente.name || paciente.nome || 'Paciente'} agendou uma consulta para ${dataFormatada}`,
+        type: 'appointment',
+        link: `/agendamentos/${novoAgendamento._id}`,
+        unread: true
+      });
     } catch (notifError) {
       console.error('Erro ao criar notificação:', notifError);
     }
@@ -628,6 +782,31 @@ export const listarAgendamentosPaciente = async (req, res) => {
       .populate('medicoId', 'nome areaAtuacao crm')
       .sort({ dataHora: 1 })
       .lean();
+
+    const agora = new Date();
+    const idsParaAtualizar = [];
+
+    for (const agendamento of agendamentos) {
+      const dataHoraConsulta = new Date(agendamento.dataHora);
+      const fimConsulta = new Date(dataHoraConsulta.getTime() + (agendamento.duracao || 30) * 60000);
+
+      if (fimConsulta < agora && agendamento.status !== 'cancelada' && agendamento.status !== 'realizada') {
+        idsParaAtualizar.push(agendamento._id);
+        agendamento.status = 'realizada';
+      }
+    }
+
+    if (idsParaAtualizar.length > 0) {
+      await Agendamento.updateMany(
+        { _id: { $in: idsParaAtualizar } },
+        { 
+          $set: { 
+            status: 'realizada',
+            updatedAt: new Date()
+          }
+        }
+      );
+    }
 
     res.json({
       total: agendamentos.length,
@@ -727,6 +906,7 @@ export const cancelarAgendamentoPaciente = async (req, res) => {
 
     try {
       const Notification = (await import('../models/Notification.js')).default;
+      const mongoose = (await import('mongoose')).default;
       const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -735,14 +915,23 @@ export const cancelarAgendamentoPaciente = async (req, res) => {
         minute: '2-digit'
       }).format(agendamento.dataHora);
 
-      const mongoose = (await import('mongoose')).default;
       await Notification.create({
         user: mongoose.Types.ObjectId.isValid(pacienteId) ? pacienteId : new mongoose.Types.ObjectId(pacienteId.toString()),
         userModel: 'Paciente',
         title: 'Consulta cancelada',
-        description: `Sua consulta com ${agendamento.medicoId.nome} agendada para ${dataFormatada} foi cancelada`,
+        description: `Sua consulta com ${agendamento.medicoId.nome} agendada para ${dataFormatada} foi cancelada${motivoCancelamento ? `. Motivo: ${motivoCancelamento}` : ''}`,
         type: 'appointment',
         link: `/appointments/${agendamento._id}`,
+        unread: true
+      });
+
+      await Notification.create({
+        user: mongoose.Types.ObjectId.isValid(agendamento.medicoId._id) ? agendamento.medicoId._id : new mongoose.Types.ObjectId(agendamento.medicoId._id.toString()),
+        userModel: 'User',
+        title: 'Agendamento cancelado pelo paciente',
+        description: `${agendamento.pacienteNome || 'Paciente'} cancelou a consulta agendada para ${dataFormatada}`,
+        type: 'appointment',
+        link: `/agendamentos/${agendamento._id}`,
         unread: true
       });
     } catch (notifError) {

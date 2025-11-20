@@ -385,7 +385,7 @@ export const obterHorariosDisponiveis = async (req, res) => {
         $gte: inicioDia,
         $lte: fimDia
       },
-      status: { $in: ['agendada', 'confirmada'] }
+      status: { $in: ['agendada', 'confirmada', 'remarcada'] }
     }).lean();
 
     // Gerar slots de horários disponíveis

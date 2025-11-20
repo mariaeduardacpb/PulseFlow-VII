@@ -11,8 +11,13 @@ const escapeHTML = (str) =>
 const formatDateLong = (dateString) => {
   if (!dateString) return '';
   try {
-    const normalized = dateString.length === 10 ? `${dateString}T00:00:00` : dateString;
-    return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(normalized));
+    if (dateString.length === 10) {
+      const [year, month, day] = dateString.split('-').map(Number);
+      const date = new Date(year, month - 1, day, 0, 0, 0, 0);
+      return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(date);
+    } else {
+      return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(dateString));
+    }
   } catch (_) {
     return dateString;
   }
@@ -69,9 +74,12 @@ const getAuthHeaders = () => {
 
 const buildIsoDateTime = (date, time) => {
   if (!date || !time) return null;
-  const combined = new Date(`${date}T${time}`);
-  if (Number.isNaN(combined.getTime())) return null;
-  return combined.toISOString();
+  const [year, month, day] = date.split('-').map(Number);
+  const [hours, minutes] = time.split(':').map(Number);
+  const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00.000Z`;
+  const testDate = new Date(dateStr);
+  if (Number.isNaN(testDate.getTime())) return null;
+  return dateStr;
 };
 
 document.addEventListener('DOMContentLoaded', () => {

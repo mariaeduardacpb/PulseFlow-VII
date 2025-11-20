@@ -86,11 +86,64 @@
     return `${hours}:${minutes}`;
   };
 
+  const buildLocalDate = (dateString, timeString = '00:00') => {
+    if (!dateString) return null;
+    const [year, month, day] = dateString.split('-').map(Number);
+    const [hours, minutes] = timeString.split(':').map(Number);
+    return new Date(year, month - 1, day, hours || 0, minutes || 0, 0, 0);
+  };
+
+  const dateToLocalISOString = (date) => {
+    if (!(date instanceof Date)) return null;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}:00.000Z`;
+  };
+
   const normalizeAppointment = (appointment) => {
     if (!appointment) return null;
-    const dataHora = appointment.dataHora ? new Date(appointment.dataHora) : null;
-    const dateString = dataHora ? toLocalDateValue(dataHora) : appointment.data || '';
-    const timeString = dataHora ? toLocalTimeValue(dataHora) : appointment.hora || '';
+    
+    let dateString = appointment.data || '';
+    let timeString = appointment.hora || '';
+    
+    if (appointment.dataHora) {
+      let dataHoraStr = '';
+      
+      if (typeof appointment.dataHora === 'string') {
+        dataHoraStr = appointment.dataHora;
+      } else if (appointment.dataHora.$date) {
+        dataHoraStr = appointment.dataHora.$date;
+      } else if (appointment.dataHora instanceof Date) {
+        dataHoraStr = appointment.dataHora.toISOString();
+      } else {
+        dataHoraStr = appointment.dataHora.toString();
+      }
+      
+      if (dataHoraStr.includes('T')) {
+        const [datePart, timePart] = dataHoraStr.split('T');
+        if (datePart && timePart) {
+          const [year, month, day] = datePart.split('-');
+          const timeOnly = timePart.split('.')[0].split('Z')[0].split('+')[0];
+          const [hours, minutes] = timeOnly.split(':');
+          
+          if (year && month && day && hours !== undefined && minutes !== undefined) {
+            dateString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+          }
+        }
+      }
+      
+      if (!dateString || !timeString) {
+        const dataHora = new Date(appointment.dataHora);
+        if (!isNaN(dataHora.getTime())) {
+          dateString = toLocalDateValue(dataHora);
+          timeString = toLocalTimeValue(dataHora);
+        }
+      }
+    }
 
     return {
       id: appointment._id || appointment.id,
@@ -127,13 +180,23 @@
   const formatDate = (dateString) => {
     if (!dateString) return '';
     try {
-      const normalized = dateString.length === 10 ? `${dateString}T00:00:00` : dateString;
-      return new Intl.DateTimeFormat('pt-BR', {
-        weekday: 'short',
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }).format(new Date(normalized));
+      if (dateString.length === 10) {
+        const date = buildLocalDate(dateString, '00:00');
+        if (!date) return dateString;
+        return new Intl.DateTimeFormat('pt-BR', {
+          weekday: 'short',
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        }).format(date);
+      } else {
+        return new Intl.DateTimeFormat('pt-BR', {
+          weekday: 'short',
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        }).format(new Date(dateString));
+      }
     } catch (_) {
       return dateString;
     }
@@ -148,8 +211,13 @@
   const formatDateLong = (dateString) => {
     if (!dateString) return '';
     try {
-      const normalized = dateString.length === 10 ? `${dateString}T00:00:00` : dateString;
-      return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(normalized));
+      if (dateString.length === 10) {
+        const date = buildLocalDate(dateString, '00:00');
+        if (!date) return dateString;
+        return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(date);
+      } else {
+        return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(dateString));
+      }
     } catch (_) {
       return dateString;
     }
@@ -261,16 +329,16 @@
 
       if (!startFilter && !endFilter) return true;
 
-      const appointmentDate = appointment.data ? new Date(`${appointment.data}T${appointment.hora || '00:00'}`) : null;
+      const appointmentDate = appointment.data ? buildLocalDate(appointment.data, appointment.hora || '00:00') : null;
       if (!appointmentDate) return false;
 
       if (startFilter) {
-        const startDate = new Date(`${startFilter}T00:00`);
+        const startDate = buildLocalDate(startFilter, '00:00');
         if (appointmentDate < startDate) return false;
       }
 
       if (endFilter) {
-        const endDate = new Date(`${endFilter}T23:59`);
+        const endDate = buildLocalDate(endFilter, '23:59');
         if (appointmentDate > endDate) return false;
       }
 
@@ -282,8 +350,9 @@
     return appointments
       .slice()
       .sort((a, b) => {
-        const dateA = new Date(`${a.data || ''}T${a.hora || '00:00'}`);
-        const dateB = new Date(`${b.data || ''}T${b.hora || '00:00'}`);
+        const dateA = buildLocalDate(a.data || '', a.hora || '00:00');
+        const dateB = buildLocalDate(b.data || '', b.hora || '00:00');
+        if (!dateA || !dateB) return 0;
         return dateA - dateB;
       });
   }
@@ -593,39 +662,203 @@
 
     if (reagendarBtn) {
       reagendarBtn.addEventListener('click', async () => {
-        if (!appointmentInModal) return;
+        if (!appointmentInModal) {
+          showToast('Erro: Agendamento não encontrado.', 'error');
+          return;
+        }
+
+        const agendamentoId = appointmentInModal.id || appointmentInModal._id;
+        if (!agendamentoId) {
+          showToast('Erro: ID do agendamento não encontrado.', 'error');
+          return;
+        }
+
+        let medicoId = appointmentInModal.raw?.medicoId?._id || 
+                        appointmentInModal.raw?.medicoId || 
+                        appointmentInModal.raw?.medicoId?._id?.toString() ||
+                        appointmentInModal.doctorId;
+        
+        if (!medicoId) {
+          try {
+            const token = ensureAuthenticated();
+            if (!token) return;
+            const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.ok) {
+              const perfil = await response.json();
+              medicoId = perfil._id || perfil.id;
+            }
+          } catch (e) {
+            console.error('Erro ao buscar perfil:', e);
+          }
+        }
+        
+        if (!medicoId) {
+          showToast('Não foi possível identificar o médico.', 'error');
+          return;
+        }
+
+        const medicoIdStr = typeof medicoId === 'object' && medicoId._id 
+          ? medicoId._id.toString() 
+          : medicoId.toString();
+
+        let selectedDate = '';
+        let selectedTime = '';
+        let horariosDisponiveis = [];
+
+        const loadHorarios = async (data) => {
+          try {
+            const url = `${API_URL}/api/horarios-disponibilidade/disponiveis/${medicoIdStr}?data=${data}`;
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error('Erro ao carregar horários');
+            }
+            const result = await response.json();
+            return result.horariosDisponiveis || [];
+          } catch (error) {
+            console.error('Erro ao carregar horários:', error);
+            return [];
+          }
+        };
+
+        const updateHorariosDisplay = (horarios, currentSelectedTime) => {
+          const horariosContainer = document.getElementById('horariosDisponiveisContainer');
+          if (!horariosContainer) return;
+
+          if (horarios.length === 0) {
+            horariosContainer.innerHTML = `
+              <div class="reagendar-empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <p>Nenhum horário disponível para esta data</p>
+                <span>Tente selecionar outra data</span>
+              </div>
+            `;
+            return;
+          }
+
+          const horariosHTML = horarios.map(horario => {
+            const isSelected = currentSelectedTime === horario.hora;
+            return `
+              <button 
+                type="button" 
+                class="horario-slot-btn ${isSelected ? 'horario-slot-btn-selected' : ''}" 
+                data-hora="${horario.hora}"
+              >
+                ${horario.hora}
+              </button>
+            `;
+          }).join('');
+
+          horariosContainer.innerHTML = `
+            <div class="reagendar-horarios-wrapper">
+              <label class="reagendar-label">
+                <i class="fas fa-clock"></i> Horários disponíveis (${horarios.length})
+              </label>
+              <div class="reagendar-horarios-grid">
+                ${horariosHTML}
+              </div>
+            </div>
+          `;
+
+          document.querySelectorAll('.horario-slot-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              selectedTime = btn.dataset.hora;
+              updateHorariosDisplay(horariosDisponiveis, selectedTime);
+            });
+            btn.addEventListener('mouseenter', function() {
+              if (this.dataset.hora !== selectedTime) {
+                this.style.background = '#f1f5f9';
+                this.style.borderColor = '#94a3b8';
+              }
+            });
+            btn.addEventListener('mouseleave', function() {
+              if (this.dataset.hora !== selectedTime) {
+                this.style.background = '#ffffff';
+                this.style.borderColor = '#cbd5e1';
+              }
+            });
+          });
+        };
 
         const { value: formValues } = await Swal.fire({
           title: 'Reagendar consulta',
           html: `
-            <div style="display:flex;flex-direction:column;gap:8px;text-align:left">
-              <label>Nova data</label>
-              <input type="date" id="novaData" class="swal2-input" style="width: 100%" required>
-              <label>Novo horário</label>
-              <input type="time" id="novaHora" class="swal2-input" style="width: 100%" required>
+            <div class="reagendar-modal-content">
+              <div class="reagendar-form-group">
+                <label class="reagendar-label">
+                  <i class="fas fa-calendar-alt"></i> Selecione a data
+                </label>
+                <input 
+                  type="date" 
+                  id="novaData" 
+                  class="reagendar-input" 
+                  required
+                  min="${new Date().toISOString().split('T')[0]}"
+                >
+              </div>
+              <div id="horariosDisponiveisContainer" class="reagendar-horarios-container">
+                <div class="reagendar-empty-state">
+                  <i class="fas fa-calendar-check"></i>
+                  <p>Selecione uma data para ver os horários disponíveis</p>
+                </div>
+              </div>
             </div>
           `,
           focusConfirm: false,
           showCancelButton: true,
           cancelButtonText: 'Cancelar',
           confirmButtonText: 'Confirmar',
-          confirmButtonColor: '#002a42',
-          cancelButtonColor: '#94a3b8',
+          confirmButtonColor: 'var(--ag-primary)',
+          cancelButtonColor: 'var(--ag-danger)',
+          width: window.innerWidth > 1200 ? '900px' : window.innerWidth > 768 ? '85vw' : '95vw',
+          padding: '0',
+          customClass: {
+            popup: 'swal2-popup-reagendar',
+            container: 'swal2-container-reagendar',
+            title: 'swal2-title-reagendar',
+            htmlContainer: 'swal2-html-container-reagendar'
+          },
+          didOpen: () => {
+            const dataInput = document.getElementById('novaData');
+            if (dataInput) {
+              dataInput.addEventListener('change', async (e) => {
+                selectedDate = e.target.value;
+                selectedTime = '';
+                if (selectedDate) {
+                  const container = document.getElementById('horariosDisponiveisContainer');
+                  if (container) {
+                    container.innerHTML = `
+                      <div class="reagendar-loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Carregando horários disponíveis...</p>
+                      </div>
+                    `;
+                  }
+                  horariosDisponiveis = await loadHorarios(selectedDate);
+                  updateHorariosDisplay(horariosDisponiveis, selectedTime);
+                }
+              });
+            }
+          },
           preConfirm: () => {
-            const novaData = document.getElementById('novaData').value;
-            const novaHora = document.getElementById('novaHora').value;
-            if (!novaData || !novaHora) {
-              Swal.showValidationMessage('Informe a nova data e horário');
+            const novaData = document.getElementById('novaData')?.value;
+            if (!novaData) {
+              Swal.showValidationMessage('Selecione uma data');
               return false;
             }
-            return { novaData, novaHora };
+            if (!selectedTime) {
+              Swal.showValidationMessage('Selecione um horário disponível');
+              return false;
+            }
+            return { novaData, novaHora: selectedTime };
           },
         });
 
         if (!formValues) return;
 
-        const novaDataHora = new Date(`${formValues.novaData}T${formValues.novaHora}`);
-        if (Number.isNaN(novaDataHora.getTime())) {
+        const novaDataHora = buildLocalDate(formValues.novaData, formValues.novaHora);
+        if (!novaDataHora || Number.isNaN(novaDataHora.getTime())) {
           showToast('Data ou horário inválidos.', 'error');
           return;
         }
@@ -635,10 +868,15 @@
 
         try {
           setLoadingState(true);
-          const response = await fetch(`${API_URL}/api/agendamentos/${appointmentInModal.id}/remarcar`, {
+          const isoString = dateToLocalISOString(novaDataHora);
+          if (!isoString) {
+            showToast('Erro ao processar data e horário.', 'error');
+            return;
+          }
+          const response = await fetch(`${API_URL}/api/agendamentos/${agendamentoId}/remarcar`, {
             method: 'PATCH',
             headers: getAuthHeaders(),
-            body: JSON.stringify({ novaDataHora: novaDataHora.toISOString() }),
+            body: JSON.stringify({ novaDataHora: isoString }),
           });
 
           if (!response.ok) {
@@ -1046,7 +1284,7 @@
             `}).join('')}
           </div>
           <div class="dia-card-actions">
-            <button class="btn-add-horario" data-dia="${dia}" data-data="${dataDia.toISOString()}">
+            <button class="btn-add-horario" data-dia="${dia}" data-data="${toLocalDateValue(dataDia)}">
               <i class="fas fa-plus"></i> ${temHorario ? 'Adicionar' : 'Definir Horário'}
             </button>
           </div>
@@ -1807,7 +2045,7 @@
                       headers: getAuthHeaders(),
                       body: JSON.stringify({
                         diaSemana,
-                        dataEspecifica: dataAlvo.toISOString(),
+                        dataEspecifica: dateToLocalISOString(dataAlvo),
                         horaInicio: slot.inicio,
                         horaFim: slot.fim,
                         duracaoConsulta,
