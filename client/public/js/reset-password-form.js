@@ -1,12 +1,64 @@
-document.addEventListener("DOMContentLoaded", () => {
+import { API_URL } from './config.js';
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (!token) {
+        Swal.fire({
+            title: 'Código não encontrado',
+            text: 'Você precisa de um código válido para redefinir sua senha.',
+            icon: 'error',
+            confirmButtonText: 'Solicitar Novo Código',
+            confirmButtonColor: '#00324A',
+            background: '#FFFFFF'
+        }).then(() => {
+            window.location.href = "/client/views/reset-password.html";
+        });
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/auth/validate-reset-token`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.valid) {
+            Swal.fire({
+                title: 'Código inválido ou expirado',
+                text: result.message || 'O código de redefinição não é válido ou expirou. Solicite um novo código.',
+                icon: 'error',
+                confirmButtonText: 'Solicitar Novo Código',
+                confirmButtonColor: '#00324A',
+                background: '#FFFFFF'
+            }).then(() => {
+                window.location.href = "/client/views/reset-password.html";
+            });
+            return;
+        }
+    } catch (err) {
+        Swal.fire({
+            title: 'Erro na validação',
+            text: 'Erro ao validar o código. Tente novamente.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#00324A',
+            background: '#FFFFFF'
+        }).then(() => {
+            window.location.href = "/client/views/reset-password.html";
+        });
+        return;
+    }
+
     const form = document.getElementById("resetPasswordForm");
     const senhaInput = document.getElementById("senha");
     const confirmarSenhaInput = document.getElementById("confirmarSenha");
     const senhaError = document.getElementById("senhaError");
     const confirmarSenhaError = document.getElementById("confirmarSenhaError");
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
 
     // Toggle de visibilidade da senha
     document.querySelectorAll('.password-toggle').forEach(button => {
@@ -59,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = { senha, token };
 
       try {
-        const response = await fetch("http://localhost:65432/api/auth/confirm-reset-password", {
+        const response = await fetch(`${API_URL}/api/auth/confirm-reset-password`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),

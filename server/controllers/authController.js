@@ -255,6 +255,33 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+// Validação do token de redefinição de senha
+export const validateResetToken = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    if (!token) {
+      return res.status(400).json({ valid: false, message: 'Token não fornecido.' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(400).json({ valid: false, message: 'Usuário não encontrado.' });
+    }
+
+    res.status(200).json({ valid: true, message: 'Token válido.' });
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(400).json({ valid: false, message: 'Token expirado. Solicite um novo código.' });
+    } else if (err.name === 'JsonWebTokenError') {
+      return res.status(400).json({ valid: false, message: 'Token inválido.' });
+    }
+    return res.status(500).json({ valid: false, message: 'Erro ao validar token.', error: err.message });
+  }
+};
+
 // Confirmação da redefinição de senha
 export const confirmResetPassword = async (req, res) => {
   const { senha, token } = req.body;
