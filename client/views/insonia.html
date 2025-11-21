@@ -20,98 +20,77 @@
   
   <div class="container">
     <main class="content">
-      <!-- Card Principal da Insônia -->
-      <section class="insonia-card">
-        <div class="card-header">
-          <div class="title-section">
-            <h1 class="page-title">Monitoramento de Insônia</h1>
-            <p class="page-subtitle">Acompanhamento dos padrões de sono e qualidade do descanso</p>
+      <!-- Header da Página -->
+      <section class="page-header">
+        <div class="header-content">
+          <div class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <path d="M12 2v8"></path>
+              <path d="M8 6h8"></path>
+            </svg>
           </div>
-          <div class="stats-section">
-            <div class="stat-card">
-              <div class="stat-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 3v18h18"></path>
-                  <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
-                </svg>
-              </div>
-              <div class="stat-content">
-                <span class="stat-value" id="totalRecordsCount">0</span>
-                <span class="stat-label">Total de Registros</span>
-              </div>
+          <div class="header-text">
+            <h1>Monitoramento de Insônia</h1>
+            <p>Acompanhamento dos padrões de sono e horas de descanso</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção de Estatísticas -->
+      <section class="stats-section">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"></path>
+                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+              </svg>
             </div>
-            <div class="stat-card">
-              <div class="stat-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-              </div>
-              <div class="stat-content">
-                <span class="stat-value" id="avgSleepHours">0</span>
-                <span class="stat-label">Média de Horas</span>
-              </div>
+            <div class="stat-content">
+              <span class="stat-value" id="totalRecordsCount">0</span>
+              <span class="stat-label">Total de Registros</span>
             </div>
-            <div class="stat-card">
-              <div class="stat-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 12l2 2 4-4"></path>
-                  <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
-                  <path d="M16 2l4 4-4 4"></path>
-                </svg>
-              </div>
-              <div class="stat-content">
-                <span class="stat-value" id="avgSleepQuality">0</span>
-                <span class="stat-label">Qualidade Média</span>
-              </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
             </div>
-            <div class="stat-card">
-              <div class="stat-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 12l2 2 4-4"></path>
-                  <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
-                  <path d="M16 2l4 4-4 4"></path>
-                </svg>
-              </div>
-              <div class="stat-content">
-                <span class="stat-value" id="goodSleepCount">0</span>
-                <span class="stat-label">Noites Boas</span>
-              </div>
+            <div class="stat-content">
+              <span class="stat-value" id="avgSleepHours">0</span>
+              <span class="stat-label">Média de Horas</span>
             </div>
           </div>
         </div>
+      </section>
 
-        <!-- Gráfico de Horas de Sono -->
-        <div class="chart-section">
-          <div class="chart-header">
-            <div class="chart-title">
-              <div class="title-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 3v18h18"></path>
-                  <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
-                </svg>
-              </div>
-              <div class="title-text">
-                <h2>Horas de Sono</h2>
-                <p>Registro diário das horas de sono</p>
-              </div>
-            </div>
-            <div class="month-selector">
-              <button class="arrow-btn" data-direction="prev">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M15 18l-6-6 6-6"></path>
-                </svg>
-              </button>
-              <span class="month-label">Abril • 2025</span>
-              <button class="arrow-btn" data-direction="next">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 18l6-6-6-6"></path>
-                </svg>
-              </button>
-            </div>
+      <!-- Seção do Gráfico -->
+      <section class="chart-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Horas de Sono</h2>
+            <p>Registro diário das horas de sono</p>
           </div>
-          
+          <div class="month-selector">
+            <button class="arrow-btn" data-direction="prev">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6"></path>
+              </svg>
+            </button>
+            <span class="month-label">Abril • 2025</span>
+            <button class="arrow-btn" data-direction="next">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="section-body">
           <div id="no-data-msg-horas" class="no-data-message">
             <div class="no-data-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -127,96 +106,44 @@
             <canvas id="chartHorasSono"></canvas>
           </div>
         </div>
+      </section>
 
-        <!-- Gráfico de Qualidade do Sono -->
-        <div class="chart-section">
-          <div class="chart-header">
-            <div class="chart-title">
-              <div class="title-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 3v18h18"></path>
-                  <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
-                </svg>
-              </div>
-              <div class="title-text">
-                <h2>Qualidade do Sono</h2>
-                <p>Avaliação da qualidade do descanso</p>
-              </div>
-            </div>
-            <div class="month-selector">
-              <button class="arrow-btn" data-direction="prev">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M15 18l-6-6 6-6"></path>
-                </svg>
-              </button>
-              <span class="month-label">Abril • 2025</span>
-              <button class="arrow-btn" data-direction="next">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 18l6-6-6-6"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-          
-          <div id="no-data-msg-qualidade" class="no-data-message">
-            <div class="no-data-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 3v18h18"></path>
-                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
-              </svg>
-            </div>
-            <h3>Nenhum dado encontrado</h3>
-            <p>Não há registros de qualidade do sono para este mês.</p>
-          </div>
-          
-          <div class="chart-container">
-            <canvas id="chartQualidadeSono"></canvas>
+      <!-- Seção de Informações -->
+      <section class="info-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Referências de Horas de Sono</h2>
+            <p>Classificação baseada em recomendações médicas</p>
           </div>
         </div>
-
-        <!-- Informações sobre Sono -->
-        <div class="info-section">
-          <div class="info-header">
-            <div class="info-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg>
-            </div>
-            <h3>Classificação da Qualidade do Sono</h3>
-          </div>
+        <div class="section-body">
           <div class="info-content">
             <div class="reference-item">
-              <div class="reference-label">Excelente (5):</div>
-              <div class="reference-value excellent">Sono profundo e reparador</div>
+              <div class="reference-label">Ideal:</div>
+              <div class="reference-value excellent">7 a 9 horas por noite</div>
             </div>
             <div class="reference-item">
-              <div class="reference-label">Bom (4):</div>
-              <div class="reference-value good">Sono satisfatório</div>
+              <div class="reference-label">Adequado:</div>
+              <div class="reference-value good">6 a 7 horas por noite</div>
             </div>
             <div class="reference-item">
-              <div class="reference-label">Regular (3):</div>
-              <div class="reference-value regular">Sono moderado</div>
+              <div class="reference-label">Excessivo:</div>
+              <div class="reference-value regular">Mais de 9 horas por noite</div>
             </div>
             <div class="reference-item">
-              <div class="reference-label">Ruim (2):</div>
-              <div class="reference-value poor">Sono insatisfatório</div>
-            </div>
-            <div class="reference-item">
-              <div class="reference-label">Muito Ruim (1):</div>
-              <div class="reference-value very-poor">Sono inadequado</div>
+              <div class="reference-label">Insuficiente:</div>
+              <div class="reference-value poor">Menos de 6 horas por noite</div>
             </div>
           </div>
           <div class="info-footer">
-            <a href="https://support.garmin.com/pt-BR/?faq=DWcdBazhr097VgqFufsTk8" 
+            <a href="https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" 
                target="_blank" rel="noopener noreferrer" class="reference-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15,3 21,3 21,9"></polyline>
                 <line x1="10" y1="14" x2="21" y2="3"></line>
               </svg>
-              Saiba mais sobre classificação do sono
+              Saiba mais sobre horas de sono recomendadas
             </a>
           </div>
         </div>
