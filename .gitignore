@@ -112,9 +112,6 @@ temp/
 ehthumbs.db
 Thumbs.db
 
-# Uploads directory (if contains user uploads)
-uploads/
-
 # Firebase configuration files with API keys
 **/firebaseClient.js.bak
 **/firebase-config.js

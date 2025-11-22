@@ -1,110 +1,385 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #002a42;
+  --primary-strong: #00324a;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --border: #e2e8f0;
+  --border-strong: #cbd5f5;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --text-soft: #94a3b8;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    color: #1e293b;
-    line-height: 1.6;
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-    box-sizing: border-box;
+  background: #f8fafc;
+  min-height: 100vh;
+  color: var(--text);
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#header-component .main-header {
+  background: var(--primary);
 }
 
 .container {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 100vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
+  display: flex !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 40px;
+  height: 40px;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  gap: 6px;
+  padding: 0 10px;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #f8fafc;
+  border-radius: 1px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.menu-toggle.shifted {
+  background: #0ea5e9;
+  border-color: #0ea5e9;
+}
+
+.menu-toggle.shifted span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.menu-toggle.shifted span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.shifted span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  min-height: 88px;
+  background: #0f172a;
+  z-index: 110;
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  box-sizing: border-box;
+  gap: 24px;
+  flex-wrap: nowrap;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.2);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.header-title-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.app-header .header-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #f8fafc;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.header-logo {
+  width: 80px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.header-action {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  color: #ffffff;
+}
+
+.header-action:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.header-action i {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.header-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  background: #1d4ed8;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.header-logout:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+.header-logout i {
+  font-size: 16px;
+}
+
+.header-logout:active {
+  transform: scale(0.98);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 120;
+  backdrop-filter: blur(4px);
+}
+
+.sidebar-overlay.hidden {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .menu-toggle {
+    display: flex;
+  }
+
+  .app-header {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 16px 20px;
+    min-height: 80px;
+    gap: 12px;
+  }
+
+  .header-left {
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-title-group {
+    gap: 10px;
+  }
+
+  .app-header .header-title {
+    font-size: 18px;
+    max-width: 200px;
+  }
+
+  .header-logo {
+    width: 60px;
+  }
+
+  .header-right {
+    gap: 10px;
+  }
+
+  .header-action {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-action i {
+    font-size: 16px;
+  }
+
+  .header-logout {
+    padding: 8px 14px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .header-logout span {
+    display: none;
+  }
+
+  .header-logout i {
+    font-size: 14px;
+  }
 }
 
 .content {
   margin-left: 280px !important;
   width: calc(100% - 280px) !important;
   min-height: 100vh !important;
-  box-sizing: border-box !important;
-  overflow-x: hidden !important;
   padding: 100px 40px 40px !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 24px !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
   transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease !important;
   max-width: none !important;
 }
 
-/* Card Principal do Diabetes */
-.diabetes-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 32px;
-  margin-bottom: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  width: 100%;
-}
-
-.card-header {
+.page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #e2e8f0;
-  flex-wrap: wrap;
-  gap: 24px;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 24px 28px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.title-section {
+.header-content {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  align-items: center;
+  gap: 20px;
 }
 
-.page-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0;
-  line-height: 1.2;
+.header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--primary);
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: 24px;
 }
 
-.page-subtitle {
+.header-icon i {
+  font-size: 24px;
+}
+
+.header-text h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.header-text p {
   font-size: 16px;
-  color: #64748b;
-  margin: 0;
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 .stats-section {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
-  flex-wrap: wrap;
+  margin-bottom: 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  min-width: 160px;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .stat-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 10px;
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,27 +397,32 @@ body {
 .stat-content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .stat-value {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text);
   line-height: 1;
 }
 
 .stat-label {
-  font-size: 12px;
-  color: #64748b;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
-/* Seção do Gráfico */
 .chart-section {
-  margin-bottom: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .chart-header {
@@ -152,6 +432,7 @@ body {
   margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .chart-title {
@@ -163,12 +444,13 @@ body {
 .title-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 12px;
+  background: var(--primary);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
+  flex-shrink: 0;
 }
 
 .title-icon svg {
@@ -181,13 +463,13 @@ body {
 .title-text h2 {
   font-size: 24px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text);
   margin-bottom: 4px;
 }
 
 .title-text p {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .month-selector {
@@ -195,29 +477,29 @@ body {
   align-items: center;
   gap: 12px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
 
 .arrow-btn {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: var(--primary);
   color: #ffffff;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
 }
 
 .arrow-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  background: var(--primary-strong);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .arrow-btn:active {
@@ -225,8 +507,8 @@ body {
 }
 
 .arrow-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   stroke: currentColor;
   fill: none;
 }
@@ -234,19 +516,35 @@ body {
 .month-label {
   font-size: 14px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text);
   min-width: 120px;
   text-align: center;
 }
 
 .chart-container {
-  background: #ffffff;
-  border-radius: 16px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
   padding: 24px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
   position: relative;
-  min-height: 400px;
+  min-height: 300px;
+  max-height: 400px;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
 }
 
 .no-data-message {
@@ -256,7 +554,7 @@ body {
   justify-content: center;
   text-align: center;
   padding: 48px 24px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .no-data-message.show {
@@ -266,18 +564,18 @@ body {
 .no-data-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-radius: 16px;
+  background: var(--surface-alt);
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  color: #94a3b8;
+  color: var(--text-soft);
 }
 
 .no-data-icon svg {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
   stroke: currentColor;
   fill: none;
 }
@@ -285,21 +583,23 @@ body {
 .no-data-message h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
   margin-bottom: 8px;
 }
 
 .no-data-message p {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
-/* Seção de Informações */
 .info-section {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid #e2e8f0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .info-header {
@@ -312,12 +612,13 @@ body {
 .info-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 10px;
+  background: var(--primary);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
+  flex-shrink: 0;
 }
 
 .info-icon svg {
@@ -330,7 +631,7 @@ body {
 .info-header h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text);
 }
 
 .info-content {
@@ -345,14 +646,14 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #ffffff;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  background: var(--surface-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
 .reference-label {
   font-size: 14px;
-  color: #475569;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -364,41 +665,41 @@ body {
 }
 
 .reference-value.normal {
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  background: #ecfdf5;
   color: #059669;
   border: 1px solid #a7f3d0;
 }
 
 .reference-value.low {
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  background: #fef2f2;
   color: #dc2626;
   border: 1px solid #fecaca;
 }
 
 .reference-value.high {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: #fef3c7;
   color: #d97706;
   border: 1px solid #fcd34d;
 }
 
 .info-footer {
   padding-top: 16px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .reference-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #3b82f6;
+  color: var(--primary);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
 }
 
 .reference-link:hover {
-  color: #1d4ed8;
+  color: var(--primary-strong);
   transform: translateY(-1px);
 }
 
@@ -409,12 +710,11 @@ body {
   fill: none;
 }
 
-/* Responsividade */
 @media (max-width: 1200px) {
   .content {
-    margin-left: 280px !important;
-    width: calc(100% - 280px) !important;
-    padding: 100px 32px 32px !important;
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 100px 32px 32px;
   }
   
   .stats-section {
@@ -422,42 +722,25 @@ body {
   }
   
   .stat-card {
-    min-width: 140px;
+    min-width: 180px;
   }
 }
 
 @media (max-width: 1024px) {
   .content {
-    width: 100% !important;
-    max-width: 100% !important;
     margin-left: 0 !important;
-    padding: 100px 32px 32px !important;
+    width: 100% !important;
+    padding: 100px 32px 32px;
   }
   
-  .diabetes-card {
-    padding: 28px;
-  }
-  
-  .card-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 20px;
-  }
-  
-  .title-section {
-    text-align: center;
+  .page-header {
+    padding: 20px;
   }
   
   .stats-section {
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  
-  .stat-card {
-    flex: 1;
-    min-width: 150px;
-    max-width: 200px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .chart-header {
@@ -468,7 +751,6 @@ body {
   
   .chart-title {
     justify-content: center;
-    text-align: center;
   }
   
   .month-selector {
@@ -482,44 +764,60 @@ body {
   
   .info-content {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 14px;
+  }
+  
+  .page-header,
+  .chart-section,
+  .info-section {
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
 @media (max-width: 768px) {
   .content {
-    padding: 100px 24px 24px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding: 80px 16px 16px 16px !important;
+    gap: 20px !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
   
-  .diabetes-card {
+  .page-header {
     padding: 24px;
-    border-radius: 16px;
-    margin-bottom: 24px;
   }
   
-  .page-title {
-    font-size: 28px;
-    line-height: 1.1;
+  .header-icon {
+    width: 56px;
+    height: 56px;
   }
   
-  .page-subtitle {
-    font-size: 15px;
+  .header-icon i {
+    font-size: 24px;
+  }
+  
+  .header-text h1 {
+    font-size: 24px;
+  }
+  
+  .header-text p {
+    font-size: 14px;
   }
   
   .stats-section {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 12px;
   }
   
   .stat-card {
-    min-width: auto;
-    max-width: none;
-    padding: 14px 18px;
+    padding: 20px;
   }
   
   .stat-icon {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
   
   .stat-icon svg {
@@ -528,11 +826,15 @@ body {
   }
   
   .stat-value {
-    font-size: 22px;
+    font-size: 24px;
   }
   
   .stat-label {
-    font-size: 11px;
+    font-size: 13px;
+  }
+  
+  .chart-section {
+    padding: 24px;
   }
   
   .chart-header {
@@ -567,8 +869,8 @@ body {
   }
   
   .arrow-btn svg {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
   }
   
   .month-label {
@@ -579,7 +881,10 @@ body {
   .chart-container {
     padding: 16px;
     min-height: 300px;
-    border-radius: 12px;
+  }
+  
+  .info-section {
+    padding: 24px;
   }
   
   .info-content {
@@ -597,67 +902,52 @@ body {
   
   .reference-value {
     font-size: 13px;
-    padding: 3px 6px;
-  }
-  
-  .info-section {
-    padding: 20px;
-    border-radius: 12px;
-  }
-  
-  .info-icon {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .info-icon svg {
-    width: 18px;
-    height: 18px;
-  }
-  
-  .info-header h3 {
-    font-size: 16px;
-  }
-  
-  .reference-link {
-    font-size: 13px;
-  }
-  
-  .reference-link svg {
-    width: 14px;
-    height: 14px;
   }
 }
 
 @media (max-width: 640px) {
   .content {
-    padding: 100px 16px 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding: 80px 12px 12px 12px !important;
+    gap: 16px !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
   
-  .diabetes-card {
+  .page-header {
     padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
   }
   
-  .page-title {
-    font-size: 24px;
+  .header-content {
+    gap: 12px;
   }
   
-  .page-subtitle {
-    font-size: 14px;
+  .header-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .header-icon i {
+    font-size: 20px;
+  }
+  
+  .header-text h1 {
+    font-size: 22px;
+  }
+  
+  .header-text p {
+    font-size: 13px;
   }
   
   .stat-card {
-    padding: 12px 16px;
-    flex-direction: row;
-    align-items: center;
+    padding: 16px;
   }
   
   .stat-icon {
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
   }
   
   .stat-icon svg {
@@ -665,20 +955,16 @@ body {
     height: 16px;
   }
   
-  .stat-content {
-    flex: 1;
-  }
-  
   .stat-value {
-    font-size: 20px;
+    font-size: 22px;
   }
   
   .stat-label {
-    font-size: 10px;
+    font-size: 12px;
   }
   
-  .chart-header {
-    gap: 10px;
+  .chart-section {
+    padding: 20px;
   }
   
   .title-icon {
@@ -710,8 +996,8 @@ body {
   }
   
   .arrow-btn svg {
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
   }
   
   .month-label {
@@ -722,35 +1008,28 @@ body {
   .chart-container {
     padding: 12px;
     min-height: 250px;
-    border-radius: 10px;
   }
   
   .info-section {
-    padding: 16px;
-    border-radius: 10px;
-  }
-  
-  .info-header {
-    gap: 10px;
+    padding: 20px;
   }
   
   .info-icon {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
   }
   
   .info-icon svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
   }
   
   .info-header h3 {
-    font-size: 15px;
+    font-size: 16px;
   }
   
   .reference-item {
     padding: 8px 12px;
-    border-radius: 8px;
   }
   
   .reference-label {
@@ -759,290 +1038,95 @@ body {
   
   .reference-value {
     font-size: 12px;
-    padding: 2px 5px;
-    border-radius: 4px;
   }
   
   .reference-link {
-    font-size: 12px;
-    gap: 6px;
-  }
-  
-  .reference-link svg {
-    width: 12px;
-    height: 12px;
+    font-size: 13px;
   }
 }
 
 @media (max-width: 480px) {
+  body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  .container {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
   .content {
-    padding: 100px 16px 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding: 70px 12px 12px 12px !important;
+    gap: 16px !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
   
-  .diabetes-card {
+  .page-header {
     padding: 16px;
-    border-radius: 10px;
-    margin-bottom: 16px;
   }
   
-  .page-title {
-    font-size: 22px;
+  .header-text h1 {
+    font-size: 20px;
   }
   
-  .page-subtitle {
-    font-size: 13px;
+  .stat-value {
+    font-size: 20px;
   }
   
-  .stat-card {
-    padding: 10px 12px;
-    gap: 8px;
+  .chart-section {
+    padding: 16px;
   }
   
-  .stat-icon {
-    width: 28px;
-    height: 28px;
+  .info-section {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding: 70px 10px 10px 10px !important;
+    gap: 12px !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
   
-  .stat-icon svg {
-    width: 14px;
-    height: 14px;
+  .page-header {
+    padding: 12px;
+  }
+  
+  .header-text h1 {
+    font-size: 18px;
   }
   
   .stat-value {
     font-size: 18px;
   }
   
-  .stat-label {
-    font-size: 9px;
-  }
-  
-  .chart-header {
-    gap: 8px;
-  }
-  
-  .title-icon {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .title-icon svg {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .title-text h2 {
-    font-size: 16px;
-  }
-  
-  .title-text p {
-    font-size: 11px;
-  }
-  
-  .month-selector {
-    padding: 3px 6px;
-    gap: 6px;
-  }
-  
-  .arrow-btn {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .arrow-btn svg {
-    width: 10px;
-    height: 10px;
-  }
-  
-  .month-label {
-    font-size: 11px;
-    min-width: 70px;
-  }
-  
-  .chart-container {
-    padding: 8px;
-    min-height: 200px;
-    border-radius: 8px;
+  .chart-section {
+    padding: 12px;
   }
   
   .info-section {
     padding: 12px;
-    border-radius: 8px;
-  }
-  
-  .info-header {
-    gap: 8px;
-  }
-  
-  .info-icon {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .info-icon svg {
-    width: 14px;
-    height: 14px;
-  }
-  
-  .info-header h3 {
-    font-size: 14px;
-  }
-  
-  .reference-item {
-    padding: 6px 10px;
-    border-radius: 6px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-  
-  .reference-label {
-    font-size: 11px;
-  }
-  
-  .reference-value {
-    font-size: 11px;
-    padding: 2px 4px;
-    border-radius: 3px;
-  }
-  
-  .reference-link {
-    font-size: 11px;
-    gap: 4px;
-  }
-  
-  .reference-link svg {
-    width: 10px;
-    height: 10px;
   }
 }
 
-@media (max-width: 360px) {
-  .content {
-    padding: 100px 12px 12px !important;
-  }
-  
-  .diabetes-card {
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-  }
-  
-  .page-title {
-    font-size: 20px;
-  }
-  
-  .page-subtitle {
-    font-size: 12px;
-  }
-  
-  .stat-card {
-    padding: 8px 10px;
-    gap: 6px;
-  }
-  
-  .stat-icon {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .stat-icon svg {
-    width: 12px;
-    height: 12px;
-  }
-  
-  .stat-value {
-    font-size: 16px;
-  }
-  
-  .stat-label {
-    font-size: 8px;
-  }
-  
-  .title-icon {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .title-icon svg {
-    width: 14px;
-    height: 14px;
-  }
-  
-  .title-text h2 {
-    font-size: 14px;
-  }
-  
-  .title-text p {
-    font-size: 10px;
-  }
-  
-  .month-selector {
-    padding: 2px 4px;
-    gap: 4px;
-  }
-  
-  .arrow-btn {
-    width: 18px;
-    height: 18px;
-  }
-  
-  .arrow-btn svg {
-    width: 8px;
-    height: 8px;
-  }
-  
-  .month-label {
-    font-size: 10px;
-    min-width: 60px;
-  }
-  
-  .chart-container {
-    padding: 6px;
-    min-height: 180px;
-    border-radius: 6px;
-  }
-  
-  .info-section {
-    padding: 10px;
-    border-radius: 6px;
-  }
-  
-  .info-icon {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .info-icon svg {
-    width: 12px;
-    height: 12px;
-  }
-  
-  .info-header h3 {
-    font-size: 13px;
-  }
-  
-  .reference-item {
-    padding: 4px 8px;
-    border-radius: 4px;
-  }
-  
-  .reference-label {
-    font-size: 10px;
-  }
-  
-  .reference-value {
-    font-size: 10px;
-    padding: 1px 3px;
-    border-radius: 2px;
-  }
-  
-  .reference-link {
-    font-size: 10px;
-    gap: 3px;
-  }
-  
-  .reference-link svg {
-    width: 8px;
-    height: 8px;
-  }
+.content,
+.page-header,
+.stats-section,
+.chart-section,
+.info-section {
+  overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }

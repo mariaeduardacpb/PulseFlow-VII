@@ -1,12 +1,15 @@
 import { API_URL } from './config.js';
 import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
 import { startConnectionMonitoring, stopConnectionMonitoring } from './utils/connectionMonitor.js';
+import { initHeaderComponent } from './components/header.js';
+import { initSidebar } from './components/sidebar.js';
 
 // Elementos DOM
 let examsGrid, emptyState, loadingState, examsCount, totalExames, examesMes, categorias;
 let filtroNome, filtroCategoria, filtroData, btnLimparFiltros, btnNovoExame, btnNovoExameEmpty;
 let examModal, modalClose, modalTitle, modalNomeExame, modalCategoria, modalData, modalDescricao, modalImage;
 let btnDownload, btnImprimir;
+let uploadModal, uploadModalClose, uploadForm, btnSelectFile, arquivoExame, fileName, btnCancelUpload, btnSubmitUpload;
 
 // Variáveis globais
 let allExames = [];
@@ -15,6 +18,9 @@ let currentExamId = null;
 let selectedPatient = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  initHeaderComponent({ title: 'Anexo de Exames' });
+  initSidebar('anexoexame');
+  
   const validation = validateActivePatient();
   if (!validation.valid) {
     redirectToPatientSelection(validation.error);
@@ -23,11 +29,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   startConnectionMonitoring(5);
   
-  // Aguardar carregamento dos componentes
+  const toggleButton = document.querySelector('.menu-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  
+  if (toggleButton && sidebar) {
+    toggleButton.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      toggleButton.classList.toggle('shifted');
+    });
+  }
+  
   setTimeout(async () => {
     await inicializarPagina();
+    await carregarDadosMedico();
   }, 100);
 });
+
+async function carregarDadosMedico() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) return;
+
+    const medico = await response.json();
+    
+    if (window.updateSidebarInfo) {
+      window.updateSidebarInfo(medico.nome, medico.areaAtuacao || 'Acompanhamento Integrado', medico.genero, medico.crm);
+    }
+  } catch (error) {
+    console.error('Erro ao carregar dados do médico:', error);
+  }
+}
 
 async function inicializarPagina() {
   try {
@@ -80,6 +120,16 @@ function inicializarElementosDOM() {
   modalImage = document.getElementById('modalImage');
   btnDownload = document.getElementById('btnDownload');
   btnImprimir = document.getElementById('btnImprimir');
+  
+  // Modal Upload
+  uploadModal = document.getElementById('uploadModal');
+  uploadModalClose = document.getElementById('uploadModalClose');
+  uploadForm = document.getElementById('uploadForm');
+  btnSelectFile = document.getElementById('btnSelectFile');
+  arquivoExame = document.getElementById('arquivoExame');
+  fileName = document.getElementById('fileName');
+  btnCancelUpload = document.getElementById('btnCancelUpload');
+  btnSubmitUpload = document.getElementById('btnSubmitUpload');
 }
 
 function configurarEventListeners() {
@@ -113,6 +163,57 @@ function configurarEventListeners() {
       }
     });
   }
+  
+  // Modal Upload
+  if (btnSelectFile && arquivoExame) {
+    btnSelectFile.addEventListener('click', () => {
+      arquivoExame.click();
+    });
+  }
+  
+  if (arquivoExame) {
+    arquivoExame.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        fileName.textContent = file.name;
+        fileName.style.color = '#1e293b';
+      } else {
+        fileName.textContent = 'Nenhum arquivo selecionado';
+        fileName.style.color = '#64748b';
+      }
+    });
+  }
+  
+  if (uploadForm) {
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await enviarExame();
+    });
+  }
+  
+  if (uploadModalClose) {
+    uploadModalClose.addEventListener('click', fecharModalUpload);
+  }
+  
+  if (btnCancelUpload) {
+    btnCancelUpload.addEventListener('click', fecharModalUpload);
+  }
+  
+  if (uploadModal) {
+    uploadModal.addEventListener('click', (e) => {
+      if (e.target === uploadModal) {
+        fecharModalUpload();
+      }
+    });
+  }
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (uploadModal && uploadModal.classList.contains('show')) {
+        fecharModalUpload();
+      }
+    }
+  });
 }
 
 async function carregarExames() {
@@ -180,10 +281,6 @@ async function carregarExames() {
     
     filteredExames = [...allExames];
     atualizarEstatisticas();
-    
-    if (allExames.length > 0) {
-      mostrarAviso(`${allExames.length} exame${allExames.length !== 1 ? 's' : ''} carregado${allExames.length !== 1 ? 's' : ''} com sucesso!`, 'success');
-    }
     
   } catch (error) {
     console.error('Erro ao carregar exames:', error);
@@ -327,11 +424,10 @@ function atualizarEstatisticas() {
   if (categorias) categorias.textContent = categoriasUnicas.length;
 }
 
-function abrirModalExame(exameId) {
+async function abrirModalExame(exameId) {
   const exame = allExames.find(e => e.id === exameId);
   if (!exame) return;
   
-  // Definir exame atual para download/impressão
   currentExamId = exameId;
   
   if (modalTitle) modalTitle.textContent = exame.nome;
@@ -341,42 +437,122 @@ function abrirModalExame(exameId) {
   if (modalDescricao) modalDescricao.textContent = exame.descricao;
   
   if (modalImage) {
-    if (exame.filePath) {
-      // Se for um caminho local do dispositivo móvel, mostrar placeholder
-      if (exame.filePath.includes('/data/user/') || exame.filePath.includes('app_flutter/')) {
-        modalImage.innerHTML = `
-          <div style="text-align: center; color: #94a3b8;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21,15 16,10 5,21"></polyline>
-            </svg>
-            <p style="margin-top: 12px;">Imagem do exame não disponível para visualização</p>
-            <p style="font-size: 12px; color: #64748b;">Arquivo: ${exame.filePath.split('/').pop()}</p>
-          </div>
-        `;
-      } else {
-        modalImage.innerHTML = `<img src="${exame.filePath}" alt="${exame.nome}">`;
-      }
-    } else {
-      modalImage.innerHTML = `
-        <div style="text-align: center; color: #94a3b8;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14,2 14,8 20,8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10,9 9,9 8,9"></polyline>
-          </svg>
-          <p style="margin-top: 12px;">Nenhuma imagem disponível</p>
-        </div>
-      `;
-    }
+    modalImage.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: center; min-height: 200px;">
+        <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+      </div>
+    `;
+    
+    await carregarPreviewExame(exame);
   }
   
   if (examModal) {
     examModal.classList.add('show');
     document.body.style.overflow = 'hidden';
+  }
+}
+
+async function carregarPreviewExame(exame) {
+  if (!exame || !exame.id) {
+    if (modalImage) {
+      modalImage.innerHTML = `
+        <div style="text-align: center; color: #94a3b8; padding: 40px 20px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <p style="margin-top: 12px;">Nenhum arquivo disponível</p>
+        </div>
+      `;
+    }
+    return;
+  }
+  
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Token não encontrado');
+    }
+    
+    const previewUrl = `${API_URL}/api/anexoExame/preview/${exame.id}`;
+    const response = await fetch(previewUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+    
+    const blob = await response.blob();
+    const contentType = blob.type;
+    const url = window.URL.createObjectURL(blob);
+    
+    let extensao = '';
+    if (exame.filePath) {
+      const partes = exame.filePath.split('.');
+      if (partes.length > 1) {
+        extensao = partes[partes.length - 1].toLowerCase();
+      }
+    }
+    
+    if (contentType.startsWith('image/') || extensao === 'png' || extensao === 'jpg' || extensao === 'jpeg' || extensao === 'heic') {
+      if (modalImage) {
+        modalImage.innerHTML = `
+          <img src="${url}" alt="${exame.nome}" style="max-width: 100%; max-height: 500px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); object-fit: contain;">
+        `;
+        
+        const img = modalImage.querySelector('img');
+        if (img) {
+          img.onload = () => {
+            window.URL.revokeObjectURL(url);
+          };
+          img.onerror = () => {
+            window.URL.revokeObjectURL(url);
+            mostrarPreviewErro();
+          };
+        }
+      }
+    } else if (contentType === 'application/pdf' || extensao === 'pdf') {
+      if (modalImage) {
+        modalImage.innerHTML = `
+          <div style="width: 100%; height: 500px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+            <iframe src="${url}" style="width: 100%; height: 100%; border: none;"></iframe>
+          </div>
+          <div style="margin-top: 12px; text-align: center;">
+            <a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 500;">
+              Abrir PDF em nova aba
+            </a>
+          </div>
+        `;
+      }
+    } else {
+      mostrarPreviewErro();
+    }
+  } catch (error) {
+    console.error('Erro ao carregar preview:', error);
+    mostrarPreviewErro();
+  }
+}
+
+function mostrarPreviewErro() {
+  if (modalImage) {
+    modalImage.innerHTML = `
+      <div style="text-align: center; color: #94a3b8; padding: 40px 20px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14,2 14,8 20,8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <p style="margin-top: 12px;">Prévia não disponível</p>
+        <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Use o botão Download para visualizar o arquivo</p>
+      </div>
+    `;
   }
 }
 
@@ -387,7 +563,7 @@ function fecharModal() {
   }
 }
 
-function downloadExame(exameId = null) {
+async function downloadExame(exameId = null) {
   const exameIdToUse = exameId || currentExamId;
   const exame = allExames.find(e => e.id === exameIdToUse);
   if (!exame) {
@@ -401,46 +577,74 @@ function downloadExame(exameId = null) {
     return;
   }
   
-  // Usar o endpoint de download do backend
-  const downloadUrl = `${API_URL}/api/anexoExame/download/${exameId}`;
+  if (!exameIdToUse) {
+    mostrarAviso('ID do exame não encontrado.', 'error');
+    return;
+  }
   
-  // Criar link temporário para download
-  const link = document.createElement('a');
-  link.href = downloadUrl;
-  link.download = `${exame.nome}.pdf`; // Assumir PDF por padrão
-  
-  // Adicionar headers de autorização via fetch
-  fetch(downloadUrl, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`Erro ${response.status}: ${response.statusText}`);
-    }
-    return response.blob();
-  })
-  .then(blob => {
-    // Criar URL temporária para o blob
-    const url = window.URL.createObjectURL(blob);
-    link.href = url;
+  try {
+    const downloadUrl = `${API_URL}/api/anexoExame/download/${exameIdToUse}`;
     
-    // Adicionar ao DOM, clicar e remover
+    const response = await fetch(downloadUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    const handled = await handleApiError(response);
+    if (handled) {
+      return;
+    }
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
+    }
+    
+    const blob = await response.blob();
+    
+    let extensao = 'pdf';
+    if (exame.filePath) {
+      const partes = exame.filePath.split('.');
+      if (partes.length > 1) {
+        extensao = partes[partes.length - 1].toLowerCase();
+      }
+    }
+    
+    const contentType = response.headers.get('content-type') || blob.type;
+    if (contentType) {
+      const extensoesPorTipo = {
+        'application/pdf': 'pdf',
+        'image/png': 'png',
+        'image/jpeg': 'jpg',
+        'image/jpg': 'jpg',
+        'image/heic': 'heic'
+      };
+      
+      if (extensoesPorTipo[contentType]) {
+        extensao = extensoesPorTipo[contentType];
+      }
+    }
+    
+    const nomeArquivo = `${exame.nome.replace(/[^a-z0-9]/gi, '_')}.${extensao}`;
+    
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = nomeArquivo;
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
-    // Limpar URL temporária
     window.URL.revokeObjectURL(url);
     
     mostrarAviso(`Download do exame "${exame.nome}" iniciado!`, 'success');
-  })
-  .catch(error => {
+  } catch (error) {
     console.error('Erro ao fazer download:', error);
     mostrarAviso(`Erro ao fazer download: ${error.message}`, 'error');
-  });
+  }
 }
 
 function imprimirExame() {
@@ -825,7 +1029,140 @@ function imprimirExame() {
 }
 
 function criarNovoExame() {
-  mostrarAviso('Função de criar novo exame em desenvolvimento!', 'info');
+  const validation = validateActivePatient();
+  if (!validation.valid) {
+    redirectToPatientSelection(validation.error);
+    return;
+  }
+  
+  if (uploadModal) {
+    if (uploadForm) {
+      uploadForm.reset();
+    }
+    if (fileName) {
+      fileName.textContent = 'Nenhum arquivo selecionado';
+      fileName.style.color = '#64748b';
+    }
+    if (arquivoExame) {
+      arquivoExame.value = '';
+    }
+    const hoje = new Date().toISOString().split('T')[0];
+    const dataExame = document.getElementById('dataExame');
+    if (dataExame) {
+      dataExame.value = hoje;
+    }
+    
+    uploadModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function fecharModalUpload() {
+  if (uploadModal) {
+    uploadModal.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+}
+
+async function enviarExame() {
+  const validation = validateActivePatient();
+  if (!validation.valid) {
+    redirectToPatientSelection(validation.error);
+    return;
+  }
+  
+  const nome = document.getElementById('nomeExame')?.value.trim();
+  const categoria = document.getElementById('categoriaExame')?.value;
+  const data = document.getElementById('dataExame')?.value;
+  const arquivo = arquivoExame?.files[0];
+  
+  if (!nome || !categoria || !data || !arquivo) {
+    mostrarAviso('Por favor, preencha todos os campos obrigatórios.', 'warning');
+    return;
+  }
+  
+  if (arquivo.size > 10 * 1024 * 1024) {
+    mostrarAviso('O arquivo é muito grande. Tamanho máximo permitido: 10MB', 'warning');
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('arquivo', arquivo);
+  formData.append('nome', nome);
+  formData.append('categoria', categoria);
+  formData.append('data', data);
+  formData.append('cpf', validation.cpf);
+  
+  if (btnSubmitUpload) {
+    btnSubmitUpload.disabled = true;
+    btnSubmitUpload.classList.add('btn-submit-loading');
+    const originalText = btnSubmitUpload.innerHTML;
+    btnSubmitUpload.innerHTML = `
+      <div class="loading-spinner" style="width: 16px; height: 16px; border: 2px solid white; border-top: 2px solid transparent; border-radius: 50%; display: inline-block;"></div>
+      Enviando...
+    `;
+  }
+  
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Token não encontrado');
+    }
+    
+    const response = await fetch(`${API_URL}/api/anexoExame/medico/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+    
+    const handled = await handleApiError(response);
+    if (handled) {
+      if (btnSubmitUpload) {
+        btnSubmitUpload.disabled = false;
+        btnSubmitUpload.classList.remove('btn-submit-loading');
+        btnSubmitUpload.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7,10 12,15 17,10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Enviar Exame
+        `;
+      }
+      return;
+    }
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    mostrarAviso('Exame enviado com sucesso!', 'success');
+    fecharModalUpload();
+    
+    await carregarExames();
+    atualizarEstatisticas();
+    
+  } catch (error) {
+    console.error('Erro ao enviar exame:', error);
+    mostrarAviso(`Erro ao enviar exame: ${error.message}`, 'error');
+  } finally {
+    if (btnSubmitUpload) {
+      btnSubmitUpload.disabled = false;
+      btnSubmitUpload.classList.remove('btn-submit-loading');
+      btnSubmitUpload.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7,10 12,15 17,10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Enviar Exame
+      `;
+    }
+  }
 }
 
 function mostrarLoading(show) {

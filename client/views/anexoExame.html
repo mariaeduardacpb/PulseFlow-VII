@@ -5,16 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
   <title>PulseFlow | Anexo de Exames</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/client/public/css/perfilPaciente.css">
-  <link rel="stylesheet" href="/client/public/css/sidebar.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/client/public/css/anexoExame.css" />
+  <link rel="stylesheet" href="/client/public/css/sidebar.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
   <link rel="stylesheet" href="/client/public/css/dark-theme.css"/>
   <script src="/client/public/js/theme.js"></script>
 </head>
-
 <body>
   <div id="header-component"></div>
   <div id="sidebar-component"></div>
@@ -22,161 +20,113 @@
   <div class="container">
     <main class="content">
       <!-- Mensagem de Erro -->
-      <div id="erroExames" class="error-message" style="display: none;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="15" y1="9" x2="9" y2="15"></line>
-          <line x1="9" y1="9" x2="15" y2="15"></line>
-        </svg>
+      <div class="error-message" id="erroExames" style="display: none;">
+        <i class="fas fa-exclamation-circle"></i>
         <span id="erroTexto">Erro ao carregar exames</span>
       </div>
 
       <!-- Header da Página -->
-      <div class="page-header">
+      <section class="page-header">
         <div class="header-content">
+          <div class="header-icon">
+            <i class="fas fa-file-medical"></i>
+          </div>
           <div class="header-text">
             <h1>Anexo de Exames</h1>
-            <p>Visualize e gerencie os exames médicos do paciente com organização e facilidade</p>
+            <p>Visualize e gerencie todos os exames anexados do paciente</p>
           </div>
-          <div class="header-stats">
-            <div class="stat-card">
-              <div class="stat-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14,2 14,8 20,8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10,9 9,9 8,9"></polyline>
-                </svg>
-              </div>
-              <div class="stat-info">
-                <span class="stat-number" id="totalExames">0</span>
-                <span class="stat-label">Total de Exames</span>
-              </div>
+        </div>
+      </section>
+      <div class="stats-section">
+          <div class="stat-card">
+            <i class="fas fa-file-medical"></i>
+            <div class="stat-info">
+              <span class="stat-number" id="totalExames">0</span>
+              <span class="stat-label">Total de Exames</span>
             </div>
-            <div class="stat-card">
-              <div class="stat-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </div>
-              <div class="stat-info">
-                <span class="stat-number" id="examesMes">0</span>
-                <span class="stat-label">Este Mês</span>
-              </div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-calendar"></i>
+            <div class="stat-info">
+              <span class="stat-number" id="examesMes">0</span>
+              <span class="stat-label">Este Mês</span>
             </div>
-            <div class="stat-card">
-              <div class="stat-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.64 16.2a2 2 0 0 1-2.83-2.83l8.49-8.49"></path>
-                </svg>
-              </div>
-              <div class="stat-info">
-                <span class="stat-number" id="categorias">0</span>
-                <span class="stat-label">Categorias</span>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-tags"></i>
+            <div class="stat-info">
+              <span class="stat-number" id="categorias">0</span>
+              <span class="stat-label">Categorias</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters-section">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="filtroNome">Nome do Exame</label>
+              <input type="text" id="filtroNome" placeholder="Digite o nome do exame...">
+            </div>
+            <div class="form-group">
+              <label for="filtroCategoria">Categoria</label>
+              <select id="filtroCategoria">
+                <option value="">Todas as categorias</option>
+                <option value="Cardiologia">Cardiologia</option>
+                <option value="Neurologia">Neurologia</option>
+                <option value="Laboratório">Laboratório</option>
+                <option value="Imagem">Imagem</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="filtroData">Data</label>
+              <input type="date" id="filtroData">
+            </div>
+            <div class="form-group form-actions-group">
+              <label style="visibility: hidden;">Ações</label>
+              <div class="filter-actions">
+                <button class="btn-secondary" id="btnLimparFiltros">
+                  <i class="fas fa-times"></i>
+                  Limpar
+                </button>
+                <button class="btn-primary" id="btnNovoExame">
+                  <i class="fas fa-plus"></i>
+                  Novo Exame
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Seção de Filtros -->
-      <div class="filters-section">
-        <div class="filters-container">
-          <div class="filter-group">
-            <label for="filtroNome">Nome do Exame</label>
-            <input type="text" id="filtroNome" placeholder="Digite o nome do exame...">
+        <div class="exams-section">
+          <div id="loadingState" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Carregando exames...</p>
           </div>
-          <div class="filter-group">
-            <label for="filtroCategoria">Categoria</label>
-            <select id="filtroCategoria">
-              <option value="">Todas as categorias</option>
-              <option value="Cardiologia">Cardiologia</option>
-              <option value="Neurologia">Neurologia</option>
-              <option value="Laboratório">Laboratório</option>
-              <option value="Imagem">Imagem</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label for="filtroData">Data</label>
-            <input type="date" id="filtroData">
-          </div>
-          <div class="filter-actions">
-            <button class="btn-secondary" id="btnLimparFiltros">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 6h18"></path>
-                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-              </svg>
-              Limpar Filtros
-            </button>
-            <button class="btn-primary" id="btnNovoExame">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Novo Exame
+
+          <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">
+              <i class="fas fa-file-medical"></i>
+            </div>
+            <h3>Nenhum exame encontrado</h3>
+            <p>Não há exames cadastrados para este paciente ainda.</p>
+            <button class="btn-primary" id="btnNovoExameEmpty">
+              <i class="fas fa-plus"></i>
+              Adicionar Primeiro Exame
             </button>
           </div>
-        </div>
-      </div>
 
-      <!-- Seção de Exames -->
-      <div class="exams-section">
-        <div class="section-header">
-          <h2>Exames do Paciente</h2>
+          <div class="exams-grid" id="examsGrid"></div>
         </div>
-
-        <!-- Estado de Carregamento -->
-        <div id="loadingState" class="loading-state">
-          <div class="loading-spinner"></div>
-          <p>Carregando exames...</p>
-        </div>
-
-        <!-- Estado Vazio -->
-        <div id="emptyState" class="empty-state" style="display: none;">
-          <div class="empty-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14,2 14,8 20,8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10,9 9,9 8,9"></polyline>
-            </svg>
-          </div>
-          <h3>Nenhum exame encontrado</h3>
-          <p>Não há exames cadastrados para este paciente ainda.</p>
-          <button class="btn-primary" id="btnNovoExameEmpty">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Adicionar Primeiro Exame
-          </button>
-        </div>
-
-        <!-- Grid de Exames -->
-        <div class="exams-grid" id="examsGrid">
-          <!-- Os cards de exames serão inseridos aqui via JavaScript -->
-        </div>
-      </div>
     </main>
   </div>
 
-  <!-- Modal para Visualizar Exame -->
   <div id="examModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h3 id="modalTitle">Visualizar Exame</h3>
         <button class="modal-close" id="modalClose">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
+          <i class="fas fa-times"></i>
         </button>
       </div>
       <div class="modal-body">
@@ -199,25 +149,15 @@
               <span id="modalDescricao">-</span>
             </div>
           </div>
-          <div class="exam-image" id="modalImage">
-            <!-- Imagem do exame será inserida aqui -->
-          </div>
+          <div class="exam-image" id="modalImage"></div>
         </div>
         <div class="modal-actions">
           <button class="btn-secondary" id="btnDownload">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7,10 12,15 17,10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
+            <i class="fas fa-download"></i>
             Download
           </button>
           <button class="btn-primary" id="btnImprimir">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6,9 6,2 18,2 18,9"></polyline>
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-              <rect width="12" height="8" x="6" y="14"></rect>
-            </svg>
+            <i class="fas fa-print"></i>
             Imprimir
           </button>
         </div>
@@ -225,53 +165,60 @@
     </div>
   </div>
 
+  <div id="uploadModal" class="modal">
+    <div class="modal-content modal-upload">
+      <div class="modal-header">
+        <h3>Adicionar Novo Exame</h3>
+        <button class="modal-close" id="uploadModalClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadForm">
+          <div class="form-group">
+            <label for="nomeExame">Nome do Exame *</label>
+            <input type="text" id="nomeExame" name="nome" required placeholder="Ex: Hemograma completo">
+          </div>
+          <div class="form-group">
+            <label for="categoriaExame">Categoria *</label>
+            <select id="categoriaExame" name="categoria" required>
+              <option value="">Selecione uma categoria</option>
+              <option value="Cardiologia">Cardiologia</option>
+              <option value="Neurologia">Neurologia</option>
+              <option value="Laboratório">Laboratório</option>
+              <option value="Imagem">Imagem</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="dataExame">Data do Exame *</label>
+            <input type="date" id="dataExame" name="data" required>
+          </div>
+          <div class="form-group">
+            <label for="arquivoExame">Arquivo do Exame *</label>
+            <div class="file-upload-container">
+              <input type="file" id="arquivoExame" name="arquivo" accept=".pdf,.png,.jpg,.jpeg,.heic" required style="display: none;">
+              <button type="button" class="btn-file-select" id="btnSelectFile">
+                <i class="fas fa-upload"></i>
+                Escolher Arquivo
+              </button>
+              <span id="fileName" class="file-name">Nenhum arquivo selecionado</span>
+            </div>
+            <small class="file-hint">Formatos aceitos: PDF, PNG, JPG, JPEG, HEIC (máx. 10MB)</small>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="btnCancelUpload">Cancelar</button>
+            <button type="submit" class="btn-primary" id="btnSubmitUpload">
+              <i class="fas fa-upload"></i>
+              Enviar Exame
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
-  <script type="module">
-    import { initHeaderComponent } from '/client/public/js/components/header.js';
-    import { initSidebar } from '/client/public/js/components/sidebar.js';
-    import { API_URL } from '/client/public/js/config.js';
-
-    initHeaderComponent({ title: 'Anexo de Exames' });
-    initSidebar('anexoexame');
-
-    const toggleButton = document.querySelector('.menu-toggle');
-    const sidebar = document.querySelector('.sidebar');
-
-    if (toggleButton && sidebar) {
-      toggleButton.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
-        toggleButton.classList.toggle('shifted');
-      });
-    }
-
-    // Carregar dados do médico para atualizar o sidebar
-    async function loadDoctorInfo() {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
-        const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) return;
-
-        const medico = await response.json();
-        
-        // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
-        if (window.updateSidebarInfo) {
-          window.updateSidebarInfo(medico.nome, medico.areaAtuacao || 'Acompanhamento Integrado', medico.genero, medico.crm);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar dados do médico:', error);
-      }
-    }
-
-    loadDoctorInfo();
-  </script>
   <script type="module" src="/client/public/js/anexoExame.js"></script>
 </body>
 </html>
