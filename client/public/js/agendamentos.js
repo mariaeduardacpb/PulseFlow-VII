@@ -313,15 +313,6 @@
         ? payload.agendamentos.map(normalizeAppointment).filter(Boolean)
         : [];
       renderAppointments();
-      // Atualizar visualização semanal se estiver na aba de horários
-      const tabHorarios = document.getElementById('tabHorarios');
-      if (tabHorarios && tabHorarios.classList.contains('active')) {
-        setTimeout(() => {
-          if (typeof renderSemanaView === 'function') {
-            renderSemanaView();
-          }
-        }, 200);
-      }
     } catch (error) {
       console.error(error);
       showToast(error.message || 'Não foi possível carregar os agendamentos.', 'error');
@@ -990,7 +981,6 @@
   let semanaAtual = 0; // 0 = semana atual, 1 = próxima semana, etc.
   let modoSelecaoMultipla = false;
   let horariosSelecionados = new Set();
-  let agendamentosPorHorario = new Map(); // Mapa para armazenar agendamentos por horário
   let filtroAgendamentos = 'todos'; // 'todos', 'agendados', 'livres'
 
   // Função para gerar slots de horários automaticamente
@@ -1083,24 +1073,6 @@
     periodoInfoEl.textContent = texto;
   }
 
-  // Atualizar visibilidade dos campos de almoço no modal de configurar horários
-  function atualizarVisibilidadeAlmocoConfig() {
-    const semAlmocoEl = document.getElementById('semAlmoco');
-    const almocoContainer = document.getElementById('almocoContainer');
-    const almocoInicioEl = document.getElementById('almocoInicio');
-    const almocoFimEl = document.getElementById('almocoFim');
-    
-    if (semAlmocoEl && almocoContainer) {
-      if (semAlmocoEl.checked) {
-        almocoContainer.style.display = 'none';
-        if (almocoInicioEl) almocoInicioEl.value = '';
-        if (almocoFimEl) almocoFimEl.value = '';
-      } else {
-        almocoContainer.style.display = 'flex';
-      }
-    }
-  }
-
   // Atualizar preview dos horários
   function updatePreview() {
     try {
@@ -1110,26 +1082,39 @@
         return;
       }
 
+      const horarioForm = document.getElementById('horarioForm');
       const horaInicioEl = document.getElementById('horaInicio');
       const horaFimEl = document.getElementById('horaFim');
       const duracaoEl = document.getElementById('duracaoConsulta');
       const almocoInicioEl = document.getElementById('almocoInicio');
       const almocoFimEl = document.getElementById('almocoFim');
       const periodoSemanasEl = document.getElementById('periodoSemanas');
-      const semAlmocoEl = document.getElementById('semAlmoco');
 
       if (!horaInicioEl || !horaFimEl || !duracaoEl) {
         previewEl.innerHTML = '<p class="preview-placeholder">Aguardando configuração...</p>';
         return;
       }
 
+      // Verificar se é para um dia específico
+      const diaEspecifico = horarioForm?.dataset.diaEspecifico;
+      const dataEspecifica = horarioForm?.dataset.dataEspecifica;
+      const isDiaEspecifico = diaEspecifico !== undefined && diaEspecifico !== '' && dataEspecifica !== undefined && dataEspecifica !== '';
+
       const horaInicio = horaInicioEl.value;
       const horaFim = horaFimEl.value;
       const duracao = parseInt(duracaoEl.value || '30');
-      const semAlmoco = semAlmocoEl?.checked || false;
+      const semAlmoco = document.getElementById('semAlmoco')?.checked || false;
       const almocoInicio = semAlmoco ? null : (almocoInicioEl?.value || null);
       const almocoFim = semAlmoco ? null : (almocoFimEl?.value || null);
-      const diasSelecionados = Array.from(document.querySelectorAll('.dia-select:checked')).length;
+      
+      // Para dia específico, usar 1 dia. Caso contrário, contar os checkboxes selecionados
+      let diasSelecionados;
+      if (isDiaEspecifico) {
+        diasSelecionados = 1;
+      } else {
+        diasSelecionados = Array.from(document.querySelectorAll('.dia-select:checked')).length;
+      }
+      
       const periodoSemanas = periodoSemanasEl?.value || '2';
       const isIndefinido = periodoSemanas === 'indefinido';
       const numSemanas = isIndefinido ? 1 : parseInt(periodoSemanas);
@@ -1139,7 +1124,7 @@
         return;
       }
 
-      if (diasSelecionados === 0) {
+      if (!isDiaEspecifico && diasSelecionados === 0) {
         previewEl.innerHTML = '<p class="preview-placeholder">Selecione pelo menos um dia da semana</p>';
         return;
       }
@@ -1156,20 +1141,45 @@
         return;
       }
 
-      const totalHorarios = isIndefinido 
-        ? slots.length * diasSelecionados 
-        : slots.length * diasSelecionados * numSemanas;
-      
-      const periodoTexto = isIndefinido 
-        ? 'horários recorrentes' 
-        : `${numSemanas} semana${numSemanas > 1 ? 's' : ''}`;
+      // Para dia específico, sempre criar apenas para 1 dia e 1 semana
+      let totalHorarios, periodoTexto;
+      if (isDiaEspecifico) {
+        totalHorarios = slots.length; // Apenas os slots para aquele dia específico
+        // Formatar data específica para exibição
+        let dataFormatada = dataEspecifica;
+        try {
+          const dataAlvo = buildLocalDate(dataEspecifica, '00:00');
+          if (dataAlvo) {
+            dataFormatada = dataAlvo.toLocaleDateString('pt-BR', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            });
+            dataFormatada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
+          }
+        } catch (e) {
+          console.error('Erro ao formatar data:', e);
+        }
+        periodoTexto = `para ${dataFormatada}`;
+      } else {
+        totalHorarios = isIndefinido 
+          ? slots.length * diasSelecionados 
+          : slots.length * diasSelecionados * numSemanas;
+        periodoTexto = isIndefinido 
+          ? 'horários recorrentes' 
+          : `${numSemanas} semana${numSemanas > 1 ? 's' : ''}`;
+      }
       
       let html = `<div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--ag-border);">
         <p style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 700; color: var(--ag-text);">
-          ${totalHorarios} horários serão criados
+          ${totalHorarios} horário${totalHorarios > 1 ? 's serão criados' : ' será criado'}
         </p>
         <p style="margin: 0; font-size: 0.85rem; color: var(--ag-muted);">
-          ${slots.length} horários por dia × ${diasSelecionados} ${diasSelecionados === 1 ? 'dia' : 'dias'} × ${periodoTexto}
+          ${isDiaEspecifico 
+            ? `${slots.length} horário${slots.length > 1 ? 's' : ''} ${periodoTexto}`
+            : `${slots.length} horários por dia × ${diasSelecionados} ${diasSelecionados === 1 ? 'dia' : 'dias'} × ${periodoTexto}`
+          }
         </p>
       </div>`;
       
@@ -1211,24 +1221,6 @@
         } else {
           if (novoAgendamentoBtn) novoAgendamentoBtn.style.display = 'none';
           if (addHorarioBtn) addHorarioBtn.style.display = 'flex';
-          
-          // Quando mudar para aba de horários, carregar agendamentos se necessário
-          if (!appointmentsCache || appointmentsCache.length === 0) {
-            fetchAppointmentsFromApi().then(() => {
-              if (typeof renderSemanaView === 'function') {
-                setTimeout(() => {
-                  renderSemanaView();
-                }, 300);
-              }
-            });
-          } else {
-            // Atualizar visualização semanal com agendamentos já carregados
-            if (typeof renderSemanaView === 'function') {
-              setTimeout(() => {
-                renderSemanaView();
-              }, 100);
-            }
-          }
         }
       });
     });
@@ -1259,11 +1251,6 @@
       horarios = data.horarios || [];
 
       renderHorarios();
-      
-      // Garantir que os agendamentos sejam carregados para mostrar indicadores
-      if (!appointmentsCache || appointmentsCache.length === 0) {
-        fetchAppointmentsFromApi();
-      }
     } catch (error) {
       console.error('Erro ao carregar horários:', error);
       if (listEl) listEl.innerHTML = `<div class="error">${error.message}</div>`;
@@ -1271,100 +1258,6 @@
     } finally {
       if (loadingEl) loadingEl.style.display = 'none';
     }
-  }
-
-  // Verificar se um horário tem agendamentos
-  function getAgendamentosDoHorario(horario, dataDia) {
-    const agendamentos = [];
-    
-    // Verificar se appointmentsCache existe e está disponível
-    if (!appointmentsCache || appointmentsCache.length === 0) {
-      return agendamentos;
-    }
-
-    // Determinar a data do horário
-    let dataHorario;
-    if (horario.dataEspecifica) {
-      const dataEspecificaDate = new Date(horario.dataEspecifica);
-      dataHorario = new Date(dataEspecificaDate);
-    } else {
-      // Horário recorrente - usar a data do dia da semana
-      dataHorario = new Date(dataDia);
-    }
-    dataHorario.setHours(0, 0, 0, 0);
-
-    // Buscar agendamentos que correspondem a este horário (usar cache local se appointmentsCache não estiver disponível)
-    const cache = appointmentsCache || [];
-    cache.forEach(appointment => {
-      if (!appointment) return;
-
-      // Tentar diferentes formatos de data/hora do agendamento
-      let appointmentDate = null;
-      let appointmentHora = null;
-
-      // Método 1: Usar dataHora se disponível
-      if (appointment.dataHora) {
-        const dataHora = new Date(appointment.dataHora);
-        if (!isNaN(dataHora.getTime())) {
-          appointmentDate = new Date(dataHora);
-          appointmentHora = `${String(dataHora.getHours()).padStart(2, '0')}:${String(dataHora.getMinutes()).padStart(2, '0')}`;
-        }
-      }
-
-      // Método 2: Usar data e hora separados
-      if (!appointmentDate && appointment.data && appointment.hora) {
-        appointmentDate = buildLocalDate(appointment.data, appointment.hora);
-        appointmentHora = appointment.hora;
-      }
-
-      // Método 3: Usar apenas data e extrair hora de dataHora
-      if (!appointmentDate && appointment.data) {
-        appointmentDate = buildLocalDate(appointment.data, appointment.hora || '00:00');
-        if (appointment.hora) {
-          appointmentHora = appointment.hora;
-        } else if (appointment.dataHora) {
-          const dataHora = new Date(appointment.dataHora);
-          appointmentHora = `${String(dataHora.getHours()).padStart(2, '0')}:${String(dataHora.getMinutes()).padStart(2, '0')}`;
-        }
-      }
-
-      if (!appointmentDate || !appointmentHora) return;
-
-      const appointmentDateOnly = new Date(appointmentDate);
-      appointmentDateOnly.setHours(0, 0, 0, 0);
-
-      // Verificar se é o mesmo dia
-      if (appointmentDateOnly.getTime() !== dataHorario.getTime()) {
-        return;
-      }
-
-      // Validar formato da hora
-      if (!appointmentHora.match(/^\d{2}:\d{2}$/)) return;
-
-      // Verificar se o horário do agendamento corresponde ao slot
-      const horaParts = appointmentHora.split(':').map(Number);
-      if (horaParts.length !== 2 || isNaN(horaParts[0]) || isNaN(horaParts[1])) return;
-
-      const [appointmentH, appointmentM] = horaParts;
-      const [horarioInicioH, horarioInicioM] = horario.horaInicio.split(':').map(Number);
-      const [horarioFimH, horarioFimM] = horario.horaFim.split(':').map(Number);
-
-      if (isNaN(horarioInicioH) || isNaN(horarioInicioM) || isNaN(horarioFimH) || isNaN(horarioFimM)) return;
-
-      const appointmentTimeMinutos = appointmentH * 60 + appointmentM;
-      const horarioInicioMinutos = horarioInicioH * 60 + horarioInicioM;
-      const horarioFimMinutos = horarioFimH * 60 + horarioFimM;
-
-      // Verificar se o agendamento está dentro do intervalo do horário
-      if (appointmentTimeMinutos >= horarioInicioMinutos && appointmentTimeMinutos < horarioFimMinutos) {
-        // Verificar se o status não é cancelado
-        if (!appointment.status || appointment.status !== 'cancelada') {
-          agendamentos.push(appointment);
-        }
-      }
-    });
-
-    return agendamentos;
   }
 
   // Renderizar visualização semanal
@@ -1442,66 +1335,77 @@
       const horariosDia = horariosPorDia[dia] || [];
       const temHorario = horariosDia.length > 0;
       
-      // Verificar se todos os horários do dia estão selecionados
-      const todosSelecionados = temHorario && 
-        horariosDia.every(horario => horariosSelecionados.has(horario._id));
-      
       // Calcular data do dia
       const dataDia = new Date(inicioSemana);
       const offsetDia = (dia === 0 ? 6 : dia - 1); // Ajuste para começar na segunda
       dataDia.setDate(inicioSemana.getDate() + offsetDia);
       
+      // Filtrar horários baseado no filtro de agendamentos
+      const horariosDiaFiltrados = horariosDia.filter(horario => {
+        const agendamentos = getAgendamentosDoHorario(horario, dataDia);
+        const temAgendamentos = agendamentos.length > 0;
+        
+        // Aplicar filtro
+        if (filtroAgendamentos === 'agendados' && !temAgendamentos) {
+          return false;
+        }
+        if (filtroAgendamentos === 'livres' && temAgendamentos) {
+          return false;
+        }
+        return true;
+      });
+      
+      // Não renderizar card do dia se não houver horários visíveis após o filtro (exceto se filtro for "todos")
+      if (filtroAgendamentos !== 'todos' && horariosDiaFiltrados.length === 0) {
+        return;
+      }
+      
       const diaNumero = dataDia.getDate();
       const mesAbrev = dataDia.toLocaleDateString('pt-BR', { month: 'short' });
       const isHoje = dataDia.toDateString() === hoje.toDateString();
       
-      // Filtrar horários baseado no filtro de agendamentos para determinar se o dia deve ser mostrado
-      const horariosFiltradosDia = horariosDia.map(horario => {
-        const isSelecionado = horariosSelecionados.has(horario._id);
-        
-        // Buscar agendamentos para este horário
-        const dataDiaFiltro = new Date(inicioSemana);
-        const offsetDiaFiltro = (dia === 0 ? 6 : dia - 1);
-        dataDiaFiltro.setDate(inicioSemana.getDate() + offsetDiaFiltro);
-        
-        const agendamentos = getAgendamentosDoHorario(horario, dataDiaFiltro);
-        const temAgendamentos = agendamentos.length > 0;
-        
-        // Aplicar filtro de agendamentos
-        if (filtroAgendamentos === 'agendados' && !temAgendamentos) {
-          return null; // Não mostrar horários sem agendamento
-        }
-        if (filtroAgendamentos === 'livres' && temAgendamentos) {
-          return null; // Não mostrar horários com agendamento
-        }
-        
-        return { horario, isSelecionado, agendamentos, temAgendamentos, dataDia: dataDiaFiltro };
-      }).filter(item => item !== null);
-      
-      // Se não houver horários visíveis após o filtro e o filtro estiver ativo, não renderizar o card do dia
-      if (horariosFiltradosDia.length === 0 && filtroAgendamentos !== 'todos') {
-        return; // Não renderizar este card do dia
-      }
+      // Verificar se todos estão selecionados
+      const todosSelecionados = horariosDiaFiltrados.length > 0 && horariosDiaFiltrados.every(h => horariosSelecionados.has(h._id));
       
       html += `
-        <div class="dia-card ${!temHorario ? 'sem-horario' : ''} ${isHoje ? 'dia-hoje' : ''}" data-dia="${dia}">
+        <div class="dia-card ${!temHorario ? 'sem-horario' : ''} ${isHoje ? 'dia-hoje' : ''}" data-dia="${dia}" data-data-dia="${toLocalDateValue(dataDia)}">
           <div class="dia-card-header">
             <div>
               <strong>${diasSemanaAbrev[dia]}</strong>
               <span class="dia-data">${diaNumero} ${mesAbrev}</span>
             </div>
             <div class="dia-header-actions">
-              ${modoSelecaoMultipla && temHorario ? `
-                <button class="btn-selecionar-todos-dia ${todosSelecionados ? 'todos-selecionados' : ''}" data-dia="${dia}" title="${todosSelecionados ? 'Desselecionar todos os horários deste dia' : 'Selecionar todos os horários deste dia'}">
-                  <i class="fas ${todosSelecionados ? 'fa-square' : 'fa-check-square'}"></i> ${todosSelecionados ? 'Desmarcar' : 'Selecionar todos'}
+              ${modoSelecaoMultipla && horariosDiaFiltrados.length > 0 ? `
+                <button class="btn-selecionar-todos-dia ${todosSelecionados ? 'todos-selecionados' : ''}" 
+                        data-dia="${dia}" 
+                        data-data-dia="${toLocalDateValue(dataDia)}"
+                        title="${todosSelecionados ? 'Desmarcar todos' : 'Selecionar todos'}">
+                  <i class="fas ${todosSelecionados ? 'fa-check-square' : 'fa-square'}"></i>
+                  <span>${todosSelecionados ? 'Desmarcar' : 'Selecionar todos'}</span>
                 </button>
               ` : ''}
               ${isHoje ? '<span class="badge-hoje">Hoje</span>' : ''}
             </div>
           </div>
           <div class="dia-horarios">
-            ${horariosFiltradosDia.map(({ horario, isSelecionado, agendamentos, temAgendamentos, dataDia: dataDiaRender }) => {
-              // Criar tooltip com informações dos pacientes
+            ${horariosDiaFiltrados.map(horario => {
+              const isSelecionado = horariosSelecionados.has(horario._id);
+              
+              // Buscar agendamentos para este horário
+              const agendamentos = getAgendamentosDoHorario(horario, dataDia);
+              const temAgendamentos = agendamentos.length > 0;
+              
+              // Armazenar dados dos agendamentos
+              const agendamentosData = temAgendamentos ? JSON.stringify(agendamentos.map(apt => ({
+                id: apt.id,
+                paciente: apt.paciente || 'Paciente',
+                contato: apt.contato || 'Não informado',
+                data: apt.data,
+                hora: apt.hora,
+                status: apt.status
+              }))) : '';
+              
+              // Tooltip
               let tooltipText = '';
               if (temAgendamentos) {
                 const pacientes = agendamentos.map(apt => apt.paciente || 'Paciente').join(', ');
@@ -1509,7 +1413,12 @@
               }
               
               return `
-              <div class="horario-item ${!horario.ativo ? 'inactive' : ''} ${isSelecionado ? 'selecionado' : ''} ${temAgendamentos ? 'tem-agendamento' : ''}" data-id="${horario._id}" title="${tooltipText}">
+              <div class="horario-item ${!horario.ativo ? 'inactive' : ''} ${isSelecionado ? 'selecionado' : ''} ${temAgendamentos ? 'tem-agendamento' : ''}" 
+                   data-id="${horario._id}" 
+                   data-agendamentos='${agendamentosData}'
+                   data-data-dia="${toLocalDateValue(dataDia)}"
+                   title="${tooltipText}"
+                   style="${temAgendamentos ? 'cursor: pointer;' : ''}">
                 ${modoSelecaoMultipla ? `
                   <label class="horario-checkbox">
                     <input type="checkbox" class="checkbox-horario" value="${horario._id}" ${isSelecionado ? 'checked' : ''}>
@@ -1532,14 +1441,10 @@
                       <i class="fas fa-check"></i>
                     </button>
                   `}
-                  <button class="btn-edit-dia" title="Editar horário">
-                    <i class="fas fa-pencil-alt"></i>
-                  </button>
                 </div>
                 ` : ''}
               </div>
-            `;
-            }).join('')}
+            `}).join('')}
           </div>
           <div class="dia-card-actions">
             <button class="btn-add-horario" data-dia="${dia}" data-data="${toLocalDateValue(dataDia)}">
@@ -1552,17 +1457,26 @@
 
     semanaGrid.innerHTML = html;
 
+    // Atualizar botões de filtro ativos
+    const filtroButtons = document.querySelectorAll('.filtro-btn');
+    filtroButtons.forEach(btn => {
+      const filtro = btn.dataset.filtro;
+      if (filtro === filtroAgendamentos) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
     // Configurar eventos dos cards
     setupDiaCardEvents();
     
     // Carregar agendamentos se necessário para mostrar indicadores
     if (!appointmentsCache || appointmentsCache.length === 0) {
-      // Carregar agendamentos e re-renderizar
       fetchAppointmentsFromApi().then(() => {
-        // Re-renderizar após carregar agendamentos
         setTimeout(() => {
           renderSemanaView();
-        }, 500);
+        }, 300);
       }).catch(err => {
         console.error('Erro ao carregar agendamentos:', err);
       });
@@ -1585,14 +1499,25 @@
       if (emptyStateEl) {
         emptyStateEl.innerHTML = `
           <div class="empty-state-content">
-            <div class="empty-state-icon">
-              <i class="fas fa-calendar-times"></i>
+            <div class="empty-state-illustration">
+              <div class="empty-state-icon-large">
+                <i class="fas fa-calendar-times"></i>
+              </div>
+              <div class="empty-state-decorative">
+                <div class="empty-state-dot dot-1"></div>
+                <div class="empty-state-dot dot-2"></div>
+                <div class="empty-state-dot dot-3"></div>
+              </div>
             </div>
-            <h3>Nenhum horário cadastrado</h3>
-            <p>Configure seus horários de disponibilidade para começar a receber agendamentos</p>
-            <button class="btn-primary" onclick="document.getElementById('configurarHorariosBtn').click()">
-              <i class="fas fa-cog"></i> Configurar Horários
-            </button>
+            <div class="empty-state-text">
+              <h3>Nenhum horário cadastrado</h3>
+              <p>Configure seus horários de disponibilidade para começar a receber agendamentos. Você pode criar horários recorrentes ou específicos para datas específicas.</p>
+            </div>
+            <div class="empty-state-actions">
+              <button class="btn-primary" onclick="document.getElementById('configurarHorariosBtn').click()">
+                <i class="fas fa-cog"></i> Configurar Horários
+              </button>
+            </div>
           </div>
         `;
         emptyStateEl.style.display = 'flex';
@@ -1604,16 +1529,29 @@
       if (emptyStateEl) {
         const filtroTexto = filtroAgendamentos === 'agendados' ? 'com agendamentos' : filtroAgendamentos === 'livres' ? 'livres (sem agendamentos)' : 'disponíveis';
         const filtroIcon = filtroAgendamentos === 'agendados' ? 'fa-calendar-check' : filtroAgendamentos === 'livres' ? 'fa-calendar-times' : 'fa-calendar';
+        const filtroTitulo = filtroAgendamentos === 'agendados' ? 'Nenhum horário agendado' : filtroAgendamentos === 'livres' ? 'Nenhum horário livre' : 'Nenhum horário encontrado';
+        const filtroDescricao = filtroAgendamentos === 'agendados' 
+          ? 'Não há horários com agendamentos para esta semana. Tente navegar para outra semana ou verificar os horários livres.'
+          : filtroAgendamentos === 'livres'
+          ? 'Não há horários livres (sem agendamentos) para esta semana. Todos os horários disponíveis já foram agendados.'
+          : 'Não há horários disponíveis para esta semana. Tente alterar o filtro ou navegar para outra semana.';
+        
         emptyStateEl.innerHTML = `
           <div class="empty-state-content">
-            <div class="empty-state-icon">
-              <i class="fas ${filtroIcon}"></i>
+            <div class="empty-state-illustration">
+              <div class="empty-state-icon-large">
+                <i class="fas ${filtroIcon}"></i>
+              </div>
+              <div class="empty-state-decorative">
+                <div class="empty-state-dot dot-1"></div>
+                <div class="empty-state-dot dot-2"></div>
+                <div class="empty-state-dot dot-3"></div>
+              </div>
             </div>
-            <h3>Nenhum horário encontrado</h3>
-            <p>Não há horários ${filtroTexto} para esta semana. Tente alterar o filtro ou navegar para outra semana.</p>
-            <button class="btn-secondary btn-limpar-filtro" onclick="document.getElementById('filtroAgendamentos').value = 'todos'; document.getElementById('filtroAgendamentos').dispatchEvent(new Event('change'));">
-              <i class="fas fa-filter"></i> Limpar Filtro
-            </button>
+            <div class="empty-state-text">
+              <h3>${filtroTitulo}</h3>
+              <p>${filtroDescricao}</p>
+            </div>
           </div>
         `;
         emptyStateEl.style.display = 'flex';
@@ -1629,19 +1567,6 @@
 
   // Configurar eventos dos cards de dia
   function setupDiaCardEvents() {
-    // Event listeners para botão de selecionar todos do dia
-    document.querySelectorAll('.btn-selecionar-todos-dia').forEach(btn => {
-      btn.replaceWith(btn.cloneNode(true));
-    });
-    
-    document.querySelectorAll('.btn-selecionar-todos-dia').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const dia = parseInt(e.target.closest('.btn-selecionar-todos-dia').dataset.dia);
-        selecionarTodosHorariosDoDia(dia);
-      });
-    });
-
     // Event listeners para checkboxes de seleção múltipla
     document.querySelectorAll('.checkbox-horario').forEach(checkbox => {
       checkbox.addEventListener('change', (e) => {
@@ -1663,13 +1588,11 @@
     
     document.querySelectorAll('.btn-add-horario').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const dia = parseInt(e.target.closest('.btn-add-horario').dataset.dia);
-        const dataStr = e.target.closest('.btn-add-horario').dataset.data;
-        const form = document.getElementById('editarDiaForm');
-        if (form && dataStr) {
-          form.dataset.dataEspecifica = dataStr;
-        }
-        openEditarDiaModal(dia, null, dataStr);
+        const btnEl = e.target.closest('.btn-add-horario');
+        const dia = parseInt(btnEl.dataset.dia);
+        const dataStr = btnEl.dataset.data;
+        console.log('Botão Definir Horário clicado:', { dia, dataStr, dataset: btnEl.dataset });
+        openHorarioModal(dia, dataStr);
       });
     });
 
@@ -1701,6 +1624,48 @@
       });
     });
 
+    // Event listeners para selecionar todos os horários do dia
+    document.querySelectorAll('.btn-selecionar-todos-dia').forEach(btn => {
+      btn.replaceWith(btn.cloneNode(true));
+    });
+    
+    document.querySelectorAll('.btn-selecionar-todos-dia').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const dia = parseInt(btn.getAttribute('data-dia'));
+        const dataDia = btn.getAttribute('data-data-dia');
+        console.log('Clicou no botão selecionar todos:', { dia, dataDia, modoSelecaoMultipla, btn });
+        if (dia !== null && dia !== undefined && !isNaN(dia) && dataDia) {
+          selecionarTodosHorariosDoDia(dia, dataDia);
+        } else {
+          console.error('Dados do botão inválidos:', { dia, dataDia, btn });
+          showToast('Erro: Dados do botão não encontrados', 'error');
+        }
+      });
+    });
+
+    // Event listeners para selecionar todos os horários do dia
+    document.querySelectorAll('.btn-selecionar-todos-dia').forEach(btn => {
+      btn.replaceWith(btn.cloneNode(true));
+    });
+    
+    document.querySelectorAll('.btn-selecionar-todos-dia').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const dia = parseInt(btn.getAttribute('data-dia'));
+        const dataDia = btn.getAttribute('data-data-dia');
+        console.log('Clicou no botão selecionar todos:', { dia, dataDia, modoSelecaoMultipla, btn });
+        if (dia !== null && dia !== undefined && !isNaN(dia) && dataDia) {
+          selecionarTodosHorariosDoDia(dia, dataDia);
+        } else {
+          console.error('Dados do botão inválidos:', { dia, dataDia, btn });
+          showToast('Erro: Dados do botão não encontrados', 'error');
+        }
+      });
+    });
+
     // Event listeners para reativar horário
     document.querySelectorAll('.btn-reativar-horario').forEach(btn => {
       btn.replaceWith(btn.cloneNode(true));
@@ -1713,6 +1678,257 @@
         await reativarHorario(id);
       });
     });
+
+    // Event listeners para clicar em horários com agendamento
+    document.querySelectorAll('.horario-item.tem-agendamento').forEach(item => {
+      item.addEventListener('click', (e) => {
+        // Não abrir modal se clicar nos botões de ação ou checkbox
+        if (e.target.closest('.horario-item-actions') || 
+            e.target.closest('.horario-checkbox') || 
+            e.target.closest('button') ||
+            e.target.tagName === 'BUTTON') {
+          return;
+        }
+        
+        e.stopPropagation();
+        
+        const agendamentosData = item.dataset.agendamentos;
+        const dataDia = item.dataset.dataDia;
+        
+        if (agendamentosData && dataDia) {
+          try {
+            const agendamentos = JSON.parse(agendamentosData);
+            mostrarInformacoesPaciente(agendamentos, dataDia);
+          } catch (err) {
+            console.error('Erro ao parsear dados dos agendamentos:', err);
+          }
+        }
+      });
+    });
+  }
+
+  // Verificar se um horário tem agendamentos
+  function getAgendamentosDoHorario(horario, dataDia) {
+    const agendamentos = [];
+    
+    if (!appointmentsCache || appointmentsCache.length === 0) {
+      return agendamentos;
+    }
+
+    // Determinar a data do horário
+    let dataHorario;
+    if (horario.dataEspecifica) {
+      dataHorario = new Date(horario.dataEspecifica);
+    } else {
+      dataHorario = new Date(dataDia);
+    }
+    dataHorario.setHours(0, 0, 0, 0);
+
+    // Buscar agendamentos que correspondem a este horário
+    appointmentsCache.forEach(appointment => {
+      if (!appointment) return;
+
+      // Obter data do agendamento
+      let appointmentDate = null;
+      if (appointment.dataHora) {
+        const dataHora = new Date(appointment.dataHora);
+        if (!isNaN(dataHora.getTime())) {
+          appointmentDate = new Date(dataHora);
+        }
+      } else if (appointment.data && appointment.hora) {
+        appointmentDate = buildLocalDate(appointment.data, appointment.hora);
+      } else if (appointment.data) {
+        appointmentDate = buildLocalDate(appointment.data, appointment.hora || '00:00');
+      }
+
+      if (!appointmentDate) return;
+
+      const appointmentDateOnly = new Date(appointmentDate);
+      appointmentDateOnly.setHours(0, 0, 0, 0);
+
+      // Verificar se é o mesmo dia
+      if (appointmentDateOnly.getTime() !== dataHorario.getTime()) {
+        return;
+      }
+
+      // Obter hora do agendamento
+      let appointmentHora = appointment.hora;
+      if (!appointmentHora && appointment.dataHora) {
+        const dataHora = new Date(appointment.dataHora);
+        appointmentHora = `${String(dataHora.getHours()).padStart(2, '0')}:${String(dataHora.getMinutes()).padStart(2, '0')}`;
+      }
+
+      if (!appointmentHora || !appointmentHora.match(/^\d{2}:\d{2}$/)) return;
+
+      // Verificar se o horário do agendamento corresponde ao slot
+      const horaParts = appointmentHora.split(':').map(Number);
+      if (horaParts.length !== 2 || isNaN(horaParts[0]) || isNaN(horaParts[1])) return;
+
+      const [appointmentH, appointmentM] = horaParts;
+      const [horarioInicioH, horarioInicioM] = horario.horaInicio.split(':').map(Number);
+      const [horarioFimH, horarioFimM] = horario.horaFim.split(':').map(Number);
+
+      if (isNaN(horarioInicioH) || isNaN(horarioInicioM) || isNaN(horarioFimH) || isNaN(horarioFimM)) return;
+
+      const appointmentTimeMinutos = appointmentH * 60 + appointmentM;
+      const horarioInicioMinutos = horarioInicioH * 60 + horarioInicioM;
+      const horarioFimMinutos = horarioFimH * 60 + horarioFimM;
+
+      // Verificar se o agendamento está dentro do intervalo do horário
+      if (appointmentTimeMinutos >= horarioInicioMinutos && appointmentTimeMinutos < horarioFimMinutos) {
+        // Verificar se o status não é cancelado
+        if (!appointment.status || appointment.status !== 'cancelada') {
+          agendamentos.push(appointment);
+        }
+      }
+    });
+
+    return agendamentos;
+  }
+
+  // Mostrar informações do paciente quando clicar em horário agendado
+  function mostrarInformacoesPaciente(agendamentos, dataDia) {
+    if (!agendamentos || agendamentos.length === 0) return;
+
+    // Formatar data
+    let dataFormatada;
+    try {
+      if (typeof dataDia === 'string') {
+        const dataParts = dataDia.split('-');
+        if (dataParts.length === 3) {
+          dataFormatada = new Date(parseInt(dataParts[0]), parseInt(dataParts[1]) - 1, parseInt(dataParts[2])).toLocaleDateString('pt-BR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+        } else {
+          dataFormatada = new Date(dataDia).toLocaleDateString('pt-BR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+        }
+      } else {
+        dataFormatada = new Date(dataDia).toLocaleDateString('pt-BR', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+    } catch (err) {
+      dataFormatada = dataDia || 'Data não informada';
+    }
+
+    const dataFormatadaCapitalizada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
+
+    // Criar HTML
+    let htmlContent = '';
+    
+    if (agendamentos.length === 1) {
+      const apt = agendamentos[0];
+      htmlContent = `
+        <div class="info-paciente-modal">
+          <div class="info-paciente-header-main">
+            <div class="info-paciente-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="info-paciente-title-section">
+              <h3 class="info-paciente-nome">${apt.paciente || 'Paciente'}</h3>
+              <p class="info-paciente-subtitle">Informações do Agendamento</p>
+            </div>
+          </div>
+          
+          <div class="info-paciente-divider"></div>
+          
+          <div class="info-paciente-details">
+            <div class="info-paciente-detail-item">
+              <div class="info-paciente-detail-icon phone">
+                <i class="fas fa-phone"></i>
+              </div>
+              <div class="info-paciente-detail-content">
+                <span class="info-paciente-detail-label">Telefone</span>
+                <span class="info-paciente-detail-value">
+                  ${apt.contato && apt.contato !== 'Não informado' ? `<a href="tel:${apt.contato.replace(/\D/g, '')}" class="info-paciente-link">${apt.contato}</a>` : '<span class="info-paciente-empty">Não informado</span>'}
+                </span>
+              </div>
+            </div>
+            
+            <div class="info-paciente-detail-item">
+              <div class="info-paciente-detail-icon calendar">
+                <i class="fas fa-calendar"></i>
+              </div>
+              <div class="info-paciente-detail-content">
+                <span class="info-paciente-detail-label">Data</span>
+                <span class="info-paciente-detail-value">${dataFormatadaCapitalizada}</span>
+              </div>
+            </div>
+            
+            <div class="info-paciente-detail-item">
+              <div class="info-paciente-detail-icon clock">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="info-paciente-detail-content">
+                <span class="info-paciente-detail-label">Horário</span>
+                <span class="info-paciente-detail-value">${apt.hora || '<span class="info-paciente-empty">Não informado</span>'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      htmlContent = `
+        <div class="info-paciente-modal">
+          <div class="info-paciente-header">
+            <i class="fas fa-calendar-check"></i> ${agendamentos.length} agendamentos para ${dataFormatadaCapitalizada}
+          </div>
+          <div class="info-pacientes-list">
+            ${agendamentos.map((apt, index) => `
+              <div class="info-paciente-card">
+                <div class="info-paciente-card-header">
+                  <span class="info-paciente-numero">${index + 1}</span>
+                  <span class="info-paciente-hora">${apt.hora || 'Não informado'}</span>
+                </div>
+                <div class="info-paciente-card-body">
+                  <div class="info-paciente-item">
+                    <div class="info-paciente-label">
+                      <i class="fas fa-user"></i> Nome:
+                    </div>
+                    <div class="info-paciente-value">${apt.paciente || 'Não informado'}</div>
+                  </div>
+                  <div class="info-paciente-item">
+                    <div class="info-paciente-label">
+                      <i class="fas fa-phone"></i> Telefone:
+                    </div>
+                    <div class="info-paciente-value">
+                      ${apt.contato && apt.contato !== 'Não informado' ? `<a href="tel:${apt.contato.replace(/\D/g, '')}" style="color: var(--ag-primary); text-decoration: none;">${apt.contato}</a>` : 'Não informado'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    Swal.fire({
+      title: '',
+      html: htmlContent,
+      width: agendamentos.length === 1 ? '520px' : '640px',
+      showCloseButton: false,
+      showConfirmButton: false,
+      allowOutsideClick: true,
+      allowEscapeKey: true,
+      customClass: {
+        popup: 'swal2-popup-info-paciente',
+        htmlContainer: 'swal2-html-container-info-paciente',
+        title: 'swal2-title-info-paciente'
+      },
+      padding: '0'
+    });
   }
 
   // Renderizar horários (mantido para compatibilidade)
@@ -1720,18 +1936,14 @@
     renderSemanaView();
   }
 
-  // Função para atualizar visualização semanal após carregar agendamentos
-  function atualizarVisualizacaoComAgendamentos() {
-    if (typeof renderSemanaView === 'function') {
-      renderSemanaView();
-    }
-  }
-
   // Abrir modal de configuração de horários
-  function openHorarioModal() {
-    console.log('Abrindo modal de horários...');
+  function openHorarioModal(diaEspecifico = null, dataEspecifica = null) {
+    console.log('Abrindo modal de horários...', { diaEspecifico, dataEspecifica, tipoDia: typeof diaEspecifico, tipoData: typeof dataEspecifica });
     const modal = document.getElementById('horarioModal');
     const form = document.getElementById('horarioForm');
+    const title = document.getElementById('modalHorarioTitle');
+    const periodoStep = document.querySelector('.form-step:first-of-type');
+    const periodoSelect = document.getElementById('periodoSemanas');
     
     if (!modal) {
       console.error('Modal não encontrado!');
@@ -1739,26 +1951,136 @@
       return;
     }
     
+    // Se for para um dia específico, ajustar o modal
+    // Verificar se ambos os parâmetros estão definidos e não são vazios
+    const isDiaEspecifico = diaEspecifico !== null && 
+                           diaEspecifico !== undefined && 
+                           diaEspecifico !== '' && 
+                           dataEspecifica !== null && 
+                           dataEspecifica !== undefined && 
+                           dataEspecifica !== '';
+    
+    console.log('É dia específico?', isDiaEspecifico, { diaEspecifico, dataEspecifica });
+    
+    if (isDiaEspecifico) {
+      // Mudar título
+      if (title) {
+        title.textContent = 'Definir Horário para Dia Específico';
+      }
+      
+      // Ocultar seção de período e dias
+      if (periodoStep) {
+        periodoStep.style.display = 'none';
+      }
+      
+      // Desabilitar seleção de dias (já está definido para o dia específico)
+      // Não marcar nenhum checkbox - o dia já está definido pelo parâmetro
+      document.querySelectorAll('.dia-select').forEach(cb => {
+        cb.checked = false;
+        cb.disabled = true; // Desabilitar todos os dias (já está definido)
+      });
+      
+      // Ocultar seleção de período (não é necessário para dia específico)
+      if (periodoSelect) {
+        periodoSelect.value = '1'; // Sempre 1 semana para dia específico
+        periodoSelect.style.display = 'none';
+        const periodoLabel = periodoSelect.closest('.config-item');
+        if (periodoLabel) {
+          periodoLabel.style.display = 'none';
+        }
+      }
+      
+      // Armazenar dados do dia específico no form
+      if (form) {
+        form.dataset.diaEspecifico = String(diaEspecifico);
+        form.dataset.dataEspecifica = String(dataEspecifica);
+        console.log('Armazenado no form:', { 
+          diaEspecifico: form.dataset.diaEspecifico, 
+          dataEspecifica: form.dataset.dataEspecifica 
+        });
+      }
+    } else {
+      // Modo normal - múltiplos dias
+      console.log('Modo normal - múltiplos dias');
+      if (title) {
+        title.textContent = 'Configurar Horários de Atendimento';
+      }
+      
+      // Mostrar seção de período e dias
+      if (periodoStep) {
+        periodoStep.style.display = 'block';
+      }
+      
+      // Resetar seleção de dias
+      document.querySelectorAll('.dia-select').forEach(cb => {
+        cb.checked = false;
+        cb.disabled = false;
+      });
+      
+      // Mostrar seleção de período
+      if (periodoSelect) {
+        periodoSelect.style.display = 'block';
+        const periodoLabel = periodoSelect.closest('.config-item');
+        if (periodoLabel) {
+          periodoLabel.style.display = 'block';
+        }
+      }
+      
+      // Remover dados do dia específico
+      if (form) {
+        delete form.dataset.diaEspecifico;
+        delete form.dataset.dataEspecifica;
+        console.log('Limpos dados de dia específico do form');
+      }
+    }
+    
     // Resetar formulário
     if (form) {
       form.reset();
+      
+      // Se for dia específico, limpar todos os valores padrão
+      if (diaEspecifico !== null && dataEspecifica) {
+        const horaInicioEl = document.getElementById('horaInicio');
+        const horaFimEl = document.getElementById('horaFim');
+        const duracaoEl = document.getElementById('duracaoConsulta');
+        const almocoInicioEl = document.getElementById('almocoInicio');
+        const almocoFimEl = document.getElementById('almocoFim');
+        
+        if (horaInicioEl) horaInicioEl.value = '';
+        if (horaFimEl) horaFimEl.value = '';
+        if (duracaoEl) duracaoEl.value = '30';
+        if (almocoInicioEl) almocoInicioEl.value = '';
+        if (almocoFimEl) almocoFimEl.value = '';
+      }
+      
+      // Atualizar visibilidade dos campos de almoço após reset
+      setTimeout(() => {
+        const semAlmoco = document.getElementById('semAlmoco');
+        const almocoFields = document.getElementById('almocoFields');
+        if (semAlmoco && almocoFields) {
+          semAlmoco.checked = false;
+          almocoFields.style.display = 'flex';
+        }
+        // Atualizar preview
+        if (typeof updatePreview === 'function') {
+          updatePreview();
+        }
+      }, 0);
     }
-    document.querySelectorAll('.dia-select').forEach(cb => cb.checked = false);
     
+    // Campos de horário devem sempre abrir vazios
     const horaInicioEl = document.getElementById('horaInicio');
     const horaFimEl = document.getElementById('horaFim');
     const duracaoEl = document.getElementById('duracaoConsulta');
     const almocoInicioEl = document.getElementById('almocoInicio');
     const almocoFimEl = document.getElementById('almocoFim');
     
-    if (horaInicioEl) horaInicioEl.value = '08:00';
-    if (horaFimEl) horaFimEl.value = '18:00';
+    // Limpar campos de horário (mas manter duração padrão)
+    if (horaInicioEl) horaInicioEl.value = '';
+    if (horaFimEl) horaFimEl.value = '';
     if (duracaoEl) duracaoEl.value = '30';
-    if (almocoInicioEl) almocoInicioEl.value = '12:00';
-    if (almocoFimEl) almocoFimEl.value = '13:30';
-    const semAlmocoEl = document.getElementById('semAlmoco');
-    if (semAlmocoEl) semAlmocoEl.checked = false;
-    atualizarVisibilidadeAlmocoConfig();
+    if (almocoInicioEl) almocoInicioEl.value = '';
+    if (almocoFimEl) almocoFimEl.value = '';
     
     const periodoSemanasEl = document.getElementById('periodoSemanas');
     if (periodoSemanasEl) periodoSemanasEl.value = '2';
@@ -1783,102 +2105,12 @@
     }, 300);
   }
 
-  // Atualizar preview dos horários no modal de editar
-  function updatePreviewEditar() {
-    try {
-      const previewEl = document.getElementById('previewHorariosEditar');
-      if (!previewEl) {
-        return;
-      }
-
-      const horaInicioEl = document.getElementById('editarHoraInicio');
-      const horaFimEl = document.getElementById('editarHoraFim');
-      const duracaoEl = document.getElementById('editarDuracao');
-      const almocoInicioEl = document.getElementById('editarAlmocoInicio');
-      const almocoFimEl = document.getElementById('editarAlmocoFim');
-      const semAlmocoEl = document.getElementById('editarSemAlmoco');
-
-      if (!horaInicioEl || !horaFimEl || !duracaoEl) {
-        previewEl.innerHTML = '<p class="preview-placeholder">Aguardando configuração...</p>';
-        return;
-      }
-
-      const horaInicio = horaInicioEl.value;
-      const horaFim = horaFimEl.value;
-      const duracao = parseInt(duracaoEl.value || '30');
-      const semAlmoco = semAlmocoEl?.checked || false;
-      const almocoInicio = semAlmoco ? null : (almocoInicioEl?.value || null);
-      const almocoFim = semAlmoco ? null : (almocoFimEl?.value || null);
-
-      if (!horaInicio || !horaFim) {
-        previewEl.innerHTML = '<p class="preview-placeholder">Configure os horários de início e fim</p>';
-        return;
-      }
-
-      if (horaFim <= horaInicio) {
-        previewEl.innerHTML = '<p class="preview-placeholder" style="color: var(--ag-danger);">Hora de fim deve ser maior que hora de início</p>';
-        return;
-      }
-
-      const slots = gerarSlotsHorarios(horaInicio, horaFim, duracao, almocoInicio, almocoFim);
-      
-      if (slots.length === 0) {
-        previewEl.innerHTML = '<p class="preview-placeholder">Nenhum horário será gerado com essas configurações. Verifique o intervalo de almoço.</p>';
-        return;
-      }
-
-      let html = `<div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--ag-border);">
-        <p style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 700; color: var(--ag-text);">
-          ${slots.length} horário(s) será(ão) criado(s)
-        </p>
-        <p style="margin: 0; font-size: 0.85rem; color: var(--ag-muted);">
-          ${slots.length} horários serão criados para este dia
-        </p>
-      </div>`;
-      
-      html += '<div class="preview-list">';
-      slots.forEach(slot => {
-        html += `<span class="preview-item">${slot.inicio} - ${slot.fim}</span>`;
-      });
-      html += '</div>';
-
-      previewEl.innerHTML = html;
-    } catch (error) {
-      console.error('Erro ao atualizar preview:', error);
-    }
-  }
-
-  // Atualizar visibilidade dos campos de almoço no modal de editar
-  function atualizarVisibilidadeAlmoco() {
-    const semAlmocoEl = document.getElementById('editarSemAlmoco');
-    const almocoContainer = document.getElementById('editarAlmocoContainer');
-    const almocoInicioEl = document.getElementById('editarAlmocoInicio');
-    const almocoFimEl = document.getElementById('editarAlmocoFim');
-    
-    if (semAlmocoEl && almocoContainer) {
-      if (semAlmocoEl.checked) {
-        almocoContainer.style.display = 'none';
-        if (almocoInicioEl) almocoInicioEl.value = '';
-        if (almocoFimEl) almocoFimEl.value = '';
-      } else {
-        almocoContainer.style.display = 'flex';
-      }
-    }
-  }
-
   // Abrir modal de editar dia específico
   function openEditarDiaModal(diaSemana, horario = null, dataEspecifica = null) {
     const modal = document.getElementById('editarDiaModal');
     const form = document.getElementById('editarDiaForm');
     const title = document.getElementById('editarDiaTitle');
     const excluirBtn = document.getElementById('excluirDiaBtn');
-
-    // Armazenar data específica no form
-    if (form && dataEspecifica) {
-      form.dataset.dataEspecifica = dataEspecifica;
-    } else if (form) {
-      delete form.dataset.dataEspecifica;
-    }
 
     if (horario) {
       title.textContent = `Editar Horário - ${diasSemana[diaSemana]}`;
@@ -1889,10 +2121,6 @@
       document.getElementById('editarDuracao').value = horario.duracaoConsulta;
       document.getElementById('editarObservacoes').value = horario.observacoes || '';
       document.getElementById('editarAtivo').checked = horario.ativo;
-      document.getElementById('editarAlmocoInicio').value = '';
-      document.getElementById('editarAlmocoFim').value = '';
-      document.getElementById('editarSemAlmoco').checked = false;
-      atualizarVisibilidadeAlmoco();
       if (excluirBtn) excluirBtn.style.display = 'block';
     } else {
       title.textContent = `Adicionar Horário - ${diasSemana[diaSemana]}`;
@@ -1901,24 +2129,10 @@
       document.getElementById('editarDiaSemana').value = diaSemana;
       document.getElementById('editarDuracao').value = '30';
       document.getElementById('editarAtivo').checked = true;
-      document.getElementById('editarHoraInicio').value = '08:00';
-      document.getElementById('editarHoraFim').value = '18:00';
-      document.getElementById('editarAlmocoInicio').value = '12:00';
-      document.getElementById('editarAlmocoFim').value = '13:30';
-      document.getElementById('editarSemAlmoco').checked = false;
-      atualizarVisibilidadeAlmoco();
       if (excluirBtn) excluirBtn.style.display = 'none';
     }
 
-    if (modal) {
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-    
-    // Atualizar preview após um pequeno delay
-    setTimeout(() => {
-      updatePreviewEditar();
-    }, 100);
+    if (modal) modal.style.display = 'flex';
   }
 
   // Fechar modal de horário
@@ -1926,10 +2140,41 @@
     console.log('Fechando modal de horários...');
     const modal = document.getElementById('horarioModal');
     const form = document.getElementById('horarioForm');
+    const periodoStep = document.querySelector('.form-step:first-of-type');
+    const periodoSelect = document.getElementById('periodoSemanas');
+    const title = document.getElementById('modalHorarioTitle');
     
     if (!modal) {
       console.error('Modal não encontrado!');
       return;
+    }
+    
+    // Restaurar visibilidade dos elementos (caso tenha sido ocultado para dia específico)
+    if (periodoStep) {
+      periodoStep.style.display = 'block';
+    }
+    
+    document.querySelectorAll('.dia-select').forEach(cb => {
+      cb.disabled = false;
+    });
+    
+    if (periodoSelect) {
+      periodoSelect.style.display = 'block';
+      const periodoLabel = periodoSelect.closest('.config-item');
+      if (periodoLabel) {
+        periodoLabel.style.display = 'block';
+      }
+    }
+    
+    // Restaurar título
+    if (title) {
+      title.textContent = 'Configurar Horários de Atendimento';
+    }
+    
+    // Remover dados do dia específico
+    if (form) {
+      delete form.dataset.diaEspecifico;
+      delete form.dataset.dataEspecifica;
     }
     
     // Fechar modal
@@ -2156,62 +2401,167 @@
     }
   }
 
-  // Selecionar/Desselecionar todos os horários de um dia específico (toggle)
-  function selecionarTodosHorariosDoDia(dia) {
-    // Sempre mostrar apenas horários ativos
-    const horariosFiltrados = horarios.filter(h => h.ativo);
+  // Selecionar todos os horários de um dia específico
+  function selecionarTodosHorariosDoDia(dia, dataDia) {
+    console.log('selecionarTodosHorariosDoDia chamado:', { dia, dataDia, modoSelecaoMultipla });
     
-    // Calcular data inicial da semana atual
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    const diaAtual = hoje.getDay();
-    const diasParaSegunda = (diaAtual === 0 ? -6 : 1) - diaAtual; // Segunda-feira = 1
-    const inicioSemana = new Date(hoje);
-    inicioSemana.setDate(hoje.getDate() + diasParaSegunda + (semanaAtual * 7));
+    if (!modoSelecaoMultipla) {
+      showToast('Ative o modo de seleção múltipla primeiro', 'warning');
+      return;
+    }
     
-    // Calcular data do dia específico
-    const dataDia = new Date(inicioSemana);
-    const offsetDia = (dia === 0 ? 6 : dia - 1); // Ajuste para começar na segunda
-    dataDia.setDate(inicioSemana.getDate() + offsetDia);
+    // Buscar horários do dia que estão visíveis (já filtrados)
+    const selector = `.dia-card[data-dia="${dia}"][data-data-dia="${dataDia}"]`;
+    console.log('Procurando card com selector:', selector);
     
-    // Buscar todos os horários deste dia (usando a mesma lógica de renderSemanaView)
-    const horariosDoDia = [];
-    
-    // Buscar horários recorrentes para este dia da semana
-    horariosFiltrados.forEach(horario => {
-      if (horario.diaSemana === dia && (!horario.tipo || horario.tipo === 'recorrente')) {
-        horariosDoDia.push(horario);
+    let diaCard = document.querySelector(selector);
+    if (!diaCard) {
+      // Tentar encontrar sem data-data-dia se não funcionar
+      const diaCardAlternativo = document.querySelector(`.dia-card[data-dia="${dia}"]`);
+      if (diaCardAlternativo) {
+        console.log('Card encontrado sem data-data-dia:', diaCardAlternativo);
+        diaCard = diaCardAlternativo;
+        const diaCardDataDia = diaCardAlternativo.getAttribute('data-data-dia');
+        if (diaCardDataDia && diaCardDataDia !== dataDia) {
+          console.warn('Data do dia não corresponde:', { esperado: dataDia, encontrado: diaCardDataDia });
+        }
+      } else {
+        console.error('Dia card não encontrado com selector:', selector);
+        showToast('Erro: Dia não encontrado', 'error');
+        return;
       }
-    });
+    }
     
-    // Buscar horários específicos para esta data
-    horariosFiltrados.forEach(horario => {
-      if (horario.dataEspecifica) {
-        const dataHorario = new Date(horario.dataEspecifica);
-        dataHorario.setHours(0, 0, 0, 0);
-        dataDia.setHours(0, 0, 0, 0);
-        
-        if (dataHorario.getTime() === dataDia.getTime()) {
-          horariosDoDia.push(horario);
+    const horariosItems = diaCard.querySelectorAll('.horario-item');
+    console.log('Horários encontrados no dia:', horariosItems.length);
+    
+    if (horariosItems.length === 0) {
+      showToast('Nenhum horário disponível neste dia', 'info');
+      return;
+    }
+    
+    let todosEstaoSelecionados = true;
+    const horariosIds = [];
+    
+    // Verificar se todos já estão selecionados e coletar IDs
+    horariosItems.forEach(item => {
+      const id = item.dataset.id;
+      if (id) {
+        horariosIds.push(id);
+        if (!horariosSelecionados.has(id)) {
+          todosEstaoSelecionados = false;
         }
       }
     });
     
-    // Verificar se todos os horários do dia já estão selecionados
-    const todosSelecionados = horariosDoDia.length > 0 && 
-      horariosDoDia.every(horario => horariosSelecionados.has(horario._id));
+    console.log('IDs dos horários:', horariosIds);
+    console.log('Todos estão selecionados?', todosEstaoSelecionados);
     
-    // Se todos estão selecionados, desselecionar todos; caso contrário, selecionar todos
-    horariosDoDia.forEach(horario => {
-      if (todosSelecionados) {
-        horariosSelecionados.delete(horario._id);
-      } else {
-        horariosSelecionados.add(horario._id);
-      }
-    });
+    // Toggle: se todos estão selecionados, deselecionar; senão, selecionar todos
+    if (todosEstaoSelecionados) {
+      // Deselecionar todos
+      horariosIds.forEach(id => {
+        horariosSelecionados.delete(id);
+      });
+      console.log('Deselecionou todos os horários do dia');
+      showToast(`${horariosIds.length} horário(s) desmarcado(s)`, 'success');
+    } else {
+      // Selecionar todos (apenas os ativos)
+      let selecionados = 0;
+      horariosIds.forEach(id => {
+        const horario = horarios.find(h => h._id === id);
+        if (horario && horario.ativo) {
+          horariosSelecionados.add(id);
+          selecionados++;
+        }
+      });
+      console.log(`Selecionou ${selecionados} horário(s) do dia`);
+      showToast(`${selecionados} horário(s) selecionado(s)`, 'success');
+    }
     
     atualizarContadorSelecionados();
     renderSemanaView();
+  }
+
+  // Excluir todos os horários de um dia específico
+  async function excluirHorariosDoDia(dia, dataDia) {
+    if (!modoSelecaoMultipla) return;
+    
+    // Buscar horários selecionados do dia
+    const diaCard = document.querySelector(`.dia-card[data-dia="${dia}"][data-data-dia="${dataDia}"]`);
+    if (!diaCard) return;
+    
+    const horariosSelecionadosDoDia = [];
+    diaCard.querySelectorAll('.horario-item').forEach(item => {
+      const id = item.dataset.id;
+      if (horariosSelecionados.has(id)) {
+        horariosSelecionadosDoDia.push(id);
+      }
+    });
+    
+    if (horariosSelecionadosDoDia.length === 0) {
+      showToast('Nenhum horário selecionado neste dia', 'warning');
+      return;
+    }
+
+    const diaNome = diasSemanaAbrev[dia];
+    const result = await Swal.fire({
+      title: 'Excluir horários do dia?',
+      html: `
+        <p>Deseja excluir permanentemente <strong>${horariosSelecionadosDoDia.length}</strong> horário(s) de <strong>${diaNome}</strong>?</p>
+        <p style="margin-top: 10px; font-size: 0.9rem; color: #64748b;">
+          Esta ação não pode ser desfeita.
+        </p>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: `Sim, excluir ${horariosSelecionadosDoDia.length} horário(s)`,
+      cancelButtonText: 'Cancelar',
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+        try {
+          const promises = horariosSelecionadosDoDia.map(id => 
+            fetch(`${API_URL}/api/horarios-disponibilidade/${id}`, {
+              method: 'DELETE',
+              headers: getAuthHeaders()
+            })
+          );
+
+          const responses = await Promise.all(promises);
+          
+          for (const response of responses) {
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || 'Erro ao excluir horário');
+            }
+          }
+
+          // Remover os horários excluídos da seleção
+          horariosSelecionadosDoDia.forEach(id => horariosSelecionados.delete(id));
+
+          return true;
+        } catch (error) {
+          Swal.showValidationMessage(`Erro: ${error.message}`);
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    });
+
+    if (result.isConfirmed) {
+      showToast(`${horariosSelecionadosDoDia.length} horário(s) excluído(s) com sucesso!`);
+      atualizarContadorSelecionados();
+      await loadHorarios();
+      
+      // Se não há mais horários selecionados, sair do modo de seleção
+      if (horariosSelecionados.size === 0) {
+        modoSelecaoMultipla = false;
+        toggleModoSelecaoMultipla();
+      } else {
+        renderSemanaView();
+      }
+    }
   }
 
   // Excluir horários selecionados
@@ -2279,11 +2629,9 @@
     const closeHorarioModalBtn = document.getElementById('closeHorarioModal');
     const cancelHorarioFormBtn = document.getElementById('cancelHorarioForm');
     const horarioForm = document.getElementById('horarioForm');
-    
     // Botões de seleção múltipla
     const toggleSelecaoBtn = document.getElementById('toggleSelecaoMultipla');
     const excluirSelecionadosBtn = document.getElementById('excluirSelecionados');
-    
     if (toggleSelecaoBtn) {
       toggleSelecaoBtn.addEventListener('click', toggleModoSelecaoMultipla);
     }
@@ -2292,14 +2640,19 @@
       excluirSelecionadosBtn.addEventListener('click', excluirHorariosSelecionados);
     }
     
-    // Filtro de agendamentos
-    const filtroAgendamentosEl = document.getElementById('filtroAgendamentos');
-    if (filtroAgendamentosEl) {
-      filtroAgendamentosEl.addEventListener('change', (e) => {
-        filtroAgendamentos = e.target.value;
+    // Filtro de agendamentos (botões modernos)
+    document.querySelectorAll('.filtro-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const filtro = e.currentTarget.dataset.filtro;
+        filtroAgendamentos = filtro;
+        
+        // Atualizar classes ativas
+        document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        
         renderSemanaView();
       });
-    }
+    });
 
     // Navegação de semanas
     const prevWeekBtn = document.getElementById('prevWeek');
@@ -2327,15 +2680,6 @@
       });
     }
     
-    // Event listener para checkbox de sem almoço
-    const semAlmocoEl = document.getElementById('semAlmoco');
-    if (semAlmocoEl) {
-      semAlmocoEl.addEventListener('change', () => {
-        atualizarVisibilidadeAlmocoConfig();
-        updatePreview();
-      });
-    }
-
     // Templates rápidos
     const templateButtons = document.querySelectorAll('.template-btn');
     const selectAllDays = document.getElementById('selectAllDays');
@@ -2363,49 +2707,80 @@
         const horaFim = document.getElementById('horaFim');
         const almocoInicio = document.getElementById('almocoInicio');
         const almocoFim = document.getElementById('almocoFim');
-        const semAlmocoEl = document.getElementById('semAlmoco');
+        const semAlmoco = document.getElementById('semAlmoco');
         
         switch(template) {
           case 'manha':
             horaInicio.value = '08:00';
             horaFim.value = '12:00';
+            if (semAlmoco) semAlmoco.checked = true;
             almocoInicio.value = '';
             almocoFim.value = '';
-            if (semAlmocoEl) semAlmocoEl.checked = true;
-            atualizarVisibilidadeAlmocoConfig();
             break;
           case 'tarde':
             horaInicio.value = '13:00';
             horaFim.value = '18:00';
+            if (semAlmoco) semAlmoco.checked = true;
             almocoInicio.value = '';
             almocoFim.value = '';
-            if (semAlmocoEl) semAlmocoEl.checked = true;
-            atualizarVisibilidadeAlmocoConfig();
             break;
           case 'dia-completo':
             horaInicio.value = '08:00';
             horaFim.value = '18:00';
+            if (semAlmoco) semAlmoco.checked = false;
             almocoInicio.value = '12:00';
             almocoFim.value = '13:30';
-            if (semAlmocoEl) semAlmocoEl.checked = false;
-            atualizarVisibilidadeAlmocoConfig();
             break;
           case 'limpar':
             horaInicio.value = '08:00';
             horaFim.value = '18:00';
+            if (semAlmoco) semAlmoco.checked = false;
             almocoInicio.value = '';
             almocoFim.value = '';
-            if (semAlmocoEl) semAlmocoEl.checked = false;
-            atualizarVisibilidadeAlmocoConfig();
             document.querySelectorAll('.dia-select').forEach(cb => cb.checked = false);
             break;
         }
+        atualizarVisibilidadeAlmoco();
         updatePreview();
       });
     });
 
+    // Função para atualizar visibilidade dos campos de almoço
+    function atualizarVisibilidadeAlmoco() {
+      const semAlmoco = document.getElementById('semAlmoco');
+      const almocoFields = document.getElementById('almocoFields');
+      
+      if (semAlmoco && almocoFields) {
+        if (semAlmoco.checked) {
+          almocoFields.style.display = 'none';
+          // Limpar valores quando desmarcar
+          document.getElementById('almocoInicio').value = '';
+          document.getElementById('almocoFim').value = '';
+        } else {
+          almocoFields.style.display = 'flex';
+          // Restaurar valores padrão se vazios
+          if (!document.getElementById('almocoInicio').value) {
+            document.getElementById('almocoInicio').value = '12:00';
+          }
+          if (!document.getElementById('almocoFim').value) {
+            document.getElementById('almocoFim').value = '13:30';
+          }
+        }
+      }
+    }
+    
+    // Event listener para checkbox de sem almoço
+    const semAlmocoCheckbox = document.getElementById('semAlmoco');
+    if (semAlmocoCheckbox) {
+      semAlmocoCheckbox.addEventListener('change', () => {
+        atualizarVisibilidadeAlmoco();
+        updatePreview();
+      });
+      atualizarVisibilidadeAlmoco(); // Inicializar visibilidade
+    }
+    
     // Atualizar preview quando campos mudarem
-    const previewInputs = ['horaInicio', 'horaFim', 'duracaoConsulta', 'almocoInicio', 'almocoFim'];
+    const previewInputs = ['horaInicio', 'horaFim', 'duracaoConsulta', 'almocoInicio', 'almocoFim', 'semAlmoco'];
     previewInputs.forEach(id => {
       const input = document.getElementById(id);
       if (input) {
@@ -2473,12 +2848,26 @@
         e.preventDefault();
         e.stopPropagation();
 
-        const diasSelecionados = Array.from(document.querySelectorAll('.dia-select:checked'))
-          .map(cb => parseInt(cb.value));
+        // Verificar se é para um dia específico
+        const diaEspecifico = horarioForm.dataset.diaEspecifico;
+        const dataEspecifica = horarioForm.dataset.dataEspecifica;
+        const isDiaEspecifico = diaEspecifico !== undefined && diaEspecifico !== '' && dataEspecifica !== undefined && dataEspecifica !== '';
         
-        if (diasSelecionados.length === 0) {
-          showToast('Selecione pelo menos um dia da semana', 'warning');
-          return;
+        console.log('Submit horário:', { diaEspecifico, dataEspecifica, isDiaEspecifico });
+
+        let diasSelecionados;
+        if (isDiaEspecifico) {
+          // Para dia específico, usar apenas esse dia
+          diasSelecionados = [parseInt(diaEspecifico)];
+        } else {
+          // Para múltiplos dias, obter da seleção
+          diasSelecionados = Array.from(document.querySelectorAll('.dia-select:checked'))
+            .map(cb => parseInt(cb.value));
+          
+          if (diasSelecionados.length === 0) {
+            showToast('Selecione pelo menos um dia da semana', 'warning');
+            return;
+          }
         }
 
         const horaInicio = document.getElementById('horaInicio')?.value;
@@ -2510,9 +2899,17 @@
           }
 
           // Obter período selecionado
-          const periodoSemanas = document.getElementById('periodoSemanas')?.value || '2';
-          const isIndefinido = periodoSemanas === 'indefinido';
-          const numSemanas = isIndefinido ? 0 : (parseInt(periodoSemanas) || 1);
+          let periodoSemanas, isIndefinido, numSemanas;
+          if (isDiaEspecifico) {
+            // Para dia específico, sempre criar apenas para aquela data
+            periodoSemanas = '1';
+            isIndefinido = false;
+            numSemanas = 1;
+          } else {
+            periodoSemanas = document.getElementById('periodoSemanas')?.value || '2';
+            isIndefinido = periodoSemanas === 'indefinido';
+            numSemanas = isIndefinido ? 0 : (parseInt(periodoSemanas) || 1);
+          }
 
           // Criar horários para cada dia e cada slot
           const promises = [];
@@ -2537,6 +2934,55 @@
                   })
                 );
               }
+            }
+          } else if (isDiaEspecifico) {
+            // Criar horários apenas para a data específica
+            console.log('Criando horários para dia específico:', { dataEspecifica, diaEspecifico, slots: slots.length });
+            
+            const dataAlvo = buildLocalDate(dataEspecifica, '00:00');
+            if (!dataAlvo) {
+              console.error('Data inválida:', dataEspecifica);
+              showToast('Data inválida', 'error');
+              return;
+            }
+            
+            // Converter data para formato ISO correto
+            const dataEspecificaIso = dateToLocalISOString(dataAlvo);
+            if (!dataEspecificaIso) {
+              console.error('Erro ao converter data para ISO:', dataAlvo);
+              showToast('Erro ao processar data', 'error');
+              return;
+            }
+            
+            console.log('Data convertida:', { original: dataEspecifica, iso: dataEspecificaIso });
+            
+            for (const slot of slots) {
+              const payload = {
+                diaSemana: parseInt(diaEspecifico),
+                horaInicio: slot.inicio,
+                horaFim: slot.fim,
+                duracaoConsulta,
+                observacoes,
+                ativo: true,
+                tipo: 'especifico',
+                dataEspecifica: dataEspecificaIso
+              };
+              
+              console.log('Enviando horário:', payload);
+              
+              promises.push(
+                fetch(`${API_URL}/api/horarios-disponibilidade`, {
+                  method: 'POST',
+                  headers: getAuthHeaders(),
+                  body: JSON.stringify(payload)
+                }).then(async (response) => {
+                  if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                    console.error('Erro ao criar horário:', errorData);
+                  }
+                  return response;
+                })
+              );
             }
           } else {
             // Criar horários para múltiplas semanas
@@ -2647,137 +3093,40 @@
         e.preventDefault();
 
         const id = document.getElementById('editarDiaId').value;
-        const diaSemana = parseInt(document.getElementById('editarDiaSemana').value);
-        const horaInicio = document.getElementById('editarHoraInicio').value;
-        const horaFim = document.getElementById('editarHoraFim').value;
-        const duracaoConsulta = parseInt(document.getElementById('editarDuracao').value);
-        const observacoes = document.getElementById('editarObservacoes').value || '';
-        const ativo = document.getElementById('editarAtivo').checked;
-        const semAlmoco = document.getElementById('editarSemAlmoco')?.checked || false;
-        const almocoInicio = semAlmoco ? null : (document.getElementById('editarAlmocoInicio')?.value || null);
-        const almocoFim = semAlmoco ? null : (document.getElementById('editarAlmocoFim')?.value || null);
-
-        // Validar horários
-        if (!horaInicio || !horaFim) {
-          showToast('Preencha os horários de início e fim', 'error');
-          return;
-        }
-
-        if (horaFim <= horaInicio) {
-          showToast('Hora de fim deve ser maior que hora de início', 'error');
-          return;
-        }
+        const data = {
+          diaSemana: parseInt(document.getElementById('editarDiaSemana').value),
+          horaInicio: document.getElementById('editarHoraInicio').value,
+          horaFim: document.getElementById('editarHoraFim').value,
+          duracaoConsulta: parseInt(document.getElementById('editarDuracao').value),
+          observacoes: document.getElementById('editarObservacoes').value,
+          ativo: document.getElementById('editarAtivo').checked
+        };
 
         try {
-          // Se estiver editando, atualizar o horário existente
+          let response;
           if (id) {
-            const response = await fetch(`${API_URL}/api/horarios-disponibilidade/${id}`, {
+            response = await fetch(`${API_URL}/api/horarios-disponibilidade/${id}`, {
               method: 'PUT',
               headers: getAuthHeaders(),
-              body: JSON.stringify({
-                diaSemana,
-                horaInicio,
-                horaFim,
-                duracaoConsulta,
-                observacoes,
-                ativo
-              })
+              body: JSON.stringify(data)
             });
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.message || 'Erro ao atualizar horário');
-            }
-
-            showToast('Horário atualizado com sucesso!');
-            const modal = document.getElementById('editarDiaModal');
-            if (modal) modal.style.display = 'none';
-            document.body.style.overflow = '';
-            loadHorarios();
           } else {
-            // Se estiver criando, gerar todos os slots e criar múltiplos horários
-            const slots = gerarSlotsHorarios(horaInicio, horaFim, duracaoConsulta, almocoInicio, almocoFim);
-            
-            if (slots.length === 0) {
-              showToast('Nenhum horário será gerado com essas configurações. Verifique os horários e intervalo de almoço.', 'warning');
-              return;
-            }
-
-            // Obter a data específica se foi passada
-            const form = document.getElementById('editarDiaForm');
-            const dataEspecificaInput = form?.dataset?.dataEspecifica;
-            let dataEspecifica = null;
-            if (dataEspecificaInput) {
-              // dataEspecificaInput já está no formato YYYY-MM-DD
-              const dataDia = buildLocalDate(dataEspecificaInput, '00:00');
-              if (dataDia) {
-                dataEspecifica = dateToLocalISOString(dataDia);
-              }
-            }
-
-            // Criar todos os horários dos slots
-            const promises = slots.map(slot => {
-              const horarioData = dataEspecifica 
-                ? {
-                    dataEspecifica,
-                    horaInicio: slot.inicio,
-                    horaFim: slot.fim,
-                    duracaoConsulta,
-                    observacoes,
-                    ativo: true,
-                    tipo: 'especifico'
-                  }
-                : {
-                    diaSemana,
-                    horaInicio: slot.inicio,
-                    horaFim: slot.fim,
-                    duracaoConsulta,
-                    observacoes,
-                    ativo: true,
-                    tipo: 'recorrente'
-                  };
-              
-              return fetch(`${API_URL}/api/horarios-disponibilidade`, {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(horarioData)
-              });
+            response = await fetch(`${API_URL}/api/horarios-disponibilidade`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+              body: JSON.stringify(data)
             });
-
-            const responses = await Promise.all(promises);
-            
-            let totalSucesso = 0;
-            let totalErros = 0;
-            
-            for (const response of responses) {
-              if (!response.ok) {
-                totalErros++;
-                try {
-                  const errorData = await response.json();
-                  console.error('Erro ao criar horário:', errorData.message || 'Erro desconhecido');
-                } catch (e) {
-                  console.error('Erro ao processar resposta:', e);
-                }
-              } else {
-                totalSucesso++;
-              }
-            }
-            
-            if (totalErros > 0 && totalSucesso === 0) {
-              throw new Error('Nenhum horário foi criado. Verifique as configurações.');
-            }
-            
-            if (totalErros > 0) {
-              showToast(`${totalSucesso} horário(s) criado(s) com sucesso, ${totalErros} falharam!`, 'warning');
-            } else {
-              showToast(`${totalSucesso} horário(s) criado(s) com sucesso!`);
-            }
-            
-            const modal = document.getElementById('editarDiaModal');
-            if (modal) modal.style.display = 'none';
-            document.body.style.overflow = '';
-            loadHorarios();
           }
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao salvar horário');
+          }
+
+          showToast(id ? 'Horário atualizado com sucesso!' : 'Horário cadastrado com sucesso!');
+          const modal = document.getElementById('editarDiaModal');
+          if (modal) modal.style.display = 'none';
+          loadHorarios();
         } catch (error) {
           console.error('Erro ao salvar horário:', error);
           showToast(error.message, 'error');
@@ -2794,68 +3143,6 @@
       });
     }
 
-    // Event listener para checkbox de sem almoço
-    const semAlmocoEditarEl = document.getElementById('editarSemAlmoco');
-    if (semAlmocoEditarEl) {
-      semAlmocoEditarEl.addEventListener('change', () => {
-        atualizarVisibilidadeAlmoco();
-        updatePreviewEditar();
-      });
-    }
-
-    // Event listeners para atualizar preview do modal de editar
-    const previewInputsEditar = ['editarHoraInicio', 'editarHoraFim', 'editarDuracao', 'editarAlmocoInicio', 'editarAlmocoFim'];
-    previewInputsEditar.forEach(id => {
-      const input = document.getElementById(id);
-      if (input) {
-        input.addEventListener('change', updatePreviewEditar);
-        input.addEventListener('input', updatePreviewEditar);
-      }
-    });
-
-    // Templates rápidos para modal de editar
-    const templateButtonsEditar = document.querySelectorAll('[data-template^="manha-editar"], [data-template^="tarde-editar"], [data-template^="dia-completo-editar"]');
-    templateButtonsEditar.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const template = btn.dataset.template;
-        const horaInicio = document.getElementById('editarHoraInicio');
-        const horaFim = document.getElementById('editarHoraFim');
-        const almocoInicio = document.getElementById('editarAlmocoInicio');
-        const almocoFim = document.getElementById('editarAlmocoFim');
-        
-        switch(template) {
-          case 'manha-editar':
-            if (horaInicio) horaInicio.value = '08:00';
-            if (horaFim) horaFim.value = '12:00';
-            if (almocoInicio) almocoInicio.value = '';
-            if (almocoFim) almocoFim.value = '';
-            const semAlmocoManha = document.getElementById('editarSemAlmoco');
-            if (semAlmocoManha) semAlmocoManha.checked = true;
-            atualizarVisibilidadeAlmoco();
-            break;
-          case 'tarde-editar':
-            if (horaInicio) horaInicio.value = '13:00';
-            if (horaFim) horaFim.value = '18:00';
-            if (almocoInicio) almocoInicio.value = '';
-            if (almocoFim) almocoFim.value = '';
-            const semAlmocoTarde = document.getElementById('editarSemAlmoco');
-            if (semAlmocoTarde) semAlmocoTarde.checked = true;
-            atualizarVisibilidadeAlmoco();
-            break;
-          case 'dia-completo-editar':
-            if (horaInicio) horaInicio.value = '08:00';
-            if (horaFim) horaFim.value = '18:00';
-            if (almocoInicio) almocoInicio.value = '12:00';
-            if (almocoFim) almocoFim.value = '13:30';
-            const semAlmocoDia = document.getElementById('editarSemAlmoco');
-            if (semAlmocoDia) semAlmocoDia.checked = false;
-            atualizarVisibilidadeAlmoco();
-            break;
-        }
-        updatePreviewEditar();
-      });
-    });
 
     // Fechar modal ao clicar fora
     const modal = document.getElementById('horarioModal');

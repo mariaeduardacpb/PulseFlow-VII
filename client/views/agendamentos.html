@@ -209,15 +209,21 @@
                   <p>Visualize e gerencie seus horários de atendimento</p>
                 </div>
                 <div class="semana-header-actions">
-                  <div class="filtro-agendamentos">
-                    <label for="filtroAgendamentos" class="filtro-label">
-                      <i class="fas fa-filter"></i> Filtrar:
-                    </label>
-                    <select id="filtroAgendamentos" class="filtro-select">
-                      <option value="todos">Todos os horários</option>
-                      <option value="agendados">Apenas agendados</option>
-                      <option value="livres">Apenas livres</option>
-                    </select>
+                  <div class="filtro-agendamentos-modern">
+                    <div class="filtro-agendamentos-buttons">
+                      <button class="filtro-btn active" data-filtro="todos" id="filtroTodos">
+                        <i class="fas fa-list"></i>
+                        <span>Todos</span>
+                      </button>
+                      <button class="filtro-btn" data-filtro="agendados" id="filtroAgendados">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Agendados</span>
+                      </button>
+                      <button class="filtro-btn" data-filtro="livres" id="filtroLivres">
+                        <i class="fas fa-calendar-times"></i>
+                        <span>Livres</span>
+                      </button>
+                    </div>
                   </div>
                   <div class="semana-navigation">
                     <button class="btn-nav-semana" id="prevWeek">
@@ -352,14 +358,14 @@
               <label for="horaInicio" class="config-label-simple">
                 Horário de Início *
               </label>
-              <input type="time" id="horaInicio" required value="08:00" class="config-input-simple" />
+              <input type="time" id="horaInicio" required class="config-input-simple" />
             </div>
 
             <div class="config-item">
               <label for="horaFim" class="config-label-simple">
                 Horário de Fim *
               </label>
-              <input type="time" id="horaFim" required value="18:00" class="config-input-simple" />
+              <input type="time" id="horaFim" required class="config-input-simple" />
             </div>
 
             <div class="config-item">
@@ -373,22 +379,24 @@
                 <option value="60">60 minutos</option>
               </select>
             </div>
+          </div>
 
-            <div class="config-item">
-              <label class="config-label-simple">
-                Intervalo de Almoço <span class="optional-text">(opcional)</span>
+          <!-- Seção de Intervalo de Almoço -->
+          <div class="config-item-almoco">
+            <label class="config-label-simple">
+              Intervalo de Almoço <span class="optional-text">(opcional)</span>
+            </label>
+            <div class="intervalo-checkbox-group">
+              <label>
+                <input type="checkbox" id="semAlmoco" />
+                <span class="checkbox-custom"></span>
+                <span>Sem intervalo de almoço</span>
               </label>
-              <div style="display: flex; flex-direction: column; gap: 12px;">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; border: 1px solid var(--ag-border); border-radius: var(--ag-radius-sm); background: var(--ag-surface-alt);">
-                  <input type="checkbox" id="semAlmoco" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--ag-primary);" />
-                  <span style="font-size: 0.9rem; font-weight: 600; color: var(--ag-text);">Sem intervalo de almoço</span>
-                </label>
-                <div class="intervalo-simple" id="almocoContainer">
-                  <input type="time" id="almocoInicio" value="12:00" class="config-input-simple" />
-                  <span class="intervalo-text">até</span>
-                  <input type="time" id="almocoFim" value="13:30" class="config-input-simple" />
-                </div>
-              </div>
+            </div>
+            <div class="intervalo-simple" id="almocoFields">
+              <input type="time" id="almocoInicio" class="config-input-simple" />
+                <span class="intervalo-text">até</span>
+                <input type="time" id="almocoFim" class="config-input-simple" />
             </div>
           </div>
 
@@ -446,7 +454,7 @@
 
   <!-- Modal para editar dia específico -->
   <div id="editarDiaModal" class="modal" style="display: none;">
-    <div class="modal-content modal-large">
+    <div class="modal-content">
       <div class="modal-header">
         <h2 id="editarDiaTitle">Editar Horário</h2>
         <button class="modal-close" id="closeEditarDiaModal">
@@ -457,122 +465,39 @@
         <input type="hidden" id="editarDiaId" />
         <input type="hidden" id="editarDiaSemana" />
         
-        <!-- Passo 1: Configuração de Horários -->
-        <div class="form-step">
-          <div class="step-header">
-            <div class="step-number">1</div>
-            <div class="step-title">
-              <h3>Configure os Horários</h3>
-              <p>Defina o período de atendimento para este horário</p>
-            </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editarHoraInicio">Hora de Início *</label>
+            <input type="time" id="editarHoraInicio" required />
           </div>
-          
-          <div class="config-simple-grid">
-            <div class="config-item">
-              <label for="editarHoraInicio" class="config-label-simple">
-                Horário de Início *
-              </label>
-              <input type="time" id="editarHoraInicio" required class="config-input-simple" />
-            </div>
-
-            <div class="config-item">
-              <label for="editarHoraFim" class="config-label-simple">
-                Horário de Fim *
-              </label>
-              <input type="time" id="editarHoraFim" required class="config-input-simple" />
-            </div>
-
-            <div class="config-item">
-              <label for="editarDuracao" class="config-label-simple">
-                Duração da Consulta *
-              </label>
-              <select id="editarDuracao" required class="config-input-simple">
-                <option value="15">15 minutos</option>
-                <option value="30" selected>30 minutos</option>
-                <option value="45">45 minutos</option>
-                <option value="60">60 minutos</option>
-                <option value="90">90 minutos</option>
-                <option value="120">120 minutos</option>
-              </select>
-            </div>
-
-            <div class="config-item">
-              <label class="config-label-simple">
-                Status do Horário
-              </label>
-              <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--ag-border); border-radius: var(--ag-radius-sm); background: var(--ag-surface);">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; flex: 1;">
-                  <input type="checkbox" id="editarAtivo" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--ag-primary);" />
-                  <span style="font-size: 0.9rem; font-weight: 600; color: var(--ag-text);">Horário ativo</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="config-item" style="grid-column: span 2;">
-              <label class="config-label-simple">
-                Intervalo de Almoço <span class="optional-text">(opcional)</span>
-              </label>
-              <div style="display: flex; flex-direction: column; gap: 12px;">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; border: 1px solid var(--ag-border); border-radius: var(--ag-radius-sm); background: var(--ag-surface-alt);">
-                  <input type="checkbox" id="editarSemAlmoco" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--ag-primary);" />
-                  <span style="font-size: 0.9rem; font-weight: 600; color: var(--ag-text);">Sem intervalo de almoço</span>
-                </label>
-                <div class="intervalo-simple" id="editarAlmocoContainer">
-                  <input type="time" id="editarAlmocoInicio" class="config-input-simple" />
-                  <span class="intervalo-text">até</span>
-                  <input type="time" id="editarAlmocoFim" class="config-input-simple" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Templates Rápidos -->
-          <div class="templates-quick">
-            <p class="templates-label">Ou use um template rápido:</p>
-            <div class="template-buttons">
-              <button type="button" class="template-btn" data-template="manha-editar">
-                <i class="fas fa-sun"></i> Manhã
-              </button>
-              <button type="button" class="template-btn" data-template="tarde-editar">
-                <i class="fas fa-sun"></i> Tarde
-              </button>
-              <button type="button" class="template-btn" data-template="dia-completo-editar">
-                <i class="fas fa-calendar-day"></i> Dia Completo
-              </button>
-            </div>
+          <div class="form-group">
+            <label for="editarHoraFim">Hora de Fim *</label>
+            <input type="time" id="editarHoraFim" required />
           </div>
         </div>
 
-        <!-- Passo 2: Preview dos horários -->
-        <div class="form-step preview-step">
-          <div class="step-header">
-            <div class="step-number">2</div>
-            <div class="step-title">
-              <h3>Preview dos Horários</h3>
-              <p>Visualize quantos horários serão criados antes de salvar</p>
-            </div>
-          </div>
-          <div id="previewHorariosEditar" class="preview-container">
-            <p class="preview-placeholder">Configure os horários de início e fim para ver o preview</p>
-          </div>
+        <div class="form-group">
+          <label for="editarDuracao">Duração (minutos) *</label>
+          <select id="editarDuracao" required>
+            <option value="15">15 minutos</option>
+            <option value="30" selected>30 minutos</option>
+            <option value="45">45 minutos</option>
+            <option value="60">60 minutos</option>
+            <option value="90">90 minutos</option>
+            <option value="120">120 minutos</option>
+          </select>
         </div>
 
-        <!-- Passo 3: Observações -->
-        <div class="form-step">
-          <div class="step-header">
-            <div class="step-number">3</div>
-            <div class="step-title">
-              <h3>Observações</h3>
-              <p>Adicione informações adicionais sobre este horário <span class="optional-text">(opcional)</span></p>
-            </div>
-          </div>
-          
-          <div class="config-item">
-            <label for="editarObservacoes" class="config-label-simple">
-              Observações
-            </label>
-            <textarea id="editarObservacoes" rows="4" class="config-input-simple" style="resize: vertical; min-height: 100px;"></textarea>
-          </div>
+        <div class="form-group">
+          <label for="editarObservacoes">Observações</label>
+          <textarea id="editarObservacoes" rows="2"></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="editarAtivo" checked />
+            Horário ativo
+          </label>
         </div>
 
         <div class="modal-actions">
