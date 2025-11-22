@@ -2,12 +2,26 @@ import Agendamento from '../models/Agendamento.js';
 import Paciente from '../models/Paciente.js';
 import User from '../models/User.js';
 
+const parseDateAsLocal = (dateString) => {
+  if (typeof dateString === 'string' && dateString.includes('T') && !dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
+    const [datePart, timePart] = dateString.split('T');
+    const [year, month, day] = datePart.split('-').map(Number);
+    const timeOnly = timePart.split('.')[0];
+    const [hours, minutes, seconds = 0] = timeOnly.split(':').map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds || 0);
+  }
+  return new Date(dateString);
+};
+
 // Criar novo agendamento
 export const criarAgendamento = async (req, res) => {
   try {
     const {
       pacienteId,
       dataHora,
+      data,
+      horaInicio,
+      horaFim,
       tipoConsulta,
       motivoConsulta,
       observacoes,
@@ -19,9 +33,15 @@ export const criarAgendamento = async (req, res) => {
     const medicoId = req.user._id;
 
     // Validar campos obrigatórios
-    if (!pacienteId || !dataHora || !motivoConsulta || !motivoConsulta.trim()) {
+    if (!pacienteId || !motivoConsulta || !motivoConsulta.trim()) {
       return res.status(400).json({ 
-        message: 'Campos obrigatórios: pacienteId, dataHora e motivoConsulta' 
+        message: 'Campos obrigatórios: pacienteId e motivoConsulta' 
+      });
+    }
+
+    if (!dataHora && (!data || !horaInicio || !horaFim)) {
+      return res.status(400).json({ 
+        message: 'Campos obrigatórios: (data + horaInicio + horaFim) ou dataHora' 
       });
     }
 
@@ -31,14 +51,36 @@ export const criarAgendamento = async (req, res) => {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
 
-    // Verificar se a data/hora é futura
-    const dataHoraConsulta = new Date(dataHora);
-    if (isNaN(dataHoraConsulta.getTime())) {
+    let dataConsulta, horaInicioFinal, horaFimFinal, dataHoraCompleta;
+
+    if (data && horaInicio && horaFim) {
+      const [ano, mes, dia] = data.split('-').map(Number);
+      dataConsulta = new Date(ano, mes - 1, dia);
+      horaInicioFinal = horaInicio;
+      horaFimFinal = horaFim;
+      
+      const [horaInicioH, minutoInicioM] = horaInicio.split(':').map(Number);
+      dataHoraCompleta = new Date(ano, mes - 1, dia, horaInicioH, minutoInicioM);
+    } else if (dataHora) {
+      const dataHoraConsulta = parseDateAsLocal(dataHora);
+      if (isNaN(dataHoraConsulta.getTime())) {
+        return res.status(400).json({ 
+          message: 'Data e hora inválidas' 
+        });
+      }
+      dataConsulta = new Date(dataHoraConsulta.getFullYear(), dataHoraConsulta.getMonth(), dataHoraConsulta.getDate());
+      horaInicioFinal = `${String(dataHoraConsulta.getHours()).padStart(2, '0')}:${String(dataHoraConsulta.getMinutes()).padStart(2, '0')}`;
+      const duracaoConsulta = duracao || 30;
+      const fimConsulta = new Date(dataHoraConsulta.getTime() + duracaoConsulta * 60000);
+      horaFimFinal = `${String(fimConsulta.getHours()).padStart(2, '0')}:${String(fimConsulta.getMinutes()).padStart(2, '0')}`;
+      dataHoraCompleta = dataHoraConsulta;
+    } else {
       return res.status(400).json({ 
-        message: 'Data e hora inválidas' 
+        message: 'Campos obrigatórios: (data + horaInicio + horaFim) ou dataHora' 
       });
     }
-    if (dataHoraConsulta <= new Date()) {
+
+    if (dataHoraCompleta <= new Date()) {
       return res.status(400).json({ 
         message: 'A data e hora da consulta deve ser futura' 
       });
@@ -46,22 +88,35 @@ export const criarAgendamento = async (req, res) => {
 
     // Verificar conflito de horário para o médico
     const duracaoConsulta = duracao || 30;
-    const inicioConsulta = dataHoraConsulta.getTime();
+    const inicioConsulta = dataHoraCompleta.getTime();
     const fimConsulta = inicioConsulta + duracaoConsulta * 60000;
     
     const agendamentosExistentes = await Agendamento.find({
       medicoId,
-      status: { $in: ['agendada', 'confirmada'] },
-      dataHora: {
-        $gte: new Date(inicioConsulta - duracaoConsulta * 60000),
-        $lte: new Date(fimConsulta)
-      }
-    });
+      status: { $in: ['agendada', 'confirmada', 'remarcada'] },
+      $or: [
+        { data: { $gte: new Date(dataConsulta.getFullYear(), dataConsulta.getMonth(), dataConsulta.getDate()), $lte: new Date(dataConsulta.getFullYear(), dataConsulta.getMonth(), dataConsulta.getDate(), 23, 59, 59) } },
+        { dataHora: { $gte: new Date(inicioConsulta - duracaoConsulta * 60000), $lte: new Date(fimConsulta) } }
+      ]
+    }).lean();
     
-    const conflito = agendamentosExistentes.find(ag => {
-      const inicioExistente = new Date(ag.dataHora).getTime();
-      const fimExistente = inicioExistente + (ag.duracao || 30) * 60000;
-      return (inicioConsulta < fimExistente && fimConsulta > inicioExistente);
+    const conflito = agendamentosExistentes.some(ag => {
+      let agInicio, agFim;
+      
+      if (ag.data && ag.horaInicio && ag.horaFim) {
+        const [anoAg, mesAg, diaAg] = ag.data.toString().split('T')[0].split('-').map(Number);
+        const [horaInicioAg, minutoInicioAg] = ag.horaInicio.split(':').map(Number);
+        const [horaFimAg, minutoFimAg] = ag.horaFim.split(':').map(Number);
+        agInicio = new Date(anoAg, mesAg - 1, diaAg, horaInicioAg, minutoInicioAg).getTime();
+        agFim = new Date(anoAg, mesAg - 1, diaAg, horaFimAg, minutoFimAg).getTime();
+      } else if (ag.dataHora) {
+        agInicio = new Date(ag.dataHora).getTime();
+        agFim = agInicio + (ag.duracao || 30) * 60000;
+      } else {
+        return false;
+      }
+      
+      return (inicioConsulta < agFim && fimConsulta > agInicio);
     });
 
     if (conflito) {
@@ -77,7 +132,10 @@ export const criarAgendamento = async (req, res) => {
       pacienteNome: paciente.name || paciente.nome || 'Paciente',
       pacienteEmail: paciente.email || '',
       pacienteTelefone: paciente.phone || paciente.telefone || '',
-      dataHora: dataHoraConsulta,
+      data: dataConsulta,
+      horaInicio: horaInicioFinal,
+      horaFim: horaFimFinal,
+      dataHora: dataHoraCompleta,
       tipoConsulta: tipoConsulta || 'presencial',
       motivoConsulta,
       observacoes: observacoes || '',
@@ -102,7 +160,7 @@ export const criarAgendamento = async (req, res) => {
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
-      }).format(dataHoraConsulta);
+      }).format(dataHoraCompleta);
 
       await Notification.create({
         user: mongoose.Types.ObjectId.isValid(pacienteId) ? pacienteId : new mongoose.Types.ObjectId(pacienteId.toString()),
@@ -280,7 +338,7 @@ export const atualizarAgendamento = async (req, res) => {
 
     // Atualizar campos
     if (dataHora) {
-      const novaDataHora = new Date(dataHora);
+      const novaDataHora = parseDateAsLocal(dataHora);
       if (novaDataHora <= new Date()) {
         return res.status(400).json({ 
           message: 'A data e hora da consulta deve ser futura' 
@@ -545,7 +603,7 @@ export const remarcarConsulta = async (req, res) => {
       });
     }
 
-    const novaData = new Date(novaDataHora);
+    const novaData = parseDateAsLocal(novaDataHora);
     if (novaData <= new Date()) {
       return res.status(400).json({ 
         message: 'A nova data e hora da consulta deve ser futura' 
@@ -620,6 +678,9 @@ export const criarAgendamentoPaciente = async (req, res) => {
     const {
       medicoId,
       dataHora,
+      data,
+      horaInicio,
+      horaFim,
       tipoConsulta,
       motivoConsulta,
       observacoes,
@@ -630,9 +691,34 @@ export const criarAgendamentoPaciente = async (req, res) => {
 
     const pacienteId = req.user._id;
 
-    if (!medicoId || !dataHora || !motivoConsulta || !motivoConsulta.trim()) {
+    let dataConsulta, horaInicioFinal, horaFimFinal;
+
+    if (data && horaInicio && horaFim) {
+      const [ano, mes, dia] = data.split('-').map(Number);
+      dataConsulta = new Date(ano, mes - 1, dia);
+      horaInicioFinal = horaInicio;
+      horaFimFinal = horaFim;
+    } else if (dataHora) {
+      const dataHoraConsulta = parseDateAsLocal(dataHora);
+      if (isNaN(dataHoraConsulta.getTime())) {
+        return res.status(400).json({ 
+          message: 'Data e hora inválidas' 
+        });
+      }
+      dataConsulta = new Date(dataHoraConsulta.getFullYear(), dataHoraConsulta.getMonth(), dataHoraConsulta.getDate());
+      horaInicioFinal = `${String(dataHoraConsulta.getHours()).padStart(2, '0')}:${String(dataHoraConsulta.getMinutes()).padStart(2, '0')}`;
+      const duracaoConsulta = duracao || 30;
+      const fimConsulta = new Date(dataHoraConsulta.getTime() + duracaoConsulta * 60000);
+      horaFimFinal = `${String(fimConsulta.getHours()).padStart(2, '0')}:${String(fimConsulta.getMinutes()).padStart(2, '0')}`;
+    } else {
       return res.status(400).json({ 
-        message: 'Campos obrigatórios: medicoId, dataHora e motivoConsulta' 
+        message: 'Campos obrigatórios: (data + horaInicio + horaFim) ou dataHora + motivoConsulta' 
+      });
+    }
+
+    if (!medicoId || !motivoConsulta || !motivoConsulta.trim()) {
+      return res.status(400).json({ 
+        message: 'Campos obrigatórios: medicoId e motivoConsulta' 
       });
     }
 
@@ -646,35 +732,29 @@ export const criarAgendamentoPaciente = async (req, res) => {
       return res.status(404).json({ message: 'Paciente não encontrado' });
     }
 
-    const dataHoraConsulta = new Date(dataHora);
-    if (isNaN(dataHoraConsulta.getTime())) {
+    const inicioDia = new Date(dataConsulta);
+    inicioDia.setHours(0, 0, 0, 0);
+    const fimDia = new Date(dataConsulta);
+    fimDia.setHours(23, 59, 59, 999);
+
+    if (dataConsulta < new Date(new Date().setHours(0, 0, 0, 0))) {
       return res.status(400).json({ 
-        message: 'Data e hora inválidas' 
-      });
-    }
-    if (dataHoraConsulta <= new Date()) {
-      return res.status(400).json({ 
-        message: 'A data e hora da consulta deve ser futura' 
+        message: 'A data da consulta deve ser futura ou hoje' 
       });
     }
 
-    const duracaoConsulta = duracao || 30;
-    const inicioConsulta = dataHoraConsulta.getTime();
-    const fimConsulta = inicioConsulta + duracaoConsulta * 60000;
-    
     const agendamentosExistentes = await Agendamento.find({
       medicoId,
-      status: { $in: ['agendada', 'confirmada'] },
-      dataHora: {
-        $gte: new Date(inicioConsulta - duracaoConsulta * 60000),
-        $lte: new Date(fimConsulta)
-      }
+      data: {
+        $gte: inicioDia,
+        $lte: fimDia
+      },
+      status: { $in: ['agendada', 'confirmada'] }
     });
     
     const conflito = agendamentosExistentes.find(ag => {
-      const inicioExistente = new Date(ag.dataHora).getTime();
-      const fimExistente = inicioExistente + (ag.duracao || 30) * 60000;
-      return (inicioConsulta < fimExistente && fimConsulta > inicioExistente);
+      if (!ag.horaInicio || !ag.horaFim) return false;
+      return (horaInicioFinal < ag.horaFim && horaFimFinal > ag.horaInicio);
     });
 
     if (conflito) {
@@ -683,13 +763,20 @@ export const criarAgendamentoPaciente = async (req, res) => {
       });
     }
 
+    const [horaInicioH, minutoInicioM] = horaInicioFinal.split(':').map(Number);
+    const dataHoraCompleta = new Date(dataConsulta);
+    dataHoraCompleta.setHours(horaInicioH, minutoInicioM, 0, 0);
+
     const novoAgendamento = new Agendamento({
       medicoId,
       pacienteId,
       pacienteNome: paciente.name || paciente.nome || 'Paciente',
       pacienteEmail: paciente.email || '',
       pacienteTelefone: paciente.phone || paciente.telefone || '',
-      dataHora: dataHoraConsulta,
+      data: dataConsulta,
+      horaInicio: horaInicioFinal,
+      horaFim: horaFimFinal,
+      dataHora: dataHoraCompleta,
       tipoConsulta: tipoConsulta || 'presencial',
       motivoConsulta,
       observacoes: observacoes || '',
@@ -713,7 +800,7 @@ export const criarAgendamentoPaciente = async (req, res) => {
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
-      }).format(dataHoraConsulta);
+      }).format(dataHoraCompleta);
 
       await Notification.create({
         user: mongoose.Types.ObjectId.isValid(pacienteId) ? pacienteId : new mongoose.Types.ObjectId(pacienteId.toString()),

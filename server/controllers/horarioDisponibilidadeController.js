@@ -1,6 +1,17 @@
 import HorarioDisponibilidade from '../models/HorarioDisponibilidade.js';
 import Agendamento from '../models/Agendamento.js';
 
+const parseDateAsLocal = (dateString) => {
+  if (typeof dateString === 'string' && dateString.includes('T') && !dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
+    const [datePart, timePart] = dateString.split('T');
+    const [year, month, day] = datePart.split('-').map(Number);
+    const timeOnly = timePart.split('.')[0];
+    const [hours, minutes, seconds = 0] = timeOnly.split(':').map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds || 0);
+  }
+  return new Date(dateString);
+};
+
 // Criar novo horário de disponibilidade
 export const criarHorario = async (req, res) => {
   try {
@@ -47,9 +58,9 @@ export const criarHorario = async (req, res) => {
     };
 
     if (dataEspecifica) {
-      const dataEspecificaObj = new Date(dataEspecifica);
+      const dataEspecificaObj = parseDateAsLocal(dataEspecifica);
+      dataEspecificaObj.setHours(0, 0, 0, 0);
       const inicioDia = new Date(dataEspecificaObj);
-      inicioDia.setHours(0, 0, 0, 0);
       const fimDia = new Date(dataEspecificaObj);
       fimDia.setHours(23, 59, 59, 999);
       queryHorarioExistente.dataEspecifica = {
@@ -81,7 +92,9 @@ export const criarHorario = async (req, res) => {
     };
 
     if (dataEspecifica) {
-      dadosHorario.dataEspecifica = new Date(dataEspecifica);
+      const dataLocal = parseDateAsLocal(dataEspecifica);
+      dataLocal.setHours(0, 0, 0, 0);
+      dadosHorario.dataEspecifica = dataLocal;
     } else if (diaSemana !== undefined) {
       dadosHorario.diaSemana = diaSemana;
     }
@@ -100,9 +113,17 @@ export const criarHorario = async (req, res) => {
     });
   } catch (error) {
     console.error('Erro ao criar horário:', error);
+    
+    let errorMessage = 'Erro interno do servidor';
+    if (error.name === 'ValidationError') {
+      errorMessage = 'Erro de validação: ' + Object.values(error.errors).map(e => e.message).join(', ');
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
     res.status(500).json({ 
-      message: 'Erro interno do servidor',
-      error: error.message 
+      message: errorMessage,
+      error: error.message || error.toString()
     });
   }
 };
@@ -337,10 +358,9 @@ export const obterHorariosDisponiveis = async (req, res) => {
       });
     }
 
-    const dataConsulta = new Date(data);
-    dataConsulta.setHours(0, 0, 0, 0);
-    const fimDiaConsulta = new Date(dataConsulta);
-    fimDiaConsulta.setHours(23, 59, 59, 999);
+    const [ano, mes, dia] = data.split('-').map(Number);
+    const dataConsulta = new Date(ano, mes - 1, dia, 0, 0, 0, 0);
+    const fimDiaConsulta = new Date(ano, mes - 1, dia, 23, 59, 59, 999);
     const diaSemana = dataConsulta.getDay(); // 0 = Domingo, 6 = Sábado
 
     // Buscar horários cadastrados para esse dia da semana (recorrentes)
@@ -352,15 +372,26 @@ export const obterHorariosDisponiveis = async (req, res) => {
     }).sort({ horaInicio: 1 });
 
     // Buscar horários específicos para essa data
-    const horariosEspecificos = await HorarioDisponibilidade.find({
+    const horariosTodos = await HorarioDisponibilidade.find({
       medicoId,
-      dataEspecifica: {
-        $gte: dataConsulta,
-        $lte: fimDiaConsulta
-      },
-      ativo: true,
-      tipo: 'especifico'
-    }).sort({ horaInicio: 1 });
+      tipo: 'especifico',
+      ativo: true
+    }).lean();
+    
+    const horariosEspecificos = horariosTodos.filter(horario => {
+      if (!horario.dataEspecifica) return false;
+      
+      const dataHorario = new Date(horario.dataEspecifica);
+      const anoHorario = dataHorario.getFullYear();
+      const mesHorario = dataHorario.getMonth();
+      const diaHorario = dataHorario.getDate();
+      
+      const anoConsulta = dataConsulta.getFullYear();
+      const mesConsulta = dataConsulta.getMonth();
+      const diaConsulta = dataConsulta.getDate();
+      
+      return anoHorario === anoConsulta && mesHorario === mesConsulta && diaHorario === diaConsulta;
+    }).sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
 
     const horariosCadastrados = [...horariosRecorrentes, ...horariosEspecificos];
 
@@ -381,10 +412,10 @@ export const obterHorariosDisponiveis = async (req, res) => {
 
     const agendamentos = await Agendamento.find({
       medicoId,
-      dataHora: {
-        $gte: inicioDia,
-        $lte: fimDia
-      },
+      $or: [
+        { data: { $gte: inicioDia, $lte: fimDia } },
+        { dataHora: { $gte: inicioDia, $lte: fimDia } }
+      ],
       status: { $in: ['agendada', 'confirmada', 'remarcada'] }
     }).lean();
 
@@ -405,12 +436,22 @@ export const obterHorariosDisponiveis = async (req, res) => {
         
         // Verificar se o slot não está ocupado
         const ocupado = agendamentos.some(agendamento => {
-          const agendamentoHora = new Date(agendamento.dataHora);
-          const diferencaMinutos = Math.abs(
-            (agendamentoHora.getHours() * 60 + agendamentoHora.getMinutes()) - 
-            (horaAtual * 60 + minutoAtual)
-          );
-          return diferencaMinutos < horario.duracaoConsulta;
+          let agendamentoHoraInicio, agendamentoHoraFim;
+          
+          if (agendamento.horaInicio && agendamento.horaFim) {
+            agendamentoHoraInicio = agendamento.horaInicio;
+            agendamentoHoraFim = agendamento.horaFim;
+          } else if (agendamento.dataHora) {
+            const agendamentoHora = new Date(agendamento.dataHora);
+            agendamentoHoraInicio = `${String(agendamentoHora.getHours()).padStart(2, '0')}:${String(agendamentoHora.getMinutes()).padStart(2, '0')}`;
+            const duracao = agendamento.duracao || 30;
+            const fimAgendamento = new Date(agendamentoHora.getTime() + duracao * 60000);
+            agendamentoHoraFim = `${String(fimAgendamento.getHours()).padStart(2, '0')}:${String(fimAgendamento.getMinutes()).padStart(2, '0')}`;
+          } else {
+            return false;
+          }
+          
+          return slotHora < agendamentoHoraFim && `${horaAtual}:${minutoAtual + horario.duracaoConsulta}` > agendamentoHoraInicio;
         });
 
         if (!ocupado && slotDataHora > new Date()) {

@@ -25,8 +25,23 @@ const agendamentoSchema = new mongoose.Schema({
   },
   dataHora: {
     type: Date,
+    required: false,
+    index: true
+  },
+  data: {
+    type: Date,
     required: true,
     index: true
+  },
+  horaInicio: {
+    type: String,
+    required: true,
+    match: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/
+  },
+  horaFim: {
+    type: String,
+    required: true,
+    match: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/
   },
   tipoConsulta: {
     type: String,
@@ -100,6 +115,9 @@ agendamentoSchema.index({ medicoId: 1, dataHora: 1 });
 agendamentoSchema.index({ pacienteId: 1, dataHora: 1 });
 agendamentoSchema.index({ status: 1, dataHora: 1 });
 agendamentoSchema.index({ medicoId: 1, status: 1, dataHora: 1 });
+agendamentoSchema.index({ medicoId: 1, data: 1 });
+agendamentoSchema.index({ pacienteId: 1, data: 1 });
+agendamentoSchema.index({ medicoId: 1, data: 1, horaInicio: 1 });
 
 // Middleware para atualizar updatedAt antes de salvar
 agendamentoSchema.pre('save', function(next) {

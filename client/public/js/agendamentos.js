@@ -100,49 +100,96 @@
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}:00.000Z`;
+    return `${year}-${month}-${day}T${hours}:${minutes}:00.000`;
   };
 
   const normalizeAppointment = (appointment) => {
     if (!appointment) return null;
     
-    let dateString = appointment.data || '';
-    let timeString = appointment.hora || '';
+    let dateString = '';
+    let timeString = '';
     
-    if (appointment.dataHora) {
-      let dataHoraStr = '';
-      
-      if (typeof appointment.dataHora === 'string') {
-        dataHoraStr = appointment.dataHora;
-      } else if (appointment.dataHora.$date) {
-        dataHoraStr = appointment.dataHora.$date;
-      } else if (appointment.dataHora instanceof Date) {
-        dataHoraStr = appointment.dataHora.toISOString();
+    if (appointment.data && appointment.horaInicio) {
+      let dataStr = '';
+      if (typeof appointment.data === 'string') {
+        dataStr = appointment.data;
+      } else if (appointment.data.$date) {
+        dataStr = appointment.data.$date;
+      } else if (appointment.data instanceof Date) {
+        const date = appointment.data;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        dateString = `${year}-${month}-${day}`;
       } else {
-        dataHoraStr = appointment.dataHora.toString();
+        dataStr = appointment.data.toString();
       }
       
-      if (dataHoraStr.includes('T')) {
-        const [datePart, timePart] = dataHoraStr.split('T');
-        if (datePart && timePart) {
-          const [year, month, day] = datePart.split('-');
-          const timeOnly = timePart.split('.')[0].split('Z')[0].split('+')[0];
-          const [hours, minutes] = timeOnly.split(':');
-          
-          if (year && month && day && hours !== undefined && minutes !== undefined) {
-            dateString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-            timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+      if (!dateString && dataStr) {
+        if (dataStr.includes('T')) {
+          const [datePart] = dataStr.split('T');
+          if (datePart) {
+            const [year, month, day] = datePart.split('-');
+            if (year && month && day) {
+              dateString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            }
+          }
+        } else if (dataStr.length === 10 && dataStr.includes('-')) {
+          dateString = dataStr;
+        }
+      }
+      
+      if (appointment.horaInicio) {
+        timeString = appointment.horaInicio.toString();
+        if (timeString && !timeString.match(/^\d{2}:\d{2}$/)) {
+          timeString = '';
+        }
+      }
+    }
+    
+    if (!dateString || !timeString) {
+      if (appointment.dataHora) {
+        let dataHoraStr = '';
+        
+        if (typeof appointment.dataHora === 'string') {
+          dataHoraStr = appointment.dataHora;
+        } else if (appointment.dataHora.$date) {
+          dataHoraStr = appointment.dataHora.$date;
+        } else if (appointment.dataHora instanceof Date) {
+          dataHoraStr = appointment.dataHora.toISOString();
+        } else {
+          dataHoraStr = appointment.dataHora.toString();
+        }
+        
+        if (dataHoraStr.includes('T')) {
+          const [datePart, timePart] = dataHoraStr.split('T');
+          if (datePart && timePart) {
+            const [year, month, day] = datePart.split('-');
+            const timeOnly = timePart.split('.')[0].split('Z')[0].split('+')[0];
+            const [hours, minutes] = timeOnly.split(':');
+            
+            if (year && month && day && hours !== undefined && minutes !== undefined) {
+              dateString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+              timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            }
+          }
+        }
+        
+        if (!dateString || !timeString) {
+          const dataHora = new Date(appointment.dataHora);
+          if (!isNaN(dataHora.getTime())) {
+            dateString = toLocalDateValue(dataHora);
+            timeString = toLocalTimeValue(dataHora);
           }
         }
       }
-      
-      if (!dateString || !timeString) {
-        const dataHora = new Date(appointment.dataHora);
-        if (!isNaN(dataHora.getTime())) {
-          dateString = toLocalDateValue(dataHora);
-          timeString = toLocalTimeValue(dataHora);
-        }
-      }
+    }
+    
+    if (!dateString) {
+      dateString = appointment.data || '';
+    }
+    if (!timeString) {
+      timeString = appointment.hora || '';
     }
 
     return {
@@ -484,6 +531,11 @@
     const reagendarBtn = document.getElementById('reagendarAgendamentoBtn');
     if (!modal || !content) return;
 
+    if (!appointment || !appointment.id) {
+      showToast('Erro: Agendamento inválido.', 'error');
+      return;
+    }
+
     appointmentInModal = appointment;
 
     const status = appointment.status || 'agendada';
@@ -582,12 +634,21 @@
   }
 
   async function cancelCurrentAppointment() {
-    if (!appointmentInModal) return;
+    if (!appointmentInModal) {
+      showToast('Erro: Agendamento não encontrado.', 'error');
+      return;
+    }
+
+    const agendamentoId = appointmentInModal.id || appointmentInModal._id || appointmentInModal.raw?._id;
+    if (!agendamentoId) {
+      showToast('Erro: ID do agendamento não encontrado.', 'error');
+      return;
+    }
 
     const result = await Swal.fire({
       title: 'Cancelar agendamento?',
       html: `
-        <p>Tem certeza de que deseja cancelar o atendimento de <strong>${escapeHTML(appointmentInModal.paciente)}</strong>?</p>
+        <p>Tem certeza de que deseja cancelar o atendimento de <strong>${escapeHTML(appointmentInModal.paciente || 'o paciente')}</strong>?</p>
         <p class="swal-subtext">Essa ação pode ser desfeita apenas editando o agendamento novamente.</p>
       `,
       icon: 'warning',
@@ -605,7 +666,7 @@
 
     try {
       setLoadingState(true);
-      const response = await fetch(`${API_URL}/api/agendamentos/${appointmentInModal.id}/cancelar`, {
+      const response = await fetch(`${API_URL}/api/agendamentos/${agendamentoId}/cancelar`, {
         method: 'PATCH',
         headers: getAuthHeaders(),
         body: JSON.stringify({ motivoCancelamento: 'Cancelado via painel do médico' }),
@@ -616,8 +677,12 @@
         throw new Error(errorData.message || 'Não foi possível cancelar o agendamento.');
       }
 
-      closeDetailsModal();
       await fetchAppointmentsFromApi();
+      
+      if (appointmentInModal) {
+        appointmentInModal.status = 'cancelada';
+        openDetailsModal(appointmentInModal);
+      }
 
       Swal.fire({
         icon: 'success',
@@ -1990,7 +2055,7 @@
           // Obter período selecionado
           const periodoSemanas = document.getElementById('periodoSemanas')?.value || '2';
           const isIndefinido = periodoSemanas === 'indefinido';
-          const numSemanas = isIndefinido ? 0 : parseInt(periodoSemanas);
+          const numSemanas = isIndefinido ? 0 : (parseInt(periodoSemanas) || 1);
 
           // Criar horários para cada dia e cada slot
           const promises = [];
@@ -2039,20 +2104,21 @@
                 dataAlvo.setDate(hoje.getDate() + diasParaAdicionar + (semana * 7));
                 
                 for (const slot of slots) {
+                  const horarioData = {
+                    dataEspecifica: dateToLocalISOString(dataAlvo),
+                    horaInicio: slot.inicio,
+                    horaFim: slot.fim,
+                    duracaoConsulta,
+                    observacoes,
+                    ativo: true,
+                    tipo: 'especifico'
+                  };
+                  
                   promises.push(
                     fetch(`${API_URL}/api/horarios-disponibilidade`, {
                       method: 'POST',
                       headers: getAuthHeaders(),
-                      body: JSON.stringify({
-                        diaSemana,
-                        dataEspecifica: dateToLocalISOString(dataAlvo),
-                        horaInicio: slot.inicio,
-                        horaFim: slot.fim,
-                        duracaoConsulta,
-                        observacoes,
-                        ativo: true,
-                        tipo: 'especifico'
-                      })
+                      body: JSON.stringify(horarioData)
                     })
                   );
                 }
@@ -2062,21 +2128,37 @@
 
           const responses = await Promise.all(promises);
           
-          // Verificar se algum falhou
+          let totalSucesso = 0;
+          let totalErros = 0;
+          const erros = [];
+          
           for (const response of responses) {
             if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.message || 'Erro ao salvar horário');
+              totalErros++;
+              try {
+                const errorData = await response.json();
+                erros.push(errorData.message || errorData.error || 'Erro ao salvar horário');
+              } catch (e) {
+                erros.push(`Erro ${response.status}: ${response.statusText}`);
+              }
+            } else {
+              totalSucesso++;
             }
           }
-
-          const totalCriados = isIndefinido 
-            ? slots.length * diasSelecionados 
-            : slots.length * diasSelecionados * numSemanas;
+          
+          if (totalErros > 0 && totalSucesso === 0) {
+            throw new Error(`Nenhum horário foi salvo. Erros: ${erros[0]}`);
+          }
+          
           const periodoTexto = isIndefinido 
             ? 'horários recorrentes' 
             : `próximas ${numSemanas} semana${numSemanas > 1 ? 's' : ''}`;
-          showToast(`${totalCriados} horários criados com sucesso para ${periodoTexto}!`);
+          
+          if (totalErros > 0) {
+            showToast(`${totalSucesso} horários criados com sucesso, ${totalErros} falharam para ${periodoTexto}!`, 'warning');
+          } else {
+            showToast(`${totalSucesso} horários criados com sucesso para ${periodoTexto}!`);
+          }
           
           // Fechar modal usando a função
           console.log('Fechando modal após salvar...');

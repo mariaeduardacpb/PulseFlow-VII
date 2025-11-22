@@ -76,7 +76,7 @@ const buildIsoDateTime = (date, time) => {
   if (!date || !time) return null;
   const [year, month, day] = date.split('-').map(Number);
   const [hours, minutes] = time.split(':').map(Number);
-  const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00.000Z`;
+  const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00.000`;
   const testDate = new Date(dateStr);
   if (Number.isNaN(testDate.getTime())) return null;
   return dateStr;
@@ -344,28 +344,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const dataConsulta = form.dataConsulta.value;
       const horaConsulta = form.horaConsulta.value;
-      const dataHoraISO = buildIsoDateTime(dataConsulta, horaConsulta);
 
-      if (!dataHoraISO) {
-        showToast('Data e horário inválidos.', 'error');
+      if (!dataConsulta || !horaConsulta) {
+        showToast('Data e horário são obrigatórios.', 'error');
         return;
       }
 
       const token = ensureAuthenticated();
       if (!token) return;
 
-      const dataHoraObj = new Date(dataHoraISO);
+      const [horaInicioH, minutoInicioM] = horaConsulta.split(':').map(Number);
+      const duracaoConsulta = form.duracaoConsulta.value ? Number(form.duracaoConsulta.value) : 30;
+      const [ano, mes, dia] = dataConsulta.split('-').map(Number);
+      
+      const dataHoraObj = new Date(ano, mes - 1, dia, horaInicioH, minutoInicioM);
       if (dataHoraObj <= new Date()) {
         showToast('A data e horário da consulta deve ser futura.', 'error');
         return;
       }
 
+      const horaFimObj = new Date(dataHoraObj.getTime() + duracaoConsulta * 60000);
+      const horaFim = `${String(horaFimObj.getHours()).padStart(2, '0')}:${String(horaFimObj.getMinutes()).padStart(2, '0')}`;
+
       const payload = {
         pacienteId: pacienteIdInput.value,
-        dataHora: dataHoraISO,
+        data: dataConsulta,
+        horaInicio: horaConsulta,
+        horaFim: horaFim,
         tipoConsulta: form.tipoAtendimento.value,
         motivoConsulta: form.motivoConsulta.value.trim(),
-        duracao: form.duracaoConsulta.value ? Number(form.duracaoConsulta.value) : 30,
+        duracao: duracaoConsulta,
       };
 
       const observacoesConsulta = form.observacoesConsulta.value.trim();
