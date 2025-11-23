@@ -2,7 +2,6 @@
   const API_URL = window.API_URL || 'http://localhost:65432';
   const STATUS_LABEL = {
     agendada: 'Agendada',
-    confirmada: 'Confirmada',
     realizada: 'Realizada',
     cancelada: 'Cancelada',
     remarcada: 'Remarcada',
@@ -454,7 +453,6 @@
   function updateStats(list) {
     const counters = {
       agendada: 0,
-      confirmada: 0,
       realizada: 0,
       cancelada: 0,
     };
@@ -462,18 +460,20 @@
     list.forEach((item) => {
       const status = item.status || 'agendada';
       const normalizedStatus = status === 'remarcada' ? 'agendada' : status;
+      // Ignorar status 'confirmada' - não será mais exibido
+      if (normalizedStatus === 'confirmada') {
+        return;
+      }
       if (counters[normalizedStatus] !== undefined) {
         counters[normalizedStatus] += 1;
       }
     });
 
     const statAgendadas = document.getElementById('statAgendadas');
-    const statConfirmadas = document.getElementById('statConfirmadas');
     const statRealizadas = document.getElementById('statRealizadas');
     const statCanceladas = document.getElementById('statCanceladas');
 
     if (statAgendadas) statAgendadas.textContent = counters.agendada.toString();
-    if (statConfirmadas) statConfirmadas.textContent = counters.confirmada.toString();
     if (statRealizadas) statRealizadas.textContent = counters.realizada.toString();
     if (statCanceladas) statCanceladas.textContent = counters.cancelada.toString();
   }
@@ -657,7 +657,7 @@
     content.innerHTML = infoBasica + infoAtendimento + detalhesClinicos;
 
     if (reagendarBtn) {
-      const podeReagendar = ['agendada', 'confirmada', 'remarcada'].includes(status);
+      const podeReagendar = ['agendada', 'remarcada'].includes(status);
       reagendarBtn.style.display = podeReagendar ? 'inline-flex' : 'none';
     }
     if (cancelarBtn) {
