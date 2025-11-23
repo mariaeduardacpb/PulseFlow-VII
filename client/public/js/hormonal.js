@@ -213,6 +213,8 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      devicePixelRatio: 2,
       animation: {
         duration: 1200,
         easing: 'easeOutQuart',
