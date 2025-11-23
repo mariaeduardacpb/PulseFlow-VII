@@ -13,7 +13,6 @@ const connectDB = async () => {
       socketTimeoutMS: 45000,
     });
     console.log('Conectado ao MongoDB com sucesso!');
-    console.log(`MongoDB URI: ${CONFIG.MONGO_URI}`);
   } catch (error) {
     console.error('Erro ao conectar ao MongoDB:', error.message);
     process.exit(1);

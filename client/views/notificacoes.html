@@ -27,22 +27,23 @@
         </div>
         <div class="hero-actions">
           <button type="button" class="hero-btn" data-action="mark-all">Marcar todas como lidas</button>
-          <button type="button" class="hero-btn ghost" data-action="clear-all">Limpar notificações</button>
+          <button type="button" class="hero-btn ghost" data-action="archive-all">Arquivar todas</button>
+          <button type="button" class="hero-btn ghost" data-action="delete-all">Excluir todas</button>
         </div>
       </header>
 
       <section class="notifications-summary">
-        <article class="summary-card">
+        <article class="summary-card" data-filter="all" style="cursor: pointer;">
           <span class="summary-label">Pendentes</span>
           <strong class="summary-value" id="summaryPending">0</strong>
         </article>
-        <article class="summary-card">
-          <span class="summary-label">Respondidas</span>
-          <strong class="summary-value" id="summaryHandled">0</strong>
-        </article>
-        <article class="summary-card critical">
-          <span class="summary-label">Críticas</span>
+        <article class="summary-card critical" data-filter="alerta" style="cursor: pointer;">
+          <span class="summary-label">Alerta</span>
           <strong class="summary-value" id="summaryCritical">0</strong>
+        </article>
+        <article class="summary-card archived" data-filter="archived" style="cursor: pointer;">
+          <span class="summary-label">Arquivadas</span>
+          <strong class="summary-value" id="summaryArchived">0</strong>
         </article>
       </section>
 
@@ -53,10 +54,11 @@
         </div>
         <div class="notifications-filters">
           <button type="button" class="filter-chip active" data-filter="all">Todas</button>
-          <button type="button" class="filter-chip" data-filter="critical">Críticas</button>
+          <button type="button" class="filter-chip" data-filter="alerta">Alerta</button>
           <button type="button" class="filter-chip" data-filter="appointments">Consultas</button>
           <button type="button" class="filter-chip" data-filter="updates">Atualizações</button>
           <button type="button" class="filter-chip" data-filter="today">Hoje</button>
+          <button type="button" class="filter-chip" data-filter="archived">Arquivadas</button>
         </div>
       </section>
 

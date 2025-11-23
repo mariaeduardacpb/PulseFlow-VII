@@ -196,6 +196,30 @@ body {
     grid-template-columns: 1fr;
     gap: 12px;
   }
+  
+  .summary-card {
+    min-height: auto;
+  }
+  
+  .summary-card.critical,
+  .summary-card.alerta,
+  .summary-card.archived {
+    min-height: auto;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .notifications-shell {
+    padding: 100px 32px 32px;
+  }
+
+  .notifications-hero {
+    padding: 22px 24px;
+  }
+
+  .notification-card {
+    padding: 18px 22px;
+  }
 }
 
 .summary-card {
@@ -207,6 +231,25 @@ body {
   flex-direction: column;
   gap: 6px;
   box-shadow: var(--shadow-soft);
+  min-height: 100px;
+  height: 100%;
+  transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.summary-card.active {
+  border-color: var(--brand-dark);
+  background: rgba(0, 42, 66, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 42, 66, 0.15);
+}
+
+.summary-card.archived {
+  min-height: 100px;
+  height: 100%;
 }
 
 .summary-label {
@@ -223,12 +266,24 @@ body {
   color: var(--brand-dark);
 }
 
-.summary-card.critical {
+.summary-card.critical,
+.summary-card.alerta {
   border-color: rgba(239, 68, 68, 0.3);
+  min-height: 100px;
+  height: 100%;
 }
 
-.summary-card.critical .summary-value {
+.summary-card.critical .summary-value,
+.summary-card.alerta .summary-value {
   color: #ef4444;
+}
+
+.summary-card.archived {
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+.summary-card.archived .summary-value {
+  color: var(--text-light);
 }
 
 .notifications-toolbar {
@@ -357,6 +412,28 @@ body {
   gap: 24px;
 }
 
+@media (max-width: 768px) {
+  .notification-card header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .notification-card header > div {
+    width: 100%;
+  }
+
+  .notification-card .timestamp {
+    align-self: flex-end;
+  }
+}
+
+.notification-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .notification-card h2 {
   margin: 0;
   font-size: 18px;
@@ -383,6 +460,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  align-items: center;
 }
 
 .notification-card footer button {
@@ -393,6 +471,10 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .notification-card footer button[data-link] {
@@ -413,7 +495,59 @@ body {
   background: #cbd5f0;
 }
 
-.notification-card.critical {
+.notification-card footer .archive-btn,
+.notification-card footer .unarchive-btn,
+.notification-card footer .delete-btn {
+  background: transparent;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  min-width: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+}
+
+.notification-card footer .archive-btn:hover {
+  background: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+  border-color: rgba(14, 165, 233, 0.2);
+}
+
+.notification-card footer .unarchive-btn:hover {
+  background: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+  border-color: rgba(14, 165, 233, 0.2);
+}
+
+.notification-card footer .delete-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.notification-card footer .archive-btn i,
+.notification-card footer .unarchive-btn i,
+.notification-card footer .delete-btn i {
+  font-size: 14px;
+}
+
+.archived-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--text-light);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.notification-card.critical,
+.notification-card.alerta {
   border-color: rgba(239, 68, 68, 0.28);
 }
 
@@ -423,6 +557,23 @@ body {
 
 .notification-card.updates {
   border-color: rgba(37, 99, 235, 0.24);
+}
+
+.notification-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.alerta-tag {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .empty-state {
@@ -456,11 +607,15 @@ body {
 
 @media (max-width: 768px) {
   .notifications-shell {
-    padding: 112px 28px 40px;
+    padding: 100px 20px 20px;
+  }
+
+  .notifications-container {
+    gap: 20px;
   }
 
   .notifications-hero {
-    padding: 28px;
+    padding: 20px;
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
@@ -470,24 +625,234 @@ body {
   .hero-text {
     align-items: flex-start;
     text-align: left;
+    width: 100%;
   }
 
   .hero-actions {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero-btn {
+    width: 100%;
+    text-align: center;
   }
 
   .notifications-hero h1 {
-    font-size: 26px;
+    font-size: 24px;
+  }
+
+  .notifications-hero p {
+    font-size: 13px;
+  }
+
+  .notifications-summary {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 16px 20px;
+  }
+
+  .summary-value {
+    font-size: 28px;
+  }
+
+  .notifications-toolbar {
+    padding: 16px 20px;
+  }
+
+  .toolbar-title h2 {
+    font-size: 16px;
+  }
+
+  .toolbar-title p {
+    font-size: 12px;
+  }
+
+  .notifications-filters {
+    gap: 8px;
+  }
+
+  .filter-chip {
+    font-size: 12px;
+    padding: 6px 12px;
+    flex: 1;
+    min-width: calc(50% - 4px);
+  }
+
+  .notification-card {
+    padding: 16px 20px;
+    gap: 12px;
   }
 
   .notification-card header {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .notification-card h2 {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .notification-card p {
+    font-size: 13px;
+    margin-top: 6px;
+  }
+
+  .notification-card .timestamp {
+    font-size: 11px;
+    align-self: flex-start;
   }
 
   .notification-card footer {
     flex-direction: column;
+    gap: 10px;
+  }
+
+  .notification-card footer button {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .notification-tag {
+    font-size: 10px;
+    padding: 3px 10px;
+  }
+
+  .feed-header h2 {
+    font-size: 16px;
+  }
+
+  .feed-header p {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notifications-shell {
+    padding: 90px 16px 16px;
+  }
+
+  .notifications-container {
+    gap: 16px;
+  }
+
+  .notifications-hero {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .notifications-hero h1 {
+    font-size: 22px;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+  }
+
+  .notifications-hero p {
+    font-size: 12px;
+  }
+
+  .summary-card {
+    padding: 14px 16px;
+  }
+
+  .summary-label {
+    font-size: 11px;
+  }
+
+  .summary-value {
+    font-size: 24px;
+  }
+
+  .notifications-toolbar {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .toolbar-title h2 {
+    font-size: 15px;
+  }
+
+  .filter-chip {
+    font-size: 11px;
+    padding: 6px 10px;
+    min-width: calc(50% - 4px);
+  }
+
+  .notification-card {
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .notification-card h2 {
+    font-size: 15px;
+  }
+
+  .notification-card p {
+    font-size: 12px;
+  }
+
+  .feed-header h2 {
+    font-size: 15px;
+  }
+
+  .empty-state {
+    padding: 30px 20px;
+  }
+
+  .empty-state h2 {
+    font-size: 18px;
+  }
+
+  .empty-state p {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .notifications-shell {
+    padding: 85px 12px 12px;
+  }
+
+  .notifications-hero {
+    padding: 14px;
+  }
+
+  .notifications-hero h1 {
+    font-size: 20px;
+  }
+
+  .summary-card {
+    padding: 12px 14px;
+  }
+
+  .summary-value {
+    font-size: 22px;
+  }
+
+  .notifications-toolbar {
+    padding: 12px 14px;
+  }
+
+  .notification-card {
+    padding: 12px 14px;
+  }
+
+  .filter-chip {
+    font-size: 10px;
+    padding: 5px 8px;
   }
 }
 

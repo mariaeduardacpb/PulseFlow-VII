@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
   cidade: { type: String },
   estado: { type: String },
   foto: { type: String },
+  fcmToken: { type: String },
   otp: String,
   otpExpires: Date,
 }, { 

@@ -1,6 +1,8 @@
 import { API_URL } from '../config.js';
+import { initializeNotifications } from '../initNotifications.js';
 
 export function initHeaderComponent({ title = '' } = {}) {
+  initializeNotifications();
   const container = document.getElementById('header-component');
   if (!container) {
     return;
@@ -23,8 +25,9 @@ export function initHeaderComponent({ title = '' } = {}) {
       </div>
       <div class="header-right">
         <div class="header-actions">
-          <button type="button" class="header-action" aria-label="Notificações" data-action="notifications">
+          <button type="button" class="header-action" aria-label="Notificações" data-action="notifications" id="notificationButton">
             <i class="far fa-bell"></i>
+            <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
           </button>
           <button type="button" class="header-action" aria-label="Agendamentos" data-action="appointments">
             <i class="far fa-calendar"></i>
@@ -148,5 +151,46 @@ export function initHeaderComponent({ title = '' } = {}) {
   }
 
   window.updateHeaderDoctorInfo = function() {};
+
+  async function updateNotificationBadge() {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('tokenPaciente');
+      if (!token) {
+        return;
+      }
+
+      const endpoint = localStorage.getItem('token') 
+        ? '/api/notificacoes/unread-count' 
+        : '/api/notificacoes-paciente/unread-count';
+
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const count = data.count || 0;
+        const badge = document.getElementById('notificationBadge');
+        
+        if (badge) {
+          if (count > 0) {
+            badge.textContent = count > 99 ? '99+' : count.toString();
+            badge.style.display = 'inline-flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar badge de notificações:', error);
+    }
+  }
+
+  updateNotificationBadge();
+  setInterval(updateNotificationBadge, 30000);
+  
+  window.updateNotificationBadge = updateNotificationBadge;
 }
 
