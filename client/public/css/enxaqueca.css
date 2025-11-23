@@ -4,14 +4,30 @@
     box-sizing: border-box;
 }
 
+:root {
+  --primary: #002a42;
+  --primary-strong: #00324a;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --border: #e2e8f0;
+  --border-strong: #cbd5f5;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --text-soft: #94a3b8;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    color: #1e293b;
-    line-height: 1.6;
+    background: #f8fafc;
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
     box-sizing: border-box;
 }
 
@@ -77,67 +93,74 @@ body {
   }
 }
 
-/* Card Principal da Enxaqueca */
-.enxaqueca-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 32px;
-  margin-bottom: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  width: 100%;
-}
-
-.card-header {
+/* Header da Página - mesmo estilo do diabetes */
+.page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #e2e8f0;
-  flex-wrap: wrap;
-  gap: 24px;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 24px 28px;
+  background: var(--surface, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-sm, 0 1px 3px 0 rgba(0, 0, 0, 0.1));
+  border: 1px solid var(--border, #e2e8f0);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.title-section {
+.header-content {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  align-items: center;
+  gap: 20px;
 }
 
-.page-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0;
-  line-height: 1.2;
+.header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--primary, #002a42);
+  border-radius: var(--radius-md, 12px);
+  color: white;
+  font-size: 24px;
 }
 
-.page-subtitle {
+.header-icon i {
+  font-size: 24px;
+}
+
+.header-text h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text, #0f172a);
+  margin-bottom: 4px;
+}
+
+.header-text p {
   font-size: 16px;
-  color: #64748b;
-  margin: 0;
+  color: var(--text-muted, #64748b);
+  font-weight: 400;
 }
 
 .stats-section {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
-  flex-wrap: wrap;
+  margin-bottom: 24px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .stat-card {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-md, 12px);
+  padding: 24px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  min-width: 160px;
-  flex: 1;
-  box-sizing: border-box;
+  gap: 16px;
+  box-shadow: var(--shadow-sm, 0 1px 3px 0 rgba(0, 0, 0, 0.1));
 }
 
 @media (max-width: 768px) {
@@ -205,15 +228,22 @@ body {
 }
 
 .stat-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 10px;
+  width: 48px;
+  height: 48px;
+  background: var(--primary, #002a42);
+  border-radius: var(--radius-md, 12px);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
   flex-shrink: 0;
+}
+
+.stat-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
 }
 
 .stat-content {
@@ -223,26 +253,29 @@ body {
 }
 
 .stat-value {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text, #0f172a);
   line-height: 1;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #64748b;
-  font-weight: 500;
+  color: var(--text-muted, #64748b);
 }
 
-/* Seção do Gráfico */
+/* Seção do Gráfico - mesmo estilo do diabetes */
 .chart-section {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  border: 1px solid #e2e8f0;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: 32px;
+  box-shadow: var(--shadow-sm, 0 1px 3px 0 rgba(0, 0, 0, 0.1));
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .chart-header {
@@ -252,122 +285,210 @@ body {
   margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .chart-title {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .title-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 10px;
+  width: 48px;
+  height: 48px;
+  background: var(--primary, #002a42);
+  border-radius: var(--radius-md, 12px);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
+  flex-shrink: 0;
+}
+
+.title-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  fill: none;
 }
 
 .title-text h2 {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text, #0f172a);
   margin-bottom: 4px;
 }
 
 .title-text p {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
 }
 
 .month-selector {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #f8fafc;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--surface-alt, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-md, 12px);
 }
 
 .arrow-btn {
   width: 32px;
   height: 32px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  background: var(--primary, #002a42);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md, 12px);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: #64748b;
+  transition: all 0.2s;
 }
 
 .arrow-btn:hover {
-  background: #3b82f6;
-  color: #ffffff;
-  border-color: #3b82f6;
+  background: var(--primary-strong, #00324a);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+}
+
+.arrow-btn:active {
+  transform: translateY(0);
+}
+
+.arrow-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
 }
 
 .month-label {
+  font-size: 14px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text, #0f172a);
   min-width: 120px;
   text-align: center;
-  font-size: 14px;
 }
 
-/* Mensagem de Sem Dados */
-.no-data-message {
-  text-align: center;
-  padding: 40px 20px;
-  color: #64748b;
-  display: none;
-}
-
-.no-data-icon {
-  margin-bottom: 16px;
-  color: #cbd5e1;
-}
-
-.no-data-message h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #1e293b;
-}
-
-.no-data-message p {
-  font-size: 14px;
-  opacity: 0.8;
-}
-
-/* Container do Gráfico */
-.chart-container {
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid #e2e8f0;
+/* Empty State Styles - mesmo layout de agendamentos */
+.empty-state-enxaqueca {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 400px;
+  padding: 60px 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 16px;
+  margin: 24px 0;
   position: relative;
+  border: 1px solid #e2e8f0;
+}
+
+.empty-state-enxaqueca .empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 500px;
+}
+
+.empty-state-icon-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.empty-state-icon-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #002a42;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 42, 66, 0.25);
+  position: relative;
+  z-index: 2;
+}
+
+.empty-state-icon-circle i {
+  font-size: 48px;
+  color: white;
+}
+
+.empty-state-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1e293b;
+  opacity: 0.6;
+  top: 8px;
+  left: 20px;
+  z-index: 3;
+}
+
+.empty-state-enxaqueca h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+.empty-state-enxaqueca p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* Container do Gráfico - mesmo estilo do diabetes */
+.chart-container {
+  background: var(--surface, #ffffff);
+  border-radius: var(--radius-md, 12px);
+  padding: 24px;
+  border: 1px solid var(--border, #e2e8f0);
+  box-shadow: var(--shadow-sm, 0 1px 3px 0 rgba(0, 0, 0, 0.1));
+  position: relative;
+  min-height: 300px;
+  max-height: 400px;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .chart-container canvas {
   width: 100% !important;
-  height: 350px !important;
+  height: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
 }
 
-/* Seção de Informações */
+/* Seção de Informações - mesmo estilo do diabetes */
 .info-section {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  border: 1px solid #e2e8f0;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: 32px;
+  box-shadow: var(--shadow-sm, 0 1px 3px 0 rgba(0, 0, 0, 0.1));
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .info-header {
@@ -380,18 +501,26 @@ body {
 .info-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 10px;
+  background: var(--primary, #002a42);
+  border-radius: var(--radius-md, 12px);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
+  flex-shrink: 0;
+}
+
+.info-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
 }
 
 .info-header h3 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text, #0f172a);
 }
 
 .info-content {
@@ -402,7 +531,7 @@ body {
 }
 
 .reference-item {
-  background: #f8fafc;
+  background: var(--surface-alt, #f8fafc);
   padding: 16px;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
@@ -505,29 +634,24 @@ body {
 }
 
 @media (max-width: 768px) {
-  
-  .enxaqueca-card {
-    padding: 24px;
-    border-radius: 16px;
-  }
-  
-  .card-header {
+  .page-header {
+    padding: 20px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
+    gap: 16px;
   }
   
-  .title-section {
+  .header-content {
     width: 100%;
   }
   
-  .page-title {
+  .header-text h1 {
     font-size: 24px;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
   
-  .page-subtitle {
+  .header-text p {
     font-size: 14px;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -535,7 +659,6 @@ body {
   
   .chart-section {
     padding: 20px;
-    margin-bottom: 24px;
   }
   
   .chart-header {
@@ -612,27 +735,20 @@ body {
 }
 
 @media (max-width: 480px) {
-  .enxaqueca-card {
-    padding: 20px;
-    border-radius: 12px;
+  .page-header {
+    padding: 16px;
   }
   
-  .card-header {
-    gap: 16px;
-    padding-bottom: 16px;
-  }
-  
-  .page-title {
+  .header-text h1 {
     font-size: 22px;
   }
   
-  .page-subtitle {
+  .header-text p {
     font-size: 13px;
   }
   
   .chart-section {
     padding: 16px;
-    margin-bottom: 20px;
   }
   
   .chart-header {

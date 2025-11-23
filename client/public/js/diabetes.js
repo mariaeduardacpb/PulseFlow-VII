@@ -238,11 +238,16 @@ function setupMonthNavigation() {
 
 // Função para atualizar gráfico
 function updateChart(data) {
+  const chartContainer = document.querySelector('.chart-container');
   const noDataMsg = document.getElementById('no-data-msg-glicemia');
   
   if (!data || !data.data || data.data.length === 0) {
+    // Esconder apenas o container do gráfico quando não houver dados
+    if (chartContainer) {
+      chartContainer.style.display = 'none';
+    }
     if (noDataMsg) {
-      noDataMsg.classList.add('show');
+      noDataMsg.style.display = 'flex';
     }
     if (chartGlicemia) {
       chartGlicemia.data.datasets[0].data = [];
@@ -251,8 +256,12 @@ function updateChart(data) {
     return;
   }
 
+  // Mostrar o container do gráfico quando houver dados
+  if (chartContainer) {
+    chartContainer.style.display = 'flex';
+  }
   if (noDataMsg) {
-    noDataMsg.classList.remove('show');
+    noDataMsg.style.display = 'none';
   }
 
   // Criar pontos de dados com coordenadas x,y

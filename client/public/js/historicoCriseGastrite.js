@@ -418,7 +418,7 @@ function renderizarCrises(crises) {
     crisesGrid.innerHTML = '';
 
     if (crises.length === 0) {
-        noCrises.style.display = 'block';
+        noCrises.style.display = 'flex';
         if (paginationControls) {
             paginationControls.style.display = 'none';
         }

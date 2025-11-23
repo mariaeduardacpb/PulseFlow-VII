@@ -195,18 +195,18 @@ document.addEventListener("DOMContentLoaded", function () {
       datasets: [{
         label: "Níveis Hormonais",
         data: [],
-        borderColor: "#667eea",
-        backgroundColor: "rgba(102, 126, 234, 0.1)",
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
         borderWidth: 3,
         tension: 0.4,
         pointRadius: 6,
         pointHoverRadius: 8,
-        pointBackgroundColor: "#667eea",
+        pointBackgroundColor: "#3b82f6",
         pointBorderColor: "#ffffff",
         pointBorderWidth: 2,
         fill: true,
         spanGaps: true,
-        pointHoverBackgroundColor: "#764ba2",
+        pointHoverBackgroundColor: "#1d4ed8",
         pointHoverBorderColor: "#ffffff",
         pointHoverBorderWidth: 3
       }]
@@ -311,9 +311,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateChart(data) {
+    const chartContainer = document.querySelector('.chart-container');
+    
     if (!data || !data.data || data.data.length === 0) {
+      // Esconder apenas o container do gráfico quando não houver dados
+      if (chartContainer) {
+        chartContainer.style.display = 'none';
+      }
       if (noDataLabel) {
-        noDataLabel.style.display = 'block';
+        noDataLabel.style.display = 'flex';
       }
       chartHormonal.data.labels = [];
       chartHormonal.data.datasets[0].data = [];
@@ -321,6 +327,10 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    // Mostrar o container do gráfico quando houver dados
+    if (chartContainer) {
+      chartContainer.style.display = 'flex';
+    }
     if (noDataLabel) {
       noDataLabel.style.display = 'none';
     }

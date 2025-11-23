@@ -102,8 +102,8 @@ document.addEventListener("DOMContentLoaded", function () {
       datasets: [{
         label: "Intensidade da Enxaqueca",
         data: [],
-        borderColor: "#E91E63",
-        backgroundColor: "rgba(233, 30, 99, 0.1)",
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
         tension: 0.3,
         pointRadius: 5,
         pointHoverRadius: 7,
@@ -213,10 +213,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateChart(data) {
+    const chartContainer = document.querySelector('.chart-container');
+    const noDataMsg = document.getElementById('no-data-msg-enxaqueca');
+    
     if (!data || !data.data || data.data.length === 0) {
-      const noDataMsg = document.getElementById('no-data-msg-enxaqueca');
+      // Esconder apenas o container do gráfico quando não houver dados
+      if (chartContainer) {
+        chartContainer.style.display = 'none';
+      }
       if (noDataMsg) {
-        noDataMsg.style.display = 'block';
+        noDataMsg.style.display = 'flex';
       }
       chartEnxaqueca.data.labels = [];
       chartEnxaqueca.data.datasets[0].data = [];
@@ -224,7 +230,10 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const noDataMsg = document.getElementById('no-data-msg-enxaqueca');
+    // Mostrar o container do gráfico quando houver dados
+    if (chartContainer) {
+      chartContainer.style.display = 'flex';
+    }
     if (noDataMsg) {
       noDataMsg.style.display = 'none';
     }

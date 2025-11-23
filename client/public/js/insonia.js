@@ -97,8 +97,8 @@ document.addEventListener("DOMContentLoaded", function () {
       datasets: [{
         label: "Horas de Sono",
         data: [],
-        borderColor: "#4CAF50",
-        backgroundColor: "rgba(76, 175, 80, 0.1)",
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
         tension: 0.3,
         pointRadius: 5,
         pointHoverRadius: 7,
@@ -211,10 +211,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const chartContainer = document.querySelector('.chart-container');
     
     if (!data || !data.data || data.data.length === 0) {
-      // Mostrar mensagem de sem dados
-      if (noDataMsg) noDataMsg.style.display = 'block';
-      // Ocultar container do gráfico
-      if (chartContainer) chartContainer.style.display = 'none';
+      // Esconder apenas o container do gráfico quando não houver dados
+      if (chartContainer) {
+        chartContainer.style.display = 'none';
+      }
+      if (noDataMsg) {
+        noDataMsg.style.display = 'flex';
+      }
       // Limpar dados do gráfico
       chartHorasSono.data.labels = [];
       chartHorasSono.data.datasets[0].data = [];
@@ -222,10 +225,13 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Ocultar mensagem de sem dados
-    if (noDataMsg) noDataMsg.style.display = 'none';
-    // Mostrar container do gráfico
-    if (chartContainer) chartContainer.style.display = 'block';
+    // Mostrar o container do gráfico quando houver dados
+    if (chartContainer) {
+      chartContainer.style.display = 'flex';
+    }
+    if (noDataMsg) {
+      noDataMsg.style.display = 'none';
+    }
 
     // Extrair dias e valores de sono
     const dias = data.data.map(d => d.dia);

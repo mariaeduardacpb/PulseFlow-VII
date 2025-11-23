@@ -253,11 +253,16 @@ function configurarNavegacaoMes() {
 }
 
 function atualizarGrafico(dados) {
+    const chartContainer = document.querySelector('.chart-container');
     const mensagemSemDados = document.getElementById('no-data-msg-pressao');
     
     if (!dados || !dados.data || dados.data.length === 0) {
+        // Esconder apenas o container do gráfico quando não houver dados
+        if (chartContainer) {
+            chartContainer.style.display = 'none';
+        }
         if (mensagemSemDados) {
-            mensagemSemDados.classList.add('show');
+            mensagemSemDados.style.display = 'flex';
         }
         graficoPressao.data.datasets[0].data = [];
         graficoPressao.data.datasets[1].data = [];
@@ -265,8 +270,12 @@ function atualizarGrafico(dados) {
         return;
     }
 
+    // Mostrar o container do gráfico quando houver dados
+    if (chartContainer) {
+        chartContainer.style.display = 'flex';
+    }
     if (mensagemSemDados) {
-        mensagemSemDados.classList.remove('show');
+        mensagemSemDados.style.display = 'none';
     }
 
     // Criar pontos de dados para sistólica e diastólica

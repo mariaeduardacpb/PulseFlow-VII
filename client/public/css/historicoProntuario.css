@@ -487,44 +487,168 @@ body {
 }
 
 /* ===== ESTADO VAZIO ===== */
-.no-records {
+.empty-state-eventos {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 32px;
+  min-height: 400px;
+  padding: 60px 40px;
   text-align: center;
-}
-
-.no-records-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  background: var(--surface-alt);
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
   border-radius: var(--radius-lg);
-  color: var(--primary);
-  margin-bottom: 24px;
+  margin: 24px 0;
+  position: relative;
   border: 1px solid var(--border);
 }
 
-.no-records-icon svg {
-  width: 48px;
-  height: 48px;
+.empty-state-eventos .empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 500px;
 }
 
-.no-records h3 {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text);
+.empty-state-icon-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 8px;
 }
 
-.no-records p {
-  font-size: 16px;
+.empty-state-icon-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 42, 66, 0.25);
+  position: relative;
+  z-index: 2;
+}
+
+.empty-state-icon-circle i {
+  font-size: 48px;
+  color: white;
+}
+
+.empty-state-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text);
+  opacity: 0.6;
+  top: 8px;
+  left: 20px;
+  z-index: 3;
+}
+
+.empty-state-eventos h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.empty-state-eventos p {
+  margin: 0;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  margin-bottom: 24px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* Empty state para prontuário - mesmo layout */
+.empty-state-prontuario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 60px 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: var(--radius-lg);
+  margin: 24px 0;
+  position: relative;
+  border: 1px solid var(--border);
+}
+
+.empty-state-prontuario .empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 500px;
+}
+
+.empty-state-prontuario h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.empty-state-prontuario p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.empty-state-prontuario .btn-primary {
+  margin-top: 8px;
+}
+
+/* Empty state para crises de gastrite - mesmo layout */
+.empty-state-crises {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 60px 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: var(--radius-lg);
+  margin: 24px 0;
+  position: relative;
+  border: 1px solid var(--border);
+}
+
+.empty-state-crises .empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 500px;
+}
+
+.empty-state-crises h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.empty-state-crises p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.empty-state-crises .btn-clear {
+  margin-top: 8px;
 }
 
 /* ===== CONTROLES DE PAGINAÇÃO ===== */
@@ -766,27 +890,10 @@ body {
     width: 100%;
   }
 
-  .no-records {
+  .empty-state-eventos {
     padding: 60px 20px;
   }
 
-  .no-records-icon {
-    width: 64px;
-    height: 64px;
-  }
-
-  .no-records-icon svg {
-    width: 40px;
-    height: 40px;
-  }
-
-  .no-records h3 {
-    font-size: 18px;
-  }
-
-  .no-records p {
-    font-size: 14px;
-  }
 
   .pagination-controls {
     flex-direction: column;
@@ -915,29 +1022,21 @@ body {
     font-size: 13px;
   }
 
-  .no-records {
+  .empty-state-eventos {
     padding: 40px 16px;
   }
 
-  .no-records-icon {
+  .empty-state-icon-wrapper {
     width: 56px;
     height: 56px;
     margin-bottom: 20px;
   }
 
-  .no-records-icon svg {
+  .empty-state-icon-circle i {
     width: 32px;
     height: 32px;
   }
 
-  .no-records h3 {
-    font-size: 16px;
-  }
-
-  .no-records p {
-    font-size: 13px;
-    margin-bottom: 20px;
-  }
 
   .btn-primary {
     padding: 10px 20px;

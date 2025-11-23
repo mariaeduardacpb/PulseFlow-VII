@@ -20,14 +20,21 @@
   
   <div class="container">
     <main class="content">
-      <!-- Card Principal da Enxaqueca -->
-      <section class="enxaqueca-card">
-        <div class="card-header">
-          <div class="title-section">
-            <h1 class="page-title">Monitoramento de Enxaqueca</h1>
-            <p class="page-subtitle">Acompanhamento da intensidade e frequência das crises de enxaqueca</p>
+      <!-- Header da Página -->
+      <section class="page-header">
+        <div class="header-content">
+          <div class="header-icon">
+            <i class="fas fa-head-side-virus"></i>
           </div>
-          <div class="stats-section">
+          <div class="header-text">
+            <h1>Monitoramento de Enxaqueca</h1>
+            <p>Acompanhamento da intensidade e frequência das crises de enxaqueca</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Estatísticas -->
+      <div class="stats-section">
             <div class="stat-card">
               <div class="stat-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -80,7 +87,6 @@
               </div>
             </div>
           </div>
-        </div>
 
         <!-- Gráfico de Intensidade da Enxaqueca -->
         <div class="chart-section">
@@ -112,15 +118,17 @@
             </div>
           </div>
           
-          <div id="no-data-msg-enxaqueca" class="no-data-message">
-            <div class="no-data-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 3v18h18"></path>
-                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
-              </svg>
+          <div id="no-data-msg-enxaqueca" class="empty-state-enxaqueca" style="display: none;">
+            <div class="empty-state-content">
+              <div class="empty-state-icon-wrapper">
+                <div class="empty-state-dot"></div>
+                <div class="empty-state-icon-circle">
+                  <i class="fas fa-head-side-virus"></i>
+                </div>
+              </div>
+              <h3>Nenhum dado encontrado</h3>
+              <p>Não há registros de enxaqueca para este mês.</p>
             </div>
-            <h3>Nenhum dado encontrado</h3>
-            <p>Não há registros de enxaqueca para este mês.</p>
           </div>
           
           <div class="chart-container">
@@ -170,7 +178,6 @@
             </a>
           </div>
         </div>
-      </section>
     </main>
   </div>
 
