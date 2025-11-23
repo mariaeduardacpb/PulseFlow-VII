@@ -337,16 +337,40 @@
     const filtroDataFim = document.getElementById('filtroDataFim');
     const limparFiltrosBtn = document.getElementById('limparFiltrosBtn');
 
+    // Validação de datas: data início não pode ser maior que data fim
+    const validateDates = () => {
+      if (filtroDataInicio && filtroDataFim && filtroDataInicio.value && filtroDataFim.value) {
+        const startDate = buildLocalDate(filtroDataInicio.value, '00:00');
+        const endDate = buildLocalDate(filtroDataFim.value, '00:00');
+        
+        if (startDate && endDate && startDate > endDate) {
+          showToast('A data de início não pode ser maior que a data de fim', 'warning');
+          filtroDataFim.value = '';
+          return false;
+        }
+      }
+      return true;
+    };
+
+
     if (filtroStatus) {
       filtroStatus.addEventListener('change', onChange);
     }
 
     if (filtroDataInicio) {
-      filtroDataInicio.addEventListener('change', onChange);
+      filtroDataInicio.addEventListener('change', () => {
+        if (validateDates()) {
+          onChange();
+        }
+      });
     }
 
     if (filtroDataFim) {
-      filtroDataFim.addEventListener('change', onChange);
+      filtroDataFim.addEventListener('change', () => {
+        if (validateDates()) {
+          onChange();
+        }
+      });
     }
 
     if (limparFiltrosBtn) {
@@ -366,27 +390,50 @@
     const filtroDataFim = document.getElementById('filtroDataFim');
 
     return appointments.filter((appointment) => {
+      // Filtro por status
       const statusFilter = filtroStatus ? filtroStatus.value : '';
       if (statusFilter && (appointment.status || 'agendada') !== statusFilter) {
         return false;
       }
 
+      // Filtro por data
       const startFilter = filtroDataInicio ? filtroDataInicio.value : '';
       const endFilter = filtroDataFim ? filtroDataFim.value : '';
 
+      // Se não há filtro de data, mostra todos
       if (!startFilter && !endFilter) return true;
 
+      // Obtém a data do agendamento
       const appointmentDate = appointment.data ? buildLocalDate(appointment.data, appointment.hora || '00:00') : null;
       if (!appointmentDate) return false;
 
-      if (startFilter) {
+      // Se apenas data de início foi selecionada, filtra a partir dessa data
+      if (startFilter && !endFilter) {
         const startDate = buildLocalDate(startFilter, '00:00');
         if (appointmentDate < startDate) return false;
+        return true;
       }
 
-      if (endFilter) {
+      // Se apenas data de fim foi selecionada, filtra até essa data
+      if (!startFilter && endFilter) {
         const endDate = buildLocalDate(endFilter, '23:59');
         if (appointmentDate > endDate) return false;
+        return true;
+      }
+
+      // Se ambas as datas foram selecionadas, filtra no intervalo
+      if (startFilter && endFilter) {
+        const startDate = buildLocalDate(startFilter, '00:00');
+        const endDate = buildLocalDate(endFilter, '23:59');
+        
+        // Validação: data início não pode ser maior que data fim
+        if (startDate > endDate) {
+          return false;
+        }
+        
+        if (appointmentDate < startDate || appointmentDate > endDate) {
+          return false;
+        }
       }
 
       return true;
@@ -679,10 +726,8 @@
 
       await fetchAppointmentsFromApi();
       
-      if (appointmentInModal) {
-        appointmentInModal.status = 'cancelada';
-        openDetailsModal(appointmentInModal);
-      }
+      // Fechar o modal após o cancelamento bem-sucedido
+      closeDetailsModal();
 
       Swal.fire({
         icon: 'success',
@@ -1619,8 +1664,27 @@
     document.querySelectorAll('.btn-cancelar-horario').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const id = e.target.closest('.btn-cancelar-horario').dataset.id;
-        await cancelarHorario(id);
+        const horarioItem = e.target.closest('.horario-item');
+        if (!horarioItem) return;
+        
+        const horarioId = horarioItem.dataset.id;
+        const dataDia = horarioItem.dataset.dataDia;
+        
+        // Buscar o horário completo
+        const horario = horarios.find(h => h._id === horarioId);
+        if (!horario) return;
+        
+        // Verificar se há agendamentos para este horário
+        const agendamentos = getAgendamentosDoHorario(horario, dataDia);
+        
+        if (agendamentos && agendamentos.length > 0) {
+          // Se houver agendamentos, mostrar modal perguntando se quer cancelar o agendamento
+          await mostrarModalCancelarAgendamento(agendamentos, dataDia, horario);
+        } else {
+          // Se não houver agendamentos, não fazer nada (a funcionalidade de cancelar horário foi removida)
+          // O usuário deve usar o modo de seleção múltipla para excluir horários
+          showToast('Este horário não possui agendamentos. Use o modo de seleção múltipla para excluir horários.', 'info');
+        }
       });
     });
 
@@ -1784,6 +1848,210 @@
     });
 
     return agendamentos;
+  }
+
+  // Mostrar modal para cancelar agendamento quando clicar no botão de cancelar horário que tem agendamento
+  async function mostrarModalCancelarAgendamento(agendamentos, dataDia, horario) {
+    if (!agendamentos || agendamentos.length === 0) return;
+    
+    // Formatar data
+    let dataFormatada;
+    try {
+      if (typeof dataDia === 'string') {
+        const dataParts = dataDia.split('-');
+        if (dataParts.length === 3) {
+          dataFormatada = new Date(parseInt(dataParts[0]), parseInt(dataParts[1]) - 1, parseInt(dataParts[2])).toLocaleDateString('pt-BR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+        } else {
+          dataFormatada = new Date(dataDia).toLocaleDateString('pt-BR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+        }
+      } else {
+        dataFormatada = new Date(dataDia).toLocaleDateString('pt-BR', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+    } catch (err) {
+      dataFormatada = dataDia || 'Data não informada';
+    }
+    
+    const dataFormatadaCapitalizada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
+    
+    // Criar mensagem do modal
+    let mensagem;
+    if (agendamentos.length === 1) {
+      const apt = agendamentos[0];
+      mensagem = `
+        <p style="margin-bottom: 12px;">Este horário possui um agendamento:</p>
+        <div style="background: #f8fafc; padding: 16px; border-radius: 10px; margin-bottom: 16px; border-left: 4px solid var(--ag-primary);">
+          <p style="margin: 0 0 6px 0; font-weight: 600; color: var(--ag-text);">
+            <i class="fas fa-user" style="margin-right: 8px; color: var(--ag-primary);"></i>
+            ${apt.paciente || 'Paciente'}
+          </p>
+          <p style="margin: 0; font-size: 0.9rem; color: var(--ag-muted);">
+            ${dataFormatadaCapitalizada} às ${apt.hora || 'horário não informado'}
+          </p>
+        </div>
+      `;
+    } else {
+      mensagem = `
+        <p style="margin-bottom: 12px;">Este horário possui <strong>${agendamentos.length}</strong> agendamentos:</p>
+        <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 16px; max-height: 200px; overflow-y: auto; border-left: 4px solid var(--ag-primary);">
+          ${agendamentos.map((apt, index) => `
+            <div style="margin-bottom: ${index < agendamentos.length - 1 ? '12px' : '0'}; padding-bottom: ${index < agendamentos.length - 1 ? '12px' : '0'}; ${index < agendamentos.length - 1 ? 'border-bottom: 1px solid var(--ag-border);' : ''}">
+              <p style="margin: 0 0 4px 0; font-weight: 600; color: var(--ag-text);">
+                <i class="fas fa-user" style="margin-right: 8px; color: var(--ag-primary);"></i>
+                ${apt.paciente || 'Paciente'}
+              </p>
+              <p style="margin: 0; font-size: 0.85rem; color: var(--ag-muted);">
+                ${apt.hora || 'Horário não informado'}
+              </p>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    const result = await Swal.fire({
+      title: 'O que deseja fazer?',
+      html: mensagem,
+      icon: 'question',
+      showCancelButton: false,
+      showDenyButton: true,
+      showCloseButton: true,
+      closeButtonHtml: '<i class="fas fa-arrow-left"></i>',
+      closeButtonAriaLabel: 'Voltar',
+      confirmButtonColor: '#dc2626',
+      denyButtonColor: '#991b1b',
+      confirmButtonText: agendamentos.length === 1 ? 'Cancelar agendamento' : `Cancelar ${agendamentos.length} agendamentos`,
+      denyButtonText: agendamentos.length === 1 ? 'Cancelar agendamento e horário' : `Cancelar agendamentos e horário`,
+      customClass: {
+        popup: 'swal-cancelar-agendamento-popup',
+        actions: 'swal-cancelar-agendamento-actions'
+      }
+    });
+    
+    // Se clicou no X (voltar), não fazer nada
+    if (result.dismiss === Swal.DismissReason.close) {
+      return;
+    }
+    
+    if (result.isConfirmed) {
+      // Apenas cancelar agendamento(s), manter o horário
+      try {
+        const token = ensureAuthenticated();
+        if (!token) return;
+        
+        setLoadingState(true);
+        
+        // Cancelar cada agendamento
+        const promises = agendamentos.map(async (agendamento) => {
+          const agendamentoId = agendamento.id || agendamento._id;
+          if (!agendamentoId) return null;
+          
+          const response = await fetch(`${API_URL}/api/agendamentos/${agendamentoId}/cancelar`, {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ motivoCancelamento: 'Cancelado via gerenciamento de horários' }),
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Não foi possível cancelar o agendamento.');
+          }
+          
+          return response.json();
+        });
+        
+        await Promise.all(promises);
+        
+        // Atualizar cache e recarregar
+        await fetchAppointmentsFromApi();
+        await loadHorarios();
+        
+        showToast(agendamentos.length === 1 
+          ? 'Agendamento cancelado com sucesso!' 
+          : `${agendamentos.length} agendamentos cancelados com sucesso!`, 
+        'success');
+      } catch (error) {
+        console.error('Erro ao cancelar agendamentos:', error);
+        showToast(error.message || 'Erro ao cancelar agendamento(s).', 'error');
+      } finally {
+        setLoadingState(false);
+      }
+    } else if (result.isDenied) {
+      // Cancelar agendamento(s) E o horário
+      try {
+        const token = ensureAuthenticated();
+        if (!token) return;
+        
+        setLoadingState(true);
+        
+        // Primeiro, cancelar todos os agendamentos
+        const promisesAgendamentos = agendamentos.map(async (agendamento) => {
+          const agendamentoId = agendamento.id || agendamento._id;
+          if (!agendamentoId) return null;
+          
+          const response = await fetch(`${API_URL}/api/agendamentos/${agendamentoId}/cancelar`, {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ motivoCancelamento: 'Cancelado via gerenciamento de horários - horário removido' }),
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Não foi possível cancelar o agendamento.');
+          }
+          
+          return response.json();
+        });
+        
+        await Promise.all(promisesAgendamentos);
+        
+        // Depois, desativar o horário
+        const horarioId = horario._id;
+        if (horarioId) {
+          const responseHorario = await fetch(`${API_URL}/api/horarios-disponibilidade/${horarioId}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+              ativo: false,
+              observacoes: horario.observacoes || ''
+            })
+          });
+          
+          if (!responseHorario.ok) {
+            const errorData = await responseHorario.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Não foi possível cancelar o horário.');
+          }
+        }
+        
+        // Atualizar cache e recarregar
+        await fetchAppointmentsFromApi();
+        await loadHorarios();
+        
+        showToast(agendamentos.length === 1 
+          ? 'Agendamento e horário cancelados com sucesso!' 
+          : `${agendamentos.length} agendamentos e horário cancelados com sucesso!`, 
+        'success');
+      } catch (error) {
+        console.error('Erro ao cancelar agendamentos e horário:', error);
+        showToast(error.message || 'Erro ao cancelar agendamento(s) e horário.', 'error');
+      } finally {
+        setLoadingState(false);
+      }
+    }
   }
 
   // Mostrar informações do paciente quando clicar em horário agendado

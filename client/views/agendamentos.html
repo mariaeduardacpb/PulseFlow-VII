@@ -50,44 +50,7 @@
       <!-- Conteúdo da aba Agendamentos -->
       <div id="tabAgendamentos" class="tab-content active">
 
-      <!-- Filtros -->
-      <div class="filters-section">
-        <div class="filters-header">
-          <div class="filters-title">
-            <h2><i class="fas fa-sliders-h"></i> Filtros avançados</h2>
-            <p>Combine filtros para localizar rapidamente um agendamento específico</p>
-            <span class="filters-hint">Datas representam o período de busca (início e fim)</span>
-          </div>
-          <div class="filters-meta">
-            <span><i class="fas fa-bullseye"></i> Resultados sob medida</span>
-            <span><i class="fas fa-magnifying-glass-chart"></i> Insights precisos</span>
-          </div>
-        </div>
-        <div class="filter-group">
-          <label for="filtroStatus">Status</label>
-          <select id="filtroStatus" class="filter-select">
-            <option value="">Todos</option>
-            <option value="agendada">Agendada</option>
-            <option value="confirmada">Confirmada</option>
-            <option value="realizada">Realizada</option>
-            <option value="cancelada">Cancelada</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="filtroDataInicio">Data Início</label>
-          <input type="date" id="filtroDataInicio" class="filter-input">
-        </div>
-        <div class="filter-group">
-          <label for="filtroDataFim">Data Fim</label>
-          <input type="date" id="filtroDataFim" class="filter-input">
-        </div>
-        <div class="filter-group">
-          <button id="limparFiltrosBtn" class="btn-secondary">
-            <i class="fas fa-times"></i> Limpar
-          </button>
-        </div>
-      </div>
-
+      <!-- Resumo geral -->
       <section class="stats-card">
         <div class="section-heading">
           <div class="section-heading-text">
@@ -152,6 +115,57 @@
         </div>
       </section>
 
+      <!-- Filtros -->
+      <div class="filters-section">
+        <div class="filters-header">
+          <div class="filters-title">
+            <h2><i class="fas fa-sliders-h"></i> Filtros avançados</h2>
+            <p>Combine filtros para localizar rapidamente um agendamento específico</p>
+          </div>
+          <div class="filters-meta">
+            <span class="filter-badge"><i class="fas fa-bullseye"></i> Resultados sob medida</span>
+            <span class="filter-badge"><i class="fas fa-magnifying-glass-chart"></i> Insights precisos</span>
+          </div>
+        </div>
+        <div class="filters-hint-container">
+          <span class="filters-hint">Selecione o período para filtrar os agendamentos</span>
+        </div>
+        <div class="filters-controls">
+          <div class="filter-group">
+            <label for="filtroStatus">STATUS</label>
+            <div class="filter-select-wrapper">
+              <select id="filtroStatus" class="filter-select">
+                <option value="">Todos</option>
+                <option value="agendada">Agendada</option>
+                <option value="confirmada">Confirmada</option>
+                <option value="realizada">Realizada</option>
+                <option value="cancelada">Cancelada</option>
+              </select>
+              <i class="fas fa-chevron-down filter-select-icon"></i>
+            </div>
+          </div>
+          <div class="filter-group filter-group-period">
+            <label for="filtroPeriodo">PERÍODO</label>
+            <div class="period-input-wrapper">
+              <div class="period-date-field">
+                <input type="date" id="filtroDataInicio" class="period-date-input" placeholder="dd/mm/aaaa">
+                <i class="fas fa-calendar-alt period-date-icon"></i>
+              </div>
+              <span class="period-separator">até</span>
+              <div class="period-date-field">
+                <input type="date" id="filtroDataFim" class="period-date-input" placeholder="dd/mm/aaaa">
+                <i class="fas fa-calendar-alt period-date-icon"></i>
+              </div>
+            </div>
+          </div>
+          <div class="filter-group filter-group-action">
+            <button id="limparFiltrosBtn" class="btn-clear-filters">
+              <i class="fas fa-times"></i> Limpar
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Lista de Agendamentos -->
       <div class="agendamentos-section">
         <div class="agendamentos-header">
@@ -174,9 +188,17 @@
         <div id="listaAgendamentos" class="agendamentos-list">
           <!-- Agendamentos serão inseridos aqui via JavaScript -->
         </div>
-        <div id="semAgendamentos" class="empty-state" style="display: none;">
-          <i class="fas fa-calendar-times"></i>
-          <p>Nenhum agendamento encontrado</p>
+        <div id="semAgendamentos" class="empty-state-agendamentos" style="display: none;">
+          <div class="empty-state-content">
+            <div class="empty-state-icon-wrapper">
+              <div class="empty-state-dot"></div>
+              <div class="empty-state-icon-circle">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+            </div>
+            <h3>Nenhum horário encontrado</h3>
+            <p>Não há horários disponíveis para esta semana. Tente alterar o filtro ou navegar para outra semana.</p>
+          </div>
         </div>
       </div>
       </div>
