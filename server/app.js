@@ -27,7 +27,9 @@ import geminiRoutes from './routes/geminiRoutes.js';
 import agendamentoRoutes from './routes/agendamentoRoutes.js';
 import agendamentoPacienteRoutes from './routes/agendamentoPacienteRoutes.js';
 import horarioDisponibilidadeRoutes from './routes/horarioDisponibilidadeRoutes.js';
+import notificacaoRoutes from './routes/notificacaoRoutes.js';
 import notificacaoPacienteRoutes from './routes/notificacaoPacienteRoutes.js';
+import firebaseRoutes from './routes/firebaseRoutes.js';
 
 
 // Carregar variáveis de ambiente
@@ -69,7 +71,7 @@ if (!process.env.GEMINI_API_KEY) {
 // Configuração do CORS
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permitir requisições sem origem (apps mobile, Postman, etc)
+    // Permitir requisições sem origem (apps mobile, Postman, Service Workers, etc)
     if (!origin) return callback(null, true);
     
     // Lista de origens permitidas
@@ -77,6 +79,7 @@ const corsOptions = {
       'http://localhost:3000',
       'http://127.0.0.1:3000',
       'http://127.0.0.1:65432',
+      'http://localhost:65432',
       'http://localhost:5500',
       'http://127.0.0.1:5501',
       'http://localhost:5501',
@@ -86,16 +89,14 @@ const corsOptions = {
       'http://pulseflow-vii.onrender.com'
     ];
     
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      // Para desenvolvimento, permitir todas as origens
-      callback(null, true);
-    }
+    // Para desenvolvimento, permitir todas as origens
+    callback(null, true);
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 // Middlewares
@@ -155,7 +156,9 @@ app.use('/api/gemini', geminiRoutes);
 app.use('/api/agendamentos', agendamentoRoutes);
 app.use('/api/agendamentos-paciente', agendamentoPacienteRoutes);
 app.use('/api/horarios-disponibilidade', horarioDisponibilidadeRoutes);
+app.use('/api/notificacoes', notificacaoRoutes);
 app.use('/api/notificacoes-paciente', notificacaoPacienteRoutes);
+app.use('/api/firebase', firebaseRoutes);
 
 
 // Middleware de erro

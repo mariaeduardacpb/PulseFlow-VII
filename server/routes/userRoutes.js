@@ -168,6 +168,38 @@ router.put('/perfil', authMiddleware, async (req, res) => {
     await medico.save();
     console.log('Alterações salvas com sucesso');
 
+    try {
+      const notif = await Notification.create({
+        user: req.user._id,
+        title: 'Perfil atualizado',
+        description: 'Seus dados do perfil foram atualizados com sucesso.',
+        type: 'updates',
+        link: '/client/views/perfilMedico.html',
+        unread: true
+      });
+      console.log('Notificação criada com sucesso');
+
+      try {
+        const { sendNotificationToUser } = await import('../services/fcmService.js');
+        
+        await sendNotificationToUser(
+          req.user._id,
+          'User',
+          'Perfil atualizado',
+          'Seus dados do perfil foram atualizados com sucesso.',
+          {
+            link: '/client/views/perfilMedico.html',
+            type: 'profile_update',
+            notificationId: notif._id.toString()
+          }
+        );
+      } catch (fcmError) {
+        console.error('Erro ao enviar notificação push:', fcmError);
+      }
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError);
+    }
+
     // Retorna os dados atualizados formatados
     const medicoAtualizado = medico.toObject();
     
@@ -295,6 +327,32 @@ router.post('/perfil/foto', authMiddleware, async (req, res) => {
       res.status(500).json({ message: 'Erro ao processar upload da foto' });
     }
   });
+});
+
+router.post('/fcm-token', authMiddleware, async (req, res) => {
+  try {
+    const { fcmToken } = req.body;
+    const userId = req.user._id;
+
+    if (!fcmToken) {
+      return res.status(400).json({ message: 'Token FCM não fornecido' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { fcmToken: fcmToken },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+
+    res.json({ message: 'Token FCM salvo com sucesso' });
+  } catch (error) {
+    console.error('Erro ao salvar token FCM:', error);
+    res.status(500).json({ message: 'Erro ao salvar token FCM', error: error.message });
+  }
 });
 
 export default router;

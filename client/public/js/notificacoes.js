@@ -1,5 +1,4 @@
 import { API_URL } from '/client/public/js/config.js';
-import { getDb, collection, getDocs, orderBy, query, limit } from '/client/public/js/firebaseClient.js';
 
 const STORAGE_KEY = 'pf_notifications';
 let currentFilter = 'all';
@@ -37,10 +36,29 @@ function normalizeNotification(raw, fallbackIndex = 0) {
   }
 
   const rawType = (raw.type || raw.tipo || '').toString().toLowerCase();
-  const allowedTypes = ['critical', 'appointments', 'updates', 'info'];
-  const type = allowedTypes.includes(rawType) ? rawType : 'updates';
+  const allowedTypes = ['alerta', 'appointments', 'updates', 'info'];
+  let type = allowedTypes.includes(rawType) ? rawType : 'updates';
+  
+  if (rawType === 'critical' || rawType === 'críticas') {
+    type = 'alerta';
+  }
+  
+  if (rawType === 'appointment') {
+    type = 'appointments';
+  }
+  
+  if (raw.title && (raw.title.toLowerCase().includes('cancel') || raw.title.toLowerCase().includes('cancelado'))) {
+    type = 'alerta';
+  }
+  
+  if (raw.title && (raw.title.toLowerCase().includes('agendamento') || raw.title.toLowerCase().includes('consulta'))) {
+    if (type !== 'alerta') {
+      type = 'appointments';
+    }
+  }
 
   const unread = raw.unread !== undefined ? raw.unread : !(raw.lido ?? false);
+  const archived = raw.archived !== undefined ? raw.archived : false;
 
   return {
     id,
@@ -50,7 +68,8 @@ function normalizeNotification(raw, fallbackIndex = 0) {
     createdAt,
     link: raw.link || '#',
     action: raw.action || raw.rotuloAcao || 'Visualizar detalhes',
-    unread: Boolean(unread)
+    unread: Boolean(unread),
+    archived: Boolean(archived)
   };
 }
 
@@ -81,7 +100,6 @@ function loadNotifications() {
       }
     }
   } catch (error) {
-    console.warn('Não foi possível ler notificações salvas:', error);
   }
   return [];
 }
@@ -93,13 +111,19 @@ function persistNotifications(list) {
 let notifications = [];
 
 function renderSummary(list) {
-  const pending = list.filter(item => item.unread).length;
-  const handled = list.length - pending;
-  const critical = list.filter(item => item.type === 'critical' && item.unread).length;
+  const activeList = list.filter(item => !item.archived);
+  const archivedList = list.filter(item => item.archived);
+  const pending = activeList.filter(item => item.unread).length;
+  const alerta = activeList.filter(item => item.type === 'alerta' && item.unread).length;
+  const archived = archivedList.length;
 
-  document.getElementById('summaryPending').textContent = pending.toString();
-  document.getElementById('summaryHandled').textContent = handled.toString();
-  document.getElementById('summaryCritical').textContent = critical.toString();
+  const pendingEl = document.getElementById('summaryPending');
+  const criticalEl = document.getElementById('summaryCritical');
+  const archivedEl = document.getElementById('summaryArchived');
+  
+  if (pendingEl) pendingEl.textContent = pending.toString();
+  if (criticalEl) criticalEl.textContent = alerta.toString();
+  if (archivedEl) archivedEl.textContent = archived.toString();
 }
 
 function createCard(notification) {
@@ -109,10 +133,18 @@ function createCard(notification) {
 
   const createdAt = new Date(notification.createdAt);
 
+  const alertaTag = notification.type === 'alerta' ? '<span class="notification-tag alerta-tag">Alerta</span>' : '';
+  
+  const archivedBadge = notification.archived ? '<span class="archived-badge">Arquivada</span>' : '';
+
   card.innerHTML = `
     <header>
       <div>
+        <div class="notification-title-wrapper">
         <h2>${notification.title}</h2>
+          ${alertaTag}
+          ${archivedBadge}
+        </div>
         <p>${notification.description}</p>
       </div>
       <span class="timestamp">${formatRelativeTime(createdAt)}</span>
@@ -121,6 +153,18 @@ function createCard(notification) {
       <button type="button" data-link="${notification.link}">${notification.action}</button>
       <button type="button" class="mark-read" data-id="${notification.id}">
         ${notification.unread ? 'Marcar como lida' : 'Mover para pendências'}
+      </button>
+      ${!notification.archived ? `
+        <button type="button" class="archive-btn" data-id="${notification.id}" title="Arquivar">
+          <i class="fas fa-archive"></i>
+        </button>
+      ` : `
+        <button type="button" class="unarchive-btn" data-id="${notification.id}" title="Desarquivar">
+          <i class="fas fa-inbox"></i>
+        </button>
+      `}
+      <button type="button" class="delete-btn" data-id="${notification.id}" title="Excluir">
+        <i class="fas fa-trash"></i>
       </button>
     </footer>
   `;
@@ -132,14 +176,20 @@ function renderFeed(list) {
   const feed = document.getElementById('notificationsFeed');
   const emptyState = document.getElementById('notificationsEmpty');
 
+  if (!feed) return;
+
   feed.innerHTML = '';
 
-  if (!list.length) {
+  if (!list || !list.length) {
+    if (emptyState) {
     emptyState.hidden = false;
+    }
     return;
   }
 
+  if (emptyState) {
   emptyState.hidden = true;
+  }
 
   list
     .slice()
@@ -155,125 +205,431 @@ function applyFilter(filter) {
   let filtered = [...notifications];
 
   switch (filter) {
-    case 'critical':
-      filtered = filtered.filter(item => item.type === 'critical');
+    case 'alerta':
+      filtered = filtered.filter(item => item.type === 'alerta' && !item.archived);
       break;
     case 'appointments':
-      filtered = filtered.filter(item => item.type === 'appointments');
+      filtered = filtered.filter(item => (item.type === 'appointments' || item.type === 'appointment') && !item.archived);
       break;
     case 'updates':
-      filtered = filtered.filter(item => item.type === 'updates');
+      filtered = filtered.filter(item => (item.type === 'updates' || item.type === 'update') && !item.archived);
       break;
     case 'today': {
       const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       filtered = filtered.filter(item => {
         const createdAt = new Date(item.createdAt);
-        const diffHours = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
-        return diffHours < 24;
+        return createdAt >= todayStart && !item.archived;
       });
       break;
     }
+    case 'archived':
+      filtered = filtered.filter(item => item.archived === true);
+      break;
+    case 'all':
     default:
+      filtered = filtered.filter(item => !item.archived);
       break;
   }
 
+  updateActiveFilters(filter);
   renderFeed(filtered);
+  renderSummary(notifications);
 }
 
-function markAllAsRead() {
-  notifications = notifications.map(notification => ({ ...notification, unread: false }));
+function updateActiveFilters(activeFilter) {
+  document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.summary-card').forEach(card => card.classList.remove('active'));
+  
+  const filterButton = document.querySelector(`.filter-chip[data-filter="${activeFilter}"]`);
+  if (filterButton) {
+    filterButton.classList.add('active');
+  }
+  
+  const summaryCard = document.querySelector(`.summary-card[data-filter="${activeFilter}"]`);
+  if (summaryCard) {
+    summaryCard.classList.add('active');
+  }
+  
+}
+
+async function markAllAsRead() {
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('tokenPaciente');
+    if (!token) return;
+
+    const endpoint = localStorage.getItem('token') 
+      ? '/api/notificacoes/mark-all-read' 
+      : '/api/notificacoes-paciente/mark-all-read';
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      await synchronizeNotifications();
+      if (window.updateNotificationBadge) {
+        window.updateNotificationBadge();
+      }
+    }
+  } catch (error) {
+  }
+}
+
+async function archiveAll() {
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('tokenPaciente');
+    if (!token) return;
+
+    const endpoint = localStorage.getItem('token') 
+      ? '/api/notificacoes/archive-all' 
+      : '/api/notificacoes-paciente/archive-all';
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      await synchronizeNotifications();
+      if (window.updateNotificationBadge) {
+        window.updateNotificationBadge();
+      }
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'success',
+          title: 'Sucesso!',
+          text: 'Todas as notificações foram arquivadas',
+          confirmButtonColor: '#002A42'
+        });
+      }
+    }
+  } catch (error) {
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'Não foi possível arquivar as notificações',
+        confirmButtonColor: '#002A42'
+      });
+    }
+  }
+}
+
+async function deleteAll() {
+  const result = await Swal.fire({
+    title: 'Excluir todas as notificações?',
+    text: 'Esta ação não pode ser desfeita!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#64748b',
+    confirmButtonText: 'Sim, excluir todas',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('tokenPaciente');
+    if (!token) return;
+
+    const endpoint = localStorage.getItem('token') 
+      ? '/api/notificacoes' 
+      : '/api/notificacoes-paciente';
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      notifications = [];
+      persistNotifications(notifications);
+      renderSummary(notifications);
+      applyFilter('all');
+      if (window.updateNotificationBadge) {
+        window.updateNotificationBadge();
+      }
+      Swal.fire({
+        icon: 'success',
+        title: 'Sucesso!',
+        text: 'Todas as notificações foram excluídas',
+        confirmButtonColor: '#002A42'
+      });
+    }
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: 'Não foi possível excluir as notificações',
+      confirmButtonColor: '#002A42'
+    });
+  }
+}
+
+async function archiveNotification(id) {
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('tokenPaciente');
+    if (!token) {
+      return;
+    }
+
+    if (!id) {
+      return;
+    }
+
+    const endpoint = localStorage.getItem('token') 
+      ? `/api/notificacoes/${id}/archive` 
+      : `/api/notificacoes-paciente/${id}/archive`;
+
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      
+      const itemIndex = notifications.findIndex(n => n.id === id || n._id === id);
+      if (itemIndex !== -1) {
+        notifications[itemIndex].archived = true;
+        persistNotifications(notifications);
+      }
+      
+      renderSummary(notifications);
+      applyFilter(currentFilter);
+      
+      await synchronizeNotifications();
+      
+      if (window.updateNotificationBadge) {
+        window.updateNotificationBadge();
+      }
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'success',
+          title: 'Sucesso!',
+          text: 'Notificação arquivada com sucesso',
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+      }
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: errorData.message || 'Não foi possível arquivar a notificação',
+          confirmButtonColor: '#002A42'
+        });
+      }
+    }
+  } catch (error) {
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'Não foi possível arquivar a notificação',
+        confirmButtonColor: '#002A42'
+      });
+    }
+  }
+}
+
+async function unarchiveNotification(id) {
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('tokenPaciente');
+    if (!token) {
+      return;
+    }
+
+    if (!id) {
+      return;
+    }
+
+    const endpoint = localStorage.getItem('token') 
+      ? `/api/notificacoes/${id}/unarchive` 
+      : `/api/notificacoes-paciente/${id}/unarchive`;
+
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      
+      const itemIndex = notifications.findIndex(n => n.id === id || n._id === id);
+      if (itemIndex !== -1) {
+        notifications[itemIndex].archived = false;
+        persistNotifications(notifications);
+      }
+      
+      renderSummary(notifications);
+      applyFilter(currentFilter);
+      
+      await synchronizeNotifications();
+      
+      if (window.updateNotificationBadge) {
+        window.updateNotificationBadge();
+      }
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'success',
+          title: 'Sucesso!',
+          text: 'Notificação desarquivada com sucesso',
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+      }
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: errorData.message || 'Não foi possível desarquivar a notificação',
+          confirmButtonColor: '#002A42'
+        });
+      }
+    }
+  } catch (error) {
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'Não foi possível desarquivar a notificação',
+        confirmButtonColor: '#002A42'
+      });
+    }
+  }
+}
+
+async function deleteNotification(id) {
+  const result = await Swal.fire({
+    title: 'Excluir notificação?',
+    text: 'Esta ação não pode ser desfeita!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#64748b',
+    confirmButtonText: 'Sim, excluir',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('tokenPaciente');
+    if (!token) return;
+
+    const endpoint = localStorage.getItem('token') 
+      ? `/api/notificacoes/${id}` 
+      : `/api/notificacoes-paciente/${id}`;
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      notifications = notifications.filter(n => n.id !== id);
   persistNotifications(notifications);
   renderSummary(notifications);
   applyFilter(currentFilter);
+      if (window.updateNotificationBadge) {
+        window.updateNotificationBadge();
+      }
+    }
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: 'Não foi possível excluir a notificação',
+      confirmButtonColor: '#002A42'
+    });
+  }
 }
 
 function clearAll() {
-  notifications = [];
-  persistNotifications(notifications);
-  renderSummary(notifications);
-  applyFilter(currentFilter);
+  deleteAll();
 }
 
-async function fetchNotificationsFromApi() {
+async function fetchNotificationsFromApi(includeArchived = false) {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || localStorage.getItem('tokenPaciente');
     if (!token) {
-      console.log('Token não encontrado, retornando array vazio');
       return [];
     }
-    const response = await fetch(`${API_URL}/api/notificacoes`, {
+    
+    const endpoint = localStorage.getItem('token') 
+      ? '/api/notificacoes' 
+      : '/api/notificacoes-paciente';
+    
+    let url = `${API_URL}${endpoint}`;
+    if (includeArchived) {
+      url += '?archived=true';
+    }
+    
+    const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     if (!response.ok) {
       if (response.status === 401) {
-        console.warn('Token inválido ou expirado');
         return [];
       }
       throw new Error(`Falha ao carregar notificações: ${response.status}`);
     }
     const data = await response.json();
     if (Array.isArray(data)) {
-      console.log(`Notificações carregadas da API: ${data.length}`);
       return data;
     }
-    console.warn('Resposta da API não é um array:', data);
   } catch (error) {
-    console.warn('Não foi possível sincronizar notificações do servidor:', error.message);
   }
   return [];
 }
 
 async function fetchNotificationsFromFirestore() {
-  try {
-    const db = await getDb();
-    if (!db) {
       return [];
-    }
-
-    const collectionsToTry = ['notificacoes', 'notifications'];
-
-    for (const collectionName of collectionsToTry) {
-      try {
-        const snapshot = await getDocs(
-          query(
-            collection(db, collectionName),
-            orderBy('criadoEm', 'desc'),
-            limit(50)
-          )
-        );
-
-        if (!snapshot.empty) {
-          return snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              ...data,
-              id: doc.id,
-              createdAt: data.criadoEm || data.createdAt || data.created_at
-            };
-          });
-        }
-      } catch (error) {
-        console.warn(`Não foi possível ler notificações na coleção ${collectionName}:`, error);
-      }
-    }
-
-    return [];
-  } catch (error) {
-    console.warn('Erro ao inicializar Firebase:', error);
-    return [];
-  }
 }
 
 async function synchronizeNotifications() {
-  const [apiData, firestoreData] = await Promise.all([
-    fetchNotificationsFromApi(),
-    fetchNotificationsFromFirestore()
-  ]);
+  try {
+    const apiDataActive = await fetchNotificationsFromApi(false);
+    const apiDataArchived = await fetchNotificationsFromApi(true);
+    const firestoreData = await fetchNotificationsFromFirestore();
 
+    const allApiData = [...apiDataActive, ...apiDataArchived];
   const localData = loadNotifications();
-  const merged = mergeNotifications(localData, apiData, firestoreData);
+    const merged = mergeNotifications(localData, allApiData, firestoreData);
 
   notifications = merged;
 
@@ -285,52 +641,141 @@ async function synchronizeNotifications() {
 
   renderSummary(notifications);
   applyFilter(currentFilter);
+  } catch (error) {
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  renderFeed(notifications);
+  await synchronizeNotifications();
+  
   renderSummary(notifications);
   applyFilter('all');
-  await synchronizeNotifications();
 
   document.querySelectorAll('.filter-chip').forEach(button => {
-    button.addEventListener('click', () => {
-      document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-      applyFilter(button.dataset.filter);
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const filter = button.dataset.filter || 'all';
+      applyFilter(filter);
+    });
+  });
+
+  document.querySelectorAll('.summary-card[data-filter]').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      const filter = card.dataset.filter || 'all';
+      applyFilter(filter);
     });
   });
 
   const markAllBtn = document.querySelector('.hero-btn[data-action="mark-all"]');
-  const clearAllBtn = document.querySelector('.hero-btn[data-action="clear-all"]');
+  const archiveAllBtn = document.querySelector('.hero-btn[data-action="archive-all"]');
+  const deleteAllBtn = document.querySelector('.hero-btn[data-action="delete-all"]');
 
   if (markAllBtn) {
     markAllBtn.addEventListener('click', markAllAsRead);
   }
 
-  if (clearAllBtn) {
-    clearAllBtn.addEventListener('click', clearAll);
+  if (archiveAllBtn) {
+    archiveAllBtn.addEventListener('click', archiveAll);
   }
 
-  document.getElementById('notificationsFeed').addEventListener('click', event => {
-    const actionLink = event.target.closest('button[data-link]');
-    const markButton = event.target.closest('button.mark-read');
+  if (deleteAllBtn) {
+    deleteAllBtn.addEventListener('click', deleteAll);
+  }
+
+  const feed = document.getElementById('notificationsFeed');
+  if (!feed) {
+    return;
+  }
+
+  feed.addEventListener('click', event => {
+    const target = event.target;
+    const clickedButton = target.closest('button');
+    
+    if (!clickedButton) return;
+    
+    const actionLink = clickedButton.closest('button[data-link]');
+    const markButton = clickedButton.classList.contains('mark-read') ? clickedButton : clickedButton.closest('button.mark-read');
+    const archiveBtn = clickedButton.classList.contains('archive-btn') ? clickedButton : clickedButton.closest('button.archive-btn');
+    const unarchiveBtn = clickedButton.classList.contains('unarchive-btn') ? clickedButton : clickedButton.closest('button.unarchive-btn');
+    const deleteBtn = clickedButton.classList.contains('delete-btn') ? clickedButton : clickedButton.closest('button.delete-btn');
 
     if (actionLink) {
-      const destination = actionLink.getAttribute('data-link');
+      let destination = actionLink.getAttribute('data-link');
       if (destination && destination !== '#') {
+        if (destination.startsWith('/agendamentos/') || destination.startsWith('/appointments/')) {
+          destination = '/client/views/agendamentos.html';
+        }
         window.location.href = destination;
       }
+      return;
     }
 
     if (markButton) {
-      const itemIndex = notifications.findIndex(notification => notification.id === markButton.dataset.id);
+      const notificationId = markButton.dataset.id;
+      const itemIndex = notifications.findIndex(notification => notification.id === notificationId);
       if (itemIndex !== -1) {
-        notifications[itemIndex].unread = !notifications[itemIndex].unread;
+        const newUnreadStatus = !notifications[itemIndex].unread;
+        notifications[itemIndex].unread = newUnreadStatus;
         persistNotifications(notifications);
         renderSummary(notifications);
         applyFilter(currentFilter);
+        
+        const token = localStorage.getItem('token') || localStorage.getItem('tokenPaciente');
+        if (token) {
+          const endpoint = localStorage.getItem('token') 
+            ? `/api/notificacoes/${notificationId}/read` 
+            : `/api/notificacoes-paciente/${notificationId}/read`;
+          
+          fetch(`${API_URL}${endpoint}`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ unread: newUnreadStatus })
+          }).catch(error => {
+          });
+        }
+        
+        if (window.updateNotificationBadge) {
+          window.updateNotificationBadge();
+        }
       }
+      return;
+    }
+
+    if (archiveBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      const id = archiveBtn.getAttribute('data-id');
+      if (id) {
+        archiveNotification(id);
+      } else {
+      }
+      return;
+    }
+
+    if (unarchiveBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      const id = unarchiveBtn.getAttribute('data-id');
+      if (id) {
+        unarchiveNotification(id);
+      } else {
+      }
+      return;
+    }
+
+    if (deleteBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      const id = deleteBtn.getAttribute('data-id');
+      if (id) {
+        deleteNotification(id);
+      } else {
+      }
+      return;
     }
   });
 });

@@ -619,6 +619,10 @@ async function salvarAlteracoes(event) {
         desabilitarEdicao();
         await carregarDadosMedico();
 
+        if (window.updateNotificationBadge) {
+          window.updateNotificationBadge();
+        }
+
     } catch (error) {
         console.error('Erro ao salvar:', error);
         Swal.close();

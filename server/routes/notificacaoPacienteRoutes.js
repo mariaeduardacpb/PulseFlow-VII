@@ -184,12 +184,45 @@ router.patch('/:id/unarchive', async (req, res) => {
   }
 });
 
+router.post('/archive-all', async (req, res) => {
+  try {
+    const pacienteId = req.user._id;
+    const result = await Notification.updateMany(
+      { user: pacienteId, archived: false },
+      { $set: { archived: true } }
+    );
+
+    res.json({ 
+      message: `${result.modifiedCount} notificações arquivadas com sucesso`,
+      count: result.modifiedCount
+    });
+  } catch (error) {
+    console.error('Erro ao arquivar todas as notificações:', error);
+    res.status(500).json({ message: 'Erro ao arquivar notificações' });
+  }
+});
+
+router.delete('/', async (req, res) => {
+  try {
+    const pacienteId = req.user._id;
+    const result = await Notification.deleteMany({ user: pacienteId });
+
+    res.json({ 
+      message: `${result.deletedCount} notificações excluídas com sucesso`,
+      count: result.deletedCount
+    });
+  } catch (error) {
+    console.error('Erro ao excluir todas as notificações:', error);
+    res.status(500).json({ message: 'Erro ao excluir notificações' });
+  }
+});
+
 router.post('/criar-perfil-atualizado', async (req, res) => {
   try {
     const pacienteId = req.user._id;
     const mongoose = (await import('mongoose')).default;
 
-    await Notification.create({
+    const notif = await Notification.create({
       user: mongoose.Types.ObjectId.isValid(pacienteId) ? pacienteId : new mongoose.Types.ObjectId(pacienteId.toString()),
       userModel: 'Paciente',
       title: 'Dados do perfil alterados',
@@ -198,6 +231,24 @@ router.post('/criar-perfil-atualizado', async (req, res) => {
       link: '/profile',
       unread: true
     });
+
+    try {
+      const { sendNotificationToUser } = await import('../services/fcmService.js');
+      
+      await sendNotificationToUser(
+        pacienteId,
+        'Paciente',
+        'Dados do perfil alterados',
+        'Você alterou seus dados de perfil. Verifique as alterações em seu perfil.',
+        {
+          link: '/profile',
+          type: 'profile_update',
+          notificationId: notif._id.toString()
+        }
+      );
+    } catch (fcmError) {
+      console.error('Erro ao enviar notificação push:', fcmError);
+    }
 
     res.json({ message: 'Notificação criada com sucesso' });
   } catch (error) {

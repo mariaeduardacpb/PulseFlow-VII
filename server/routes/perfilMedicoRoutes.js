@@ -171,7 +171,7 @@ router.put('/', authMiddleware, async (req, res) => {
         console.log('Alterações salvas com sucesso');
 
         try {
-            await Notification.create({
+            const notif = await Notification.create({
                 user: req.user._id,
                 title: 'Perfil atualizado',
                 description: 'Seus dados do perfil foram atualizados com sucesso.',
@@ -180,6 +180,24 @@ router.put('/', authMiddleware, async (req, res) => {
                 unread: true
             });
             console.log('Notificação criada com sucesso');
+
+            try {
+                const { sendNotificationToUser } = await import('../services/fcmService.js');
+                
+                await sendNotificationToUser(
+                    req.user._id,
+                    'User',
+                    'Perfil atualizado',
+                    'Seus dados do perfil foram atualizados com sucesso.',
+                    {
+                        link: '/client/views/perfilMedico.html',
+                        type: 'profile_update',
+                        notificationId: notif._id.toString()
+                    }
+                );
+            } catch (fcmError) {
+                console.error('Erro ao enviar notificação push:', fcmError);
+            }
         } catch (notifError) {
             console.error('Erro ao criar notificação:', notifError);
         }

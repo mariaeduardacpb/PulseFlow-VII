@@ -510,7 +510,7 @@ export const cancelarAgendamento = async (req, res) => {
         userModel: 'Paciente',
         title: 'Consulta cancelada',
         description: `Sua consulta com ${agendamento.medicoId?.nome || 'seu médico'} agendada para ${dataFormatada} foi cancelada${motivoCancelamento ? `. Motivo: ${motivoCancelamento}` : ''}`,
-        type: 'appointment',
+        type: 'alerta',
         link: `/appointments/${agendamento._id}`,
         unread: true
       });
@@ -1002,25 +1002,55 @@ export const cancelarAgendamentoPaciente = async (req, res) => {
         minute: '2-digit'
       }).format(agendamento.dataHora);
 
-      await Notification.create({
+      const notifPaciente = await Notification.create({
         user: mongoose.Types.ObjectId.isValid(pacienteId) ? pacienteId : new mongoose.Types.ObjectId(pacienteId.toString()),
         userModel: 'Paciente',
         title: 'Consulta cancelada',
         description: `Sua consulta com ${agendamento.medicoId.nome} agendada para ${dataFormatada} foi cancelada${motivoCancelamento ? `. Motivo: ${motivoCancelamento}` : ''}`,
-        type: 'appointment',
+        type: 'alerta',
         link: `/appointments/${agendamento._id}`,
         unread: true
       });
 
-      await Notification.create({
+      const notifMedico = await Notification.create({
         user: mongoose.Types.ObjectId.isValid(agendamento.medicoId._id) ? agendamento.medicoId._id : new mongoose.Types.ObjectId(agendamento.medicoId._id.toString()),
         userModel: 'User',
         title: 'Agendamento cancelado pelo paciente',
         description: `${agendamento.pacienteNome || 'Paciente'} cancelou a consulta agendada para ${dataFormatada}`,
-        type: 'appointment',
+        type: 'alerta',
         link: `/agendamentos/${agendamento._id}`,
         unread: true
       });
+
+      try {
+        const { sendNotificationToUser } = await import('../services/fcmService.js');
+        
+        await sendNotificationToUser(
+          pacienteId,
+          'Paciente',
+          'Consulta cancelada',
+          `Sua consulta com ${agendamento.medicoId.nome} agendada para ${dataFormatada} foi cancelada${motivoCancelamento ? `. Motivo: ${motivoCancelamento}` : ''}`,
+          {
+            link: `/appointments/${agendamento._id}`,
+            type: 'appointment',
+            notificationId: notifPaciente._id.toString()
+          }
+        );
+
+        await sendNotificationToUser(
+          agendamento.medicoId._id,
+          'User',
+          'Agendamento cancelado pelo paciente',
+          `${agendamento.pacienteNome || 'Paciente'} cancelou a consulta agendada para ${dataFormatada}`,
+          {
+            link: `/agendamentos/${agendamento._id}`,
+            type: 'appointment',
+            notificationId: notifMedico._id.toString()
+          }
+        );
+      } catch (fcmError) {
+        console.error('Erro ao enviar notificação push:', fcmError);
+      }
     } catch (notifError) {
       console.error('Erro ao criar notificação:', notifError);
     }
