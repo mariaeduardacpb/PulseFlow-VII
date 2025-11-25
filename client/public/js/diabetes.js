@@ -463,27 +463,3 @@ window.debugDiabetes = function() {
     console.error('Erro ao carregar dados:', error);
   });
 };
-
-// Função para simular paciente (apenas para teste)
-window.simularPaciente = function() {
-  const pacienteTeste = {
-    id: "68a3b77a5b36b8a11580651f",
-    nome: "Manuela Tagliatti",
-    cpf: "512.320.568-39",
-    email: "manuellatagliatti@gmail.com",
-    genero: "Feminino",
-    dataNascimento: "2002-10-19T00:00:00.000",
-    nacionalidade: "Brasileiro",
-    telefone: "(19) 98443-6637"
-  };
-  
-  localStorage.setItem('selectedPatient', JSON.stringify(pacienteTeste));
-  console.log('Paciente simulado salvo:', pacienteTeste);
-  
-  // Recarregar dados
-  loadChartData().then(() => {
-    console.log('Dados recarregados com paciente simulado');
-  }).catch((error) => {
-    console.error('Erro ao recarregar dados:', error);
-  });
-};

@@ -266,16 +266,17 @@ function atualizarGrafico(dados) {
     const mensagemSemDados = document.getElementById('no-data-msg-pressao');
     
     if (!dados || !dados.data || dados.data.length === 0) {
-        // Esconder apenas o container do gráfico quando não houver dados
         if (chartContainer) {
             chartContainer.style.display = 'none';
         }
         if (mensagemSemDados) {
             mensagemSemDados.style.display = 'flex';
         }
-        graficoPressao.data.datasets[0].data = [];
-        graficoPressao.data.datasets[1].data = [];
-        graficoPressao.update('none');
+        if (graficoPressao) {
+            graficoPressao.data.datasets[0].data = [];
+            graficoPressao.data.datasets[1].data = [];
+            graficoPressao.update('none');
+        }
         return;
     }
 
@@ -300,164 +301,334 @@ function atualizarGrafico(dados) {
         label: `${d.sistolica}/${d.diastolica}`
     }));
 
-    // Verificar se os dados são diferentes antes de atualizar
-    const dadosAtuaisSistolica = graficoPressao.data.datasets[0].data;
-    const dadosAtuaisDiastolica = graficoPressao.data.datasets[1].data;
-    
-    const dadosAlterados = JSON.stringify(dadosAtuaisSistolica) !== JSON.stringify(pontosSistolica) ||
-                          JSON.stringify(dadosAtuaisDiastolica) !== JSON.stringify(pontosDiastolica);
+    console.log('📊 Atualizando gráfico com dados:', {
+        totalPontos: dados.data.length,
+        pontosSistolica: pontosSistolica.length,
+        pontosDiastolica: pontosDiastolica.length,
+        primeiroPonto: pontosSistolica[0]
+    });
 
-    if (dadosAlterados) {
-        // Atualizar dados do gráfico
-        graficoPressao.data.datasets[0].data = pontosSistolica;
-        graficoPressao.data.datasets[1].data = pontosDiastolica;
-
-        // Atualizar o gráfico sem animação
-        graficoPressao.update('none');
+    // Se o gráfico não existe, criar primeiro
+    if (!graficoPressao) {
+        const ctxPressao = document.getElementById('chartPressao');
+        if (!ctxPressao) {
+            console.error('Elemento chartPressao não encontrado');
+            return;
+        }
+        
+        graficoPressao = new Chart(ctxPressao, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Pressão Sistólica',
+                    data: [],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    spanGaps: false
+                }, {
+                    label: 'Pressão Diastólica',
+                    data: [],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#ef4444',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    spanGaps: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 0
+                },
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 10,
+                        left: 10,
+                        right: 10
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'center',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 25,
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 13,
+                                weight: '400'
+                            },
+                            color: '#475569',
+                            boxWidth: 8,
+                            boxHeight: 8
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#475569',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        padding: 12,
+                        callbacks: {
+                            title: function(context) {
+                                return `Dia ${context[0].label}`;
+                            },
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y} mmHg`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        grid: {
+                            display: true,
+                            color: 'rgba(226, 232, 240, 0.5)',
+                            drawBorder: false
+                        },
+                        border: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '400'
+                            },
+                            stepSize: 1,
+                            padding: 12,
+                            precision: 0
+                        },
+                        min: 1,
+                        max: 31
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(226, 232, 240, 0.5)',
+                            drawBorder: false
+                        },
+                        border: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '400'
+                            },
+                            padding: 12,
+                            callback: function(value) {
+                                return value;
+                            }
+                        },
+                        min: 40,
+                        max: 200,
+                        beginAtZero: false
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
     }
+    
+    // Atualizar dados do gráfico
+    graficoPressao.data.datasets[0].data = pontosSistolica;
+    graficoPressao.data.datasets[1].data = pontosDiastolica;
+    graficoPressao.update('none');
+    
+    console.log('✅ Gráfico atualizado com áreas preenchidas');
 }
 
-// Configurar o gráfico de pressão arterial
-const ctxPressao = document.getElementById('chartPressao');
-const graficoPressao = new Chart(ctxPressao, {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [{
-            label: 'Pressão Sistólica (mmHg)',
-            data: [],
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderWidth: 3,
-            fill: false,
-            tension: 0.4,
-            pointBackgroundColor: '#3b82f6',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            spanGaps: false,
-            clip: false
-        }, {
-            label: 'Pressão Diastólica (mmHg)',
-            data: [],
-            borderColor: '#ef4444',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            borderWidth: 3,
-            fill: false,
-            tension: 0.4,
-            pointBackgroundColor: '#ef4444',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            spanGaps: false,
-            clip: false
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: {
-            duration: 0
-        },
-        layout: {
-            padding: {
-                top: 10,
-                bottom: 10,
-                left: 10,
-                right: 10
-            }
-        },
-        plugins: {
-            legend: {
-                display: true,
-                position: 'top',
-                labels: {
-                    usePointStyle: true,
-                    padding: 20,
-                    font: {
-                        family: 'Inter',
-                        size: 12
-                    }
-                }
-            },
-            tooltip: {
-                backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                titleColor: '#ffffff',
-                bodyColor: '#ffffff',
-                borderColor: '#3b82f6',
-                borderWidth: 1,
-                cornerRadius: 8,
-                displayColors: true,
-                callbacks: {
-                    title: function(context) {
-                        return `Dia ${context[0].label}`;
-                    },
-                    label: function(context) {
-                        const valor = context.parsed.y;
-                        const tipo = context.dataset.label.includes('Sistólica') ? 'Sistólica' : 'Diastólica';
-                        const classificacao = context.raw.label ? 
-                            classificarPressao(
-                                context.raw.label.split('/')[0], 
-                                context.raw.label.split('/')[1]
-                            ) : '';
-                        
-                        return [
-                            `${tipo}: ${valor} mmHg`,
-                            classificacao ? `Classificação: ${classificacao}` : ''
-                        ].filter(Boolean);
-                    }
-                }
-            }
-        },
-        scales: {
-            x: {
-                type: 'linear',
-                grid: {
-                    color: 'rgba(30, 41, 59, 0.1)',
-                    drawBorder: false
-                },
-                ticks: {
-                    color: '#475569',
-                    font: {
-                        family: 'Inter',
-                        size: 12
-                    },
-                    stepSize: 1
-                },
-                min: 1,
-                max: 31
-            },
-            y: {
-                grid: {
-                    color: 'rgba(30, 41, 59, 0.1)',
-                    drawBorder: false
-                },
-                ticks: {
-                    color: '#475569',
-                    font: {
-                        family: 'Inter',
-                        size: 12
-                    },
-                    callback: function(value) {
-                        return `${value} mmHg`;
-                    }
-                },
-                min: 40,
-                max: 200,
-                beginAtZero: false
-            }
-        },
-        interaction: {
-            intersect: false,
-            mode: 'index'
-        }
-    }
-});
+// Variável global para o gráfico
+let graficoPressao = null;
 
 async function inicializarPagina() {
     try {
+        const ctxPressao = document.getElementById('chartPressao');
+        if (!ctxPressao) {
+            console.error('Elemento chartPressao não encontrado');
+            return;
+        }
+        
+        // Inicializar gráfico vazio
+        if (graficoPressao) {
+            graficoPressao.destroy();
+        }
+        
+        graficoPressao = new Chart(ctxPressao, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Pressão Sistólica',
+                    data: [],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    spanGaps: false
+                }, {
+                    label: 'Pressão Diastólica',
+                    data: [],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#ef4444',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    spanGaps: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 0
+                },
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 10,
+                        left: 10,
+                        right: 10
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'center',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 25,
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 13,
+                                weight: '400'
+                            },
+                            color: '#475569',
+                            boxWidth: 8,
+                            boxHeight: 8
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#475569',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        padding: 12,
+                        callbacks: {
+                            title: function(context) {
+                                return `Dia ${context[0].label}`;
+                            },
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y} mmHg`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        grid: {
+                            display: true,
+                            color: 'rgba(226, 232, 240, 0.5)',
+                            drawBorder: false
+                        },
+                        border: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '400'
+                            },
+                            stepSize: 1,
+                            padding: 12,
+                            precision: 0
+                        },
+                        min: 1,
+                        max: 31
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(226, 232, 240, 0.5)',
+                            drawBorder: false
+                        },
+                        border: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '400'
+                            },
+                            padding: 12,
+                            callback: function(value) {
+                                return value;
+                            }
+                        },
+                        min: 40,
+                        max: 200,
+                        beginAtZero: false
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+        
         atualizarLabelMes();
         configurarNavegacaoMes();
         await carregarDadosGrafico();
@@ -504,27 +675,5 @@ window.debugPressaoArterial = function() {
         console.log('Dados carregados com sucesso');
     }).catch((error) => {
         console.error('Erro ao carregar dados:', error);
-    });
-};
-
-window.simularPaciente = function() {
-    const pacienteTeste = {
-        id: "68a3b77a5b36b8a11580651f",
-        nome: "Manuela Tagliatti",
-        cpf: "512.320.568-39",
-        email: "manuellatagliatti@gmail.com",
-        genero: "Feminino",
-        dataNascimento: "2002-10-19T00:00:00.000",
-        nacionalidade: "Brasileiro",
-        telefone: "(19) 98443-6637"
-    };
-    
-    localStorage.setItem('selectedPatient', JSON.stringify(pacienteTeste));
-    console.log('Paciente simulado salvo:', pacienteTeste);
-    
-    carregarDadosGrafico().then(() => {
-        console.log('Dados recarregados com paciente simulado');
-    }).catch((error) => {
-        console.error('Erro ao recarregar dados:', error);
     });
 };

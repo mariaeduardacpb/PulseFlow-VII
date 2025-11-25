@@ -19,8 +19,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Não precisamos mais gerenciar o toggle aqui
   
   const today = new Date();
-  let currentMonthIndex = 5; // Junho (0-indexed)
-  const currentYear = 2025;
+  let currentMonthIndex = today.getMonth();
+  const currentYear = today.getFullYear();
 
   function mostrarErro(mensagem) {
     const aviso = document.createElement('div');
@@ -137,12 +137,9 @@ document.addEventListener("DOMContentLoaded", function () {
         throw new Error(errorData.message || 'Erro ao carregar dados do médico');
       }
 
-      const medico = await res.json();
-      console.log('Dados do médico carregados:', medico);
-
+      await res.json();
       return true;
     } catch (error) {
-      console.error("Erro ao carregar dados do médico:", error);
       mostrarErro("Erro ao carregar dados do médico. Por favor, faça login novamente.");
       return false;
     }
@@ -273,15 +270,28 @@ document.addEventListener("DOMContentLoaded", function () {
         return null;
       }
 
+      const pacienteSelecionado = JSON.parse(localStorage.getItem('pacienteSelecionado') || '{}');
+      const pacienteId = pacienteSelecionado?._id || pacienteSelecionado?.id;
       const decodedPayload = JSON.parse(atob(tokenPaciente));
-      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+      const cpf = pacienteSelecionado?.cpf || decodedPayload?.cpf?.replace(/[^\d]/g, '');
 
-      if (!cpf) {
-        mostrarErro("CPF não encontrado no token do paciente.");
+      if (!pacienteId && !cpf) {
+        mostrarErro("Paciente inválido. Selecione novamente.");
         return null;
       }
 
-      const response = await fetch(`${API_URL}/api/hormonal/medico?cpf=${cpf}&month=${month}&year=${year}`, {
+      const params = new URLSearchParams({
+        month,
+        year
+      });
+
+      if (pacienteId) {
+        params.append('pacienteId', pacienteId);
+      } else if (cpf) {
+        params.append('cpf', cpf);
+      }
+
+      const response = await fetch(`${API_URL}/api/hormonal/medico?${params.toString()}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${tokenMedico}`,
@@ -296,7 +306,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       return await response.json();
     } catch (error) {
-      console.error('Erro ao buscar dados hormonais:', error);
       mostrarErro("Erro interno ao buscar dados hormonais.");
       return null;
     }
@@ -390,18 +399,30 @@ async function atualizarEstatisticas() {
       return;
     }
 
+    const pacienteSelecionado = JSON.parse(localStorage.getItem('pacienteSelecionado') || '{}');
+    const pacienteId = pacienteSelecionado?._id || pacienteSelecionado?.id;
     const decodedPayload = JSON.parse(atob(tokenPaciente));
-    const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+    const cpf = pacienteSelecionado?.cpf || decodedPayload?.cpf?.replace(/[^\d]/g, '');
 
-    if (!cpf) {
+    if (!pacienteId && !cpf) {
       return;
     }
 
-    // Buscar dados do mês atual
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
     
-    const response = await fetch(`${API_URL}/api/hormonal/medico?cpf=${cpf}&month=${currentMonth}&year=${currentYear}`, {
+    const params = new URLSearchParams({
+      month: currentMonth,
+      year: currentYear
+    });
+
+    if (pacienteId) {
+      params.append('pacienteId', pacienteId);
+    } else if (cpf) {
+      params.append('cpf', cpf);
+    }
+
+    const response = await fetch(`${API_URL}/api/hormonal/medico?${params.toString()}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${tokenMedico}`,
@@ -427,7 +448,5 @@ async function atualizarEstatisticas() {
       const normais = valores.filter(val => val >= 10 && val <= 50).length;
       document.getElementById('normalReadingsCount').textContent = normais;
     }
-  } catch (error) {
-    console.error('Erro ao atualizar estatísticas:', error);
-  }
+  } catch (_) {}
 }

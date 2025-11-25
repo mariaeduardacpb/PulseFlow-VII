@@ -23,7 +23,17 @@ const PressaoArterialSchema = new mongoose.Schema({
     required: true
   }
 }, {
-  collection: 'pressoes' // Nome da coleção usado pelo app mobile
+  collection: 'pressoes'
+});
+
+PressaoArterialSchema.pre('save', function(next) {
+  if (this.paciente != null && (this.pacienteId == null || this.pacienteId === undefined)) {
+    this.pacienteId = this.paciente;
+  }
+  if (this.pacienteId != null && (this.paciente == null || this.paciente === undefined)) {
+    this.paciente = this.pacienteId;
+  }
+  next();
 });
 
 export default mongoose.model('PressaoArterial', PressaoArterialSchema);

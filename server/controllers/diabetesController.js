@@ -14,8 +14,10 @@ export const registrarDiabetes = async (req, res) => {
 
     const novoRegistro = new Diabetes({
       paciente: pacienteId,
+      pacienteId: pacienteId,
       data: dataCorrigida,
-      glicemia: Number(glicemia)
+      glicemia: Number(glicemia),
+      nivelGlicemia: Number(glicemia)
     });
 
     await novoRegistro.save();
@@ -168,8 +170,19 @@ export const buscarDiabetesPaciente = async (req, res) => {
     const endDate = new Date(year, month, 1);
 
     const registros = await Diabetes.find({
-      paciente: pacienteId,
-      data: { $gte: startDate, $lt: endDate }
+      $and: [
+        {
+          $or: [
+            { paciente: pacienteId },
+            { paciente: pacienteId.toString() },
+            { pacienteId: pacienteId },
+            { pacienteId: pacienteId.toString() }
+          ]
+        },
+        {
+          data: { $gte: startDate, $lt: endDate }
+        }
+      ]
     }).sort({ data: 1 });
 
     const data = registros.map(r => {

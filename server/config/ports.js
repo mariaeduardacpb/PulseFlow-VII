@@ -6,8 +6,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Carregar .env do diretório server e da raiz do projeto
-// __dirname aqui é server/config, então precisamos subir dois níveis para a raiz
-const envPathServer = path.join(__dirname, '.env');
+// __dirname aqui é server/config, então precisamos subir um nível para server/.env
+const envPathServer = path.join(__dirname, '..', '.env');
 const envPathRoot = path.join(__dirname, '..', '..', '.env');
 
 // Tentar carregar do diretório server primeiro
