@@ -138,11 +138,20 @@ async function fetchGlicemiaData(month, year) {
     }
 
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Erro na resposta:', response.status, errorData);
+      
       if (response.status === 404) {
         console.log('Nenhum dado de glicemia encontrado para este período');
         return { data: [], stats: { total: 0, media: 0, normais: 0 } };
       }
-      mostrarErro("Erro ao buscar dados de glicemia!");
+      
+      if (response.status === 403) {
+        mostrarErro(errorData.message || "Acesso negado. Você não tem uma conexão ativa com este paciente.");
+        return null;
+      }
+      
+      mostrarErro(errorData.message || "Erro ao buscar dados de glicemia!");
       return null;
     }
 

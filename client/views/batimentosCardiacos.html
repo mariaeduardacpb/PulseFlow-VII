@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFlow | Monitoramento de Batimentos Cardíacos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/client/public/css/perfilPaciente.css">
+  <link rel="stylesheet" href="/client/public/css/sidebar.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/client/public/css/pressaoArterial.css">
+  <link rel="icon" type="image/png" href="/client/public/assets/logoMiniatura.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="/client/public/css/dark-theme.css"/>
+  <script src="/client/public/js/theme.js"></script>
+</head>
+<body>
+  <div id="header-component"></div>
+  <div id="sidebar-component"></div>
+  
+  <div class="container">
+    <main class="content">
+      <!-- Header da Página -->
+      <section class="page-header">
+        <div class="header-content">
+          <div class="header-icon">
+            <i class="fas fa-heartbeat"></i>
+          </div>
+          <div class="header-text">
+            <h1>Monitoramento de Batimentos Cardíacos</h1>
+            <p>Acompanhamento da frequência cardíaca do paciente</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Estatísticas -->
+      <div class="stats-section">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="totalReadingsCount">0</span>
+                <span class="stat-label">Total de Leituras</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="avgHeartRate">0</span>
+                <span class="stat-label">Média de Batimentos</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
+                  <path d="M16 2l4 4-4 4"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="normalReadingsCount">0</span>
+                <span class="stat-label">Leituras Normais</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.9.37 4.13 1.02"></path>
+                  <path d="M16 2l4 4-4 4"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="elevatedReadingsCount">0</span>
+                <span class="stat-label">Leituras Elevadas</span>
+              </div>
+            </div>
+          </div>
+
+        <!-- Gráfico de Batimentos Cardíacos -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <div class="chart-title">
+              <div class="title-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                </svg>
+              </div>
+              <div class="title-text">
+                <h2>Gráfico de Batimentos Cardíacos</h2>
+                <p>Frequência cardíaca ao longo do tempo</p>
+              </div>
+            </div>
+            <div class="month-selector">
+              <button class="arrow-btn" data-direction="prev">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+              </button>
+              <span class="month-label">Abril • 2025</span>
+              <button class="arrow-btn" data-direction="next">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 18l6-6-6-6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <div id="no-data-msg-batimentos" class="empty-state-pressao" style="display: none;">
+            <div class="empty-state-content">
+              <div class="empty-state-icon-wrapper">
+                <div class="empty-state-dot"></div>
+                <div class="empty-state-icon-circle">
+                  <i class="fas fa-heartbeat"></i>
+                </div>
+              </div>
+              <h3>Nenhum dado encontrado</h3>
+              <p>Não há registros de batimentos cardíacos para este mês.</p>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <canvas id="chartBatimentos"></canvas>
+          </div>
+        </div>
+
+        <!-- Classificação dos Batimentos Cardíacos -->
+        <div class="info-section">
+          <div class="info-header">
+            <div class="info-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <h3>Classificação dos Batimentos Cardíacos</h3>
+          </div>
+          <div class="info-content">
+            <div class="reference-item">
+              <div class="reference-label">Normal (em repouso):</div>
+              <div class="reference-value normal">60 - 100 bpm</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Bradicardia:</div>
+              <div class="reference-value borderline">< 60 bpm</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Taquicardia leve:</div>
+              <div class="reference-value stage1">100 - 120 bpm</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Taquicardia moderada:</div>
+              <div class="reference-value stage2">120 - 150 bpm</div>
+            </div>
+            <div class="reference-item">
+              <div class="reference-label">Taquicardia grave:</div>
+              <div class="reference-value stage3">> 150 bpm</div>
+            </div>
+          </div>
+          <div class="info-footer">
+            <a href="https://www.minhavida.com.br/saude/temas/frequencia-cardiaca" 
+               target="_blank" rel="noopener noreferrer" class="reference-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15,3 21,3 21,9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              Saiba mais sobre frequência cardíaca
+            </a>
+          </div>
+        </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  <script type="module">
+    import { initHeaderComponent } from '/client/public/js/components/header.js';
+    import { initSidebar } from '/client/public/js/components/sidebar.js';
+    import { API_URL } from '/client/public/js/config.js';
+
+    initHeaderComponent({ title: 'Monitoramento de Batimentos Cardíacos' });
+    initSidebar('batimentoscardiacos');
+
+    const toggleButton = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+
+    if (toggleButton && sidebar) {
+      toggleButton.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        toggleButton.classList.toggle('shifted');
+      });
+    }
+
+    // Carregar dados do médico para atualizar o sidebar
+    async function loadDoctorInfo() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch(`${API_URL}/api/usuarios/perfil`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) return;
+
+        const medico = await response.json();
+        
+        // Atualiza o sidebar do médico (mesmo quando há paciente ativo, o nome do médico deve aparecer)
+        if (window.updateSidebarInfo) {
+          window.updateSidebarInfo(medico.nome, medico.areaAtuacao || 'Acompanhamento Integrado', medico.genero, medico.crm);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados do médico:', error);
+      }
+    }
+
+    loadDoctorInfo();
+  </script>
+  <script type="module" src="/client/public/js/batimentosCardiacos.js"></script>
+</body>
+</html>
+

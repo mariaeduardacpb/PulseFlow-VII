@@ -5,8 +5,27 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const envPath = path.resolve(__dirname, '../.env');
-dotenv.config({ path: envPath });
+// Carregar .env do diretório server e da raiz do projeto
+// __dirname aqui é server/config, então precisamos subir dois níveis para a raiz
+const envPathServer = path.join(__dirname, '.env');
+const envPathRoot = path.join(__dirname, '..', '..', '.env');
+
+// Tentar carregar do diretório server primeiro
+const resultServer = dotenv.config({ path: envPathServer });
+// Depois tentar da raiz do projeto (sobrescreve se existir)
+const resultRoot = dotenv.config({ path: envPathRoot });
+
+// Log para diagnóstico
+if (resultRoot.error && resultServer.error) {
+  console.warn('⚠️ Arquivo .env não encontrado em:', envPathServer);
+  console.warn('⚠️ Arquivo .env não encontrado em:', envPathRoot);
+} else {
+  if (!resultRoot.error) {
+    console.log('✅ Arquivo .env carregado de:', envPathRoot);
+  } else if (!resultServer.error) {
+    console.log('✅ Arquivo .env carregado de:', envPathServer);
+  }
+}
 
 export const CONFIG = {
   BACKEND_PORT: process.env.PORT_BACKEND,
@@ -19,5 +38,12 @@ export const CONFIG = {
   EMAIL_PASS: process.env.EMAIL_PASS,
   NODE_ENV: process.env.NODE_ENV
 };
+
+// Log de debug para verificar se MONGO_URI foi carregada
+if (!CONFIG.MONGO_URI) {
+  console.warn('⚠️ MONGO_URI não encontrada nas variáveis de ambiente');
+  console.warn('   Tentou carregar de:', envPathServer);
+  console.warn('   Tentou carregar de:', envPathRoot);
+}
 
 export default CONFIG;

@@ -1,37 +1,45 @@
-
-// controllers/diabetesController.js
-import Diabetes from '../models/Diabetes.js';
+import BatimentosCardiacos from '../models/BatimentosCardiacos.js';
 import Paciente from '../models/Paciente.js';
 
-// Paciente registra sua glicemia
-export const registrarDiabetes = async (req, res) => {
-  const { data, glicemia } = req.body;
+export const registrarBatimentos = async (req, res) => {
+  const { data, batimentos } = req.body;
   const pacienteId = req.user.id;
 
   try {
-    const [ano, mes, dia] = data.split('-');
-    const dataCorrigida = new Date(ano, mes - 1, dia, 12);
+    // Processar data - pode ser ISO8601 string ou formato YYYY-MM-DD
+    let dataCorrigida;
+    if (typeof data === 'string' && data.includes('T')) {
+      // ISO8601 string
+      dataCorrigida = new Date(data);
+    } else if (typeof data === 'string') {
+      // Formato YYYY-MM-DD
+      const [ano, mes, dia] = data.split('-');
+      dataCorrigida = new Date(ano, mes - 1, dia, 12);
+    } else {
+      dataCorrigida = new Date(data);
+    }
 
-    const novoRegistro = new Diabetes({
+    const novoRegistro = new BatimentosCardiacos({
       paciente: pacienteId,
+      pacienteId: pacienteId,
       data: dataCorrigida,
-      glicemia: Number(glicemia)
+      valor: Number(batimentos),
+      batimentos: Number(batimentos) // Mantém para compatibilidade
     });
 
     await novoRegistro.save();
-    res.status(201).json({ message: 'Registro de glicemia salvo com sucesso' });
+    res.status(201).json({ message: 'Registro de batimentos cardíacos salvo com sucesso' });
   } catch (error) {
-    console.error('Erro ao registrar glicemia:', error);
-    res.status(500).json({ message: 'Erro ao registrar glicemia' });
+    console.error('Erro ao registrar batimentos cardíacos:', error);
+    res.status(500).json({ message: 'Erro ao registrar batimentos cardíacos' });
   }
 };
 
-// Médico busca dados de um paciente pelo CPF
-export const buscarDiabetesMedico = async (req, res) => {
+export const buscarBatimentosMedico = async (req, res) => {
   const { cpf, month, year } = req.query;
 
   try {
-    console.log('🔍 Buscando diabetes - CPF recebido:', cpf, 'Mês:', month, 'Ano:', year);
+    console.log('🔍 Buscando batimentos cardíacos - CPF recebido:', cpf, 'Mês:', month, 'Ano:', year);
     
     // Limpar CPF removendo caracteres não numéricos
     const cpfLimpo = cpf?.replace(/\D/g, '');
@@ -76,16 +84,17 @@ export const buscarDiabetesMedico = async (req, res) => {
     console.log('🔑 ID do paciente (ObjectId):', paciente._id);
     console.log('🔑 ID do paciente (String):', paciente._id.toString());
 
-    // Buscar registros - o app mobile usa 'pacienteId', o web usa 'paciente'
-    // MongoDB/Mongoose converte automaticamente strings ISO8601 para Date
-    let registros = await Diabetes.find({
+    // Buscar registros - o app mobile usa 'pacienteId' como string
+    // Tentar buscar com ObjectId e string para garantir compatibilidade
+    const pacienteIdString = paciente._id.toString();
+    let registros = await BatimentosCardiacos.find({
       $and: [
         {
           $or: [
             { paciente: paciente._id },
-            { paciente: paciente._id.toString() },
+            { paciente: pacienteIdString },
             { pacienteId: paciente._id },
-            { pacienteId: paciente._id.toString() }
+            { pacienteId: pacienteIdString }
           ]
         },
         {
@@ -99,9 +108,10 @@ export const buscarDiabetesMedico = async (req, res) => {
     console.log('📊 Registros encontrados:', registros.length);
     if (registros.length > 0) {
       console.log('Primeiro registro:', {
-        paciente: registros[0].paciente,
+        pacienteId: registros[0].pacienteId,
         data: registros[0].data,
-        glicemia: registros[0].glicemia
+        valor: registros[0].valor,
+        batimentos: registros[0].batimentos
       });
     }
 
@@ -116,9 +126,13 @@ export const buscarDiabetesMedico = async (req, res) => {
         dataRegistro = new Date(r.data);
       }
       
-      const dia = dataRegistro.getDate();
-      const nivelGlicemia = r.glicemia || r.nivelGlicemia || r._doc?.glicemia || r._doc?.nivelGlicemia || 0;
-      return { dia, nivelGlicemia };
+      // Usar 'valor' se existir, senão usar 'batimentos' (compatibilidade)
+      const batimentos = r.valor !== undefined && r.valor !== null ? r.valor : (r.batimentos || 0);
+      
+      return {
+        dia: dataRegistro.getDate(),
+        batimentos: batimentos
+      };
     });
 
     console.log('📈 Dados processados:', data.length, 'registros');
@@ -128,11 +142,15 @@ export const buscarDiabetesMedico = async (req, res) => {
 
     // Calcular estatísticas
     const total = data.length;
-    const soma = data.reduce((acc, d) => acc + (d.nivelGlicemia || 0), 0);
+    const soma = data.reduce((acc, d) => acc + (d.batimentos || 0), 0);
     const media = total > 0 ? soma / total : 0;
     const normais = data.filter(d => {
-      const glicemia = d.nivelGlicemia || 0;
-      return glicemia >= 70 && glicemia <= 100; // Valores normais de glicemia em jejum
+      const bpm = d.batimentos || 0;
+      return bpm >= 60 && bpm <= 100; // Valores normais de batimentos cardíacos em repouso
+    }).length;
+    const elevados = data.filter(d => {
+      const bpm = d.batimentos || 0;
+      return bpm > 100; // Batimentos elevados
     }).length;
 
     const response = { 
@@ -141,7 +159,8 @@ export const buscarDiabetesMedico = async (req, res) => {
       stats: {
         total,
         media: Math.round(media * 10) / 10, // Arredondar para 1 casa decimal
-        normais
+        normais,
+        elevados
       }
     };
     
@@ -153,13 +172,12 @@ export const buscarDiabetesMedico = async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('Erro ao buscar dados de glicemia por CPF:', error);
+    console.error('Erro ao buscar dados de batimentos cardíacos por CPF:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
 };
 
-// Paciente busca seus próprios dados
-export const buscarDiabetesPaciente = async (req, res) => {
+export const buscarBatimentosPaciente = async (req, res) => {
   const pacienteId = req.user.id;
   const { month, year } = req.query;
 
@@ -167,8 +185,11 @@ export const buscarDiabetesPaciente = async (req, res) => {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 1);
 
-    const registros = await Diabetes.find({
-      paciente: pacienteId,
+    const registros = await BatimentosCardiacos.find({
+      $or: [
+        { paciente: pacienteId },
+        { pacienteId: pacienteId }
+      ],
       data: { $gte: startDate, $lt: endDate }
     }).sort({ data: 1 });
 
@@ -183,14 +204,19 @@ export const buscarDiabetesPaciente = async (req, res) => {
         dataRegistro = new Date(r.data);
       }
       
-      const dia = dataRegistro.getDate();
-      const nivelGlicemia = r.glicemia || r.nivelGlicemia || r._doc?.glicemia || r._doc?.nivelGlicemia || 0;
-      return { dia, nivelGlicemia };
+      // Usar 'valor' se existir, senão usar 'batimentos' (compatibilidade)
+      const batimentos = r.valor !== undefined && r.valor !== null ? r.valor : (r.batimentos || 0);
+      
+      return {
+        dia: dataRegistro.getDate(),
+        batimentos: batimentos
+      };
     });
 
     res.json({ data });
   } catch (error) {
-    console.error('Erro ao buscar dados de glicemia do próprio paciente:', error);
+    console.error('Erro ao buscar dados de batimentos cardíacos do próprio paciente:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
 };
+

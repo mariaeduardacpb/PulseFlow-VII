@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 
 const hormonalSchema = new mongoose.Schema({
+  // App mobile usa 'paciente' como string
   paciente: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.Mixed, // Aceita ObjectId ou string
     ref: 'Paciente',
     required: true
   },
@@ -18,6 +19,8 @@ const hormonalSchema = new mongoose.Schema({
     type: Date,
     required: true
   }
+}, {
+  collection: 'hormonais' // Nome da coleção usado pelo app mobile
 });
 
 const Hormonal = mongoose.model('Hormonal', hormonalSchema);

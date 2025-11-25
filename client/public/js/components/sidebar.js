@@ -13,6 +13,8 @@ const icons = {
   historicoeventoclinico: '<i class="fas fa-clipboard-check"></i>',
   diabetes: '<i class="fas fa-tint"></i>',
   pressaoarterial: '<i class="fas fa-heartbeat"></i>',
+  batimentoscardiacos: '<i class="fas fa-heart-pulse"></i>',
+  contagempassos: '<i class="fas fa-walking"></i>',
   historicocrisegastrite: '<i class="fas fa-chart-line"></i>',
   ciclomenstrual: '<i class="fas fa-circle"></i>',
   hormonal: '<i class="fas fa-balance-scale"></i>',
@@ -45,6 +47,8 @@ const patientMainLinks = [
 const patientReportLinks = [
   { page: 'diabetes', label: 'Relatório de Diabetes', href: 'diabetes.html', icon: icons.diabetes },
   { page: 'pressaoarterial', label: 'Pressão Arterial', href: 'pressaoArterial.html', icon: icons.pressaoarterial },
+  { page: 'batimentoscardiacos', label: 'Batimentos Cardíacos', href: 'batimentosCardiacos.html', icon: icons.batimentoscardiacos },
+  { page: 'contagempassos', label: 'Contagem de Passos', href: 'contagemPassos.html', icon: icons.contagempassos },
   { page: 'historicocrisegastrite', label: 'Crise de Gastrite', href: 'historicoCriseGastrite.html', icon: icons.historicocrisegastrite },
   { page: 'ciclomenstrual', label: 'Ciclo Menstrual', href: 'cicloMenstrual.html', icon: icons.ciclomenstrual },
   { page: 'hormonal', label: 'Saúde Hormonal', href: 'hormonal.html', icon: icons.hormonal },

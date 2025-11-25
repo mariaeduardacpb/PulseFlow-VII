@@ -1,7 +1,7 @@
 import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
-    console.log('Página de pressão arterial carregada, iniciando...');
+    console.log('Página de batimentos cardíacos carregada, iniciando...');
     
     const validation = validateActivePatient();
     if (!validation.valid) {
@@ -68,7 +68,7 @@ async function carregarDadosMedico() {
     }
 }
 
-async function buscarDadosPressao(mes, ano) {
+async function buscarDadosBatimentos(mes, ano) {
     try {
         const tokenMedico = localStorage.getItem('token');
         
@@ -104,9 +104,9 @@ async function buscarDadosPressao(mes, ano) {
             return null;
         }
 
-        console.log(`Buscando dados de pressão arterial para CPF: ${cpf}, Mês: ${mes}, Ano: ${ano}`);
+        console.log(`Buscando dados de batimentos cardíacos para CPF: ${cpf}, Mês: ${mes}, Ano: ${ano}`);
 
-        const response = await fetch(`${API_URL}/api/pressaoArterial/medico?cpf=${cpf}&month=${mes}&year=${ano}`, {
+        const response = await fetch(`${API_URL}/api/batimentosCardiacos/medico?cpf=${cpf}&month=${mes}&year=${ano}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${tokenMedico}`,
@@ -124,8 +124,8 @@ async function buscarDadosPressao(mes, ano) {
             console.error('Erro na resposta:', response.status, errorData);
             
             if (response.status === 404) {
-                console.log('Nenhum dado de pressão arterial encontrado para este período');
-                return { data: [], stats: { total: 0, mediaSistolica: 0, mediaDiastolica: 0, leiturasNormais: 0 } };
+                console.log('Nenhum dado de batimentos cardíacos encontrado para este período');
+                return { data: [], stats: { total: 0, media: 0, normais: 0, elevados: 0 } };
             }
             
             if (response.status === 403) {
@@ -133,16 +133,16 @@ async function buscarDadosPressao(mes, ano) {
                 return null;
             }
             
-            mostrarErro(errorData.message || "Erro ao buscar dados de pressão arterial!");
+            mostrarErro(errorData.message || "Erro ao buscar dados de batimentos cardíacos!");
             return null;
         }
 
         const data = await response.json();
-        console.log('Dados de pressão arterial recebidos:', data);
+        console.log('Dados de batimentos cardíacos recebidos:', data);
         return data;
     } catch (error) {
-        console.error('Erro ao buscar dados de pressão arterial:', error);
-        mostrarErro("Erro interno ao buscar dados de pressão arterial.");
+        console.error('Erro ao buscar dados de batimentos cardíacos:', error);
+        mostrarErro("Erro interno ao buscar dados de batimentos cardíacos.");
         return null;
     }
 }
@@ -161,21 +161,17 @@ function atualizarLabelMes() {
     }
 }
 
-function classificarPressao(sistolica, diastolica) {
-    if (sistolica < 130 && diastolica < 85) {
+function classificarBatimentos(batimentos) {
+    if (batimentos < 60) {
+        return "Bradicardia";
+    } else if (batimentos >= 60 && batimentos <= 100) {
         return "Normal";
-    } else if (sistolica >= 130 && sistolica <= 139 && diastolica >= 85 && diastolica <= 89) {
-        return "Normal limítrofe";
-    } else if (sistolica >= 140 && sistolica <= 159 && diastolica >= 90 && diastolica <= 99) {
-        return "Hipertensão leve (estágio 1)";
-    } else if (sistolica >= 160 && sistolica <= 179 && diastolica >= 100 && diastolica <= 109) {
-        return "Hipertensão moderada (estágio 2)";
-    } else if (sistolica >= 180 && diastolica >= 110) {
-        return "Hipertensão grave (estágio 3)";
-    } else if (sistolica >= 140 && diastolica < 90) {
-        return "Hipertensão sistólica isolada";
+    } else if (batimentos > 100 && batimentos <= 120) {
+        return "Taquicardia leve";
+    } else if (batimentos > 120 && batimentos <= 150) {
+        return "Taquicardia moderada";
     } else {
-        return "Classificação indefinida";
+        return "Taquicardia grave";
     }
 }
 
@@ -183,49 +179,52 @@ function calcularEstatisticas(dados) {
     if (!dados || !dados.data || dados.data.length === 0) {
         return {
             totalLeituras: 0,
-            mediaSistolica: 0,
-            mediaDiastolica: 0,
-            leiturasNormais: 0
+            mediaBatimentos: 0,
+            leiturasNormais: 0,
+            leiturasElevadas: 0
         };
     }
 
     const leituras = dados.data;
     const totalLeituras = leituras.length;
     
-    const somaSistolica = leituras.reduce((acc, d) => acc + d.sistolica, 0);
-    const somaDiastolica = leituras.reduce((acc, d) => acc + d.diastolica, 0);
+    const somaBatimentos = leituras.reduce((acc, d) => acc + (d.batimentos || 0), 0);
+    const mediaBatimentos = totalLeituras > 0 ? Math.round(somaBatimentos / totalLeituras) : 0;
     
-    const mediaSistolica = Math.round(somaSistolica / totalLeituras);
-    const mediaDiastolica = Math.round(somaDiastolica / totalLeituras);
+    const leiturasNormais = leituras.filter(d => {
+        const bpm = d.batimentos || 0;
+        return bpm >= 60 && bpm <= 100;
+    }).length;
     
-    const leiturasNormais = leituras.filter(d => 
-        d.sistolica < 130 && d.diastolica < 85
-    ).length;
+    const leiturasElevadas = leituras.filter(d => {
+        const bpm = d.batimentos || 0;
+        return bpm > 100;
+    }).length;
 
     return {
         totalLeituras,
-        mediaSistolica,
-        mediaDiastolica,
-        leiturasNormais
+        mediaBatimentos,
+        leiturasNormais,
+        leiturasElevadas
     };
 }
 
 function atualizarEstatisticas(dados) {
-    const stats = calcularEstatisticas(dados);
+    const stats = dados.stats || calcularEstatisticas(dados);
     
     const totalElement = document.getElementById('totalReadingsCount');
-    const sistolicaElement = document.getElementById('avgSystolic');
-    const diastolicaElement = document.getElementById('avgDiastolic');
+    const mediaElement = document.getElementById('avgHeartRate');
     const normaisElement = document.getElementById('normalReadingsCount');
+    const elevadosElement = document.getElementById('elevatedReadingsCount');
 
-    if (totalElement) totalElement.textContent = stats.totalLeituras;
-    if (sistolicaElement) sistolicaElement.textContent = `${stats.mediaSistolica} mmHg`;
-    if (diastolicaElement) diastolicaElement.textContent = `${stats.mediaDiastolica} mmHg`;
-    if (normaisElement) normaisElement.textContent = stats.leiturasNormais;
+    if (totalElement) totalElement.textContent = stats.total || stats.totalLeituras || 0;
+    if (mediaElement) mediaElement.textContent = stats.media ? `${stats.media.toFixed(1)} bpm` : (stats.mediaBatimentos ? `${stats.mediaBatimentos} bpm` : '0 bpm');
+    if (normaisElement) normaisElement.textContent = stats.normais || stats.leiturasNormais || 0;
+    if (elevadosElement) elevadosElement.textContent = stats.elevados || stats.leiturasElevadas || 0;
 }
 
 async function carregarDadosGrafico() {
-    const dados = await buscarDadosPressao(mesAtual, anoAtual);
+    const dados = await buscarDadosBatimentos(mesAtual, anoAtual);
     if (!dados) return;
 
     atualizarEstatisticas(dados);
@@ -263,7 +262,7 @@ function configurarNavegacaoMes() {
 
 function atualizarGrafico(dados) {
     const chartContainer = document.querySelector('.chart-container');
-    const mensagemSemDados = document.getElementById('no-data-msg-pressao');
+    const mensagemSemDados = document.getElementById('no-data-msg-batimentos');
     
     if (!dados || !dados.data || dados.data.length === 0) {
         // Esconder apenas o container do gráfico quando não houver dados
@@ -273,9 +272,10 @@ function atualizarGrafico(dados) {
         if (mensagemSemDados) {
             mensagemSemDados.style.display = 'flex';
         }
-        graficoPressao.data.datasets[0].data = [];
-        graficoPressao.data.datasets[1].data = [];
-        graficoPressao.update('none');
+        // Limpar dados do gráfico
+        graficoBatimentos.data.labels = [];
+        graficoBatimentos.data.datasets[0].data = [];
+        graficoBatimentos.update();
         return;
     }
 
@@ -287,126 +287,67 @@ function atualizarGrafico(dados) {
         mensagemSemDados.style.display = 'none';
     }
 
-    // Criar pontos de dados para sistólica e diastólica
-    const pontosSistolica = dados.data.map(d => ({
+    // Extrair dias e valores de batimentos (igual ao de insônia)
+    const dias = dados.data.map(d => d.dia);
+    const valoresBatimentos = dados.data.map(d => ({
         x: d.dia,
-        y: d.sistolica,
-        label: `${d.sistolica}/${d.diastolica}`
+        y: d.batimentos
     }));
 
-    const pontosDiastolica = dados.data.map(d => ({
-        x: d.dia,
-        y: d.diastolica,
-        label: `${d.sistolica}/${d.diastolica}`
-    }));
+    // Atualizar dados do gráfico
+    graficoBatimentos.data.labels = dias;
+    graficoBatimentos.data.datasets[0].data = valoresBatimentos;
 
-    // Verificar se os dados são diferentes antes de atualizar
-    const dadosAtuaisSistolica = graficoPressao.data.datasets[0].data;
-    const dadosAtuaisDiastolica = graficoPressao.data.datasets[1].data;
-    
-    const dadosAlterados = JSON.stringify(dadosAtuaisSistolica) !== JSON.stringify(pontosSistolica) ||
-                          JSON.stringify(dadosAtuaisDiastolica) !== JSON.stringify(pontosDiastolica);
-
-    if (dadosAlterados) {
-        // Atualizar dados do gráfico
-        graficoPressao.data.datasets[0].data = pontosSistolica;
-        graficoPressao.data.datasets[1].data = pontosDiastolica;
-
-        // Atualizar o gráfico sem animação
-        graficoPressao.update('none');
-    }
+    // Atualizar o gráfico
+    graficoBatimentos.update();
 }
 
-// Configurar o gráfico de pressão arterial
-const ctxPressao = document.getElementById('chartPressao');
-const graficoPressao = new Chart(ctxPressao, {
+// Configurar o gráfico de batimentos cardíacos (igual ao de insônia)
+const ctxBatimentos = document.getElementById('chartBatimentos');
+const graficoBatimentos = new Chart(ctxBatimentos, {
     type: 'line',
     data: {
         labels: [],
         datasets: [{
-            label: 'Pressão Sistólica (mmHg)',
+            label: "Batimentos Cardíacos",
             data: [],
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderWidth: 3,
-            fill: false,
-            tension: 0.4,
-            pointBackgroundColor: '#3b82f6',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            spanGaps: false,
-            clip: false
-        }, {
-            label: 'Pressão Diastólica (mmHg)',
-            data: [],
-            borderColor: '#ef4444',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            borderWidth: 3,
-            fill: false,
-            tension: 0.4,
-            pointBackgroundColor: '#ef4444',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            spanGaps: false,
-            clip: false
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            tension: 0.3,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            fill: true,
+            spanGaps: true
         }]
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
         animation: {
-            duration: 0
-        },
-        layout: {
-            padding: {
-                top: 10,
-                bottom: 10,
-                left: 10,
-                right: 10
+            duration: 1200,
+            easing: 'easeOutQuart',
+            animations: {
+                y: {
+                    type: 'number',
+                    easing: 'easeOutBounce',
+                    from: 0
+                }
             }
         },
         plugins: {
-            legend: {
-                display: true,
-                position: 'top',
-                labels: {
-                    usePointStyle: true,
-                    padding: 20,
-                    font: {
-                        family: 'Inter',
-                        size: 12
-                    }
-                }
-            },
+            legend: { display: false },
             tooltip: {
-                backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                titleColor: '#ffffff',
-                bodyColor: '#ffffff',
-                borderColor: '#3b82f6',
-                borderWidth: 1,
-                cornerRadius: 8,
-                displayColors: true,
+                displayColors: false,
                 callbacks: {
-                    title: function(context) {
-                        return `Dia ${context[0].label}`;
-                    },
-                    label: function(context) {
-                        const valor = context.parsed.y;
-                        const tipo = context.dataset.label.includes('Sistólica') ? 'Sistólica' : 'Diastólica';
-                        const classificacao = context.raw.label ? 
-                            classificarPressao(
-                                context.raw.label.split('/')[0], 
-                                context.raw.label.split('/')[1]
-                            ) : '';
-                        
+                    title: context => `Dia ${context[0].parsed.x}`,
+                    label: () => '',
+                    afterBody: context => {
+                        const valor = context[0].parsed.y;
+                        const classificacao = classificarBatimentos(valor);
                         return [
-                            `${tipo}: ${valor} mmHg`,
-                            classificacao ? `Classificação: ${classificacao}` : ''
-                        ].filter(Boolean);
+                            `Batimentos: ${valor} bpm`,
+                            `Classificação: ${classificacao}`
+                        ];
                     }
                 }
             }
@@ -414,44 +355,20 @@ const graficoPressao = new Chart(ctxPressao, {
         scales: {
             x: {
                 type: 'linear',
-                grid: {
-                    color: 'rgba(30, 41, 59, 0.1)',
-                    drawBorder: false
-                },
-                ticks: {
-                    color: '#475569',
-                    font: {
-                        family: 'Inter',
-                        size: 12
-                    },
-                    stepSize: 1
-                },
-                min: 1,
-                max: 31
+                title: { display: true, text: 'Dia do Mês' },
+                ticks: { precision: 0 }
             },
             y: {
-                grid: {
-                    color: 'rgba(30, 41, 59, 0.1)',
-                    drawBorder: false
-                },
-                ticks: {
-                    color: '#475569',
-                    font: {
-                        family: 'Inter',
-                        size: 12
-                    },
-                    callback: function(value) {
-                        return `${value} mmHg`;
-                    }
-                },
                 min: 40,
                 max: 200,
-                beginAtZero: false
+                title: { display: true, text: 'Batimentos Cardíacos (bpm)' },
+                ticks: { 
+                    stepSize: 20,
+                    callback: function(value) {
+                        return `${value} bpm`;
+                    }
+                }
             }
-        },
-        interaction: {
-            intersect: false,
-            mode: 'index'
         }
     }
 });
@@ -462,7 +379,7 @@ async function inicializarPagina() {
         configurarNavegacaoMes();
         await carregarDadosGrafico();
         
-        console.log('Página de pressão arterial inicializada com sucesso!');
+        console.log('Página de batimentos cardíacos inicializada com sucesso!');
     } catch (error) {
         console.error('Erro ao inicializar página:', error);
         mostrarErro('Erro ao inicializar a página');
@@ -470,12 +387,12 @@ async function inicializarPagina() {
 }
 
 // Funções globais para debug
-window.debugPressaoArterial = function() {
-    console.log('=== DEBUG PRESSÃO ARTERIAL ===');
+window.debugBatimentosCardiacos = function() {
+    console.log('=== DEBUG BATIMENTOS CARDÍACOS ===');
     console.log('Mês atual:', mesAtual);
     console.log('Ano atual:', anoAtual);
     console.log('Token médico:', localStorage.getItem('token') ? 'Presente' : 'Ausente');
-    console.log('Gráfico inicializado:', graficoPressao ? 'Sim' : 'Não');
+    console.log('Gráfico inicializado:', graficoBatimentos ? 'Sim' : 'Não');
     
     console.log('\n=== LOCALSTORAGE ===');
     console.log('Todas as chaves:', Object.keys(localStorage));
@@ -528,3 +445,4 @@ window.simularPaciente = function() {
         console.error('Erro ao recarregar dados:', error);
     });
 };
+
