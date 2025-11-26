@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const hormonalSchema = new mongoose.Schema({
   paciente: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.Mixed,
     ref: 'Paciente',
     required: true
   },
@@ -18,6 +18,9 @@ const hormonalSchema = new mongoose.Schema({
     type: Date,
     required: true
   }
+}, {
+  collection: 'hormonais',
+  timestamps: true
 });
 
 const Hormonal = mongoose.model('Hormonal', hormonalSchema);

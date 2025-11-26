@@ -301,11 +301,6 @@ async function carregarRegistros(cpf) {
     
     mostrarErro(`Erro ao carregar registros: ${error.message}`);
     renderizarRegistros([]);
-    
-    // Tentar carregar dados de exemplo para debug
-    if (process.env.NODE_ENV === 'development') {
-      carregarDadosExemplo();
-    }
   }
 }
 
@@ -889,46 +884,6 @@ window.testarAPI = async function() {
   }
 };
 
-window.carregarDadosExemplo = function() {
-  
-  const dadosExemplo = [
-    {
-      _id: 'exemplo1',
-      titulo: 'Consulta de Rotina',
-      data: '2024-01-15T10:30:00Z',
-      categoria: 'Clínica médica',
-      medico: 'Maria Silva',
-      descricao: 'Consulta de rotina para acompanhamento geral'
-    },
-    {
-      _id: 'exemplo2',
-      titulo: 'Exame Cardiológico',
-      data: '2024-01-20T14:00:00Z',
-      categoria: 'Cardiologia',
-      medico: 'João Santos',
-      descricao: 'Eletrocardiograma e ecocardiograma realizados'
-    },
-    {
-      _id: 'exemplo3',
-      titulo: 'Consulta Dermatológica',
-      data: '2024-01-25T09:15:00Z',
-      categoria: 'Dermatologia',
-      medico: 'Ana Costa',
-      descricao: 'Avaliação de lesões cutâneas'
-    }
-  ];
-  
-  
-  // Resetar paginação ao carregar dados de exemplo
-  registrosPaginaAtual = 1;
-  
-  allAnotacoes = dadosExemplo;
-  filteredAnotacoes = [...allAnotacoes];
-  
-  renderizarRegistros(filteredAnotacoes);
-  
-  mostrarAviso(`${dadosExemplo.length} registros de exemplo carregados!`, 'success');
-};
 
 window.debugRegistros = function() {
   const elementosDOM = {
@@ -980,8 +935,6 @@ window.debugHeaderHistorico = function() {
 window.testarRenderizacao = function() {
   if (allAnotacoes.length > 0) {
     renderizarRegistros(allAnotacoes);
-  } else {
-    carregarDadosExemplo();
   }
 };
 

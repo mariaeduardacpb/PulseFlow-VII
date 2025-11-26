@@ -455,7 +455,7 @@ body {
 
 .info-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -597,7 +597,7 @@ body {
   }
   
   .info-content {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 }
@@ -657,6 +657,11 @@ body {
   
   .chart-container canvas {
     height: 250px !important;
+  }
+  
+  .info-content {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
   
   .reference-item {

@@ -9,6 +9,8 @@
 
   let appointmentsCache = [];
   let isFetchingAppointments = false;
+  let isRenderingSemana = false;
+  let isLoadingHorarios = false;
 
   const getToken = () => localStorage.getItem('token');
 
@@ -292,6 +294,11 @@
   };
 
   const fetchAppointmentsFromApi = async () => {
+    // Evitar chamadas simultâneas
+    if (isFetchingAppointments) {
+      return;
+    }
+    
     const token = ensureAuthenticated();
     if (!token) return;
 
@@ -1273,6 +1280,13 @@
 
   // Carregar horários
   async function loadHorarios() {
+    // Evitar chamadas simultâneas
+    if (isLoadingHorarios) {
+      return;
+    }
+    
+    isLoadingHorarios = true;
+    
     const loadingEl = document.getElementById('loadingHorarios');
     const listEl = document.getElementById('horariosList');
     const emptyStateEl = document.getElementById('emptyStateHorarios');
@@ -1302,16 +1316,27 @@
       showToast(error.message, 'error');
     } finally {
       if (loadingEl) loadingEl.style.display = 'none';
+      isLoadingHorarios = false;
     }
   }
 
   // Renderizar visualização semanal
   function renderSemanaView() {
+    // Evitar chamadas recursivas que causam loop infinito
+    if (isRenderingSemana) {
+      return;
+    }
+    
+    isRenderingSemana = true;
+    
     const semanaGrid = document.getElementById('semanaGrid');
     const emptyStateEl = document.getElementById('emptyStateHorarios');
     const semanaPeriodoEl = document.getElementById('semanaPeriodo');
 
-    if (!semanaGrid) return;
+    if (!semanaGrid) {
+      isRenderingSemana = false;
+      return;
+    }
 
     // Calcular data inicial da semana atual
     const hoje = new Date();
@@ -1516,16 +1541,9 @@
     // Configurar eventos dos cards
     setupDiaCardEvents();
     
-    // Carregar agendamentos se necessário para mostrar indicadores
-    if (!appointmentsCache || appointmentsCache.length === 0) {
-      fetchAppointmentsFromApi().then(() => {
-        setTimeout(() => {
-          renderSemanaView();
-        }, 300);
-      }).catch(err => {
-        console.error('Erro ao carregar agendamentos:', err);
-      });
-    }
+    // Não carregar agendamentos aqui - isso deve ser feito apenas uma vez no início
+    // Os agendamentos já devem estar no cache quando esta função é chamada
+    isRenderingSemana = false;
     
     // Verificar se há horários visíveis após aplicar filtro
     const horariosVisiveis = semanaGrid.querySelectorAll('.horario-item').length;
@@ -1608,6 +1626,9 @@
       if (emptyStateEl) emptyStateEl.style.display = 'none';
       if (semanaGrid) semanaGrid.style.display = 'grid';
     }
+    
+    // Resetar flag ao final da renderização
+    isRenderingSemana = false;
   }
 
   // Configurar eventos dos cards de dia

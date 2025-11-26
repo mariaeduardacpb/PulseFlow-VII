@@ -19,8 +19,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Não precisamos mais gerenciar o toggle aqui
   
   const today = new Date();
-  let currentMonthIndex = 5; // Junho (0-indexed)
-  const currentYear = 2025;
+  let currentMonthIndex = today.getMonth();
+  const currentYear = today.getFullYear();
 
   function mostrarErro(mensagem) {
     const aviso = document.createElement('div');
@@ -137,12 +137,9 @@ document.addEventListener("DOMContentLoaded", function () {
         throw new Error(errorData.message || 'Erro ao carregar dados do médico');
       }
 
-      const medico = await res.json();
-      console.log('Dados do médico carregados:', medico);
-
+      await res.json();
       return true;
     } catch (error) {
-      console.error("Erro ao carregar dados do médico:", error);
       mostrarErro("Erro ao carregar dados do médico. Por favor, faça login novamente.");
       return false;
     }
@@ -273,15 +270,28 @@ document.addEventListener("DOMContentLoaded", function () {
         return null;
       }
 
+      const pacienteSelecionado = JSON.parse(localStorage.getItem('pacienteSelecionado') || '{}');
+      const pacienteId = pacienteSelecionado?._id || pacienteSelecionado?.id;
       const decodedPayload = JSON.parse(atob(tokenPaciente));
-      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+      const cpf = pacienteSelecionado?.cpf || decodedPayload?.cpf?.replace(/[^\d]/g, '');
 
-      if (!cpf) {
-        mostrarErro("CPF não encontrado no token do paciente.");
+      if (!pacienteId && !cpf) {
+        mostrarErro("Paciente inválido. Selecione novamente.");
         return null;
       }
 
-      const response = await fetch(`${API_URL}/api/hormonal/medico?cpf=${cpf}&month=${month}&year=${year}`, {
+      const params = new URLSearchParams({
+        month,
+        year
+      });
+
+      if (pacienteId) {
+        params.append('pacienteId', pacienteId);
+      } else if (cpf) {
+        params.append('cpf', cpf);
+      }
+
+      const response = await fetch(`${API_URL}/api/hormonal/medico?${params.toString()}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${tokenMedico}`,
@@ -296,7 +306,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       return await response.json();
     } catch (error) {
-      console.error('Erro ao buscar dados hormonais:', error);
       mostrarErro("Erro interno ao buscar dados hormonais.");
       return null;
     }
@@ -306,16 +315,10 @@ document.addEventListener("DOMContentLoaded", function () {
   async function loadChartData() {
     const month = currentMonthIndex + 1; // Converter para 1-indexed
     const data = await fetchHormonalData(month, currentYear);
-    if (!data) {
-      // Atualizar estatísticas mesmo quando não houver dados
-      atualizarEstatisticas();
-      return;
-    }
+    if (!data) return;
 
     // Atualizar o gráfico com os dados
     updateChart(data);
-    // Atualizar estatísticas quando os dados forem carregados
-    atualizarEstatisticas();
   }
 
   function updateChart(data) {
@@ -382,39 +385,44 @@ document.addEventListener("DOMContentLoaded", function () {
     el.textContent = `${months[currentMonthIndex]} • ${currentYear}`;
   });
 
-  // Carregar dados iniciais
   loadChartData();
+  atualizarEstatisticas();
+});
 
-  // Função para atualizar estatísticas
-  async function atualizarEstatisticas() {
-    try {
-      const tokenMedico = localStorage.getItem('token');
-      const tokenPaciente = localStorage.getItem('tokenPaciente');
+// Função para atualizar estatísticas
+async function atualizarEstatisticas() {
+  try {
+    const tokenMedico = localStorage.getItem('token');
+    const tokenPaciente = localStorage.getItem('tokenPaciente');
 
-      if (!tokenMedico || !tokenPaciente) {
-        // Resetar estatísticas se não houver tokens
-        document.getElementById('totalReadingsCount').textContent = '0';
-        document.getElementById('avgHormonalLevel').textContent = '0';
-        document.getElementById('normalReadingsCount').textContent = '0';
-        return;
-      }
+    if (!tokenMedico || !tokenPaciente) {
+      return;
+    }
 
-      const decodedPayload = JSON.parse(atob(tokenPaciente));
-      const cpf = decodedPayload?.cpf?.replace(/[^\d]/g, '');
+    const pacienteSelecionado = JSON.parse(localStorage.getItem('pacienteSelecionado') || '{}');
+    const pacienteId = pacienteSelecionado?._id || pacienteSelecionado?.id;
+    const decodedPayload = JSON.parse(atob(tokenPaciente));
+    const cpf = pacienteSelecionado?.cpf || decodedPayload?.cpf?.replace(/[^\d]/g, '');
 
-      if (!cpf) {
-        // Resetar estatísticas se não houver CPF
-        document.getElementById('totalReadingsCount').textContent = '0';
-        document.getElementById('avgHormonalLevel').textContent = '0';
-        document.getElementById('normalReadingsCount').textContent = '0';
-        return;
-      }
+    if (!pacienteId && !cpf) {
+      return;
+    }
 
-      // Buscar dados do mês selecionado (não do mês atual)
-      const month = currentMonthIndex + 1; // Converter para 1-indexed
-      const year = currentYear;
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
     
-    const response = await fetch(`${API_URL}/api/hormonal/medico?cpf=${cpf}&month=${month}&year=${year}`, {
+    const params = new URLSearchParams({
+      month: currentMonth,
+      year: currentYear
+    });
+
+    if (pacienteId) {
+      params.append('pacienteId', pacienteId);
+    } else if (cpf) {
+      params.append('cpf', cpf);
+    }
+
+    const response = await fetch(`${API_URL}/api/hormonal/medico?${params.toString()}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${tokenMedico}`,
@@ -423,54 +431,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     if (!response.ok) {
-      // Resetar estatísticas em caso de erro
-      document.getElementById('totalReadingsCount').textContent = '0';
-      document.getElementById('avgHormonalLevel').textContent = '0';
-      document.getElementById('normalReadingsCount').textContent = '0';
       return;
     }
 
     const data = await response.json();
     
-    // Atualizar estatísticas
-    const totalElement = document.getElementById('totalReadingsCount');
-    const avgElement = document.getElementById('avgHormonalLevel');
-    const normalElement = document.getElementById('normalReadingsCount');
-    
     if (data && data.data && data.data.length > 0) {
-      const total = data.data.length;
-      const valores = data.data.map(d => parseFloat(d.valor)).filter(v => !isNaN(v));
+      // Atualizar estatísticas
+      document.getElementById('totalReadingsCount').textContent = data.data.length;
       
-      if (totalElement) {
-        totalElement.textContent = total;
-      }
+      const valores = data.data.map(d => parseFloat(d.valor));
+      const media = valores.reduce((sum, val) => sum + val, 0) / valores.length;
+      document.getElementById('avgHormonalLevel').textContent = media.toFixed(1);
       
-      if (valores.length > 0) {
-        const media = valores.reduce((sum, val) => sum + val, 0) / valores.length;
-        if (avgElement) {
-          avgElement.textContent = media.toFixed(1);
-        }
-        
-        // Contar leituras normais (valores entre 10-50 são considerados normais para a maioria dos hormônios)
-        const normais = valores.filter(val => val >= 10 && val <= 50).length;
-        if (normalElement) {
-          normalElement.textContent = normais;
-        }
-      } else {
-        if (avgElement) avgElement.textContent = '0';
-        if (normalElement) normalElement.textContent = '0';
-      }
-    } else {
-      // Resetar estatísticas se não houver dados
-      if (totalElement) totalElement.textContent = '0';
-      if (avgElement) avgElement.textContent = '0';
-      if (normalElement) normalElement.textContent = '0';
+      // Contar leituras normais (assumindo que valores entre 10-50 são normais)
+      const normais = valores.filter(val => val >= 10 && val <= 50).length;
+      document.getElementById('normalReadingsCount').textContent = normais;
     }
-  } catch (error) {
-    console.error('Erro ao atualizar estatísticas:', error);
-    // Resetar estatísticas em caso de erro
-    document.getElementById('totalReadingsCount').textContent = '0';
-    document.getElementById('avgHormonalLevel').textContent = '0';
-    document.getElementById('normalReadingsCount').textContent = '0';
-  }
+  } catch (_) {}
 }

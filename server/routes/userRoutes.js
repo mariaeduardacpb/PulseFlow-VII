@@ -60,6 +60,13 @@ router.get('/perfil', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: 'Usuário não encontrado' });
     }
 
+    // Formatar a URL completa da foto se existir
+    let fotoUrl = user.foto;
+    if (fotoUrl && !fotoUrl.startsWith('http')) {
+      // Se a foto não começa com http, adiciona o protocolo e host
+      fotoUrl = `${req.protocol}://${req.get('host')}${fotoUrl}`;
+    }
+
     res.json({
       nome: user.nome,
       genero: user.genero,
@@ -77,7 +84,7 @@ router.get('/perfil', authMiddleware, async (req, res) => {
       bairro: user.bairro,
       cidade: user.cidade,
       estado: user.estado,
-      foto: user.foto
+      foto: fotoUrl
     });
   } catch (error) {
     res.status(500).json({ message: 'Erro ao buscar perfil do usuário', error: error.message });

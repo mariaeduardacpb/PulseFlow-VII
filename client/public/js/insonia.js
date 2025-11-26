@@ -17,8 +17,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Não precisamos mais gerenciar o toggle aqui
   
   const today = new Date();
-  let currentMonthIndex = 8; // Setembro (0-indexed)
-  const currentYear = 2025;
+  let currentMonthIndex = today.getMonth(); // Mês atual (0-indexed)
+  let currentYear = today.getFullYear(); // Ano atual
 
   function mostrarErro(mensagem) {
     const errorDiv = document.createElement('div');

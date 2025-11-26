@@ -188,8 +188,17 @@ async function carregarDadosMedico() {
         });
 
         // Carregar foto do perfil
+        const profileImage = document.getElementById('profileImage');
         if (medico.foto) {
-            document.getElementById('profileImage').src = medico.foto;
+            console.log('URL da foto recebida:', medico.foto);
+            profileImage.src = medico.foto;
+            profileImage.onerror = () => {
+                console.error('Erro ao carregar imagem:', medico.foto);
+                profileImage.src = '/client/public/assets/user_logo.png';
+            };
+        } else {
+            console.log('Nenhuma foto encontrada, usando imagem padrão');
+            profileImage.src = '/client/public/assets/user_logo.png';
         }
 
         // Limpar e recriar campos RQE
@@ -379,11 +388,11 @@ function preencherFormulario(user) {
         profileImage.src = user.foto;
         profileImage.onerror = () => {
             console.error('Erro ao carregar imagem:', user.foto);
-            profileImage.src = '../public/assets/user_logo.png';
+            profileImage.src = '/client/public/assets/user_logo.png';
         };
     } else {
         console.log('Nenhuma foto encontrada, usando imagem padrão');
-        profileImage.src = '../public/assets/user_logo.png';
+        profileImage.src = '/client/public/assets/user_logo.png';
     }
 }
 

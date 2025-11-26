@@ -138,11 +138,20 @@ async function fetchGlicemiaData(month, year) {
     }
 
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Erro na resposta:', response.status, errorData);
+      
       if (response.status === 404) {
         console.log('Nenhum dado de glicemia encontrado para este período');
         return { data: [], stats: { total: 0, media: 0, normais: 0 } };
       }
-      mostrarErro("Erro ao buscar dados de glicemia!");
+      
+      if (response.status === 403) {
+        mostrarErro(errorData.message || "Acesso negado. Você não tem uma conexão ativa com este paciente.");
+        return null;
+      }
+      
+      mostrarErro(errorData.message || "Erro ao buscar dados de glicemia!");
       return null;
     }
 
@@ -567,29 +576,5 @@ window.debugDiabetes = function() {
     console.log('Dados carregados com sucesso');
   }).catch((error) => {
     console.error('Erro ao carregar dados:', error);
-  });
-};
-
-// Função para simular paciente (apenas para teste)
-window.simularPaciente = function() {
-  const pacienteTeste = {
-    id: "68a3b77a5b36b8a11580651f",
-    nome: "Manuela Tagliatti",
-    cpf: "512.320.568-39",
-    email: "manuellatagliatti@gmail.com",
-    genero: "Feminino",
-    dataNascimento: "2002-10-19T00:00:00.000",
-    nacionalidade: "Brasileiro",
-    telefone: "(19) 98443-6637"
-  };
-  
-  localStorage.setItem('selectedPatient', JSON.stringify(pacienteTeste));
-  console.log('Paciente simulado salvo:', pacienteTeste);
-  
-  // Recarregar dados
-  loadChartData().then(() => {
-    console.log('Dados recarregados com paciente simulado');
-  }).catch((error) => {
-    console.error('Erro ao recarregar dados:', error);
   });
 };

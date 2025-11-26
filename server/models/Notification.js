@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { sendNotificationToUser } from '../services/fcmService.js';
 
 const notificationSchema = new mongoose.Schema(
   {
@@ -45,6 +46,33 @@ const notificationSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+notificationSchema.pre('save', function (next) {
+  this._wasNew = this.isNew;
+  next();
+});
+
+notificationSchema.post('save', async function (doc) {
+  if (!doc._wasNew) {
+    return;
+  }
+
+  try {
+    await sendNotificationToUser(
+      doc.user,
+      doc.userModel,
+      doc.title,
+      doc.description,
+      {
+        type: doc.type || 'updates',
+        link: doc.link || '',
+        notificationId: doc._id?.toString() || ''
+      }
+    );
+  } catch (error) {
+    console.error('Erro ao enviar push da notificação:', error);
+  }
+});
 
 const Notification = mongoose.model('Notification', notificationSchema);
 
