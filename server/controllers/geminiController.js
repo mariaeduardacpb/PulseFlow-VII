@@ -168,7 +168,12 @@ export const buscarTodosDadosPaciente = async (cpf) => {
       enxaqueca,
       cicloMenstrual
     ] = await Promise.all([
-      Diabetes.find({ paciente: paciente._id }).sort({ data: -1 }).limit(30),
+      Diabetes.find({ 
+        $or: [
+          { pacienteId: paciente._id },
+          { paciente: paciente._id }
+        ]
+      }).sort({ data: -1 }).limit(30),
       Insonia.find({ paciente: paciente._id }).sort({ data: -1 }).limit(30),
       PressaoArterial.find({ paciente: paciente._id }).sort({ data: -1 }).limit(30),
       AnotacaoMedica.find({ pacienteId: paciente._id }).sort({ data: -1 }).limit(20),
@@ -189,7 +194,7 @@ export const buscarTodosDadosPaciente = async (cpf) => {
       },
       diabetes: diabetes.map(d => ({
         data: d.data,
-        nivelGlicemia: d.nivelGlicemia || d.glicemia,
+        nivelGlicemia: d.glicemia || d.nivelGlicemia,
         observacoes: d.observacoes
       })),
       insonia: insonia.map(i => ({
@@ -708,7 +713,7 @@ DADOS DO PACIENTE:
 
 ${diabetes.length > 0 ? `
 REGISTROS DE GLICEMIA (últimos ${diabetes.length} registros):
-${diabetes.map(d => `- Data: ${new Date(d.data).toLocaleDateString('pt-BR')}, Glicemia: ${d.nivelGlicemia} mg/dL${d.observacoes ? `, Observações: ${d.observacoes}` : ''}`).join('\n')}
+${diabetes.map(d => `- Data: ${new Date(d.data).toLocaleDateString('pt-BR')}, Glicemia: ${d.glicemia || d.nivelGlicemia || 'N/A'} ${d.unidade || 'mg/dL'}${d.observacoes ? `, Observações: ${d.observacoes}` : ''}`).join('\n')}
 ` : 'Nenhum registro de glicemia encontrado.'}
 
 ${insonia.length > 0 ? `

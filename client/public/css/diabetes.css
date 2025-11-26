@@ -551,15 +551,15 @@ body {
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   position: relative;
-  min-height: 300px;
-  max-height: 400px;
-  height: 350px;
+  min-height: 350px;
+  height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .chart-container canvas {
@@ -568,6 +568,24 @@ body {
   max-width: 100%;
   max-height: 100%;
   display: block;
+  object-fit: contain;
+}
+
+/* Garantir que o gráfico não seja cortado em diferentes tamanhos de tela */
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 16px;
+    min-height: 300px;
+    height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-container {
+    padding: 12px;
+    min-height: 280px;
+    height: 320px;
+  }
 }
 
 /* Empty State Styles - mesmo layout de agendamentos */
@@ -1063,8 +1081,9 @@ body {
   }
   
   .chart-container {
-    padding: 12px;
-    min-height: 250px;
+    padding: 16px;
+    min-height: 300px;
+    height: 350px;
   }
   
   .info-section {

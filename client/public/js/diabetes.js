@@ -175,7 +175,7 @@ function updateMonthLabel() {
 
 // Função para atualizar estatísticas
 function updateStats(data) {
-  const stats = data.stats || {};
+  const stats = data?.stats || {};
   
   const totalElement = document.getElementById('totalReadingsCount');
   const avgElement = document.getElementById('avgGlucoseLevel');
@@ -190,7 +190,8 @@ function updateStats(data) {
   }
   
   if (normalElement) {
-    normalElement.textContent = stats.normais || 0;
+    // Não exibir 0, apenas valores maiores que 0
+    normalElement.textContent = (stats.normais && stats.normais > 0) ? stats.normais : '';
   }
 }
 
@@ -236,6 +237,77 @@ function setupMonthNavigation() {
   }
 }
 
+// Funções auxiliares para calcular limites dinâmicos
+function calculateMinY(dataPoints) {
+  if (!dataPoints || dataPoints.length === 0) return 0;
+  
+  const minValue = Math.min(...dataPoints.map(d => d.y));
+  const maxValue = Math.max(...dataPoints.map(d => d.y));
+  const range = maxValue - minValue;
+  
+  // Se há apenas um ponto ou valores muito próximos, usar padding fixo
+  if (range < 1) {
+    const padding = Math.max(minValue * 0.2, 10); // 20% ou mínimo 10
+    return Math.max(0, Math.floor((minValue - padding) / 10) * 10);
+  }
+  
+  // Adiciona padding de 15% abaixo do valor mínimo
+  const padding = range * 0.15;
+  const minY = Math.max(0, minValue - padding);
+  
+  // Arredonda para baixo para o múltiplo de 10 mais próximo
+  return Math.floor(minY / 10) * 10;
+}
+
+function calculateMaxY(dataPoints) {
+  if (!dataPoints || dataPoints.length === 0) return 200;
+  
+  const minValue = Math.min(...dataPoints.map(d => d.y));
+  const maxValue = Math.max(...dataPoints.map(d => d.y));
+  const range = maxValue - minValue;
+  
+  // Se há apenas um ponto ou valores muito próximos, usar padding fixo
+  if (range < 1) {
+    const padding = Math.max(maxValue * 0.2, 10); // 20% ou mínimo 10
+    return Math.ceil((maxValue + padding) / 10) * 10;
+  }
+  
+  // Adiciona padding de 15% acima do valor máximo
+  const padding = range * 0.15;
+  const maxY = maxValue + padding;
+  
+  // Arredonda para cima para o múltiplo de 10 mais próximo
+  return Math.ceil(maxY / 10) * 10;
+}
+
+function calculateMinX(dataPoints) {
+  if (!dataPoints || dataPoints.length === 0) return 1;
+  
+  const minDay = Math.min(...dataPoints.map(d => d.x));
+  // Adiciona um pouco de espaço à esquerda
+  return Math.max(1, Math.floor(minDay - 1));
+}
+
+function calculateMaxX(dataPoints) {
+  if (!dataPoints || dataPoints.length === 0) return 31;
+  
+  const maxDay = Math.max(...dataPoints.map(d => d.x));
+  // Adiciona um pouco de espaço à direita
+  return Math.min(31, Math.ceil(maxDay + 1));
+}
+
+function calculateYInterval(minY, maxY) {
+  const range = maxY - minY;
+  
+  // Calcula o intervalo ideal baseado na faixa de valores
+  if (range <= 50) return 10;
+  if (range <= 100) return 20;
+  if (range <= 200) return 50;
+  if (range <= 500) return 100;
+  if (range <= 1000) return 200;
+  return 500;
+}
+
 // Função para atualizar gráfico
 function updateChart(data) {
   const chartContainer = document.querySelector('.chart-container');
@@ -271,6 +343,20 @@ function updateChart(data) {
   }));
 
   if (chartGlicemia) {
+    // Calcular limites dinâmicos
+    const minY = calculateMinY(pontos);
+    const maxY = calculateMaxY(pontos);
+    const minX = calculateMinX(pontos);
+    const maxX = calculateMaxX(pontos);
+    const yInterval = calculateYInterval(minY, maxY);
+    
+    // Atualizar configurações do gráfico
+    chartGlicemia.options.scales.y.min = minY;
+    chartGlicemia.options.scales.y.max = maxY;
+    chartGlicemia.options.scales.y.ticks.stepSize = yInterval;
+    chartGlicemia.options.scales.x.min = minX;
+    chartGlicemia.options.scales.x.max = maxX;
+    
     // Verificar se os dados são diferentes antes de atualizar
     const currentData = chartGlicemia.data.datasets[0].data;
     const dataChanged = JSON.stringify(currentData) !== JSON.stringify(pontos);
@@ -279,6 +365,9 @@ function updateChart(data) {
       // Atualizar dados do gráfico
       chartGlicemia.data.datasets[0].data = pontos;
       // Atualizar o gráfico sem animação
+      chartGlicemia.update('none');
+    } else {
+      // Mesmo que os dados não mudaram, atualizar os limites
       chartGlicemia.update('none');
     }
   }
@@ -318,10 +407,10 @@ function initializeChart() {
       },
       layout: {
         padding: {
-          top: 10,
-          bottom: 10,
-          left: 10,
-          right: 10
+          top: 15,
+          bottom: 15,
+          left: 15,
+          right: 15
         }
       },
       plugins: {
@@ -359,10 +448,11 @@ function initializeChart() {
               family: 'Inter',
               size: 12
             },
-            stepSize: 1
+            stepSize: 1,
+            maxTicksLimit: 15 // Limita o número de labels para não ficar muito cheio
           },
-          min: 1,
-          max: 31
+          min: 1, // Será ajustado dinamicamente
+          max: 31 // Será ajustado dinamicamente
         },
         y: {
           grid: {
@@ -377,19 +467,35 @@ function initializeChart() {
             },
             callback: function(value) {
               return `${value} mg/dL`;
-            }
+            },
+            stepSize: 20, // Será ajustado dinamicamente
+            maxTicksLimit: 10 // Limita o número de labels para não ficar muito cheio
           },
-          min: 0,
-          max: 200,
-          beginAtZero: true
+          min: 0, // Será ajustado dinamicamente
+          max: 200, // Será ajustado dinamicamente
+          beginAtZero: false // Não forçar começar do zero para melhor visualização
         }
       },
       interaction: {
         intersect: false,
         mode: 'index'
+      },
+      elements: {
+        point: {
+          radius: 6,
+          hoverRadius: 8,
+          hitRadius: 10
+        }
       }
     }
   });
+}
+
+// Função para redimensionar gráfico
+function resizeChart() {
+  if (chartGlicemia) {
+    chartGlicemia.resize();
+  }
 }
 
 // Função para inicializar página
@@ -405,6 +511,15 @@ async function inicializarPagina() {
     
     // Atualizar label do mês
     updateMonthLabel();
+    
+    // Adicionar listener para redimensionamento da janela
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        resizeChart();
+      }, 250); // Debounce para melhor performance
+    });
     
     // Carregar dados iniciais
     await loadChartData();

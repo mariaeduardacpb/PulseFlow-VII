@@ -3,10 +3,15 @@
 import mongoose from 'mongoose';
 
 const DiabetesSchema = new mongoose.Schema({
+  pacienteId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Paciente',
+    required: false
+  },
   paciente: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Paciente',
-    required: true
+    required: false
   },
   data: {
     type: Date,
