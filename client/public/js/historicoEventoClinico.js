@@ -1,4 +1,4 @@
-import { validateActivePatient, redirectToPatientSelection, handleApiError } from './utils/patientValidation.js';
+import { validateActivePatient, redirectToPatientSelection, handleApiError, getPatientCPF } from './utils/patientValidation.js';
 
 const API_URL = window.API_URL || 'http://localhost:65432';
 
@@ -20,6 +20,24 @@ let eventosPaginaAtual = 1;
 const EVENTOS_POR_PAGINA = 12;
 let ordenacaoAtual = 'dataDesc'; // dataDesc, dataAsc, titulo, especialidade
 let medicoLogadoNome = null; // Nome do médico logado para usar nos cards
+
+function obterPacienteSelecionado() {
+  const possibleKeys = ['pacienteSelecionado', 'selectedPatient', 'selectedPatientData'];
+  for (const key of possibleKeys) {
+    const value = localStorage.getItem(key);
+    if (value) {
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed && typeof parsed === 'object') {
+          return parsed;
+        }
+      } catch (error) {
+        // Ignorar erro de parse e tentar próxima chave
+      }
+    }
+  }
+  return null;
+}
 
 // Função para mostrar mensagem de aviso melhorada
 function mostrarAviso(mensagem, tipo = 'info') {
@@ -734,8 +752,16 @@ function limparFiltros() {
 // Função para carregar eventos clínicos
 async function carregarEventosClinicos() {
   try {
-    const paciente = JSON.parse(localStorage.getItem('pacienteSelecionado'));
-    const cpf = paciente?.cpf;
+    const paciente = obterPacienteSelecionado();
+    const cpfCandidatos = [
+      paciente?.cpf,
+      paciente?.CPF,
+      paciente?.documento,
+      paciente?.dados?.cpf,
+      paciente?.dadosPrincipais?.cpf
+    ].filter(Boolean);
+    const cpfFromPaciente = cpfCandidatos.length > 0 ? cpfCandidatos[0] : null;
+    const cpf = cpfFromPaciente?.replace(/[^\d]/g, '') || getPatientCPF();
 
     if (!cpf) {
       mostrarAviso('Paciente não selecionado.', 'error');
